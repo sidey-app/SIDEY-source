@@ -86,6 +86,7 @@ struct NativeMessageField: NSViewRepresentable {
     let onInputActivity: () -> Void
     let onSubmit: () -> Void
     let onCancel: () -> Void
+    var onTextEdited: (Bool) -> Void = { _ in }
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -145,10 +146,12 @@ struct NativeMessageField: NSViewRepresentable {
         }
 
         func textDidChange(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else { return }
             parent.onInputActivity()
-            guard let textView = notification.object as? NSTextView,
-                  !textView.hasMarkedText()
-            else { return }
+            if textView.hasMarkedText() {
+                parent.onTextEdited(!textView.string.isEmpty)
+                return
+            }
             let candidate = textView.string
             guard MessageValidator.isValidDraft(candidate) else {
                 // Replacing the string emits a synchronous selection-change
@@ -164,6 +167,7 @@ struct NativeMessageField: NSViewRepresentable {
             lastValidText = candidate
             lastValidSelection = textView.selectedRange()
             parent.text = candidate
+            parent.onTextEdited(!candidate.isEmpty)
             (textView as? VerticallyCenteredMessageTextView)?.revealSelection()
         }
 

@@ -21,28 +21,7 @@ cleanup() {
 }
 trap cleanup EXIT HUP INT TERM
 
-SIDEY_DMG_BACKGROUND="$SIDEY_TEST_DIR/dmg-background.png"
-xcrun swift \
-	"$SIDEY_REPO_ROOT/scripts/macos/generate_dmg_background.swift" \
-	"$SIDEY_REPO_ROOT" \
-	"$SIDEY_DMG_BACKGROUND"
-SIDEY_DMG_BACKGROUND_INFO=$(sips -g pixelWidth -g pixelHeight "$SIDEY_DMG_BACKGROUND")
-printf '%s\n' "$SIDEY_DMG_BACKGROUND_INFO" | grep -Eq 'pixelWidth: 660$'
-printf '%s\n' "$SIDEY_DMG_BACKGROUND_INFO" | grep -Eq 'pixelHeight: 420$'
-
-xcodebuild \
-	-project "$SIDEY_REPO_ROOT/macos/SIDEY.xcodeproj" \
-	-scheme SIDEY \
-	-destination 'platform=macOS,arch=arm64' \
-	-derivedDataPath "$SIDEY_TEST_DIR" \
-	-disableAutomaticPackageResolution \
-	SIDEY_RUN_BACKEND_INTEGRATION="${SIDEY_RUN_BACKEND_INTEGRATION:-0}" \
-	SIDEY_SUPABASE_URL="${SIDEY_SUPABASE_URL:-}" \
-	SIDEY_SUPABASE_PUBLISHABLE_KEY="${SIDEY_SUPABASE_PUBLISHABLE_KEY:-}" \
-	test \
-	"$@"
-
-# Each distribution owns separate products even though both executable names are SIDEY.
+# The App Store host owns all common XCTest coverage.
 xcodebuild \
     -project "$SIDEY_REPO_ROOT/macos/SIDEY.xcodeproj" \
     -scheme SIDEYAppStore \
@@ -50,6 +29,9 @@ xcodebuild \
     -derivedDataPath "$SIDEY_TEST_DIR/app-store" \
     -disableAutomaticPackageResolution \
     CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS= \
+    SIDEY_RUN_BACKEND_INTEGRATION="${SIDEY_RUN_BACKEND_INTEGRATION:-0}" \
+    SIDEY_SUPABASE_URL="${SIDEY_SUPABASE_URL:-}" \
+    SIDEY_SUPABASE_PUBLISHABLE_KEY="${SIDEY_SUPABASE_PUBLISHABLE_KEY:-}" \
     test \
     "$@"
 

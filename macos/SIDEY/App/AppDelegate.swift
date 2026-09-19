@@ -4,18 +4,15 @@ import QuartzCore
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var coordinator: AppCoordinator?
-    #if DEBUG && !APP_STORE
+    #if DEBUG
     private var feedbackRoom: CharacterFeedbackDebugRoom?
     #endif
     #if DEBUG
     private var storeReview: StoreReviewDebugWindow?
     #endif
     private let launchProbe = LaunchPerformanceProbe()
-#if APP_STORE
-    private lazy var updateController = NoUpdateController()
-#else
-    private lazy var updateController = SparkleUpdateController()
-#endif
+    private var terminationTimeout: Task<Void, Never>?
+    private var terminationReplySent = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let environment = ProcessInfo.processInfo.environment
@@ -39,7 +36,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         #endif
-        #if DEBUG && !APP_STORE
+        #if DEBUG
         if ProcessInfo.processInfo.arguments.contains(CharacterFeedbackDebugRoom.launchArgument) {
             NSApplication.shared.setActivationPolicy(.regular)
             let room = CharacterFeedbackDebugRoom()
@@ -54,7 +51,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let suiteName = environment["SIDEY_PREFERENCES_SUITE"],
            let defaults = UserDefaults(suiteName: suiteName) {
             coordinator = AppCoordinator(
-                updateController: updateController,
                 preferencesStore: .userDefaults(defaults),
                 legacyMigrator: .none,
                 releaseChannel: releaseChannel,
@@ -65,7 +61,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else if let suiteName = releaseChannel.preferencesSuiteName,
                   let defaults = UserDefaults(suiteName: suiteName) {
             coordinator = AppCoordinator(
-                updateController: updateController,
                 preferencesStore: .userDefaults(defaults),
                 legacyMigrator: .none,
                 releaseChannel: releaseChannel,
@@ -75,7 +70,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             )
         } else {
             coordinator = AppCoordinator(
-                updateController: updateController,
                 releaseChannel: releaseChannel,
                 onLandingFirstFrame: { [weak launchProbe] in
                     launchProbe?.markFirstFrame()
@@ -88,7 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        #if DEBUG && !APP_STORE
+        #if DEBUG
         if feedbackRoom != nil {
             if feedbackRoom?.window?.isVisible != true { feedbackRoom = CharacterFeedbackDebugRoom() }
             feedbackRoom?.showWindow(nil)
@@ -109,6 +103,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         for url in urls where coordinator?.handleOpenURL(url) == true {
             return
         }
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard let shutdown = coordinator?.shutdown() else { return .terminateNow }
+        guard terminationTimeout == nil else { return .terminateLater }
+        terminationTimeout = Task { [weak self] in
+            do { try await Task.sleep(for: .seconds(3)) }
+            catch { return }
+            shutdown.cancel()
+            self?.finishTermination(sender)
+        }
+        Task { [weak self] in
+            await shutdown.value
+            self?.finishTermination(sender)
+        }
+        return .terminateLater
+    }
+
+    private func finishTermination(_ sender: NSApplication) {
+        guard !terminationReplySent else { return }
+        terminationReplySent = true
+        terminationTimeout?.cancel()
+        terminationTimeout = nil
+        sender.reply(toApplicationShouldTerminate: true)
     }
 
     func applicationWillTerminate(_ notification: Notification) {

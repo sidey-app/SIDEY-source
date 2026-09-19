@@ -256,21 +256,6 @@ struct DatabaseCommerceState: Codable, Sendable {
     }
 }
 
-struct CommerceOrderRequest: Encodable, Sendable {
-    let productID: String
-    enum CodingKeys: String, CodingKey { case productID = "product_id" }
-}
-
-struct CommerceOrderResponse: Decodable, Sendable {
-    let orderID: UUID
-    let checkoutURL: URL
-
-    enum CodingKeys: String, CodingKey {
-        case orderID = "order_id"
-        case checkoutURL = "checkout_url"
-    }
-}
-
 struct DatabaseMessage: Codable, Sendable {
     let id: UUID
     let roomID: UUID

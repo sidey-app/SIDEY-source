@@ -180,7 +180,6 @@ struct CommerceProductState: Equatable, Identifiable, Sendable {
 
 enum CommercePurchaseState: Equatable, Sendable {
     case available
-    case googleConnectionRequired
     case openingCheckout
     case confirming
     case owned
@@ -193,7 +192,6 @@ enum CommercePurchaseState: Equatable, Sendable {
     var label: String {
         switch self {
         case .available: "구매 가능"
-        case .googleConnectionRequired: "Google 연결 필요"
         case .openingCheckout: "결제창 여는 중"
         case .confirming: "확인 중"
         case .owned: "보유 중"
@@ -228,18 +226,12 @@ struct CommerceState: Equatable, Sendable {
     var purchaseState: CommercePurchaseState {
         if entitlementStatus == "active" { return .owned }
         if entitlementStatus == "refunded" || latestOrderStatus == "refunded" { return .refunded }
-        return googleConnected ? .available : .googleConnectionRequired
+        return .available
     }
-}
-
-struct CommerceCheckout: Equatable, Sendable {
-    let orderID: UUID
-    let checkoutURL: URL
 }
 
 enum StoreAvailability: Equatable {
     case comingSoon
-    case direct
     case appStore
 
     var allowsCommerceActions: Bool { self != .comingSoon }

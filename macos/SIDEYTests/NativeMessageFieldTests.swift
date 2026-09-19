@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class NativeMessageFieldTests: XCTestCase {
@@ -145,6 +145,34 @@ final class NativeMessageFieldTests: XCTestCase {
         }
 
         XCTAssertEqual(boundDraft, draft)
+    }
+
+    func testIMEPasteAndDeletionReportEditsButSelectionDoesNot() {
+        let (_, textView) = makeTextView(width: 240, height: 40)
+        var draft = ""
+        var edited: [Bool] = []
+        let field = NativeMessageField(
+            text: Binding(get: { draft }, set: { draft = $0 }),
+            onInputActivity: {}, onSubmit: {}, onCancel: {},
+            onTextEdited: { edited.append($0) }
+        )
+        let coordinator = field.makeCoordinator()
+        textView.delegate = coordinator
+        textView.setMarkedText("ㅎ", selectedRange: NSRange(location: 1, length: 0),
+                               replacementRange: NSRange(location: NSNotFound, length: 0))
+        coordinator.textDidChange(Notification(name: NSText.didChangeNotification, object: textView))
+        XCTAssertEqual(edited.last, true)
+        XCTAssertEqual(draft, "", "IME marked text must not prematurely commit the draft")
+        textView.unmarkText()
+        textView.string = "한글 붙여넣기"
+        coordinator.textDidChange(Notification(name: NSText.didChangeNotification, object: textView))
+        XCTAssertEqual(draft, "한글 붙여넣기")
+        let editCount = edited.count
+        coordinator.textViewDidChangeSelection(Notification(name: NSTextView.didChangeSelectionNotification, object: textView))
+        XCTAssertEqual(edited.count, editCount)
+        textView.string = ""
+        coordinator.textDidChange(Notification(name: NSText.didChangeNotification, object: textView))
+        XCTAssertEqual(edited.last, false)
     }
 
     private func makeTextView(

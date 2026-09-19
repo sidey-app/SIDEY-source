@@ -1,9 +1,5 @@
 import XCTest
-#if APP_STORE
 @testable import SIDEYAppStore
-#else
-@testable import SIDEY
-#endif
 
 @MainActor
 final class TreeMovementTests: XCTestCase {
@@ -117,10 +113,10 @@ final class TreeMovementTests: XCTestCase {
     }
 
     func testAuthenticationTransitionCancelsAndDrainsOldRequestWithoutClearingNewOne() async throws {
-        let coordinator = AppCoordinator(updateController: NoUpdateController(),
+        let coordinator = AppCoordinator(
             preferencesStore: PreferencesStore(load: { .defaults }, save: { _ in }),
             legacyMigrator: .none, keychainAccessSession: KeychainAccessSession(),
-            releaseChannel: .development, arguments: [])
+            releaseChannel: .staging, arguments: [])
         let me = UUID()
         coordinator.model.currentUserID = me
         coordinator.model.treeMovement.accept(userID: me, paused: true, revision: 3)

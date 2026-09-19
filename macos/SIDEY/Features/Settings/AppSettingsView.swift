@@ -92,23 +92,6 @@ struct AppSettingsView: View {
                 )
             }
 
-            if !storeAvailability.usesAppStore {
-                SettingsSection(
-                    title: "업데이트",
-                    subtitle: "새로운 SIDEY 버전이 있는지 확인할 수 있습니다.",
-                    systemImage: "arrow.triangle.2.circlepath"
-                ) {
-                    SettingsControlRow(
-                        title: "업데이트 확인",
-                        description: "새 버전이 있으면 안전하게 내려받아 설치할 수 있습니다."
-                    ) {
-                        Button("지금 확인", action: actions.onCheckForUpdates)
-                            .buttonStyle(.glassProminent)
-                            .disabled(!actions.canCheckForUpdates())
-                    }
-                }
-            }
-
             SettingsSection(
                 title: "월드 배치",
                 subtitle: "픽셀 캐릭터를 표시할 화면과 위치를 선택할 수 있습니다.",

@@ -28,13 +28,11 @@ struct OverlayComposerView: View {
                     text: $model.draft,
                     onInputActivity: onInputActivity,
                     onSubmit: send,
-                    onCancel: onCancel
+                    onCancel: onCancel,
+                    onTextEdited: onTypingChanged
                 )
             }
             .frame(maxWidth: .infinity, minHeight: 34, maxHeight: 40)
-            .onChange(of: model.draft) { _, value in
-                onTypingChanged(!MessageValidator.normalized(value).isEmpty)
-            }
 
             Button(action: send) {
                 Image(systemName: "arrow.up.circle.fill")

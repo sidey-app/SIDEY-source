@@ -34,7 +34,7 @@ extension AppCoordinator {
                 let userID = await backend.currentUserID()
                 guard !Task.isCancelled else { return }
                 applyBackendSnapshot(snapshot, currentUserID: userID)
-                if releaseChannel == .appStore, userID != nil {
+                if releaseChannel.requiresAppleAuthentication, userID != nil {
                     await configureAppStoreCommerce(backend: backend)
                 }
                 refreshCommerceState()
@@ -233,6 +233,7 @@ extension AppCoordinator {
     }
 
     func leaveRoom(_ roomID: UUID) {
+        if model.activeRoom?.id == roomID { typingActivity.stop() }
         guard let backend else { return }
         let roomName = model.rooms.first(where: { $0.id == roomID })?.name ?? "그룹"
         runMutation(successMessage: "‘\(roomName)’ 그룹에서 나갔습니다.") {
@@ -241,6 +242,7 @@ extension AppCoordinator {
     }
 
     func deleteRoom(_ roomID: UUID) {
+        if model.activeRoom?.id == roomID { typingActivity.stop() }
         guard let backend else { return }
         let roomName = model.rooms.first(where: { $0.id == roomID })?.name ?? "그룹"
         runMutation(successMessage: "‘\(roomName)’ 그룹을 삭제했습니다.") {
@@ -300,6 +302,7 @@ extension AppCoordinator {
     }
 
     func sendMessage(_ body: String) {
+        typingActivity.stop()
         guard let backend, let roomID = model.activeRoom?.id else {
             model.errorMessage = SideyBackendError.noActiveRoom.localizedDescription
             model.draft = body
@@ -525,29 +528,11 @@ extension AppCoordinator {
     }
 
     func typingChanged(_ active: Bool) {
-        if let roomID = model.activeRoom?.id, let userID = model.currentUserID {
-            model.updateTyping(roomID: roomID, userID: userID, active: active)
+        guard active, let roomID = model.activeRoom?.id else {
+            typingActivity.stop()
+            return
         }
-        guard let backend else { return }
-        let actions = roomSession.typingLease.update(active: active, roomID: model.activeRoom?.id)
-        for action in actions {
-            switch action {
-            case .stop(let stoppedRoomID):
-                roomSession.typingTask?.cancel()
-                roomSession.typingTask = nil
-                Task { try? await backend.broadcastTyping(roomID: stoppedRoomID, event: "typing_stop") }
-            case .start(let startedRoomID):
-                roomSession.typingTask?.cancel()
-                roomSession.typingTask = Task {
-                    try? await backend.broadcastTyping(roomID: startedRoomID, event: "typing_start")
-                    while !Task.isCancelled {
-                        try? await Task.sleep(for: .seconds(2))
-                        guard !Task.isCancelled else { return }
-                        try? await backend.broadcastTyping(roomID: startedRoomID, event: "typing_keepalive")
-                    }
-                }
-            }
-        }
+        typingActivity.edited(roomID: roomID, hasText: true)
     }
 
     func characterDoubleClicked() {

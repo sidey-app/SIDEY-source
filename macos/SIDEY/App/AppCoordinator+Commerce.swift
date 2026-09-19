@@ -80,47 +80,6 @@ extension AppCoordinator {
         }
     }
 
-#if !APP_STORE
-    private func connectGoogleForCommerce(productID: String) {
-        guard releaseChannel.storeAvailability.allowsCommerceActions,
-              let backend,
-              model.commerceProduct(id: productID) != nil,
-              commerceSession.productTasks[productID] == nil,
-              commerceSession.googleConnectionProductID == nil || commerceSession.googleConnectionProductID == productID
-        else { return }
-
-        commerceSession.googleConnectionProductID = productID
-        model.setCommerceWorking(true, productID: productID)
-        model.errorMessage = nil
-        commerceSession.productTasks[productID] = Task { [weak self] in
-            guard let self else { return }
-            var didOpenBrowser = false
-            defer {
-                if !didOpenBrowser {
-                    commerceSession.googleConnectionProductID = nil
-                }
-                model.setCommerceWorking(false, productID: productID)
-                commerceSession.productTasks[productID] = nil
-            }
-            do {
-                let url = try await backend.googleIdentityLinkURL()
-                guard NSWorkspace.shared.open(url) else {
-                    throw SideyBackendError.remote("기본 브라우저를 열지 못했습니다.")
-                }
-                didOpenBrowser = true
-                model.presentSuccess("브라우저에서 Google 계정 연결을 완료해 주세요.")
-            } catch is CancellationError {
-                return
-            } catch {
-                model.setCommercePurchaseState(
-                    .error("Google 연결을 시작하지 못했습니다."),
-                    productID: productID
-                )
-                model.errorMessage = "Google 계정 연결 실패: \(error.localizedDescription)"
-            }
-        }
-    }
-#endif
 
     func purchase(productID: String) {
         guard releaseChannel.storeAvailability.allowsCommerceActions,
@@ -130,13 +89,6 @@ extension AppCoordinator {
               productState.purchaseState != .owned
         else { return }
 
-#if !APP_STORE
-        if !releaseChannel.storeAvailability.usesAppStore,
-           productState.purchaseState == .googleConnectionRequired {
-            connectGoogleForCommerce(productID: productID)
-            return
-        }
-#endif
         guard productState.purchaseState.canStartPurchase else { return }
 
         let product = productState.product
@@ -189,42 +141,7 @@ extension AppCoordinator {
                     }
                     return
                 }
-#if APP_STORE
                 throw SideyBackendError.remote("App Store 배포 구성이 올바르지 않습니다.")
-#else
-                let checkout = try await backend.createCommerceOrder(productID: productID)
-                guard NSWorkspace.shared.open(checkout.checkoutURL) else {
-                    throw SideyBackendError.remote("기본 브라우저를 열지 못했습니다.")
-                }
-                model.setCommercePurchaseState(.confirming, productID: productID)
-
-                for _ in 0..<90 {
-                    try Task.checkCancellation()
-                    try await Task.sleep(for: .seconds(2))
-                    let state = try await backend.commerceState(productID: productID)
-                    if state.purchaseState == .owned {
-                        model.apply(commerceState: state)
-                        let snapshot = try await backend.loadSnapshot()
-                        applyBackendSnapshot(snapshot, currentUserID: model.currentUserID)
-                        model.presentSuccess("\(product.displayName) 구매가 완료되었습니다.")
-                        model.errorMessage = nil
-                        persistPreferences()
-                        return
-                    }
-                    if state.latestOrderStatus == "failed" || state.latestOrderStatus == "canceled" {
-                        model.apply(commerceState: state)
-                        model.setCommercePurchaseState(
-                            .error("결제가 완료되지 않았습니다. 다시 시도해 주세요."),
-                            productID: productID
-                        )
-                        return
-                    }
-                }
-                model.setCommercePurchaseState(
-                    .error("결제 승인 확인 시간이 초과되었습니다. 상점 상태를 다시 확인해 주세요."),
-                    productID: productID
-                )
-#endif
             } catch is CancellationError {
                 return
             } catch {
@@ -241,6 +158,7 @@ extension AppCoordinator {
         guard releaseChannel.requiresAppleAuthentication, let backend,
               !model.accountOperationInProgress else { return }
         model.accountOperationInProgress = true
+        typingActivity.stop()
         let previousTreeTask = cancelTreeMovementRequests()
         model.errorMessage = nil
         Task { [weak self] in
@@ -263,7 +181,7 @@ extension AppCoordinator {
     }
 
     func restoreAppStorePurchases() {
-        guard releaseChannel == .appStore, let backend, let userID = model.currentUserID,
+        guard releaseChannel.requiresAppleAuthentication, let backend, let userID = model.currentUserID,
               !model.accountOperationInProgress else { return }
         model.accountOperationInProgress = true
         model.errorMessage = nil
@@ -285,9 +203,10 @@ extension AppCoordinator {
     }
 
     func deleteAccount(_ payload: AppleAuthorizationPayload) {
-        guard releaseChannel == .appStore, let backend,
+        guard releaseChannel.requiresAppleAuthentication, let backend,
               !model.accountOperationInProgress else { return }
         model.accountOperationInProgress = true
+        typingActivity.stop()
         let previousTreeTask = cancelTreeMovementRequests()
         model.errorMessage = nil
         Task { [weak self] in

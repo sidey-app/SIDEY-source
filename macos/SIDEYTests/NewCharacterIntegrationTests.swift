@@ -1,11 +1,7 @@
 import AppKit
 import SpriteKit
 import XCTest
-#if APP_STORE
 @testable import SIDEYAppStore
-#else
-@testable import SIDEY
-#endif
 
 @MainActor
 final class NewCharacterIntegrationTests: XCTestCase {

@@ -1,5 +1,7 @@
 # Mac App Store 후보 점검 — 2026-09-12
 
+> 아래 내용은 당시 후보와 검증 기록이에요. 현재 macOS는 App Store만 유지하며 Direct·Sidey-dev·DMG 배포 경로는 종료했어요. 과거 설치 경로·직배포 지침은 현재 작업 절차로 사용하지 마세요. 현재 빌드와 테스트는 [macOS 지침](../AGENTS.md)을 따라주세요.
+
 현재 App Store 후보: `macos/appstore-latest`, 마케팅 버전 1.2.1, build 31.
 원숭이 현재 판매 ID는 `character_monkey_solo_4`다. Xcode 기록의 App Store 성공 업로드 27과 공개 직배포 29를 확인해 후보 번호 30을 배정했다. 아래 build 27/28 기록은 이전 시점의 검증이다.
 이 문서는 로컬 구현·검증 상태다. 원격 상품 등록·서버 배포·심사 제출 완료를 뜻하지 않는다.

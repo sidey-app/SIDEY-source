@@ -3,11 +3,7 @@ import AVFoundation
 import CryptoKit
 import SpriteKit
 import XCTest
-#if APP_STORE
 @testable import SIDEYAppStore
-#else
-@testable import SIDEY
-#endif
 
 @MainActor
 final class CharacterImpactAudioTests: XCTestCase {
@@ -180,7 +176,7 @@ final class CharacterImpactAudioTests: XCTestCase {
         XCTAssertEqual(plays, 1, "Overdue frames must not replay stale sounds")
     }
 
-    #if DEBUG && !APP_STORE
+    #if DEBUG
     func testDebugRoomProvidesRealProjectileControlsAndAllChoices() throws {
         let room = CharacterFeedbackDebugRoom()
         defer { room.close() }
@@ -197,7 +193,9 @@ final class CharacterImpactAudioTests: XCTestCase {
         let texture = try XCTUnwrap(sprite.texture(from: room.world))
         let bitmap = NSBitmapImageRep(cgImage: texture.cgImage())
         let png = try XCTUnwrap(bitmap.representation(using: .png, properties: [:]))
-        try png.write(to: URL(fileURLWithPath: "/private/tmp/sidey-feedback-room-scene.png"))
+        let output = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".png")
+        defer { try? FileManager.default.removeItem(at: output) }
+        try png.write(to: output)
     }
     #endif
 

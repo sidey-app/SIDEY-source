@@ -4,9 +4,24 @@ import AppKit
 final class AppCoordinator {
     let model: AppModel
 
+    lazy var typingActivity = makeTypingActivity()
+
+    private func makeTypingActivity() -> TypingActivityController {
+        TypingActivityController(
+            now: { ProcessInfo.processInfo.systemUptime },
+            automaticallySchedule: true,
+            publish: { [weak self] roomID, event in
+                try await self?.backend?.broadcastTyping(roomID: roomID, event: event)
+            },
+            localTyping: { [weak self] roomID, active in
+                guard let self, let userID = model.currentUserID else { return }
+                model.updateTyping(roomID: roomID, userID: userID, active: active)
+            }
+        )
+    }
+
     let preferencesStore: PreferencesStore
     private let legacyMigrator: LegacySettingsMigrator
-    private let updateController: any AppUpdateChecking
     let releaseChannel: AppReleaseChannel
     var backend: SideyBackend?
     private let runtimeConfiguration: RuntimeConfiguration?
@@ -36,8 +51,6 @@ final class AppCoordinator {
             },
             onQuietModeChanged: { [weak self] enabled in self?.setQuietMode(enabled) },
             onLaunchAtLoginChanged: { [weak self] enabled in self?.setLaunchAtLogin(enabled) },
-            onCheckForUpdates: { [weak self] in self?.updateController.checkForUpdates() },
-            canCheckForUpdates: { [weak self] in self?.updateController.canCheckForUpdates ?? false },
             onPurchase: { [weak self] productID in self?.purchase(productID: productID) },
             onRefreshCommerceState: { [weak self] productID in
                 self?.refreshCommerceState(productID: productID)
@@ -91,8 +104,6 @@ final class AppCoordinator {
         onOpenStore: { [weak self] in self?.showStore() },
         onToggleLaunchAtLogin: { [weak self] in self?.setLaunchAtLogin(!(self?.model.launchAtLogin ?? false)) },
         onOpenGroupSettings: { [weak self] in self?.showGroupSettings() },
-        onCheckForUpdates: { [weak self] in self?.updateController.checkForUpdates() },
-        canCheckForUpdates: { [weak self] in self?.updateController.canCheckForUpdates ?? false },
         onOpenSettings: { [weak self] in self?.showSettings() },
         onQuit: { NSApplication.shared.terminate(nil) }
     )
@@ -110,7 +121,6 @@ final class AppCoordinator {
     private let mainThreadProbe = MainThreadPerformanceProbe()
 
     init(
-        updateController: any AppUpdateChecking,
         preferencesStore: PreferencesStore = .live,
         legacyMigrator: LegacySettingsMigrator = .live,
         keychainAccessSession: KeychainAccessSession = .shared,
@@ -118,7 +128,6 @@ final class AppCoordinator {
         arguments: [String] = ProcessInfo.processInfo.arguments,
         onLandingFirstFrame: @escaping () -> Void = {}
     ) {
-        self.updateController = updateController
         self.releaseChannel = releaseChannel
         self.launchAtLoginController = LaunchAtLoginController(mode: releaseChannel.loginItemMode)
         self.preferencesStore = preferencesStore
@@ -222,17 +231,28 @@ final class AppCoordinator {
         showSettings()
     }
 
-    func shutdown() {
+    private var shutdownTask: Task<Void, Never>?
+
+    @discardableResult
+    func shutdown() -> Task<Void, Never>? {
+        if let shutdownTask { return shutdownTask }
         cancelTreeMovementRequests()
         model.treeMovement.reset()
         landingTask?.cancel()
+        typingActivity.stop()
         roomSession.cancel()
         commerceSession.cancel(model: model)
         activityMonitor.stop()
         mainThreadProbe.stop()
-        if let backend { Task { await backend.shutdown() } }
+        let typingActivity = typingActivity
+        let backend = backend
+        shutdownTask = Task {
+            await typingActivity.shutdown()
+            await backend?.shutdown()
+        }
         keychainAccessSession.setAccessDeniedHandler(nil)
         persistPreferences()
+        return shutdownTask
     }
 
     private func showLanding() {
@@ -304,41 +324,7 @@ final class AppCoordinator {
     }
 
     func handleOpenURL(_ url: URL) -> Bool {
-#if APP_STORE
         return false
-#else
-        guard releaseChannel.storeAvailability == .direct,
-              SideyAuthCallback.matches(url),
-              let backend
-        else { return false }
-        showStore()
-        commerceSession.authenticationTask?.cancel()
-        let previousTreeTask = cancelTreeMovementRequests()
-        let targetProductID = commerceSession.googleConnectionProductID
-        commerceSession.authenticationTask = Task { [weak self] in
-            guard let self else { return }
-            defer {
-                commerceSession.googleConnectionProductID = nil
-                commerceSession.authenticationTask = nil
-            }
-            do {
-                await previousTreeTask?.value
-                try await backend.handleAuthCallback(url)
-                refreshCommerceState()
-                model.presentSuccess("Google 계정을 연결했습니다.")
-                model.errorMessage = nil
-            } catch {
-                if let targetProductID {
-                    model.setCommercePurchaseState(
-                        .error("Google 계정 연결을 확인하지 못했습니다."),
-                        productID: targetProductID
-                    )
-                }
-                model.errorMessage = "Google 계정 연결 실패: \(error.localizedDescription)"
-            }
-        }
-        return true
-#endif
     }
 
     private func settingsDidClose() {

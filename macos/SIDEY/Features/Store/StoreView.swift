@@ -83,7 +83,7 @@ struct StoreView: View {
                             StoreLockedProductCard(productState: state) {
                                 selectedProductID = state.id
                             }
-                        case .direct, .appStore:
+                        case .appStore:
                             StoreProductCard(productState: state, actions: actions, availability: availability) {
                                 selectedProductID = state.id
                             }
@@ -164,7 +164,6 @@ struct StoreView: View {
     private var footerHeadline: String {
         switch availability {
         case .comingSoon: "현재 상점은 준비 중입니다. 보유 상품은 계속 사용할 수 있습니다."
-        case .direct: "구매 전 Google 계정 연결이 필요합니다."
         case .appStore: "가격과 결제는 App Store에서 표시하고 처리합니다."
         }
     }

@@ -31,8 +31,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private let onOpenStore: () -> Void
     private let onToggleLaunchAtLogin: () -> Void
     private let onOpenGroupSettings: () -> Void
-    private let onCheckForUpdates: () -> Void
-    private let canCheckForUpdates: () -> Bool
     private let onOpenSettings: () -> Void
     private let onQuit: () -> Void
     private var statusItem: NSStatusItem?
@@ -52,8 +50,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         onOpenStore: @escaping () -> Void = {},
         onToggleLaunchAtLogin: @escaping () -> Void = {},
         onOpenGroupSettings: @escaping () -> Void = {},
-        onCheckForUpdates: @escaping () -> Void = {},
-        canCheckForUpdates: @escaping () -> Bool = { true },
         onOpenSettings: @escaping () -> Void,
         onQuit: @escaping () -> Void
     ) {
@@ -65,8 +61,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         self.onOpenStore = onOpenStore
         self.onToggleLaunchAtLogin = onToggleLaunchAtLogin
         self.onOpenGroupSettings = onOpenGroupSettings
-        self.onCheckForUpdates = onCheckForUpdates
-        self.canCheckForUpdates = canCheckForUpdates
         self.onOpenSettings = onOpenSettings
         self.onQuit = onQuit
     }
@@ -144,11 +138,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(login)
         menu.addItem(.separator())
 
-        let updates = NSMenuItem(title: "업데이트 확인…", action: #selector(checkForUpdates), keyEquivalent: "")
-        updates.target = self
-        updates.isEnabled = canCheckForUpdates()
-        menu.addItem(updates)
-
         let settings = NSMenuItem(title: "설정…", action: #selector(openSettings), keyEquivalent: ",")
         settings.target = self
         menu.addItem(settings)
@@ -158,10 +147,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         quit.target = self
         menu.addItem(quit)
         return menu
-    }
-
-    func menuWillOpen(_ menu: NSMenu) {
-        menu.item(withTitle: "업데이트 확인…")?.isEnabled = canCheckForUpdates()
     }
 
     private func makeRoomsMenu() -> NSMenu {
@@ -205,7 +190,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     @objc private func openStore() { onOpenStore() }
     @objc private func toggleLaunchAtLogin() { onToggleLaunchAtLogin() }
     @objc private func openGroupSettings() { onOpenGroupSettings() }
-    @objc private func checkForUpdates() { onCheckForUpdates() }
     @objc private func openSettings() { onOpenSettings() }
     @objc private func quit() { onQuit() }
 }

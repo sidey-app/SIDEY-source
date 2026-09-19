@@ -1,5 +1,5 @@
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class CommerceModelTests: XCTestCase {
@@ -64,26 +64,16 @@ final class CommerceModelTests: XCTestCase {
         XCTAssertTrue(CommerceCatalog.cosmeticProducts.allSatisfy { $0.characterID == nil })
     }
 
-    func testReleaseChannelHardCodesStoreAvailabilityAndIsolationIdentifiers() {
-        XCTAssertFalse(AppReleaseChannel.production.storeAvailability.allowsCommerceActions)
-        XCTAssertTrue(AppReleaseChannel.production.storeAvailability.allowsCosmeticEquipment)
-        XCTAssertEqual(
-            AppReleaseChannel.production.storeAvailability.unavailableDetailMessage,
-            "상점은 준비 중입니다. 빠른 시일 내에 만나요."
-        )
-        XCTAssertTrue(AppReleaseChannel.development.storeAvailability.allowsCommerceActions)
-        XCTAssertTrue(AppReleaseChannel.development.storeAvailability.allowsCosmeticEquipment)
-        XCTAssertNil(AppReleaseChannel.development.storeAvailability.unavailableDetailMessage)
-        XCTAssertTrue(AppReleaseChannel.appStore.storeAvailability.usesAppStore)
-        XCTAssertTrue(AppReleaseChannel.appStore.storeAvailability.allowsCosmeticEquipment)
-        XCTAssertNil(AppReleaseChannel.appStore.storeAvailability.unavailableDetailMessage)
-        XCTAssertNotEqual(AppReleaseChannel.production.keychainService, AppReleaseChannel.development.keychainService)
-        XCTAssertNotEqual(AppReleaseChannel.production.loginItemMode, AppReleaseChannel.development.loginItemMode)
-        XCTAssertEqual(AppReleaseChannel.appStore.loginItemMode, .mainApp)
-        XCTAssertTrue(AppReleaseChannel.appStore.requiresAppleAuthentication)
-        XCTAssertNil(AppReleaseChannel.production.preferencesSuiteName)
-        XCTAssertEqual(AppReleaseChannel.development.preferencesSuiteName, "app.sidey.desktop.dev")
+    func testAppStoreAndStagingPreserveAuthenticationAndIsolateStorage() {
+        for channel in [AppReleaseChannel.appStore, .staging] {
+            XCTAssertTrue(channel.storeAvailability.usesAppStore)
+            XCTAssertTrue(channel.requiresAppleAuthentication)
+            XCTAssertEqual(channel.loginItemMode, .mainApp)
+        }
+        XCTAssertEqual(AppReleaseChannel.appStore.keychainService, "com.sidey.desktop.appstore")
         XCTAssertEqual(AppReleaseChannel.appStore.preferencesSuiteName, "app.sidey.desktop.appstore")
+        XCTAssertNotEqual(AppReleaseChannel.appStore.keychainService, AppReleaseChannel.staging.keychainService)
+        XCTAssertNotEqual(AppReleaseChannel.appStore.preferencesSuiteName, AppReleaseChannel.staging.preferencesSuiteName)
     }
 
     func testProfileCosmeticsUseOnlySnapshotEntitlementsAndKeepCatalogOrder() {
@@ -144,7 +134,7 @@ final class CommerceModelTests: XCTestCase {
             availability: .comingSoon
         ))
         XCTAssertTrue(ProfileCosmeticEquipmentPolicy.shouldShow(
-            availability: .direct
+            availability: .appStore
         ))
         XCTAssertTrue(ProfileCosmeticEquipmentPolicy.shouldShow(
             availability: .appStore
@@ -367,7 +357,6 @@ final class CommerceModelTests: XCTestCase {
     func testMissingApplePriceNeverDisplaysServerDirectPrice() {
         let state = CommerceProductState(product: .snowflake, purchaseState: .available, isWorking: false)
         XCTAssertEqual(state.priceLabel(for: .appStore), "가격 확인 필요")
-        XCTAssertEqual(state.priceLabel(for: .direct), state.product.formattedPrice)
         XCTAssertNotEqual(state.priceLabel(for: .appStore), state.product.formattedPrice)
     }
 
@@ -433,7 +422,7 @@ final class CommerceModelTests: XCTestCase {
             googleConnected: false,
             entitlementStatus: nil,
             latestOrderStatus: nil
-        ).purchaseState, .googleConnectionRequired)
+        ).purchaseState, .available)
         XCTAssertEqual(CommerceState(
             product: product,
             googleConnected: true,

@@ -1,10 +1,18 @@
 import AppKit
 import SpriteKit
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class WindowPolicyTests: XCTestCase {
+    private func waitForWindowState(_ ready: @escaping @MainActor () -> Bool) async {
+        let condition = expectation(
+            for: NSPredicate { _, _ in MainActor.assumeIsolated { ready() } },
+            evaluatedWith: nil
+        )
+        await fulfillment(of: [condition], timeout: 2)
+    }
+
     func testRightClickSingleWaitsForDoubleClickWindow() async {
         let single = expectation(description: "single right click")
         var doubles = 0
@@ -366,7 +374,7 @@ final class WindowPolicyTests: XCTestCase {
         controller.setVisible(true)
 
         controller.focusMessageField()
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
 
         XCTAssertTrue(controller.isVisible)
         XCTAssertTrue(controller.isKeyWindow)
@@ -401,11 +409,11 @@ final class WindowPolicyTests: XCTestCase {
 
         controller.setVisible(true)
         controller.focusMessageField()
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
         XCTAssertTrue(controller.isKeyWindow)
 
         otherWindow.makeKeyAndOrderFront(nil)
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { otherWindow.isKeyWindow }
 
         XCTAssertEqual(dismissRequests, 0)
         XCTAssertEqual(scheduler.latestDelay, .milliseconds(250))
@@ -440,11 +448,11 @@ final class WindowPolicyTests: XCTestCase {
 
         controller.setVisible(true)
         controller.focusMessageField()
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
         let textView = try XCTUnwrap(controller.messageTextView)
 
         otherWindow.makeKeyAndOrderFront(nil)
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { otherWindow.isKeyWindow }
         XCTAssertTrue(controller.hasPendingFocusLossDismiss)
 
         // Selecting from the character palette can take arbitrarily longer than
@@ -455,7 +463,7 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertEqual(scheduler.scheduleCount, 1)
 
         textView.insertText("👨‍👩‍👧‍👦", replacementRange: textView.selectedRange())
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
         scheduler.fireLatest()
 
         XCTAssertEqual(model.draft, "👨‍👩‍👧‍👦")
@@ -493,9 +501,9 @@ final class WindowPolicyTests: XCTestCase {
 
         controller.setVisible(true)
         controller.focusMessageField()
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
         otherWindow.makeKeyAndOrderFront(nil)
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { otherWindow.isKeyWindow }
 
         scheduler.fireLatest()
         XCTAssertEqual(dismissRequests, 0)
@@ -538,7 +546,7 @@ final class WindowPolicyTests: XCTestCase {
         group.dismissComposer()
 
         XCTAssertEqual(model.draft, "보존할 초안")
-        XCTAssertEqual(typingChanges, [true, false])
+        XCTAssertEqual(typingChanges, [false], "Restoring a draft is not a text edit")
     }
 
     func testComposerDismissesFiveSecondsAfterTheLastSubmittedMessage() {
@@ -685,29 +693,12 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertNil(menu.item(withTitle: "오버레이 잠금 해제"))
         XCTAssertNil(menu.item(withTitle: "오버레이 위치 초기화"))
         XCTAssertNotNil(menu.item(withTitle: "그룹 설정…"))
-        XCTAssertNotNil(menu.item(withTitle: "업데이트 확인…"))
+        XCTAssertNil(menu.item(withTitle: "업데이트 확인…"))
         XCTAssertEqual(menu.item(withTitle: "조용히 모드")?.state, .on)
         XCTAssertEqual(menu.item(withTitle: "로그인 시 자동 실행")?.state, .on)
         let groups = try XCTUnwrap(menu.item(withTitle: "활성 그룹")?.submenu)
         XCTAssertEqual(groups.item(withTitle: "작업방")?.state, .on)
         XCTAssertNotNil(groups.item(withTitle: "친구방 (3)"))
-    }
-
-    func testStatusMenuDisablesUpdateCheckWhileUpdaterIsBusy() {
-        var canCheckForUpdates = false
-        let controller = StatusItemController(
-            onToggleOverlay: {},
-            canCheckForUpdates: { canCheckForUpdates },
-            onOpenSettings: {},
-            onQuit: {}
-        )
-
-        let menu = controller.makeMenu()
-        XCTAssertEqual(menu.item(withTitle: "업데이트 확인…")?.isEnabled, false)
-
-        canCheckForUpdates = true
-        controller.menuWillOpen(menu)
-        XCTAssertEqual(menu.item(withTitle: "업데이트 확인…")?.isEnabled, true)
     }
 
     func testStatusItemUsesTemplateHamsterAssetsForReadAndUnreadStates() throws {

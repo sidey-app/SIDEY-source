@@ -1,7 +1,7 @@
 import AppKit
 import SpriteKit
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class PixelWorldTests: XCTestCase {

@@ -2,7 +2,7 @@ import AppKit
 import SpriteKit
 import SwiftUI
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class StorePreviewTests: XCTestCase {
@@ -341,7 +341,7 @@ final class StorePreviewTests: XCTestCase {
     }
 
     func testDetailSheetUsesBoundedScrollableViewport() {
-        for availability in [StoreAvailability.comingSoon, .direct, .appStore] {
+        for availability in [StoreAvailability.comingSoon, .appStore] {
             for product in CommerceCatalog.characterProducts + [.bunnyPinkBubble] {
                 let state = CommerceProductState(
                     product: product,
@@ -542,7 +542,7 @@ final class StorePreviewTests: XCTestCase {
         XCTAssertTrue(StoreProductDetailSheet(
             productState: state,
             actions: .empty,
-            availability: .direct,
+            availability: .appStore,
             onClose: {}
         ).displaysCommerceAction)
     }

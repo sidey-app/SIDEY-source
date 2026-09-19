@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 final class MessageHistoryTests: XCTestCase {
     func testPageMapperHandlesZeroThroughFiftyOneRows() throws {

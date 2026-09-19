@@ -265,9 +265,6 @@ final class OverlayWindowGroup {
         worldWindow.setComposerVisible(true)
         interactionWindow.setVisible(true)
         interactionWindow.focusMessageField()
-        if !MessageValidator.normalized(model.draft).isEmpty {
-            onTypingChanged(true)
-        }
     }
 
     func dismissComposer() {
