@@ -347,7 +347,6 @@ def local_checks(root, platform):
             '-X',
             'utf8',
             'scripts/skills/verify_release_consistency.py',
-            '--allow-pending-appcast',
             '--allow-unreleased-source',
             capture=False,
         )

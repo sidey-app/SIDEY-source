@@ -7,7 +7,8 @@ presence, typing과 짧은 메시지를 보여 주는 초대 전용 desktop ambi
 
 ## 현재 제품 경계
 
-- macOS와 Windows 네이티브 클라이언트를 제공한다. 정확한 공개 버전과 지원 환경은
+- macOS는 Mac App Store판만 지원하고 Windows 네이티브 클라이언트를 유지한다.
+  배포 채널과 지원 환경은
   [배포 문서](distribution.md)가 가리키는 machine-readable source에서 확인한다.
 - 한 번에 한 private group의 친구를 overlay에 표시한다. 계정과 그룹 계약은
   [identity-and-groups.md](identity-and-groups.md)를 따른다.

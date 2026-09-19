@@ -19,8 +19,6 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--website-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--macos-release-manifest", type=Path, required=True)
-    parser.add_argument("--macos-release-dmg", type=Path, required=True)
     parser.add_argument("--windows-release-manifest", type=Path, required=True)
     parser.add_argument("--windows-release-installer", type=Path, required=True)
     return parser.parse_args()
@@ -74,28 +72,17 @@ def replace_checksum(html: str, platform: str, digest: str) -> str:
 def prepare(
     website_dir: Path,
     output_dir: Path,
-    macos_release_manifest: Path,
-    macos_release_dmg: Path,
     windows_release_manifest: Path,
     windows_release_installer: Path,
-) -> tuple[str, str, str, str]:
+) -> tuple[str, str]:
     website_dir = website_dir.resolve(strict=True)
-    macos_release_manifest = macos_release_manifest.resolve(strict=True)
-    macos_release_dmg = macos_release_dmg.resolve(strict=True)
     windows_release_manifest = windows_release_manifest.resolve(strict=True)
     windows_release_installer = windows_release_installer.resolve(strict=True)
     output_dir = output_dir.resolve()
 
-    macos_manifest = read_manifest(macos_release_manifest, "macos")
     windows_manifest = read_manifest(windows_release_manifest, "windows")
-    macos_version = str(macos_manifest["version"])
     windows_version = str(windows_manifest["version"])
-    macos_name = f"SIDEY-macOS-arm64-v{macos_version}.dmg"
     windows_name = f"SIDEY-Windows-x64-v{windows_version}-Setup.exe"
-    if macos_release_dmg.name != macos_name:
-        raise ValueError(
-            f"macOS release asset filename does not match the public contract: {macos_name}"
-        )
     if windows_release_installer.name != windows_name:
         raise ValueError(
             "Windows release installer filename does not match the public contract: "
@@ -106,12 +93,7 @@ def prepare(
 
     output_dir.mkdir(parents=True, exist_ok=True)
     shutil.copytree(website_dir, output_dir, dirs_exist_ok=True)
-    macos_hash = sha256(macos_release_dmg)
     windows_hash = sha256(windows_release_installer)
-    macos_url = (
-        "https://github.com/sidey-app/SIDEY/releases/download/"
-        f"v{macos_version}/{macos_name}"
-    )
     windows_url = (
         "https://github.com/sidey-app/SIDEY/releases/download/"
         f"windows-v{windows_version}/{windows_name}"
@@ -141,28 +123,23 @@ def prepare(
             href=APP_STORE_URL,
             **{"data-macos-url": APP_STORE_URL, "data-windows-url": windows_url},
         )
-        require_anchor(html, "macos-download-action", href=macos_url)
+        require_anchor(html, "macos-download-action", href=APP_STORE_URL)
         require_anchor(html, "windows-download-action", href=windows_url)
-        html = replace_checksum(html, "macos", macos_hash)
         html = replace_checksum(html, "windows", windows_hash)
         path.write_text(html, encoding="utf-8", newline="\n")
 
-    return macos_version, macos_hash, windows_version, windows_hash
+    return windows_version, windows_hash
 
 
 def main() -> int:
     args = parse_args()
-    macos_version, macos_hash, windows_version, windows_hash = prepare(
+    windows_version, windows_hash = prepare(
         args.website_dir,
         args.output_dir,
-        args.macos_release_manifest,
-        args.macos_release_dmg,
         args.windows_release_manifest,
         args.windows_release_installer,
     )
     print("ReleaseMetadataPrepared=true")
-    print(f"MacOSVersion={macos_version}")
-    print(f"MacOSSHA256={macos_hash}")
     print(f"WindowsVersion={windows_version}")
     print(f"WindowsSHA256={windows_hash}")
     return 0

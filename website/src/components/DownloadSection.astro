@@ -16,11 +16,9 @@ const titleParts = "titleParts" in copy ? copy.titleParts : null;
   <div class="section-heading section-heading-split"><h2 id="download-title">{titleParts ? <PhraseText parts={titleParts} /> : copy.title}</h2><p>{copy.description}</p></div>
   <div class="download-grid">
     <article class="download-card">
-      <span class="platform-label"><img class="platform-logo platform-logo-macos" src={`${import.meta.env.BASE_URL}assets/platforms/macos-dark.svg`} alt="" width="16" height="16">macOS</span><h3>SIDEY v{releases.macos.version}</h3>
-      <div class="download-actions"><DownloadButton label={copy.macButton} platform="macos" id="macos-download-action" href={releases.macos.url} legalNotice locale={locale} /><a class="button button-text" href={releases.macos.notes}>{copy.releaseNotes}<span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span></a></div>
+      <span class="platform-label"><img class="platform-logo platform-logo-macos" src={`${import.meta.env.BASE_URL}assets/platforms/macos-dark.svg`} alt="" width="16" height="16">macOS</span><h3>SIDEY</h3>
+      <div class="download-actions"><DownloadButton label={copy.macButton} platform="macos" id="macos-download-action" href={releases.macos.url} legalNotice locale={locale} /></div>
       <p class="system-note">{copy.macSystem}</p>
-      <Checksum id="macos-download-sha256" value={releases.macos.sha256} copyLabel={copy.hashCopy} copiedAnnouncement={copy.hashCopied} failureAnnouncement={copy.copyFailure} releasePlatform="macos" />
-      <div class="install-box"><strong>{copy.brewTitle}</strong><div class="code-row"><code id="brew-command">brew install --cask sidey-app/tap/sidey</code><button class="copy-button" type="button" data-copy-target="brew-command" data-copy-status="copy-status" data-copy-state="idle" data-copy-announcement={copy.copySuccess} data-copy-failure-announcement={copy.copyFailure} aria-label={copy.copyLabel}><span class="material-symbols-rounded copy-button-icon copy-button-icon-default" aria-hidden="true">content_copy</span><span class="material-symbols-rounded copy-button-icon copy-button-icon-success" aria-hidden="true">check</span></button></div><span class="visually-hidden" id="copy-status" role="status" aria-live="polite"></span></div>
     </article>
     <article class="download-card">
       <span class="platform-label"><img class="platform-logo platform-logo-windows" src={`${import.meta.env.BASE_URL}assets/platforms/windows-dark.svg`} alt="" width="16" height="16">Windows</span><h3>SIDEY v{releases.windows.version}</h3>

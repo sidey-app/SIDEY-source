@@ -30,8 +30,8 @@ ID 또는 metadata 불일치는 오류다.
 
 - Mac App Store판은 StoreKit의 비소모성 상품과 Apple이 반환한 localized price를
   사용한다. Apple에서 상품을 받지 못하면 다른 채널의 가격을 대신 표시하지 않는다.
-- macOS 직접 배포판의 production purchase availability는 build가 결정하며 remote response만으로
-  열리지 않는다. 이미 가진 상품의 장착은 판매 잠금과 별개다.
+- macOS 직접 배포판의 신규 개발·배포는 종료한다. 기존 구매 원본과 지급 권리는
+  보존하며, App Store 전환을 이유로 기존 entitlement를 회수하지 않는다.
 - Windows는 고정된 운영 backend에서 production checkout을 지원한다. 개발 전용 staging
   구매 흐름은 별도의 build 지원과 명시적인 opt-in이 모두 필요하다. 판매 가능 여부는
   서버 상태와 상품별 구매 조건으로 확인하며, 상점이 활성화되면 일괄적인 구매 준비 중

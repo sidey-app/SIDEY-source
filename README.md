@@ -70,26 +70,6 @@ SIDEY는 macOS·Windows 데스크톱 메신저예요. 화면 가장자리의 2D 
   <p>Apple의 심사를 거치므로 업데이트가 느릴 수 있어요.</p>
 </details>
 
-<details>
-  <summary><strong>GitHub에서 .dmg로 다운로드</strong></summary>
-  <br/>
-
-  [SIDEY GitHub 릴리스](https://github.com/sidey-app/SIDEY/releases) 페이지로 이동해 아래로 스크롤하면 **Assets**에 설치 파일이 있어요. 사용 환경에 적합한 파일을 내려 받아 설치할 수 있어요.
-
-</details>
-
-<details>
-  <summary><strong>Homebrew로 설치</strong></summary>
-  <br/>
-
-  [Homebrew](https://brew.sh/)에서 SIDEY를 다운로드할 수 있어요:
-
-  ```sh
-  brew install --cask sidey-app/tap/sidey
-  ```
-
-</details>
-
 ### Windows
 
 **설치 환경:** Windows 10 1809 이상 · x64.

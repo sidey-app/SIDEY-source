@@ -98,45 +98,6 @@ jobs:
           name: pages-website-dist
           path: website/dist
 
-      - name: Verify published macOS release
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $PSNativeCommandUseErrorActionPreference = $true
-          $manifest = Get-Content ./release/macos.json -Raw | ConvertFrom-Json
-          $version = [string]$manifest.version
-          $tag = "v$version"
-          $requiredAssets = @(
-            "SIDEY-macOS-arm64-$tag.dmg",
-            "SIDEY-macOS-arm64-$tag.dmg.sha256",
-            "SIDEY-macOS-arm64-$tag.zip",
-            "SIDEY-macOS-arm64-$tag.zip.sha256"
-          )
-          $release = gh release view $tag --json isDraft,isPrerelease,assets |
-            ConvertFrom-Json
-          if ($release.isDraft -or $release.isPrerelease) {
-            throw "macOS release must be a published regular release: $tag"
-          }
-          $assetNames = @($release.assets | ForEach-Object { [string]$_.name })
-          if ($assetNames.Count -ne $requiredAssets.Count) {
-            throw "macOS release must contain exactly the four expected assets: $tag"
-          }
-          foreach ($asset in $requiredAssets) {
-            if ($assetNames -cnotcontains $asset) {
-              throw "macOS release is missing $asset"
-            }
-          }
-
-          New-Item -ItemType Directory -Path ./build/macos-pages-release -Force |
-            Out-Null
-          gh release download $tag `
-            --pattern $requiredAssets[0] `
-            --dir ./build/macos-pages-release `
-            --clobber
-
       - name: Prepare verified release metadata
         shell: pwsh
         env:
@@ -167,15 +128,9 @@ jobs:
             --dir ./build/windows-pages-release `
             --clobber
 
-          $macOSManifest = Get-Content ./release/macos.json -Raw | ConvertFrom-Json
-          $macOSVersion = [string]$macOSManifest.version
-          $macOSDmgName = "SIDEY-macOS-arm64-v${macOSVersion}.dmg"
-
           python3 ./scripts/pages/prepare_release_metadata.py `
             --website-dir ./website/dist `
             --output-dir ./build/pages-site `
-            --macos-release-manifest ./release/macos.json `
-            --macos-release-dmg "./build/macos-pages-release/$macOSDmgName" `
             --windows-release-manifest ./release/windows.json `
             --windows-release-installer "./build/windows-pages-release/$installerName"
 

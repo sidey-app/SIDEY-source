@@ -1,24 +1,22 @@
-# SIDEY release manifests
+# SIDEY release metadata
 
-`macos.json` and `windows.json` are the authoritative public release metadata for each
-platform. Tags, artifact names, release-note paths, website update manifests, and workflow
-outputs are derived from these files.
+`macos.json` records the Mac App Store target version/build with the `appstore` channel.
+It must match the native project, but does not claim that a candidate has passed review or
+been published. The App Store owns public availability and updates; the website links to
+its product page without advertising a candidate version.
 
-Platform project versions remain embedded in their native build files. The release
-consistency check rejects a change unless those mirrors and the public release note match
-the corresponding manifest. The repeatable cross-platform process is documented in
+`windows.json` is the authoritative public Windows release metadata. Tags, installer names,
+release-note paths, website update manifests and workflow outputs derive from this file.
+The release consistency check validates the corresponding source and public release note.
+The repeatable process is documented in
 [`docs/operations/release.md`](../docs/operations/release.md).
 
 Windows releases are published only by the manually dispatched `Windows Release` workflow
-on `main`. Enter the exact version from `windows.json`; the workflow builds a draft, verifies
-its downloaded Setup EXE, publishes it, and calls the reusable Pages workflow.
+on `main`. It builds a draft, verifies its downloaded Setup EXE, publishes it and calls the
+reusable Pages workflow. Pages verifies only the Windows installer artifact; macOS downloads
+use the Mac App Store.
 
-macOS Developer ID, notarization, and Sparkle keys remain on the release operator's Mac.
-After the staged version change reaches `main`, run `scripts/macos/release_macos.sh`. It publishes
-verified direct-distribution assets and opens separate signed appcast and Homebrew Cask pull
-requests. Set `SIDEY_ARCHIVE_APP_STORE=1` with the App Store environment to also create the
-local App Store archive; submission remains an explicit App Store Connect operation.
-
-The integration and platform diagnostic workflows verify client changes. Backend tests and
-deployment run in the private backend repository. Pages derives public download metadata
-from these manifests and verified release assets.
+macOS supports only the App Store target. Archive creation, App Store Connect upload,
+submission and publication are separate actions. Developer ID DMG releases, Sparkle feeds
+and Homebrew Cask updates are retired. Historical releases and purchase records remain intact.
+Backend tests and deployment run in the private backend repository.

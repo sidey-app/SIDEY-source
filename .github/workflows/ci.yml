@@ -45,7 +45,7 @@ jobs:
       - run: python3 scripts/commerce_catalog.py --target shared --check
       - run: python3 scripts/commerce_catalog.py --target macos --check
       - run: python3 scripts/validate_pixel_assets.py
-      - run: python3 scripts/skills/verify_release_consistency.py --allow-pending-appcast --allow-unreleased-source
+      - run: python3 scripts/skills/verify_release_consistency.py --allow-unreleased-source
 
   macos:
     name: macOS build and tests

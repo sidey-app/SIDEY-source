@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SEMVER = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
-SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
+APP_STORE_URL = "https://apps.apple.com/kr/app/sidey/id6808528060"
 RELEASES_URL = "https://github.com/sidey-app/SIDEY/releases"
 README_PATHS = ("README.md",) + tuple(
     f"docs/readme/README.{language}.md"
@@ -48,10 +48,14 @@ def validate_readme_release_links(platform: str) -> None:
     for path in README_PATHS:
         require((ROOT / path).is_file(), f"README translation is missing: {path}")
         display = release_display(platform, path)
-        official_link = re.escape(RELEASES_URL)
+        expected_url = APP_STORE_URL if platform == "macos" else RELEASES_URL
+        official_link = re.escape(expected_url)
         require(re.search(rf'\]\({official_link}\)|href=[\"\']{official_link}[\"\']',
                           display) is not None,
-                f"{path} {platform} installation must link to {RELEASES_URL}")
+                f"{path} {platform} installation must link to {expected_url}")
+        if platform == "macos":
+            require(not re.search(r"\.dmg|Homebrew|brew install|/releases", display, re.I),
+                    f"{path} macOS installation must use only the Mac App Store")
         urls = re.findall(r'https?://[^\s<>\"\'`)\]]+', display)
         require(all(url == RELEASES_URL for url in urls if "/releases" in url),
                 f"{path} {platform} installation has a noncanonical or versioned release URL")
@@ -69,7 +73,9 @@ def load_manifest(platform: str) -> dict[str, object]:
     require(set(data) == required, f"{path} must contain exactly {sorted(required)}")
     require(data["schema"] == 1, f"{path} has an unsupported schema")
     require(data["platform"] == platform, f"{path} has the wrong platform")
-    require(data["channel"] == "production", f"{path} must use the production channel")
+    expected_channel = "appstore" if platform == "macos" else "production"
+    require(data["channel"] == expected_channel,
+            f"{path} must use the {expected_channel} channel")
     require(
         isinstance(data["version"], str) and SEMVER.fullmatch(data["version"]),
         f"{path} must contain a stable semantic version",
@@ -114,83 +120,23 @@ def project_value_for_bundle_identifier(
     )))
 
 
-def validate_macos(allow_pending_appcast: bool = False) -> dict[str, str]:
+def validate_macos() -> dict[str, str]:
     manifest = load_manifest("macos")
     version = str(manifest["version"])
     build = str(manifest["build"])
-    tag = f"v{version}"
-    dmg_name = f"SIDEY-macOS-arm64-{tag}.dmg"
-    zip_name = f"SIDEY-macOS-arm64-{tag}.zip"
-    notes = f"docs/releases/{tag}.md"
-
     project = read("macos/SIDEY.xcodeproj/project.pbxproj")
-    direct_bundle = "$(SIDEY_APP_BUNDLE_IDENTIFIER)"
-    require(project_value_for_bundle_identifier(
-        project, direct_bundle, "MARKETING_VERSION"
-    ) == version,
-            "macOS project version does not match release/macos.json")
-    require(project_value_for_bundle_identifier(
-        project, direct_bundle, "CURRENT_PROJECT_VERSION"
-    ) == build,
-            "macOS project build does not match release/macos.json")
-    app_store_bundle = "app.sidey.desktop.appstore"
-    app_store_version = project_value_for_bundle_identifier(
-        project, app_store_bundle, "MARKETING_VERSION"
-    )
-    app_store_build = project_value_for_bundle_identifier(
-        project, app_store_bundle, "CURRENT_PROJECT_VERSION"
-    )
-    require(SEMVER.fullmatch(app_store_version) is not None,
-            "Mac App Store target must contain a stable semantic version")
-    require(app_store_build.isdigit() and int(app_store_build) > 0,
-            "Mac App Store target must contain a positive numeric build")
-    require((ROOT / notes).is_file(), f"macOS release notes are missing: {notes}")
-
-    appcast_path = ROOT / "updates" / "appcast.xml"
-    appcast_text = appcast_path.read_text(encoding="utf-8")
-    appcast = ET.fromstring(appcast_text)
-    item = appcast.find("./channel/item")
-    require(item is not None, "Sparkle appcast has no release item")
-    appcast_version = item.findtext(f"{{{SPARKLE}}}shortVersionString") or ""
-    appcast_build = item.findtext(f"{{{SPARKLE}}}version") or ""
-    appcast_is_current = appcast_version == version and appcast_build == build
-    if not appcast_is_current:
-        require(allow_pending_appcast,
-                "Sparkle appcast version does not match release/macos.json")
-        require(SEMVER.fullmatch(appcast_version) is not None and appcast_build.isdigit(),
-                "Sparkle appcast has invalid version metadata")
-        manifest_order = (tuple(map(int, version.split("."))), int(build))
-        appcast_order = (tuple(map(int, appcast_version.split("."))), int(appcast_build))
-        require(appcast_order < manifest_order,
-                "Pending Sparkle appcast must be older than release/macos.json")
-    enclosure = item.find("enclosure")
-    require(enclosure is not None, "Sparkle appcast release has no enclosure")
-    expected_zip_url = (
-        f"https://github.com/sidey-app/SIDEY/releases/download/{tag}/{zip_name}"
-    )
-    if appcast_is_current:
-        require(enclosure.get("url") == expected_zip_url,
-                "Sparkle appcast ZIP URL does not match release/macos.json")
-    require("sparkle-signatures:" in appcast_text, "Sparkle appcast is not signed")
-
+    bundle = "app.sidey.desktop.appstore"
+    require(project_value_for_bundle_identifier(project, bundle, "MARKETING_VERSION") == version,
+            "Mac App Store project version does not match release/macos.json")
+    require(project_value_for_bundle_identifier(project, bundle, "CURRENT_PROJECT_VERSION") == build,
+            "Mac App Store project build does not match release/macos.json")
     release_data = read("website/src/data/releases.ts")
-    require("version: macOSRelease.version" in release_data,
-            "website release data must derive the macOS version from release/macos.json")
-    require("SIDEY-macOS-arm64-v${macOSRelease.version}.dmg" in release_data,
-            "website release data has the wrong macOS DMG URL template")
-    require("releases/tag/v${macOSRelease.version}" in release_data,
-            "website release data has the wrong macOS release URL template")
-
+    require(APP_STORE_URL in release_data and "url: appStoreURL" in release_data,
+            "website macOS installation must use the Mac App Store")
+    require(".dmg" not in release_data,
+            "website release data must not offer retired macOS installers")
     validate_readme_release_links("macos")
-
-    return {
-        "version": version,
-        "build": build,
-        "tag": tag,
-        "dmg_name": dmg_name,
-        "zip_name": zip_name,
-        "release_notes": notes,
-    }
+    return {"version": version, "build": build, "tag": f"appstore-{version}-{build}"}
 
 
 def validate_windows(allow_unreleased_source: bool = False) -> dict[str, str]:
@@ -264,11 +210,6 @@ def main() -> int:
     parser.add_argument("--platform", choices=("all", "macos", "windows"), default="all")
     parser.add_argument("--github-output", type=Path)
     parser.add_argument(
-        "--allow-pending-appcast",
-        action="store_true",
-        help="allow a signed Sparkle item older than the staged macOS manifest",
-    )
-    parser.add_argument(
         "--allow-unreleased-source",
         action="store_true",
         help="allow a Windows source version newer than the current public manifest",
@@ -278,7 +219,7 @@ def main() -> int:
     outputs: dict[str, str] = {}
     try:
         if args.platform in ("all", "macos"):
-            outputs = validate_macos(args.allow_pending_appcast)
+            outputs = validate_macos()
         if args.platform in ("all", "windows"):
             windows = validate_windows(args.allow_unreleased_source)
             outputs = windows if args.platform == "windows" else outputs

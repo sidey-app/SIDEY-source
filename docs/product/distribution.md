@@ -2,30 +2,27 @@
 
 ## 공개 상태의 source of truth
 
-현재 공개 version과 channel은 [`release/macos.json`](../../release/macos.json)과
-[`release/windows.json`](../../release/windows.json)이 소유한다. Release note,
-artifact name, website download metadata와 update manifest는 여기서 파생하거나 일치
-여부를 검사한다. 이 문서에는 version이나 build number를 복제하지 않는다.
+macOS의 App Store target version/build는 [`release/macos.json`](../../release/macos.json)과
+[`macos/SIDEY.xcodeproj/project.pbxproj`](../../macos/SIDEY.xcodeproj/project.pbxproj)가
+일치해야 한다. 이 metadata는 빌드 계약이며 App Store 심사·게시 완료를 뜻하지 않는다.
+공개 설치와 업데이트 가능 여부는 App Store가 결정한다. 웹은 후보 version을 공개
+version으로 표시하지 않고 App Store 제품 페이지로 연결한다.
 
-Platform의 정확한 build 설정도 prose가 아니라 project source를 따른다.
-
-- macOS direct target과 Mac App Store target의 version/build는
-  [`macos/SIDEY.xcodeproj/project.pbxproj`](../../macos/SIDEY.xcodeproj/project.pbxproj)
-  에 있다.
-- Windows target framework, minimum OS contract와 binary version은
-  [`windows/src/Sidey.App/Sidey.App.csproj`](../../windows/src/Sidey.App/Sidey.App.csproj)
-  및 관련 project files에 있다.
+Windows의 공개 version과 channel은 [`release/windows.json`](../../release/windows.json)이
+소유한다. Release note, artifact name, website download metadata와 update manifest는
+여기서 파생하거나 일치 여부를 검사한다. Windows target framework, minimum OS contract와
+binary version은 [`windows/src/Sidey.App/Sidey.App.csproj`](../../windows/src/Sidey.App/Sidey.App.csproj)
+및 관련 project files에 있다.
 
 ## macOS
 
-Developer ID 직접 배포판은 공증 DMG로 설치하고 서명된 Sparkle archive/feed로
-업데이트한다. Homebrew Cask는 같은 공증 artifact를 가리킨다. Mac App Store판은 별도
-product로 빌드하며 App Store가 설치와 update를 담당한다. 두 distribution은 source를
-공유하지만 identity, storage, commerce, entitlement와 signing boundary를 공유하지
-않는다.
+macOS는 Mac App Store판만 개발·지원한다. 설치와 업데이트는 App Store가 담당하며
+구매와 복원은 StoreKit 및 기존 서버 검증을 따른다. 직접 배포 DMG, Sparkle 업데이트와
+Homebrew Cask는 지원하지 않는다. 기존 직접 배포판과 관련된 과거 release 기록, 사용자
+계정·메시지·구매 원본은 보존한다. App Store 설치가 기존 직접 배포판의 Keychain 또는
+sandbox storage를 자동으로 이전한다는 보장은 하지 않는다.
 
-App Store 후보 version/build가 존재해도 공개 manifest나 direct release가 자동으로
-바뀌지 않으며, archive 생성이 submission 또는 review completion을 뜻하지 않는다.
+App Store archive 생성, submission, review와 게시 완료는 별도 단계다.
 
 ## Windows
 
@@ -57,8 +54,8 @@ artifact, update metadata와 release note는 Windows release manifest와 같은 
 
 ## 공개 웹과 release note
 
-공식 website는 공개 release artifact를 확인하고 실제 hash에서 download metadata를
-생성한다. `docs/releases/`는 사용자에게 보이는 각 platform release 결과를 기록하지만
+공식 website는 macOS 설치를 App Store로 연결한다. Windows는 공개 release artifact를
+확인하고 실제 hash에서 download metadata를 생성한다. `docs/releases/`는 사용자에게 보이는 각 platform release 결과를 기록하지만
 현재 version의 source는 아니다. Store upload, public release, website deployment와
 backend deployment는 서로 별도 작업이며 각각 명시적인 승인과 evidence가 필요하다.
 

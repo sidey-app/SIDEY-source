@@ -18,13 +18,13 @@ These instructions apply to `docs/**`. They also govern the root `README.md` whe
 
 - Keep `README.md` as the Korean entry point in its established polite conversational style. Keep English, Japanese, Simplified Chinese, Traditional Chinese, Russian and Ukrainian translations at `docs/readme/README.<locale>.md`, with valid links among all seven editions.
 - Preserve the durable introduction, official website, preview, separate macOS and Windows installation sections, contribution guidance, credits and policy links.
-- Installation sections link to the official GitHub Releases page. Do not duplicate version numbers, build numbers, versioned artifact filenames, update histories or roadmaps in README files.
+- macOS installation links only to the Mac App Store; Windows installation links to the official GitHub Releases page. Do not duplicate version numbers, build numbers, versioned artifact filenames, update histories or roadmaps in README files.
 - Store badges use the repository's official SVG assets. A store badge or availability statement must match a confirmed public product URL and shipped state.
 - Keep development setup, backend architecture, build instructions and internal rollout language out of the public README.
 
 ## Release documentation contract
 
-- `release/macos.json` and `release/windows.json` are the stable public version sources. Platform source files and update feeds are validated mirrors, not alternative prose-owned authorities.
+- `release/macos.json` records the App Store target version/build, not public review or publication status. `release/windows.json` owns the public Windows version. Native project settings and Windows update metadata are validated mirrors.
 - `docs/releases/v<version>.md` is the canonical macOS release body and `docs/releases/windows-v<version>.md` is the canonical Windows release body. Keep platform releases independent and do not copy an unverified change between them.
 - Release notes lead with a short verified user outcome, use the exact `## 변경사항` section, attribute every change bullet to its pull request or direct commit and GitHub author, and end with the exact platform comparison URL. Follow the format and evidence rules in the release-notes skill rather than copying a historical note whose layout may be obsolete.
 - Add installation steps, required warnings or limitations only when the user requests a separate section or verified user action or risk makes the information necessary. Keep implementation details only when users must act on them.

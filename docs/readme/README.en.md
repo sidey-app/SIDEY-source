@@ -70,26 +70,6 @@ SIDEY is a desktop messenger for macOS and Windows that lets you chat with frien
   <p>Updates may take longer to arrive because they go through Apple’s review process.</p>
 </details>
 
-<details>
-  <summary><strong>Download a .dmg from GitHub</strong></summary>
-  <br/>
-
-  Go to [SIDEY’s GitHub releases](https://github.com/sidey-app/SIDEY/releases), scroll down to **Assets**, and download the installer that matches your system.
-
-</details>
-
-<details>
-  <summary><strong>Install with Homebrew</strong></summary>
-  <br/>
-
-  You can install SIDEY with [Homebrew](https://brew.sh/):
-
-  ```sh
-  brew install --cask sidey-app/tap/sidey
-  ```
-
-</details>
-
 ### Windows
 
 **Requirements:** Windows 10 version 1809 or later · x64.

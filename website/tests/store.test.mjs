@@ -434,7 +434,6 @@ test("checkout redirects only after successful server completion", async () => {
   assert.deepEqual(harness.assigned, ["https://sidey-app.github.io/SIDEY/checkout-result/?result=success"]);
   assert.equal(harness.elements["#checkout-pay"].disabled, true);
 });
-
 test("checkout ignores injected API origins and sends tokens only to SIDEY production", async () => {
   const { runInNewContext } = await import("node:vm");
   for (const name of ["checkout", "checkout-result"]) {

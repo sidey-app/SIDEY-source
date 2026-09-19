@@ -649,7 +649,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertTrue(w.app_review_required(
             'macos', [
                 '.github/workflows/macos-build-and-tests.yml',
-                'scripts/macos/package_macos_release.sh',
+                'scripts/macos/archive_app_store.sh',
             ]))
 
     def test_ci_workflow_and_scope_logic_run_every_check(self):

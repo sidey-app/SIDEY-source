@@ -2,9 +2,8 @@
 
 ## 계정
 
-- macOS 직접 배포판은 기존 익명 Supabase session을 복구하며, 지원되는 개발 commerce
-  흐름에서만 같은 사용자 UUID에 외부 identity를 연결한다.
-- Mac App Store판은 Sign in with Apple과 전용 Keychain 경계를 사용한다. 직접 배포판
+- macOS는 Mac App Store판만 지원하며 Sign in with Apple과 전용 Keychain 경계를
+  사용한다. 지원이 종료된 직접 배포판
   계정과 App Store 계정은 자동 이전하거나 병합하지 않는다. 같은 사람이 두 계정으로
   한 방에 참가하면 별도 member로 센다.
 - Windows는 Google 인증을 완료한 뒤 그룹과 메시징을 사용할 수 있다. 저장된 session이
