@@ -8,7 +8,8 @@
   한 방에 참가하면 별도 member로 센다.
 - Windows는 Google 인증을 완료한 뒤 그룹과 메시징을 사용할 수 있다. 저장된 session이
   없는 설치에서는 새 익명 계정을 만들지 않고 Google로 로그인한다. 저장된 session이
-  없는 다른 PC에서도 같은 Google 계정으로 기존 SIDEY 계정에 로그인할 수 있다.
+  없는 다른 PC에서도 같은 Google 계정으로 기존 SIDEY 계정에 로그인할 수 있다. 로그인
+  확인 전에는 저장된 온보딩 완료 설정만으로 방이나 overlay에 진입하지 않는다.
 - Windows의 기존 익명 session은 같은 사용자 UUID에 Google identity를 연결하여
   profile, 그룹과 구매 권리를 보존한다. 이미 다른 SIDEY 계정에 연결된 Google identity를
   자동으로 이전하거나 두 계정을 병합하지 않으며, 충돌이나 취소 시 기존 계정을 삭제하거나
