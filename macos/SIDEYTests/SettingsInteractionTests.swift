@@ -5,6 +5,17 @@ import XCTest
 
 @MainActor
 final class SettingsInteractionTests: XCTestCase {
+    func testLegalLinksUseCanonicalPublicWebsiteRoutes() {
+        XCTAssertEqual(
+            AppSettingsLegalLinks.privacyPolicy.absoluteString,
+            "https://sidey-app.github.io/SIDEY/privacy/"
+        )
+        XCTAssertEqual(
+            AppSettingsLegalLinks.termsOfService.absoluteString,
+            "https://sidey-app.github.io/SIDEY/terms/"
+        )
+    }
+
     func testInviteCopySuccessIsVisibleForThreeSeconds() throws {
         var state = InviteCopyFeedbackState()
 
