@@ -2,7 +2,7 @@
 
 Status: Accepted
 Decided: 2026-09-02 00:57 KST
-Evidence: [commit a03c922](https://github.com/sidey-app/SIDEY/commit/a03c922d72402e61e4cbbd243cfd988e57742271)
+Evidence: [commit a03c922](https://github.com/sidey-app/SIDEY-source/commit/a03c922d72402e61e4cbbd243cfd988e57742271)
 
 ## Context
 

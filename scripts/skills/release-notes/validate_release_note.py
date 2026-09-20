@@ -14,7 +14,7 @@ CHANGES_HEADING = "## 변경사항"
 LOGIN_PATTERN = r"[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?"
 BULLET_PATTERN = re.compile(
     rf"^- (?P<description>.+) \( "
-    rf"(?P<reference>#\d+|[0-9a-f]{{7}}), "
+    rf"(?P<reference>PR \d+|commit [0-9a-f]{{7}}), "
     rf"@(?P<author>{LOGIN_PATTERN}) \)$"
 )
 
@@ -38,7 +38,12 @@ def evidence_attributions(evidence: object) -> dict[str, str]:
         reference = record.get("reference")
         author = record.get("author")
         if isinstance(reference, str) and isinstance(author, str):
-            attributions[reference] = author
+            display_reference = (
+                f"PR {reference[1:]}"
+                if re.fullmatch(r"#\d+", reference)
+                else f"commit {reference}"
+            )
+            attributions[display_reference] = author
     return attributions
 
 
@@ -48,7 +53,7 @@ def validate_note(
     target: str,
     evidence: object | None = None,
 ) -> None:
-    """Validate one release-note body against exact comparison tags."""
+    """Validate one release-note body against exact source-range tags."""
 
     normalized = source.replace("\r\n", "\n").replace("\r", "\n")
     lines = normalized.splitlines()
@@ -71,24 +76,26 @@ def validate_note(
             "Release note needs a final-user summary before 변경사항"
         )
 
-    comparison = (
-        "**전체 변경 내역**: "
-        f"https://github.com/sidey-app/SIDEY/compare/{baseline}...{target}"
-    )
     nonblank = [index for index, line in enumerate(lines) if line.strip()]
-    if not nonblank or lines[nonblank[-1]] != comparison:
+    if not nonblank:
+        raise NoteError("Release note must not be empty")
+    casefolded = normalized.casefold()
+    if "github.com/sidey-app/sidey/compare/" in casefolded:
         raise NoteError(
-            "The exact comparison URL must be the final nonblank line: "
-            f"{comparison}"
+            "Public release notes must not claim a source comparison URL"
         )
-    comparison_index = nonblank[-1]
+    if "github.com/sidey-app/sidey-source" in casefolded:
+        raise NoteError(
+            "Public release notes must not link the private source repository"
+        )
+    note_end = nonblank[-1] + 1
     following_heading = next(
         (
             index
-            for index in range(heading + 1, comparison_index)
+            for index in range(heading + 1, note_end)
             if lines[index].startswith("## ")
         ),
-        comparison_index,
+        note_end,
     )
     bullets = [
         line for line in lines[heading + 1:following_heading] if line.strip()
@@ -100,7 +107,8 @@ def validate_note(
     if invalid:
         raise NoteError(
             "Every change must be one attributed bullet in the form "
-            "'- 변경 사항 ( #123, @author )' or a seven-character commit: "
+            "'- 변경 사항 ( PR 123, @author )' or "
+            "'- 변경 사항 ( commit 1a2b3c4, @author )': "
             + repr(invalid[0])
         )
     if evidence is not None:

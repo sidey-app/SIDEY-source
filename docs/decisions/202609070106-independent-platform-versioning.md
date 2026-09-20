@@ -2,7 +2,7 @@
 
 Status: Accepted
 Decided: 2026-09-07 01:06 KST
-Evidence: [commit 43425d6](https://github.com/sidey-app/SIDEY/commit/43425d61e340c4185bf4c6e94775cef678448010)
+Evidence: [commit 43425d6](https://github.com/sidey-app/SIDEY-source/commit/43425d61e340c4185bf4c6e94775cef678448010)
 
 ## Context
 

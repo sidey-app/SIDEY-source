@@ -12,17 +12,13 @@ SPEC.loader.exec_module(VALIDATOR)
 
 BASE = "windows-v1.3.0"
 TARGET = "windows-v1.3.1"
-COMPARISON = "https://github.com/sidey-app/SIDEY/compare/" f"{BASE}...{TARGET}"
-
-
-def note(heading="## 변경사항", attribution="#108, @patulus"):
+def note(heading="## 변경사항", attribution="PR 108, @patulus"):
     """Return one minimal valid note with replaceable fields."""
 
     return (
         "프로그램 안정성을 개선했어요.\n\n"
         f"{heading}\n\n"
-        f"- 창 크기 변경 문제를 수정했어요. ( {attribution} )\n\n"
-        f"**전체 변경 내역**: {COMPARISON}\n"
+        f"- 창 크기 변경 문제를 수정했어요. ( {attribution} )\n"
     )
 
 
@@ -44,16 +40,32 @@ class ValidateReleaseNoteTests(unittest.TestCase):
         source = "사용자 요청 문구\n\n---\n\n" + note()
         VALIDATOR.validate_note(source, BASE, TARGET, evidence())
 
-    def test_rejects_old_heading_and_wrong_comparison(self):
+    def test_rejects_old_heading_and_public_source_comparison(self):
         with self.assertRaisesRegex(VALIDATOR.NoteError, "one exact"):
             VALIDATOR.validate_note(note(heading="## 변경 사항"), BASE, TARGET)
-        with self.assertRaisesRegex(VALIDATOR.NoteError, "comparison URL"):
-            VALIDATOR.validate_note(note(), BASE, "windows-v1.3.2")
+        comparison = (
+            note()
+            + "\n**전체 변경 내역**: "
+            + "https://github.com/sidey-app/SIDEY/compare/"
+            + f"{BASE}...{TARGET}\n"
+        )
+        with self.assertRaisesRegex(VALIDATOR.NoteError, "must not claim"):
+            VALIDATOR.validate_note(comparison, BASE, TARGET)
+
+    def test_rejects_private_source_links_anywhere_in_public_body(self):
+        source = (
+            note()
+            + "\n## 참고\n\n"
+            + "https://github.com/SIDEY-APP/sidey-SOURCE/pull/108\n"
+        )
+
+        with self.assertRaisesRegex(VALIDATOR.NoteError, "must not link"):
+            VALIDATOR.validate_note(source, BASE, TARGET)
 
     def test_rejects_missing_or_mismatched_attribution(self):
         with self.assertRaisesRegex(VALIDATOR.NoteError, "attributed bullet"):
             VALIDATOR.validate_note(
-                note(attribution="PR 108"),
+                note(attribution="#108"),
                 BASE,
                 TARGET,
             )
@@ -64,6 +76,15 @@ class ValidateReleaseNoteTests(unittest.TestCase):
                 TARGET,
                 evidence("someone-else"),
             )
+
+    def test_accepts_direct_commit_attribution_without_public_link(self):
+        source = note(attribution="commit 1a2b3c4, @patulus")
+        direct_evidence = evidence()
+        direct_evidence["integrations"] = [
+            {"reference": "1a2b3c4", "author": "patulus"},
+        ]
+
+        VALIDATOR.validate_note(source, BASE, TARGET, direct_evidence)
 
 
 if __name__ == "__main__":

@@ -104,6 +104,15 @@ class CollectReleaseEvidenceTests(unittest.TestCase):
             result["net_changed_paths"],
             ["docs/shared.md", "windows/file.cs"],
         )
+        self.assertEqual(
+            result["source_repository"],
+            "sidey-app/SIDEY-source",
+        )
+        self.assertEqual(
+            result["public_release_url"],
+            "https://github.com/sidey-app/SIDEY/releases/tag/"
+            "windows-v1.0.1",
+        )
 
     def test_rejects_multiple_exact_pull_requests(self):
         runner = FakeRunner()

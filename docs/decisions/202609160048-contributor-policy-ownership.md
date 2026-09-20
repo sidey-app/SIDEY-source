@@ -2,7 +2,7 @@
 
 Status: Accepted
 Decided: 2026-09-16 00:48 KST
-Evidence: [commit 5c8a857](https://github.com/sidey-app/SIDEY/commit/5c8a857637f315d2339bd027a2dc3a50ae0d642a)
+Evidence: [commit 5c8a857](https://github.com/sidey-app/SIDEY-source/commit/5c8a857637f315d2339bd027a2dc3a50ae0d642a)
 
 ## Context
 

@@ -2,7 +2,7 @@
 
 Status: Accepted
 Decided: 2026-08-31 15:11 KST
-Evidence: [commit cc36880](https://github.com/sidey-app/SIDEY/commit/cc368804943a8d6833696e4fcd4985bd77a497e6)
+Evidence: [commit cc36880](https://github.com/sidey-app/SIDEY-source/commit/cc368804943a8d6833696e4fcd4985bd77a497e6)
 
 ## Context
 

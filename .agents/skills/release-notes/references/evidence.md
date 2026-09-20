@@ -14,6 +14,8 @@ python3 scripts/skills/release-notes/collect_release_evidence.py --base <previou
 
 The collector is read-only. It follows the target's first-parent history so a traditional merge is represented once and SIDEY's squash integrations remain one record each. It resolves pull requests through GitHub's commit-to-pulls API because SIDEY squash subjects intentionally contain the Korean PR title without a `(#number)` suffix.
 
+Source commit and pull-request evidence comes from the private `sidey-app/SIDEY-source` repository. The public `sidey-app/SIDEY` repository owns release artifacts and URLs but not current source history. Do not substitute public artifact tags for the source comparison range.
+
 If GitHub authentication or commit metadata is unavailable, report `BLOCKED`. Do not fall back to guessing PR numbers from commit messages. More than one exact PR association for one integration is `ACTION REQUIRED`.
 
 ## Inspect and classify
@@ -29,12 +31,12 @@ Normally exclude release-note-only, version bookkeeping, CI-only and internal re
 
 ## Attribution
 
-Use the pull-request opener returned by GitHub for a PR bullet. Do not credit the merging account or `Co-authored-by: codex` as the PR author.
+Use the pull-request opener returned by GitHub for a PR bullet. In the public body, write `PR 108` without `#` so GitHub does not link it to an unrelated public issue or pull request. Do not link the private source repository, and do not credit the merging account or `Co-authored-by: codex` as the PR author.
 
 For a direct commit with no associated pull request, use its seven-character commit ID and GitHub commit-author login:
 
 ```text
-- 변경 사항을 설명해요. ( 3a25b84, @author )
+- 변경 사항을 설명해요. ( commit 3a25b84, @author )
 ```
 
 If GitHub cannot resolve the direct commit to an account, return `ACTION REQUIRED`; do not invent a username. Keep the direct commit in the included or excluded ledger even when no bullet is ultimately needed.

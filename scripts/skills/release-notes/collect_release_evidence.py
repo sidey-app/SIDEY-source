@@ -11,7 +11,8 @@ import subprocess
 import sys
 from typing import Callable, Sequence
 
-REPOSITORY = "sidey-app/SIDEY"
+SOURCE_REPOSITORY = "sidey-app/SIDEY-source"
+PUBLIC_REPOSITORY = "sidey-app/SIDEY"
 CommandRunner = Callable[[Sequence[str], Path], str]
 
 
@@ -197,15 +198,16 @@ def collect_evidence(
     root: Path,
     baseline_reference: str,
     target_reference: str,
-    repository: str = REPOSITORY,
+    repository: str = SOURCE_REPOSITORY,
     target_tag: str | None = None,
+    public_repository: str = PUBLIC_REPOSITORY,
     runner: CommandRunner = run_command,
 ) -> dict[str, object]:
     """Collect normalized first-parent integrations for one release range."""
 
     baseline = resolve_commit(root, baseline_reference, runner)
     target = resolve_commit(root, target_reference, runner)
-    comparison_target = target_tag or target_reference
+    release_target = target_tag or target_reference
     require_ancestor(root, baseline, target, runner)
     commit_source = git(
         root,
@@ -284,20 +286,21 @@ def collect_evidence(
         runner=runner,
     )
     return {
-        "schema_version": 1,
-        "repository": repository,
+        "schema_version": 2,
+        "source_repository": repository,
+        "public_repository": public_repository,
         "baseline": {
             "reference": baseline_reference,
             "commit": baseline,
         },
         "target": {
-            "reference": comparison_target,
+            "reference": release_target,
             "source_reference": target_reference,
             "commit": target,
         },
-        "comparison_url": (
-            f"https://github.com/{repository}/compare/"
-            f"{baseline_reference}...{comparison_target}"
+        "public_release_url": (
+            f"https://github.com/{public_repository}/releases/tag/"
+            f"{release_target}"
         ),
         "net_changed_paths": sorted(
             path for path in net_path_source.split("\0") if path
@@ -319,7 +322,7 @@ def parser() -> argparse.ArgumentParser:
     )
     command.add_argument(
         "--target-tag",
-        help="Expected release tag used in the comparison URL",
+        help="Expected release tag used in the public release URL",
     )
     command.add_argument(
         "--repo-root",
@@ -329,8 +332,19 @@ def parser() -> argparse.ArgumentParser:
     )
     command.add_argument(
         "--repository",
-        default=REPOSITORY,
-        help=f"GitHub owner/repository (default: {REPOSITORY})",
+        default=SOURCE_REPOSITORY,
+        help=(
+            "Private source GitHub owner/repository "
+            f"(default: {SOURCE_REPOSITORY})"
+        ),
+    )
+    command.add_argument(
+        "--public-repository",
+        default=PUBLIC_REPOSITORY,
+        help=(
+            "Public release GitHub owner/repository "
+            f"(default: {PUBLIC_REPOSITORY})"
+        ),
     )
     command.add_argument(
         "--output",
@@ -352,6 +366,7 @@ def main(arguments: Sequence[str] | None = None) -> int:
             options.target,
             options.repository,
             options.target_tag,
+            options.public_repository,
         )
     except CollectionError as error:
         print(f"release evidence error: {error}", file=sys.stderr)

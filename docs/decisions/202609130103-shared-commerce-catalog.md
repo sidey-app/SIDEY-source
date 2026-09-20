@@ -2,7 +2,7 @@
 
 Status: Accepted
 Decided: 2026-09-13 01:03 KST
-Evidence: [commit b256426](https://github.com/sidey-app/SIDEY/commit/b256426f88f34488e251370053e6ba3231964a63)
+Evidence: [commit b256426](https://github.com/sidey-app/SIDEY-source/commit/b256426f88f34488e251370053e6ba3231964a63)
 
 ## Context
 

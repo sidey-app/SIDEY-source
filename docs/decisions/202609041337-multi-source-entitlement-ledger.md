@@ -2,7 +2,7 @@
 
 Status: Accepted
 Decided: 2026-09-04 13:37 KST
-Evidence: [commit 222428b](https://github.com/sidey-app/SIDEY/commit/222428b92579712e7d9e242c1dbc81200f8efcb3)
+Evidence: [commit 222428b](https://github.com/sidey-app/SIDEY-source/commit/222428b92579712e7d9e242c1dbc81200f8efcb3)
 
 ## Context
 

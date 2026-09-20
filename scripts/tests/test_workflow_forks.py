@@ -34,7 +34,16 @@ class ForkRemoteTests(unittest.TestCase):
             "git",
             side_effect=(
                 "origin\nupstream\n",
-                "https://github.com/sidey-app/SIDEY.git",
+                "https://github.com/sidey-app/SIDEY-source.git",
+            ),
+        ), patch.object(
+            workflow,
+            "run",
+            return_value=json.dumps(
+                {
+                    "id": workflow.GITHUB_REPOSITORY_ID,
+                    "full_name": "sidey-app/SIDEY-source",
+                }
             ),
         ):
             self.assertEqual(workflow.main_remote(ROOT), "upstream")
@@ -45,7 +54,16 @@ class ForkRemoteTests(unittest.TestCase):
             "git",
             side_effect=(
                 "origin\n",
-                "git@github.com:sidey-app/SIDEY.git",
+                "git@github.com:sidey-app/SIDEY-source.git",
+            ),
+        ), patch.object(
+            workflow,
+            "run",
+            return_value=json.dumps(
+                {
+                    "id": workflow.GITHUB_REPOSITORY_ID,
+                    "full_name": "sidey-app/SIDEY-source",
+                }
             ),
         ):
             self.assertEqual(workflow.main_remote(ROOT), "origin")
@@ -74,10 +92,61 @@ class ForkRemoteTests(unittest.TestCase):
             side_effect=(
                 "origin\nupstream\n",
                 "https://github.com/not-sidey/not-sidey.git",
-                "https://github.com/sidey-app/SIDEY.git",
+                "https://github.com/sidey-app/SIDEY-source.git",
+            ),
+        ), patch.object(
+            workflow,
+            "run",
+            return_value=json.dumps(
+                {
+                    "id": workflow.GITHUB_REPOSITORY_ID,
+                    "full_name": "sidey-app/SIDEY-source",
+                }
             ),
         ):
             self.assertEqual(workflow.main_remote(ROOT), "origin")
+
+    def test_legacy_name_requires_the_canonical_source_repository_id(self):
+        with patch.object(
+            workflow,
+            "git",
+            side_effect=(
+                "origin\n",
+                "https://github.com/sidey-app/SIDEY.git",
+            ),
+        ), patch.object(
+            workflow,
+            "run",
+            return_value=json.dumps(
+                {
+                    "id": workflow.GITHUB_REPOSITORY_ID,
+                    "full_name": "sidey-app/SIDEY",
+                }
+            ),
+        ):
+            self.assertEqual(workflow.source_repository(ROOT), "sidey-app/SIDEY")
+
+        with patch.object(
+            workflow,
+            "git",
+            side_effect=(
+                "origin\n",
+                "https://github.com/sidey-app/SIDEY.git",
+            ),
+        ), patch.object(
+            workflow,
+            "run",
+            return_value=json.dumps(
+                {
+                    "id": 1378388474,
+                    "full_name": "sidey-app/SIDEY",
+                }
+            ),
+        ), self.assertRaisesRegex(
+            workflow.WorkflowError,
+            "does not identify the canonical",
+        ):
+            workflow.main_remote(ROOT)
 
     def test_fetch_main_refreshes_the_selected_remote(self):
         with (
@@ -136,6 +205,57 @@ class ForkRemoteTests(unittest.TestCase):
         ):
             workflow.github_repository_from_remote(ROOT, "origin")
 
+    def test_publish_head_rejects_stale_public_distribution_push_url(self):
+        with (
+            patch.object(
+                workflow,
+                "github_repository_from_remote",
+                return_value="sidey-app/SIDEY",
+            ),
+            patch.object(
+                workflow,
+                "github_repository_metadata",
+                return_value={
+                    "id": 1378388474,
+                    "full_name": "sidey-app/SIDEY",
+                    "private": False,
+                },
+            ),
+            self.assertRaisesRegex(
+                workflow.WorkflowError,
+                "canonical SIDEY source repository",
+            ),
+        ):
+            workflow.publish_head(ROOT, "origin")
+
+    def test_publish_head_accepts_private_source_fork(self):
+        with (
+            patch.object(
+                workflow,
+                "github_repository_from_remote",
+                return_value="friend/SIDEY-source",
+            ),
+            patch.object(
+                workflow,
+                "github_repository_metadata",
+                return_value={
+                    "id": 987654321,
+                    "full_name": "friend/SIDEY-source",
+                    "private": True,
+                    "parent": {"id": workflow.GITHUB_REPOSITORY_ID},
+                },
+            ),
+            patch.object(
+                workflow,
+                "branch",
+                return_value="shared/readability",
+            ),
+        ):
+            self.assertEqual(
+                workflow.publish_head(ROOT, "fork"),
+                "friend:shared/readability",
+            )
+
     def test_create_head_only_unqualifies_the_canonical_owner(self):
         self.assertEqual(
             workflow.create_head("sidey-app:shared/readability"),
@@ -172,6 +292,7 @@ class ForkPullRequestTests(unittest.TestCase):
             result = workflow.task_prs(
                 ROOT,
                 "outside-contributor:shared/readability",
+                repository="sidey-app/SIDEY-source",
             )
 
         self.assertEqual(
@@ -186,7 +307,7 @@ class ForkPullRequestTests(unittest.TestCase):
             ],
         )
         command = run.call_args.args[1:]
-        self.assertIn("repos/sidey-app/SIDEY/pulls", command)
+        self.assertIn("repos/sidey-app/SIDEY-source/pulls", command)
         self.assertIn(
             "head=outside-contributor:shared/readability",
             command,
@@ -226,6 +347,7 @@ class ForkPullRequestTests(unittest.TestCase):
                 ROOT,
                 "outside-contributor:shared/readability",
                 state="merged",
+                repository="sidey-app/SIDEY-source",
             )
 
         self.assertEqual(len(result), 1)
@@ -280,6 +402,11 @@ class ForkPullRequestTests(unittest.TestCase):
         with (
             patch.object(workflow, "owned_task", return_value=task),
             patch.object(workflow, "dirty_paths", return_value=[]),
+            patch.object(
+                workflow,
+                "source_repository",
+                return_value="sidey-app/SIDEY-source",
+            ),
             patch.object(workflow, "fetch_main", return_value="base"),
             patch.object(workflow, "attest"),
             patch.object(
@@ -341,7 +468,7 @@ class ForkPullRequestTests(unittest.TestCase):
         )
         self.assertEqual(
             create[create.index("--repo") + 1],
-            "sidey-app/SIDEY",
+            "sidey-app/SIDEY-source",
         )
         self.assertEqual(
             create[create.index("--head") + 1],
