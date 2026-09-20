@@ -3,7 +3,7 @@ import AVFoundation
 import CryptoKit
 import SpriteKit
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 @MainActor
 final class CharacterImpactAudioTests: XCTestCase {

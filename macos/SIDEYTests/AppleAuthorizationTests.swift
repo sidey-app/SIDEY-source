@@ -1,7 +1,7 @@
 import AuthenticationServices
 import CryptoKit
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 final class AppleAuthorizationTests: XCTestCase {
     func testPrepareCarriesRawNonceInStateAndHashInNonce() {

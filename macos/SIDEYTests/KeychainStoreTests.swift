@@ -1,7 +1,7 @@
 import LocalAuthentication
 import Security
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 final class KeychainStoreTests: XCTestCase {
     func testDefaultOperationReasonExplainsWhySIDEYUsesKeychain() {

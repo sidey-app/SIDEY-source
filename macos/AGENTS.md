@@ -19,7 +19,7 @@ The `macOS build and tests` job in `.github/workflows/ci.yml` is the canonical a
 ./scripts/macos/tests/test_native.sh
 ```
 
-This route verifies content assets, runs the macOS Python tests, runs all common XCTest coverage in `SIDEYAppStore`, and tests the recording tool. Read narrower scripts before invoking them and do not replace the maintained wrapper with an improvised build command for final evidence.
+This route verifies content assets, runs the macOS Python tests, runs all common XCTest coverage in `SIDEY`, and tests the recording tool. Read narrower scripts before invoking them and do not replace the maintained wrapper with an improvised build command for final evidence.
 
 Signing, notarization, packaging, app launch, Keychain prompts, StoreKit operations, release access, network-backed integration and other machine- or account-state changes require matching user authorization. A successful build does not prove runtime or distribution behavior that was not observed.
 

@@ -24,7 +24,7 @@ trap cleanup EXIT HUP INT TERM
 # The App Store host owns all common XCTest coverage.
 xcodebuild \
     -project "$SIDEY_REPO_ROOT/macos/SIDEY.xcodeproj" \
-    -scheme SIDEYAppStore \
+    -scheme SIDEY \
     -destination 'platform=macOS,arch=arm64' \
     -derivedDataPath "$SIDEY_TEST_DIR/app-store" \
     -disableAutomaticPackageResolution \
