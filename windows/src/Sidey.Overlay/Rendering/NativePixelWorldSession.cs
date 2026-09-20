@@ -93,10 +93,6 @@ public sealed class NativePixelWorldSession : IOverlayHost, IDisposable
     }
 
     public bool IsVisible { get; private set; } = true;
-    public bool HasPresentedFrame => _renderer.HasPresentedFrame;
-
-    public void VerifyMemberVisualsForSmoke(IEnumerable<Guid> expectedIds, byte red, byte green, byte blue) =>
-        _renderer.VerifyMemberVisualsForSmoke(expectedIds, red, green, blue);
 
     public string? ValidationMetricsPath => _metrics?.OutputPath;
 

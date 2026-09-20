@@ -104,66 +104,6 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     }
 
     private void OnAnimationsChanged() => AnimationsChanged?.Invoke();
-    internal async Task VerifyImpactAudioSmokeAsync()
-    {
-        DateTimeOffset deadline = DateTimeOffset.UtcNow.AddSeconds(20);
-        while (!_audio.IsReady && DateTimeOffset.UtcNow < deadline)
-            await Task.Delay(25);
-        if (!_audio.IsReady)
-            throw new InvalidOperationException("Impact smoke: audio worker did not initialize.");
-        var scope = Guid.NewGuid();
-        _audio.SetEnabled(true);
-        try
-        {
-            foreach (string id in ImpactSoundCatalog.Ids)
-            {
-                int completedBefore = await _audio.CompletedPlaybackCountAsync();
-                int previous = _audio.PlaybackStartedCount;
-                _audio.Play(id, scope, Stopwatch.GetTimestamp());
-                var wait = Stopwatch.StartNew();
-                while (_audio.PlaybackStartedCount == previous && wait.Elapsed < TimeSpan.FromSeconds(2))
-                    await Task.Delay(20);
-                if (_audio.PlaybackStartedCount != previous + 1)
-                {
-                    StartupDiagnostics.Stage($"impact-smoke-failed id={id} locked={WindowsActivityMonitor.IsScreenLocked()} {_audio.DiagnosticState}");
-                    throw new InvalidOperationException("Impact smoke: playback failed for " + id);
-                }
-                while (await _audio.CompletedPlaybackCountAsync() == completedBefore && wait.Elapsed < TimeSpan.FromSeconds(2))
-                    await Task.Delay(20);
-                if (await _audio.CompletedPlaybackCountAsync() != completedBefore + 1)
-                    throw new InvalidOperationException("Impact smoke: native buffer did not finish for " + id);
-                // Reproduce a single short hit after an idle interval, not just a burst.
-                await Task.Delay(id == "patch_soft_ball" ? 1500 : 120);
-            }
-            foreach (int volume in new[] { 37, 0, 100 })
-            {
-                _audio.SetVolume(volume);
-                if (!await _audio.VerifyVolumeAsync(volume).WaitAsync(TimeSpan.FromSeconds(3)))
-                    throw new InvalidOperationException("Impact smoke: native volume was not applied.");
-                if (volume == 0)
-                {
-                    int silentCount = _audio.PlaybackStartedCount;
-                    _audio.Play(ImpactSoundCatalog.Ids[0], scope, Stopwatch.GetTimestamp());
-                    await Task.Delay(150);
-                    if (_audio.PlaybackStartedCount != silentCount)
-                        throw new InvalidOperationException("Impact smoke: zero-volume playback.");
-                }
-            }
-            _audio.SetEnabled(false);
-            int mutedCount = _audio.PlaybackStartedCount;
-            _audio.Play(ImpactSoundCatalog.Ids[0], scope, Stopwatch.GetTimestamp());
-            await Task.Delay(150);
-            if (_audio.PlaybackStartedCount != mutedCount)
-                throw new InvalidOperationException("Impact smoke: muted playback.");
-            StartupDiagnostics.Stage($"impact-audio-smoke-complete sounds={ImpactSoundCatalog.Ids.Count} muted=true volume=0,37,100 {_audio.DiagnosticState}");
-        }
-        finally
-        {
-            _audio.StopScope(scope);
-            _audio.SetEnabled(_state.Preferences.CharacterSoundEffectsEnabled);
-            _audio.SetVolume(_state.Preferences.CharacterSoundEffectsVolume);
-        }
-    }
     public void PlayImpactSound(string id, Guid scope, long requestedAt) => _audio.Play(id, scope, requestedAt);
     public void ApplyCharacterSoundEffects(bool enabled, int volume)
     {
@@ -269,7 +209,6 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     public event Action? PulseRequested;
     public event Action<Guid?>? TreeMovementToggleRequested;
     public event Action<Guid>? CharacterThrowRequested;
-    public event Action<string, Exception>? SendFailed;
     public event Action<Exception>? RenderingFailed;
     public event Action? GroupSetupRequested;
     public event Action<string>? LanguageChanged;
@@ -1018,9 +957,10 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         return true;
     }
 
-    public async Task SendMessageAsync(string body, CancellationToken cancellationToken = default)
+    public async Task SendMessageAsync(Guid roomId, string body, CancellationToken cancellationToken = default)
     {
-        if (_state.ActiveRoomId is not { } roomId || _state.Profile is not { } profile)
+        if (_state.ActiveRoomId != roomId || _state.Profile is not { } profile
+            || _state.NeedsOnboarding || _state.GroupOperation != GroupOperation.Idle)
         {
             throw new InvalidOperationException(I18n.Get("composer.activeRoomRequired"));
         }
@@ -1047,16 +987,14 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             _messages.Confirm(confirmed);
             PublishState();
         }
-        catch (Exception exception)
+        catch
         {
+            // Realtime may have confirmed this UUID before the HTTP response was lost.
+            if (_messages.Fail(id) is null)
+                return;
             _bubbles.Remove(id);
-            string? restored = _messages.Fail(id);
             PublishState();
             ApplyWorldSnapshot();
-            if (restored is not null)
-            {
-                SendFailed?.Invoke(restored, exception);
-            }
             throw;
         }
     }
@@ -1099,8 +1037,14 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         {
             Preferences = _state.Preferences with { QuietMode = enabled },
         });
-        await PersistPreferencesAsync(cancellationToken);
         ApplyWorldSnapshot();
+        await PersistPreferencesAsync(cancellationToken);
+    }
+
+    public async Task SetComposerPlacementAsync(ComposerPlacement placement, CancellationToken cancellationToken = default)
+    {
+        SetState(_state with { Preferences = _state.Preferences with { ComposerPlacement = placement } });
+        await PersistPreferencesAsync(cancellationToken);
     }
 
     public async Task SetShowOfflineMembersAsync(
@@ -2035,88 +1979,6 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         }
     }
 
-    internal async Task VerifyStartupOverlaySmokeAsync()
-    {
-        if (_backend is not null || _overlay is not null)
-            throw new InvalidOperationException("Startup overlay smoke requires an isolated, unconnected coordinator.");
-        CoordinatorState saved = _state;
-        var roomId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        PixelCharacterDefinition[] characters = [.. PixelCharacterCatalog.All];
-        RoomMember[] peers = [.. Enumerable.Range(0, 11).Select(index => new RoomMember(Guid.NewGuid(),
-            "친구", characters[index % characters.Length].Id, PresenceState.Offline))];
-        try
-        {
-            _state = CoordinatorState.Initial with
-            {
-                GoogleAuthentication = GoogleAuthenticationState.Verified,
-                Preferences = saved.Preferences with
-                {
-                    OnboardingCompleted = true,
-                    OverlayVisible = true,
-                    ShowOfflineMembers = false,
-                    CachedNickname = "모카",
-                    CachedCharacterId = "pixel_cat",
-                    ActiveRoomId = roomId,
-                }
-            };
-            ShowStartupOverlay();
-            NativePixelWorldSession? initialOverlay = _overlay;
-            var deadline = Stopwatch.StartNew();
-            while (_overlay?.HasPresentedFrame != true && deadline.Elapsed.TotalSeconds < 3)
-                await Task.Delay(20);
-            WorldSnapshot cached = CurrentWorldSnapshot();
-            if (_overlay?.IsVisible != true || !_overlay.HasPresentedFrame || OverlayInteractionConnected
-                || cached.RoomId is not null || cached.Members.Count != 1 || cached.Members[0].Presence != PresenceState.Reconnecting)
-                throw new InvalidOperationException("Cached connecting character was not presented before backend initialization.");
-            _overlay.VerifyMemberVisualsForSmoke(cached.Members.Select(member => member.Id), 142, 142, 147);
-            await Task.Delay(300); // No authentication, room response or live transport is available yet.
-            if (!ReferenceEquals(initialOverlay, _overlay) || _backend is not null)
-                throw new InvalidOperationException("Startup overlay depended on a live backend.");
-            _state = _state with { Preferences = _state.Preferences with { ShowOfflineMembers = true } };
-            ApplySnapshot(new BackendSnapshot(new Profile(userId, "모카", "pixel_cat"),
-                [new Room(roomId, "startup smoke", userId,
-                    [new RoomMember(userId, "모카", "pixel_cat", PresenceState.Offline), .. peers], "", false, 1)],
-                userId, new HashSet<string>()));
-            WorldSnapshot pending = CurrentWorldSnapshot();
-            if (pending.RoomId != roomId || pending.Members.Count != 12
-                || pending.Members.Any(member => member.Presence != PresenceState.Reconnecting)
-                || !pending.Members.Any(member => member.Id == userId && member.IsCurrentUser))
-                throw new InvalidOperationException("Server snapshot did not display all twelve members while connecting.");
-            _overlay.VerifyMemberVisualsForSmoke(pending.Members.Select(member => member.Id), 142, 142, 147);
-            _state = _state with { Preferences = _state.Preferences with { ShowOfflineMembers = false } };
-            ApplyWorldSnapshot();
-            if (CurrentWorldSnapshot().Members.Count != 1)
-                throw new InvalidOperationException("Offline member filtering did not retain only the current user.");
-            _overlay.VerifyMemberVisualsForSmoke([userId], 142, 142, 147);
-            _state = _state with { Preferences = _state.Preferences with { ShowOfflineMembers = true } };
-            SetRealtimeConnection(new RealtimeConnectionStatus(true, true, false));
-            if (!ReferenceEquals(initialOverlay, _overlay) || !OverlayInteractionConnected
-                || CurrentWorldSnapshot().Members.Count != 12
-                || CurrentWorldSnapshot().Members.Single(member => member.IsCurrentUser).Presence != PresenceState.Online
-                || CurrentWorldSnapshot().Members.Where(member => !member.IsCurrentUser).Any(member => member.Presence != PresenceState.Offline))
-                throw new InvalidOperationException("Live transport did not promote the existing overlay to online.");
-            foreach (RoomMember? peer in peers)
-                UpdatePresence(roomId, peer.UserId, PresenceState.Online);
-            ApplyWorldSnapshot();
-            _overlay.VerifyMemberVisualsForSmoke(pending.Members.Select(member => member.Id), 52, 199, 89);
-            SetRealtimeConnection(RealtimeConnectionStatus.Disconnected);
-            _overlay.VerifyMemberVisualsForSmoke(pending.Members.Select(member => member.Id), 142, 142, 147);
-            StartupDiagnostics.Stage("startup-overlay-smoke-complete cached=gray first-frame=true snapshot=gray members=12 connected=green reconnected=gray pixels=verified reused=true");
-        }
-        finally
-        {
-            _overlay?.Dispose();
-            _overlay = null;
-            StopOverlayAudio();
-            _basePresence.Clear();
-            _initialSnapshotReceived = false;
-            _feedbackRoomId = null;
-            _feedbackConnected = false;
-            SetState(saved);
-        }
-    }
-
     private void StartOverlay(WorldSnapshot snapshot, IReadOnlySet<string>? validationIds = null)
     {
         StopOverlayAudio();
@@ -2232,14 +2094,14 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     {
         if (_backend is null && _previewSnapshot is { } preview)
         {
-            return preview with
+            return QuietModeProjection.Apply(preview with
             {
                 Pulses = [.. _pendingPulses],
                 Throws = [.. _pendingThrows],
                 Edge = _state.Preferences.OverlayRegion.Edge,
                 InstallationSeed = _state.Preferences.InstallationSeed,
                 TreeMovementPaused = _state.Preferences.TreeMovementPaused,
-            };
+            }, _state.Preferences.QuietMode);
         }
 
         if (!_initialSnapshotReceived && CachedStartupWorld.Create(_state.Preferences) is { } cached)
@@ -2263,7 +2125,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                 TreeMovementPaused: member.TreeMovementPaused,
                 TreeMovementRevision: member.TreeMovementRevision))
             .ToArray() ?? [];
-        return new WorldSnapshot(
+        return QuietModeProjection.Apply(new WorldSnapshot(
             room?.Id,
             members,
             _state.Preferences.QuietMode ? [] : _bubbles.Bubbles.ToArray(),
@@ -2271,7 +2133,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             [.. _pendingThrows],
             _state.Preferences.OverlayRegion.Edge,
             _state.Preferences.InstallationSeed,
-            _state.Preferences.TreeMovementPaused);
+            _state.Preferences.TreeMovementPaused), _state.Preferences.QuietMode);
     }
 
     private static string? OwnedCosmeticOrNull(

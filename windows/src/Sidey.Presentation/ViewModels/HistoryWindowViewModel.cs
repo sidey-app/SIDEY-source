@@ -23,6 +23,7 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
     private bool _hasMore;
     private bool _isActive;
     private bool _disposed;
+    private readonly bool _ownsComposer;
 
     [ObservableProperty]
     public partial string Title { get; set; } = I18n.Get("history.recentTitle");
@@ -56,11 +57,19 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
     [ObservableProperty]
     public partial bool IsExhaustedVisible { get; set; }
 
-    public HistoryWindowViewModel(IHistoryCoordinator coordinator)
+    public HistoryWindowViewModel(IHistoryCoordinator coordinator, ComposerViewModel? composer = null)
     {
         _coordinator = coordinator ?? throw new ArgumentNullException(nameof(coordinator));
         _state = coordinator.State;
+        _ownsComposer = composer is null;
+        Composer = composer ?? new ComposerViewModel(autoCloseAfterSend: false);
+        ApplyComposerState();
     }
+
+    public ComposerViewModel Composer { get; }
+
+    private void ApplyComposerState() => Composer.ApplyRoom(_state.ActiveRoomId,
+        _state.ActiveRoomId is not null && !_state.NeedsOnboarding && _state.GroupOperation == GroupOperation.Idle);
 
     public ObservableCollection<HistoryEntryViewModel> Items { get; } = [];
 
@@ -74,6 +83,7 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
         ObjectDisposedException.ThrowIf(_disposed, this);
         bool roomChanged = state.ActiveRoomId != _state.ActiveRoomId;
         _state = state;
+        ApplyComposerState();
         if (!_isActive)
         {
             return;
@@ -91,9 +101,7 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
 
     public void RefreshLocalizedText()
     {
-        Title = ActiveRoom() is { } room
-            ? I18n.Format("history.roomTitle", room.Name)
-            : I18n.Get("history.recentTitle");
+        Title = I18n.Get("history.recentTitle");
         RebuildEntries();
         UpdateEmptyState();
     }
@@ -120,6 +128,7 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
         }
 
         _isActive = false;
+        Composer.OnHidden();
         CancelRequest();
         ResetLoadedHistory(roomId: null);
     }
@@ -135,9 +144,7 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
         Guid? roomId = _state.ActiveRoomId;
         CancelRequest();
         ResetLoadedHistory(roomId);
-        Title = ActiveRoom() is { } room
-            ? I18n.Format("history.roomTitle", room.Name)
-            : I18n.Get("history.recentTitle");
+        Title = I18n.Get("history.recentTitle");
         if (roomId is null)
         {
             UpdateEmptyState();
@@ -270,6 +277,9 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
         }
 
         _disposed = true;
+        Composer.OnHidden();
+        if (_ownsComposer)
+            Composer.Dispose();
         _isActive = false;
         CancelRequest();
         _pagedMessages.Clear();

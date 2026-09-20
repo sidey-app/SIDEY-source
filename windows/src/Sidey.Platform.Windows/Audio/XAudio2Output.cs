@@ -58,13 +58,6 @@ internal sealed unsafe class XAudio2Output : IDisposable
     public void SetVolume(int percent) => Marshal.ThrowExceptionForHR(
         ((delegate* unmanaged[Stdcall]<nint, float, uint, int>)Table(_master)[12])(_master, percent / 100f, 0));
 
-    public float GetVolume()
-    {
-        float volume;
-        ((delegate* unmanaged[Stdcall]<nint, float*, void>)Table(_master)[13])(_master, &volume);
-        return volume;
-    }
-
     public static void Play(nint voice, nint data, int length)
     {
         var buffer = new AudioBuffer { Flags = 0x40, AudioBytes = (uint)length, AudioData = data };

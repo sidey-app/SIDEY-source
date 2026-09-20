@@ -45,6 +45,76 @@ public sealed class WindowsBorderlessWindowControllerTests
         using var frame = new WindowsBorderlessWindowController(window);
         Assert.True(DestroyWindow(window));
         frame.Dispose();
+        frame.BeginDrag(10, 10);
+        frame.DragTo(30, 40, 1);
+        frame.EndDrag();
+    }
+
+    [Fact]
+    public void CapturedDragMovesBeforeReleaseAndStopsAfterCancellation()
+    {
+        nint window = CreateWindowEx(0, "STATIC", "SIDEY drag test", 0x00CF0000,
+            100, 100, 400, 100, 0, 0, 0, 0);
+        Assert.NotEqual(nint.Zero, window);
+        try
+        {
+            using var frame = new WindowsBorderlessWindowController(window);
+            frame.BeginDrag(8, 20);
+            frame.DragTo(48, 50, 1);
+            Assert.True(GetWindowRect(window, out Rect duringDrag));
+            Assert.Equal(140, duringDrag.Left);
+            Assert.Equal(130, duringDrag.Top);
+            Assert.Equal(400, duringDrag.Right - duringDrag.Left);
+
+            // The next local point is relative to the window's new location.
+            frame.DragTo(18, 10, 1);
+            Assert.True(GetWindowRect(window, out Rect nextMove));
+            Assert.Equal(150, nextMove.Left);
+            Assert.Equal(120, nextMove.Top);
+
+            frame.EndDrag();
+            frame.DragTo(200, 200, 1);
+            Assert.True(GetWindowRect(window, out Rect afterCancel));
+            Assert.Equal(nextMove.Left, afterCancel.Left);
+            Assert.Equal(nextMove.Top, afterCancel.Top);
+
+            // A new press resets the grab offset, including a changed monitor scale.
+            frame.BeginDrag(4, 12);
+            frame.DragTo(14, 22, 1.5);
+            Assert.True(GetWindowRect(window, out Rect secondDrag));
+            Assert.Equal(165, secondDrag.Left);
+            Assert.Equal(135, secondDrag.Top);
+        }
+        finally
+        {
+            _ = DestroyWindow(window);
+        }
+    }
+
+    [Fact]
+    public void DisplayChangesNotifyWhileAttachedAndStopAfterDisposal()
+    {
+        nint window = CreateWindowEx(0, "STATIC", "SIDEY display test", 0x00CF0000,
+            0, 0, 400, 100, 0, 0, 0, 0);
+        Assert.NotEqual(nint.Zero, window);
+        try
+        {
+            using var frame = new WindowsBorderlessWindowController(window);
+            int notifications = 0;
+            frame.DisplayConfigurationChanged += () => notifications++;
+
+            _ = SendMessage(window, 0x007E, 32, 0);
+            _ = SendMessage(window, 0x001A, 0, 0);
+            Assert.Equal(2, notifications);
+
+            frame.Dispose();
+            _ = SendMessage(window, 0x007E, 32, 0);
+            Assert.Equal(2, notifications);
+        }
+        finally
+        {
+            _ = DestroyWindow(window);
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -67,6 +137,10 @@ public sealed class WindowsBorderlessWindowControllerTests
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool GetClientRect(nint window, out Rect rect);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetWindowRect(nint window, out Rect rect);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

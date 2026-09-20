@@ -27,6 +27,7 @@ public sealed unsafe class NativeOverlayWindow : IDisposable
     private static readonly ConcurrentDictionary<nint, NativeOverlayWindowRole> s_roles = new();
     private static readonly ConcurrentDictionary<nint, Action> s_activations = new();
     private static readonly ConcurrentDictionary<nint, Action> s_doubleClickActivations = new();
+    private static readonly ConcurrentDictionary<nint, LeftClickState> s_leftClicks = new();
     private static readonly ConcurrentDictionary<nint, Action<bool>> s_rightClickActivations = new();
     private static readonly ConcurrentDictionary<nint, uint> s_ownerThreads = new();
     private static readonly ConcurrentDictionary<uint, int> s_threadWindowCounts = new();
@@ -61,6 +62,7 @@ public sealed unsafe class NativeOverlayWindow : IDisposable
         if (doubleClicked is not null)
         {
             s_doubleClickActivations[handleValue] = doubleClicked;
+            s_leftClicks[handleValue] = new LeftClickState();
         }
         if (rightClicked is not null)
         {
@@ -216,6 +218,13 @@ public sealed unsafe class NativeOverlayWindow : IDisposable
         [DllImport("user32.dll")]
         internal static extern uint GetDoubleClickTime();
 
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern nuint SetTimer(nint window, nuint id, uint intervalMilliseconds, nint callback);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool KillTimer(nint window, nuint id);
+
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool IsWindow(nint window);
@@ -293,18 +302,52 @@ public sealed unsafe class NativeOverlayWindow : IDisposable
             return new LRESULT(3); // MA_NOACTIVATE
         }
 
-        if (message == PInvoke.WM_LBUTTONUP
-            && s_activations.TryGetValue((nint)window.Value, out Action? activated))
+        nint handleValue = (nint)window.Value;
+        if (s_leftClicks.TryGetValue(handleValue, out LeftClickState? leftClick))
         {
-            try
+            if (message == 0x0018 && wParam.Value == 0) // WM_SHOWWINDOW: hidden
             {
-                activated();
+                leftClick.Cancel(handleValue);
+                leftClick._ignoreRelease = false;
             }
-            catch (Exception exception)
+            else if (message == 0x0201) // WM_LBUTTONDOWN: a new single-click sequence
             {
-                Trace.TraceError("SIDEY hotspot callback failed: {0}", exception);
+                leftClick._ignoreRelease = false;
             }
+            else if (message == 0x0203) // WM_LBUTTONDBLCLK
+            {
+                leftClick.Cancel(handleValue);
+                leftClick._ignoreRelease = true;
+            }
+            else if (message == PInvoke.WM_LBUTTONUP)
+            {
+                // The first release cannot open the composer before Windows decides
+                // whether this gesture is a double-click. Its final release is ignored.
+                if (leftClick._ignoreRelease)
+                {
+                    leftClick._ignoreRelease = false;
+                    return default;
+                }
+                leftClick.Cancel(handleValue);
+                leftClick._timerId = NativeMethods.SetTimer(handleValue, ++leftClick._nextTimerId,
+                    NativeMethods.GetDoubleClickTime(), nint.Zero);
+                if (leftClick._timerId == 0)
+                {
+                    Trace.TraceError("SIDEY hotspot single-click timer failed: {0}", Marshal.GetLastPInvokeError());
+                }
+                return default;
+            }
+            else if (message == 0x0113 && leftClick._timerId != 0 && wParam.Value == leftClick._timerId) // WM_TIMER
+            {
+                leftClick.Cancel(handleValue);
+                InvokeActivation(handleValue);
+                return default;
+            }
+        }
 
+        if (message == PInvoke.WM_LBUTTONUP)
+        {
+            InvokeActivation(handleValue);
             return default;
         }
 
@@ -350,6 +393,10 @@ public sealed unsafe class NativeOverlayWindow : IDisposable
             s_roles.TryRemove(handle, out _);
             s_activations.TryRemove(handle, out _);
             s_doubleClickActivations.TryRemove(handle, out _);
+            if (s_leftClicks.TryRemove(handle, out LeftClickState? pendingClick))
+            {
+                pendingClick.Cancel(handle);
+            }
             s_rightClickActivations.TryRemove(handle, out _);
             if (s_ownerThreads.TryRemove(handle, out uint ownerThread))
             {
@@ -367,6 +414,37 @@ public sealed unsafe class NativeOverlayWindow : IDisposable
         }
 
         return PInvoke.DefWindowProc(window, message, wParam, lParam);
+    }
+
+    private static void InvokeActivation(nint handle)
+    {
+        if (s_activations.TryGetValue(handle, out Action? activated))
+        {
+            try
+            {
+                activated();
+            }
+            catch (Exception exception)
+            {
+                Trace.TraceError("SIDEY hotspot callback failed: {0}", exception);
+            }
+        }
+    }
+
+    private sealed class LeftClickState
+    {
+        internal nuint _timerId;
+        internal nuint _nextTimerId;
+        internal bool _ignoreRelease;
+
+        internal void Cancel(nint window)
+        {
+            if (_timerId != 0)
+            {
+                NativeMethods.KillTimer(window, _timerId);
+                _timerId = 0;
+            }
+        }
     }
 }
 

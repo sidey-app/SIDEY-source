@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
@@ -65,6 +66,7 @@ public sealed class TrayIconService : IDisposable
 
     private readonly ManualResetEventSlim _started = new(false);
     private readonly Thread _thread;
+    private TrayHotkeys? _hotkeys;
     private nint _window;
     private nint _icon;
     private nint _baseIcon;
@@ -242,6 +244,8 @@ public sealed class TrayIconService : IDisposable
             _ownsUnreadIcon = _unreadIcon != nint.Zero;
             _icon = _baseIcon;
             AddIcon();
+            _hotkeys = new TrayHotkeys(_window);
+            NotifyHotkeyFailures();
             _started.Set();
             while (NativeMethods.GetMessage(out NativeMessage message, nint.Zero, 0, 0) > 0)
             {
@@ -256,6 +260,7 @@ public sealed class TrayIconService : IDisposable
         }
         finally
         {
+            _hotkeys?.Dispose();
             if (_window != nint.Zero)
             {
                 RemoveIcon();
@@ -293,6 +298,27 @@ public sealed class TrayIconService : IDisposable
     {
         NotifyIconData data = CreateIconData();
         NativeMethods.ShellNotifyIcon(2, ref data);
+    }
+
+    private void NotifyHotkeyFailures()
+    {
+        if (_hotkeys is null || _hotkeys.Failures.Count == 0)
+        {
+            return;
+        }
+        foreach (TrayHotkeyFailure failure in _hotkeys.Failures)
+        {
+            Trace.TraceWarning("SIDEY could not register {0}: Win32 error {1}.", failure.Shortcut, failure.ErrorCode);
+        }
+        NotifyIconData data = CreateIconData();
+        data.Flags |= NotifyIconInfo;
+        data.InfoTitle = "SIDEY";
+        data.Info = I18n.Format(
+            "tray.hotkeyRegistrationFailedBody",
+            string.Join(", ", _hotkeys.Failures.Select(failure => failure.Shortcut)));
+        data.InfoFlags = NotifyInfoWarning;
+        _notificationClickCommand = TrayCommand.Open;
+        NativeMethods.ShellNotifyIcon(1, ref data);
     }
 
     private NotifyIconData CreateIconData() => new()
@@ -582,7 +608,7 @@ public sealed class TrayIconService : IDisposable
             menu,
             NativeMenuFlags(isChecked: false, isEnabled: isEnabled),
             (nuint)command,
-            label);
+            TrayHotkeys.MenuLabel(command, label));
     }
 
     private static void AppendToggle(
@@ -596,7 +622,7 @@ public sealed class TrayIconService : IDisposable
             menu,
             NativeMenuFlags(isChecked, isEnabled),
             (nuint)command,
-            label);
+            TrayHotkeys.MenuLabel(command, label));
     }
 
     internal static uint NativeMenuFlags(bool isChecked, bool isEnabled) =>
@@ -633,9 +659,15 @@ public sealed class TrayIconService : IDisposable
 
     private static nint WndProc(nint window, uint message, nint wParam, nint lParam)
     {
-        _ = wParam;
         if (s_instances.TryGetValue(window, out TrayIconService? service))
         {
+            if (message == TrayHotkeys.Message
+                && service._hotkeys is not null
+                && service._hotkeys.TryGetCommand(wParam, out TrayCommand hotkeyCommand))
+            {
+                service.CommandInvoked?.Invoke(hotkeyCommand);
+                return nint.Zero;
+            }
             if (message == TrayMessage)
             {
                 uint mouseMessage = unchecked((uint)(long)lParam) & 0xffff;
@@ -721,6 +753,7 @@ public sealed class TrayIconService : IDisposable
             }
             if (message == 0x0010)
             {
+                service._hotkeys?.Dispose();
                 service.RemoveIcon();
                 NativeMethods.DestroyWindow(window);
                 return nint.Zero;

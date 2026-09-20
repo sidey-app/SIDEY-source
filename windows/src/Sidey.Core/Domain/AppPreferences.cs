@@ -25,6 +25,8 @@ public sealed record AppPreferences(
 {
     public bool TreeMovementPaused { get; init; }
 
+    public ComposerPlacement? ComposerPlacement { get; init; }
+
     public string? Language { get; init; }
 
     public AppThemePreference Theme { get; init; } = AppThemePreference.System;
@@ -65,5 +67,6 @@ public sealed record AppPreferences(
             ? null
             : PixelCharacterCatalog.NormalizeId(CachedCharacterId),
         OverlayRegion = OverlayRegion ?? OverlayRegionPreference.Default,
+        ComposerPlacement = ComposerPlacement?.Normalize(),
     };
 }

@@ -27,34 +27,7 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
     private readonly Lock _gate = new();
     private readonly CharacterStunState _stun = new();
     private bool _treeMovementPaused;
-    private volatile bool _hasPresentedFrame;
-    public bool HasPresentedFrame => _hasPresentedFrame;
 
-    public void VerifyMemberVisualsForSmoke(IEnumerable<Guid> expectedIds, byte red, byte green, byte blue)
-    {
-        lock (_gate)
-        {
-            var ids = expectedIds.ToHashSet();
-            if (!ids.SetEquals(_nodeById.Keys))
-                throw new InvalidOperationException("Overlay renderer did not retain every expected member.");
-            foreach (Guid id in ids)
-            {
-                byte[] pixels = _textVisuals.Get(id).Nameplate.Pixels;
-                bool found = false;
-                for (int offset = 0; offset < pixels.Length; offset += 4)
-                {
-                    if (pixels[offset] == blue && pixels[offset + 1] == green
-                        && pixels[offset + 2] == red && pixels[offset + 3] == 255)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                    throw new InvalidOperationException("Rendered nameplate does not contain the expected status color.");
-            }
-        }
-    }
     private readonly List<(int X, int Y, double Elapsed)> _stunDraws = new(12);
     private readonly Func<bool> _animationsEnabled;
     private readonly Action<string, long>? _impact;
@@ -603,7 +576,6 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
             _renderBounds.Y,
             EntranceOpacity(_presentedFrameCount, _animationsEnabled()));
         _presentedFrameCount++;
-        _hasPresentedFrame = true;
         ReportPresentedMessageBubbles();
         if (_hotspotTrackingElapsed >= HotspotTrackingPolicy.MinimumUpdateInterval.TotalSeconds)
         {

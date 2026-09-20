@@ -63,10 +63,7 @@ jobs:
             --output build/windows/publish
           ./scripts/windows/tests/Test-SelfContainedPublish.ps1 -PublishDirectory ./build/windows/publish
 
-      - name: Run Windows app smoke
-        env:
-          SIDEY_STORE_PREVIEW_SMOKE: '1'
-          SIDEY_OVERLAY_STARTUP_SMOKE: '1'
+      - name: Verify Windows app startup
         run: |
           $PSNativeCommandUseErrorActionPreference = $true
           ./scripts/windows/tests/Test-PublishedApplication.ps1 -PublishDirectory ./build/windows/publish -TimeoutSeconds 120

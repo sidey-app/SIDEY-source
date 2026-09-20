@@ -1,8 +1,6 @@
-using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Sidey.Core.Domain;
 using Sidey.Platform.Windows;
 using Windows.UI;
@@ -23,8 +21,6 @@ public sealed partial class StoreProductArtwork : UserControl
 
     private int _generation;
     private CancellationTokenSource? _loadCancellation;
-    private Task _loadTask = Task.CompletedTask;
-    private readonly TaskCompletionSource _firstLoadCompleted = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public StoreProductArtwork()
     {
@@ -87,7 +83,7 @@ public sealed partial class StoreProductArtwork : UserControl
         BubblePreview.Height = Math.Round(pointSize * 0.44);
     }
 
-    private void BeginReload() => _loadTask = ReloadAsync();
+    private void BeginReload() => _ = ReloadAsync();
 
     private async Task ReloadAsync()
     {
@@ -126,7 +122,6 @@ public sealed partial class StoreProductArtwork : UserControl
                 PreviewImage.Height = PreviewImage.Width;
                 PreviewImage.Source = primary;
             }
-            _firstLoadCompleted.TrySetResult();
         }
         catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
         {
@@ -134,7 +129,6 @@ public sealed partial class StoreProductArtwork : UserControl
         catch (Exception exception)
         {
             StartupDiagnostics.NonFatal("store-artwork-load", exception);
-            _firstLoadCompleted.TrySetResult();
             if (generation == Volatile.Read(ref _generation) && IsLoaded)
             {
                 PreviewImage.Source = null;
@@ -148,37 +142,6 @@ public sealed partial class StoreProductArtwork : UserControl
                 cancellation.Dispose();
             }
         }
-    }
-
-    internal async Task VerifyRenderedArtworkAsync()
-    {
-        await _firstLoadCompleted.Task.WaitAsync(TimeSpan.FromSeconds(10));
-        await _loadTask.WaitAsync(TimeSpan.FromSeconds(10));
-        UpdateLayout();
-        Image image = ProductKind == CommerceProductKind.Bubble ? BubbleDecoration
-            : IsCannon() ? CannonballImage : PreviewImage;
-        if (!IsLoaded || image.Source is null || image.ActualWidth <= 0 || image.ActualHeight <= 0)
-        {
-            StartupDiagnostics.Stage($"store-artwork-not-arranged product={CatalogItemId} loaded={IsLoaded} source={image.Source is not null} width={image.ActualWidth} height={image.ActualHeight}");
-            throw new InvalidOperationException($"Store artwork is not arranged: {CatalogItemId}.");
-        }
-        var rendered = new RenderTargetBitmap();
-        await rendered.RenderAsync(image);
-        byte[] pixels = (await rendered.GetPixelsAsync()).ToArray();
-        int visiblePixels = 0;
-        for (int offset = 3; offset < pixels.Length; offset += 4)
-        {
-            if (pixels[offset] > 0)
-            {
-                visiblePixels++;
-            }
-        }
-        if (visiblePixels < 8)
-        {
-            StartupDiagnostics.Stage($"store-artwork-empty product={CatalogItemId} pixels={visiblePixels} width={rendered.PixelWidth} height={rendered.PixelHeight}");
-            throw new InvalidOperationException($"Store artwork has no visible pixels: {CatalogItemId}.");
-        }
-        StartupDiagnostics.Stage($"store-artwork-rendered product={CatalogItemId} pixels={visiblePixels}");
     }
 
     private async Task<(ImageSource? Primary, ImageSource? Secondary)> LoadPreviewAsync(

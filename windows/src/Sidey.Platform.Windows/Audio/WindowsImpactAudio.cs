@@ -33,13 +33,7 @@ public sealed class WindowsImpactAudio : IDisposable
     private bool _volumeUpdateQueued;
     private bool _disposed;
     private volatile bool _ready;
-    private int _playbackStartedCount;
-    private long _maximumRequestMilliseconds;
-    private int _playbackCompletedCount;
     private Guid? _lastStartedScope;
-    public bool IsReady => _ready;
-    public int PlaybackStartedCount => Volatile.Read(ref _playbackStartedCount);
-    public string DiagnosticState => $"engine=XAudio2 ready={_ready} submitted={PlaybackStartedCount} completed={Volatile.Read(ref _playbackCompletedCount)} max-request-ms={Volatile.Read(ref _maximumRequestMilliseconds)}";
     private static double Now => (double)Stopwatch.GetTimestamp() / Stopwatch.Frequency;
 
     public WindowsImpactAudio(Action<string, Exception> diagnostic)
@@ -159,9 +153,6 @@ public sealed class WindowsImpactAudio : IDisposable
                 XAudio2Output.Play(available.Handle, sample.Data, sample.Length);
                 available.Active = true;
                 _lastStartedScope = scope;
-                long elapsed = (long)Stopwatch.GetElapsedTime(requestedAt).TotalMilliseconds;
-                Interlocked.Exchange(ref _maximumRequestMilliseconds, Math.Max(_maximumRequestMilliseconds, elapsed));
-                Interlocked.Increment(ref _playbackStartedCount);
             });
         }
     }
@@ -203,38 +194,12 @@ public sealed class WindowsImpactAudio : IDisposable
         _output?.SetRunning(enabled && !WindowsActivityMonitor.IsScreenLocked());
     }
 
-    public Task<bool> VerifyVolumeAsync(int percent)
-    {
-        var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        lock (_gate)
-        {
-            if (_disposed)
-                return Task.FromResult(false);
-            _work.Add(() => completion.TrySetResult(_voices.Count == 4 && _output is not null
-                && Math.Abs(_output.GetVolume() - percent / 100f) < 0.0001f));
-        }
-        return completion.Task;
-    }
-
-    public Task<int> CompletedPlaybackCountAsync()
-    {
-        var completion = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
-        lock (_gate)
-        {
-            if (_disposed)
-                return Task.FromResult(_playbackCompletedCount);
-            _work.Add(() => { RefreshCompletedVoices(); completion.TrySetResult(_playbackCompletedCount); });
-        }
-        return completion.Task;
-    }
-
     private void RefreshCompletedVoices()
     {
         foreach (Voice voice in _voices)
             if (voice.Active && XAudio2Output.QueuedBuffers(voice.Handle) == 0)
             {
                 voice.Active = false;
-                Interlocked.Increment(ref _playbackCompletedCount);
             }
     }
 

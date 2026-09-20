@@ -8,8 +8,9 @@
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
-      <Border x:Name="HistoryFallbackBackground" Grid.RowSpan="2" Margin="-20" Canvas.ZIndex="-1"
+      <Border x:Name="HistoryFallbackBackground" Grid.RowSpan="3" Margin="-20" Canvas.ZIndex="-1"
           Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" IsHitTestVisible="False" />
 
       <StackPanel Spacing="4">
@@ -150,5 +151,26 @@
             TextWrapping="Wrap" />
       </StackPanel>
     </Grid>
+    <StackPanel Grid.Row="2" Spacing="8" DataContext="{Binding Composer}">
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"
+          Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+          Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      <Grid ColumnSpacing="8">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBox x:Name="HistoryInput" Text="{Binding Draft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            IsEnabled="{Binding CanCompose}" AcceptsReturn="True" TextWrapping="Wrap" MaxHeight="104"
+            PlaceholderText="{Binding Value, Source={i18n:I18n Key=composer.placeholder}, Mode=OneWay}"
+            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=composer.placeholder}, Mode=OneWay}"
+            PreviewKeyDown="OnMessageInputPreviewKeyDown" LostFocus="OnMessageInputLostFocus" />
+        <Button Grid.Column="1" Command="{Binding SendCommand}" VerticalAlignment="Bottom"
+            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=composer.sendTooltip}, Mode=OneWay}"
+            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=composer.sendTooltip}, Mode=OneWay}">
+          <SymbolIcon Symbol="Send" />
+        </Button>
+      </Grid>
+    </StackPanel>
   </Grid>
 </Window>

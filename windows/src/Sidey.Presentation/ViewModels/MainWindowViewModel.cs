@@ -913,18 +913,17 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         CommerceProductState? state = _coordinator.State.CommerceProducts.FirstOrDefault(product =>
             StringComparer.Ordinal.Equals(product.Product.Id, productId));
-        if (state?.PurchaseState is null or CommercePurchaseState.Unavailable)
+        if (state?.PurchaseState is null or CommercePurchaseState.Unavailable
+            || !state.GoogleConnected)
         {
-            // Reload first; a retry after a failed catalog request must not create an order.
+            // Account setup belongs to onboarding. Refresh stale account/catalog state
+            // without starting a separate sign-in flow or creating an order here.
             await RunCommandAsync(() => _coordinator.RefreshStoreAsync(), successMessage: null);
             return;
         }
-        string successMessage = state?.GoogleConnected == true
-            ? I18n.Get("store.purchaseCompleted")
-            : I18n.Get("store.googleConnectionOpened");
         await RunCommandAsync(
             () => _coordinator.ActivateStoreProductAsync(productId),
-            successMessage);
+            I18n.Get("store.purchaseCompleted"));
     }
 
     private async Task SaveCharacterSelectionAsync(string characterId)

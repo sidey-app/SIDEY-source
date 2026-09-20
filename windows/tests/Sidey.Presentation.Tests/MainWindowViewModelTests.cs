@@ -629,7 +629,7 @@ public sealed class MainWindowViewModelTests
     }
 
     [Theory]
-    [InlineData(CommercePurchaseState.GoogleConnectionRequired, "Google 계정 연결")]
+    [InlineData(CommercePurchaseState.GoogleConnectionRequired, "다시 시도")]
     [InlineData(CommercePurchaseState.OpeningCheckout, "결제창 여는 중…")]
     [InlineData(CommercePurchaseState.Confirming, "결제 확인 중…")]
     [InlineData(CommercePurchaseState.Owned, "보유 중")]
@@ -684,7 +684,7 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
-    public async Task DevelopmentStoreStartsGoogleLinkingBeforePurchase()
+    public async Task StoreRefreshesStaleAccountStateWithoutStartingGoogleLinking()
     {
         (FakeSideyCoordinator coordinator, CoordinatorState state) = CreateRoomState();
         coordinator.State = state with
@@ -708,11 +708,10 @@ public sealed class MainWindowViewModelTests
 
         Assert.False(product.IsPreviewOnlyVisible);
         Assert.True(product.IsActionEnabled);
-        Assert.Equal("Google 계정 연결", product.ActionText);
-        Assert.Equal(1, coordinator.ActivateStoreProductCallCount);
-        Assert.NotNull(notice);
-        Assert.Equal(NoticeKind.Success, notice.Kind);
-        Assert.Contains("Google", notice.Message, StringComparison.Ordinal);
+        Assert.Equal("다시 시도", product.ActionText);
+        Assert.Equal(0, coordinator.ActivateStoreProductCallCount);
+        Assert.Equal(1, coordinator.RefreshStoreCallCount);
+        Assert.Null(notice);
     }
 
     [Fact]
