@@ -175,6 +175,31 @@ final class NativeMessageFieldTests: XCTestCase {
         XCTAssertEqual(edited.last, false)
     }
 
+    func testMarkedKoreanReturnCommitsCompositionWithoutSubmitting() {
+        let (_, textView) = makeTextView(width: 240, height: 40)
+        var submissions = 0
+        let field = NativeMessageField(text: .constant(""), onInputActivity: {},
+                                       onSubmit: { submissions += 1 }, onCancel: {})
+        let coordinator = field.makeCoordinator()
+        textView.setMarkedText("한", selectedRange: NSRange(location: 1, length: 0),
+                               replacementRange: NSRange(location: NSNotFound, length: 0))
+        XCTAssertFalse(coordinator.textView(textView, doCommandBy: #selector(NSResponder.insertNewline(_:))))
+        XCTAssertEqual(submissions, 0)
+        textView.unmarkText()
+        XCTAssertTrue(coordinator.textView(textView, doCommandBy: #selector(NSResponder.insertNewline(_:))))
+        XCTAssertEqual(submissions, 1)
+    }
+
+    func testFocusLossEndsOnlyInputSessionWithoutReportingAnEdit() {
+        var editCount = 0
+        var focusLossCount = 0
+        let field = NativeMessageField(text: .constant("초안"), onInputActivity: {}, onSubmit: {},
+            onCancel: {}, onTextEdited: { _ in editCount += 1 }, onFocusLost: { focusLossCount += 1 })
+        field.makeCoordinator().textDidEndEditing(Notification(name: NSText.didEndEditingNotification))
+        XCTAssertEqual(focusLossCount, 1)
+        XCTAssertEqual(editCount, 0)
+    }
+
     private func makeTextView(
         width: CGFloat,
         height: CGFloat

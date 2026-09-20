@@ -97,7 +97,7 @@ final class AppCoordinator {
     )
     private lazy var statusItemController = StatusItemController(
         onToggleOverlay: { [weak self] in self?.toggleOverlay() },
-        onFocusMessage: { [weak self] in self?.focusMessageField() },
+        onFocusMessage: { [weak self] in self?.overlayWindows.toggleComposer() },
         onSelectRoom: { [weak self] roomID in self?.selectRoom(roomID) },
         onToggleQuietMode: { [weak self] in self?.setQuietMode(!(self?.model.preferences.quietModeEnabled ?? false)) },
         onOpenHistory: { [weak self] in self?.showHistory() },
@@ -106,6 +106,20 @@ final class AppCoordinator {
         onOpenGroupSettings: { [weak self] in self?.showGroupSettings() },
         onOpenSettings: { [weak self] in self?.showSettings() },
         onQuit: { NSApplication.shared.terminate(nil) }
+    )
+    private lazy var globalShortcuts = GlobalShortcutController(
+        onAction: { [weak self] action in
+            guard let self else { return }
+            switch action {
+            case .toggleQuietMode: self.setQuietMode(!self.model.preferences.quietModeEnabled)
+            case .toggleComposer: self.overlayWindows.toggleComposer()
+            case .openHistory: self.showHistory()
+            }
+        },
+        onStatusChanged: { [weak self] statuses in
+            self?.model.globalShortcutStatuses = statuses
+            self?.refreshStatusItem()
+        }
     )
     let commerceSession = CommerceSession()
     let roomSession = RoomSessionLifetime()
@@ -198,6 +212,7 @@ final class AppCoordinator {
 
         mainThreadProbe.start()
         statusItemController.install()
+        globalShortcuts.install()
         overlayWindows.restore(preference: model.preferences.overlayRegion)
         model.launchAtLogin = launchAtLoginController.isEnabled
         model.preferences.launchAtLogin = model.launchAtLogin
@@ -236,10 +251,11 @@ final class AppCoordinator {
     @discardableResult
     func shutdown() -> Task<Void, Never>? {
         if let shutdownTask { return shutdownTask }
+        globalShortcuts.uninstall()
         cancelTreeMovementRequests()
         model.treeMovement.reset()
         landingTask?.cancel()
-        typingActivity.stop()
+        stopAllTyping()
         roomSession.cancel()
         commerceSession.cancel(model: model)
         activityMonitor.stop()
@@ -453,7 +469,8 @@ final class AppCoordinator {
             activeRoomID: model.activeRoom?.id,
             unreadCounts: model.unreadCounts,
             quietModeEnabled: model.preferences.quietModeEnabled,
-            launchAtLogin: model.launchAtLogin
+            launchAtLogin: model.launchAtLogin,
+            globalShortcutStatuses: model.globalShortcutStatuses
         )
     }
 
@@ -473,7 +490,9 @@ final class AppCoordinator {
                     before: cursor,
                     pageSize: pageSize
                 )
-            }
+            },
+            onSend: { [weak self] in self?.sendMessage($0, source: .history) },
+            onTypingChanged: { [weak self] in self?.typingChanged($0, source: .history) }
         )
     }
 

@@ -5,6 +5,7 @@ struct PixelWorldView: View {
     @Bindable var model: AppModel
     let activityFrame: CGRect
     let composerVisible: Bool
+    var composerFrame: CGRect? = nil
     let characterPulse: CharacterPulseEvent?
     let characterThrow: CharacterThrowEvent?
     let onCharacterFramesChanged: ([UUID: CGRect]) -> Void
@@ -26,6 +27,7 @@ struct PixelWorldView: View {
             activityFrame: activityFrame,
             installationSeed: model.preferences.installationSeed,
             composerVisible: composerVisible,
+            composerFrame: composerFrame,
             characterPulse: characterPulse,
             characterThrow: characterThrow,
             onCharacterFramesChanged: onCharacterFramesChanged
@@ -44,6 +46,7 @@ private struct PixelWorldRepresentable: NSViewRepresentable {
     let activityFrame: CGRect
     let installationSeed: UInt64
     let composerVisible: Bool
+    var composerFrame: CGRect? = nil
     let characterPulse: CharacterPulseEvent?
     let characterThrow: CharacterThrowEvent?
     let onCharacterFramesChanged: ([UUID: CGRect]) -> Void
@@ -86,6 +89,7 @@ private struct PixelWorldRepresentable: NSViewRepresentable {
             activityFrame: activityFrame,
             installationSeed: installationSeed,
             composerVisible: composerVisible,
+            composerFrame: composerFrame,
             characterPulse: characterPulse,
             characterThrow: characterThrow,
             onCharacterFramesChanged: onCharacterFramesChanged,

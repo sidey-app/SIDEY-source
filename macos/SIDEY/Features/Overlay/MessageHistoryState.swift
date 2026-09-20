@@ -233,7 +233,7 @@ enum MessageHistoryMerge {
                 state: message.state == .pending ? .pending : .failed
             )
         }
-        return byID.values.sorted(by: newestFirst)
+        return byID.values.sorted { newestFirst($1, $0) }
     }
 
     private static func newestFirst(_ lhs: ChatMessage, _ rhs: ChatMessage) -> Bool {

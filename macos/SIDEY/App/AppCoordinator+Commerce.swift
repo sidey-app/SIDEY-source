@@ -158,7 +158,7 @@ extension AppCoordinator {
         guard releaseChannel.requiresAppleAuthentication, let backend,
               !model.accountOperationInProgress else { return }
         model.accountOperationInProgress = true
-        typingActivity.stop()
+        stopAllTyping()
         let previousTreeTask = cancelTreeMovementRequests()
         model.errorMessage = nil
         Task { [weak self] in
@@ -206,7 +206,7 @@ extension AppCoordinator {
         guard releaseChannel.requiresAppleAuthentication, let backend,
               !model.accountOperationInProgress else { return }
         model.accountOperationInProgress = true
-        typingActivity.stop()
+        stopAllTyping()
         let previousTreeTask = cancelTreeMovementRequests()
         model.errorMessage = nil
         Task { [weak self] in

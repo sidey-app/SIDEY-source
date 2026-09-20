@@ -81,9 +81,15 @@ enum PixelWorldAvoidanceLayout {
     static func composerRects(
         activityFrame: CGRect,
         edge: OverlayEdge,
-        composerVisible: Bool
+        composerVisible: Bool,
+        composerFrame: CGRect? = nil
     ) -> [CGRect] {
-        guard composerVisible, edge == .top else { return [] }
+        guard composerVisible else { return [] }
+        if let composerFrame {
+            let rect = composerFrame.insetBy(dx: -20, dy: -10).intersection(activityFrame)
+            return rect.isNull || rect.isEmpty ? [] : [rect]
+        }
+        guard edge == .top else { return [] }
         let rect = CGRect(
             x: activityFrame.midX - composerSize.width / 2,
             y: activityFrame.maxY - composerSize.height,
