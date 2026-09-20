@@ -93,6 +93,9 @@ final class AppCoordinator {
             },
             onStopCharacterSounds: { [weak self] in
                 self?.model.characterImpactAudio.stopAll()
+            },
+            onGlobalShortcutChanged: { [weak self] action, binding in
+                self?.setGlobalShortcut(action, binding: binding)
             }
         ),
         onClose: { [weak self] in self?.settingsDidClose() }
@@ -114,14 +117,8 @@ final class AppCoordinator {
         onQuit: { NSApplication.shared.terminate(nil) }
     )
     private lazy var globalShortcuts = GlobalShortcutController(
-        onAction: { [weak self] action in
-            guard let self else { return }
-            switch action {
-            case .toggleQuietMode: self.setQuietMode(!self.model.preferences.quietModeEnabled)
-            case .toggleComposer: self.toggleMessageComposer()
-            case .openHistory: self.showHistory()
-            }
-        },
+        configuration: model.preferences.globalShortcuts,
+        onAction: { [weak self] action in self?.handleGlobalShortcut(action) },
         onStatusChanged: { [weak self] statuses in
             self?.model.globalShortcutStatuses = statuses
             self?.refreshStatusItem()
@@ -368,6 +365,19 @@ final class AppCoordinator {
         setOverlayVisible(!model.overlayVisible)
     }
 
+    func handleGlobalShortcut(_ action: GlobalShortcutAction) {
+        switch action {
+        case .toggleQuietMode:
+            setQuietMode(!model.preferences.quietModeEnabled)
+        case .toggleComposer:
+            toggleMessageComposer()
+        case .openHistory:
+            showHistory()
+        case .toggleOverlay:
+            toggleOverlay()
+        }
+    }
+
     func toggleMessageComposer() {
         if overlayWindows.composerVisible {
             overlayWindows.dismissComposer()
@@ -420,6 +430,16 @@ final class AppCoordinator {
         if enabled { model.clearBubbles() }
         refreshStatusItem()
         persistPreferences()
+    }
+
+    func setGlobalShortcut(_ action: GlobalShortcutAction, binding: GlobalShortcutBinding) {
+        guard globalShortcuts.update(action, binding: binding) else {
+            refreshStatusItem()
+            return
+        }
+        model.preferences.globalShortcuts[action] = binding
+        persistPreferences()
+        refreshStatusItem()
     }
 
     private func setLaunchAtLogin(_ enabled: Bool) {
@@ -491,6 +511,7 @@ final class AppCoordinator {
             unreadCounts: model.unreadCounts,
             quietModeEnabled: model.preferences.quietModeEnabled,
             launchAtLogin: model.launchAtLogin,
+            globalShortcuts: model.preferences.globalShortcuts,
             globalShortcutStatuses: model.globalShortcutStatuses
         )
     }

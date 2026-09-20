@@ -29,6 +29,7 @@ struct SettingsActions {
     var onCharacterSoundEffectsChanged: (Bool) -> Void = { _ in }
     var onCharacterImpact: (String, TimeInterval) -> Void = { _, _ in }
     var onStopCharacterSounds: () -> Void = {}
+    var onGlobalShortcutChanged: (GlobalShortcutAction, GlobalShortcutBinding) -> Void = { _, _ in }
 
     static let empty = SettingsActions(
         onOverlayVisibilityChanged: { _ in },
