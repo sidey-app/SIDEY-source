@@ -106,8 +106,9 @@ public partial class App : Application
                 ? Environment.GetEnvironmentVariable("SIDEY_STARTUP_SMOKE_DATA_ROOT") : null);
         if (!_singleInstance.IsPrimary)
         {
-            _singleInstance.Signal(processArguments);
-            StartupDiagnostics.Stage("secondary-instance-request request=activate");
+            bool delivered = _singleInstance.Signal(processArguments);
+            StartupDiagnostics.Stage(
+                $"secondary-instance-request request=activate delivered={delivered.ToString().ToLowerInvariant()}");
             _singleInstance.Dispose();
             _singleInstance = null;
             StartupDiagnostics.CompleteSession();

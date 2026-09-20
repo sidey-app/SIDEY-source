@@ -12,6 +12,7 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
     private const int FramesPerSecond = 30;
     private const double FixedDeltaTime = 1d / FramesPerSecond;
     private const double EntranceFadeDurationSeconds = 0.24d;
+    private const double ExitFadeDurationSeconds = 0.24d;
     private const double EdgeInsetAnimationSpeedDipPerSecond = 72d;
     private const double DozeRestingOpacity = 0.55d;
     private const double DozeFloatingDistanceDip = 3d;
@@ -102,6 +103,8 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
     private double _performanceMaximumMilliseconds;
     private int _tickRunning;
     private int _presentedFrameCount;
+    private int _fadeOutStartedFrame = -1;
+    private TaskCompletionSource<bool>? _fadeOutCompletion;
     private double _edgeInsetPixels;
     private int _targetEdgeInsetPixels;
     private bool _faulted;
@@ -246,6 +249,30 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
         }
     }
 
+    public Task FadeOutAsync(CancellationToken cancellationToken = default)
+    {
+        Task completion;
+        lock (_gate)
+        {
+            if (_disposed || _faulted || !_animationsEnabled())
+            {
+                return Task.CompletedTask;
+            }
+
+            if (_fadeOutStartedFrame < 0)
+            {
+                _fadeOutStartedFrame = _presentedFrameCount;
+                _fadeOutCompletion = new TaskCompletionSource<bool>(
+                    TaskCreationOptions.RunContinuationsAsynchronously);
+            }
+            completion = _fadeOutCompletion!.Task;
+        }
+
+        return cancellationToken.CanBeCanceled
+            ? completion.WaitAsync(cancellationToken)
+            : completion;
+    }
+
     public void Dispose()
     {
         lock (_gate)
@@ -256,6 +283,7 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
             }
 
             _disposed = true;
+            _fadeOutCompletion?.TrySetResult(false);
             _timer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
             _timer.Dispose();
             _surface.Dispose();
@@ -298,6 +326,7 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
                 }
 
                 _faulted = true;
+                _fadeOutCompletion?.TrySetResult(false);
                 _timer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
             }
 
@@ -571,11 +600,15 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
             DrawStun(destinationPixels, effect.X, effect.Y, effect.Elapsed);
         RenderProjectiles(destinationPixels);
 
-        _surface.Present(
-            _renderBounds.X,
-            _renderBounds.Y,
-            EntranceOpacity(_presentedFrameCount, _animationsEnabled()));
+        byte opacity = _fadeOutStartedFrame < 0
+            ? EntranceOpacity(_presentedFrameCount, _animationsEnabled())
+            : ExitOpacity(_presentedFrameCount - _fadeOutStartedFrame, _animationsEnabled());
+        _surface.Present(_renderBounds.X, _renderBounds.Y, opacity);
         _presentedFrameCount++;
+        if (_fadeOutStartedFrame >= 0 && opacity == 0)
+        {
+            _fadeOutCompletion?.TrySetResult(true);
+        }
         ReportPresentedMessageBubbles();
         if (_hotspotTrackingElapsed >= HotspotTrackingPolicy.MinimumUpdateInterval.TotalSeconds)
         {
@@ -1304,6 +1337,22 @@ internal sealed class LayeredPixelWorldRenderer : IDisposable
             0d,
             1d);
         double eased = 1d - Math.Pow(1d - progress, 3d);
+        return (byte)Math.Round(byte.MaxValue * eased, MidpointRounding.AwayFromZero);
+    }
+
+    internal static byte ExitOpacity(int presentedFrameCount, bool animationsEnabled)
+    {
+        if (!animationsEnabled)
+        {
+            return 0;
+        }
+
+        double progress = Math.Clamp(
+            presentedFrameCount * FixedDeltaTime / ExitFadeDurationSeconds,
+            0d,
+            1d);
+        double remaining = 1d - progress;
+        double eased = remaining * remaining * (3d - (2d * remaining));
         return (byte)Math.Round(byte.MaxValue * eased, MidpointRounding.AwayFromZero);
     }
 

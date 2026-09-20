@@ -24,6 +24,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     private readonly WindowsAnimationSettings _animations = new();
     private readonly WindowsImpactAudio _audio;
     private readonly SemaphoreSlim _soundSettingGate = new(1, 1);
+    private readonly SemaphoreSlim _overlayVisibilityGate = new(1, 1);
     private readonly Guid _overlayAudioScope = Guid.NewGuid();
     private readonly Lock _overlayAudioGate = new();
     private long _overlayAudioNotBefore;
@@ -1006,29 +1007,51 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             Preferences = _state.Preferences with { OverlayVisible = visible },
         });
 
-        if (!visible)
+        await _overlayVisibilityGate.WaitAsync(cancellationToken);
+        try
         {
-            StopOverlayAudio();
-            _overlay?.Dispose();
-            _overlay = null;
-        }
-        else if (_overlay is null)
-        {
-            if (_backend is null && _previewSnapshot is not null)
+            if (!visible)
             {
-                StartPreviewOverlay(_state.Preferences);
+                StopOverlayAudio();
+                NativePixelWorldSession? overlay = _overlay;
+                if (overlay is not null)
+                {
+                    try
+                    {
+                        await overlay.FadeOutAsync(cancellationToken);
+                    }
+                    finally
+                    {
+                        if (ReferenceEquals(_overlay, overlay))
+                        {
+                            overlay.Dispose();
+                            _overlay = null;
+                        }
+                    }
+                }
             }
-            else if (_state.ActiveRoomId is not null)
+            else if (_overlay is null)
             {
-                StartOverlay(CurrentWorldSnapshot());
+                if (_backend is null && _previewSnapshot is not null)
+                {
+                    StartPreviewOverlay(_state.Preferences);
+                }
+                else if (_state.ActiveRoomId is not null)
+                {
+                    StartOverlay(CurrentWorldSnapshot());
+                }
+                else
+                {
+                    ShowStartupOverlay();
+                }
             }
-            else
-            {
-                ShowStartupOverlay();
-            }
-        }
 
-        await PersistPreferencesAsync(cancellationToken);
+            await PersistPreferencesAsync(cancellationToken);
+        }
+        finally
+        {
+            _overlayVisibilityGate.Release();
+        }
     }
 
     public async Task SetQuietModeAsync(bool enabled, CancellationToken cancellationToken = default)
@@ -1473,7 +1496,16 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         {
             disposableAuth.Dispose();
         }
-        _overlay?.Dispose();
+        await _overlayVisibilityGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            _overlay?.Dispose();
+            _overlay = null;
+        }
+        finally
+        {
+            _overlayVisibilityGate.Release();
+        }
         await _activityMonitor.DisposeAsync().ConfigureAwait(false);
     }
 
