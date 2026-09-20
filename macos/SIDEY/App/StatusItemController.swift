@@ -40,6 +40,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private var unreadCounts: [UUID: Int] = [:]
     private var quietModeEnabled = false
     private var launchAtLogin = false
+    private var globalShortcuts = GlobalShortcutConfiguration.defaults
     private var globalShortcutStatuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
 
     init(
@@ -81,6 +82,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         unreadCounts: [UUID: Int] = [:],
         quietModeEnabled: Bool = false,
         launchAtLogin: Bool = false,
+        globalShortcuts: GlobalShortcutConfiguration = .defaults,
         globalShortcutStatuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
     ) {
         self.overlayVisible = overlayVisible
@@ -89,6 +91,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         self.unreadCounts = unreadCounts
         self.quietModeEnabled = quietModeEnabled
         self.launchAtLogin = launchAtLogin
+        self.globalShortcuts = globalShortcuts
         self.globalShortcutStatuses = globalShortcutStatuses
         updateStatusIcon()
         statusItem?.menu = makeMenu()
@@ -102,6 +105,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
             action: #selector(toggleOverlay),
             keyEquivalent: ""
         )
+        annotateShortcut(.toggleOverlay, on: overlay)
         overlay.target = self
         menu.addItem(overlay)
 
@@ -157,12 +161,14 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
     private func annotateShortcut(_ action: GlobalShortcutAction, on item: NSMenuItem) {
         // Carbon owns dispatch. A menu key equivalent would create a second execution path.
-        let unavailable = globalShortcutStatuses[action]?.notice
-        let suffix = unavailable == nil ? action.displayShortcut : "\(action.displayShortcut) · 단축키 사용 불가"
+        let status = globalShortcutStatuses[action]
+        let shortcut = globalShortcuts[action]
+        let annotation = status?.menuAnnotation.map { " · \($0)" } ?? ""
+        let suffix = shortcut.displayShortcut + annotation
         let title = item.title
         item.attributedTitle = NSAttributedString(string: "\(title)    \(suffix)")
         item.title = title
-        item.toolTip = unavailable ?? action.descriptiveShortcut
+        item.toolTip = status?.notice ?? shortcut.descriptiveShortcut
     }
 
     private func makeRoomsMenu() -> NSMenu {
