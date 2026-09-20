@@ -24,4 +24,4 @@
 
 ## 남은 통합
 
-[PR #93](https://github.com/sidey-app/SIDEY/pull/93)에 저장한다. 전체 사용자 승인을 완료했으며 독립 최종 diff 검토·정확한 head의 필수 CI 뒤 merge commit으로 main에 통합한다. 이후 원본 #27에 채택 결과와 후속 링크를 남겨 종료하고 원작자 커밋의 main 반영을 확인한다. 활성 앱·상품·서버·플랫폼 배포 사본·버전·릴리스는 별도 후속 작업이다.
+[PR #93](https://github.com/sidey-app/SIDEY-source/pull/93)에 저장한다. 전체 사용자 승인을 완료했으며 독립 최종 diff 검토·정확한 head의 필수 CI 뒤 merge commit으로 main에 통합한다. 이후 원본 #27에 채택 결과와 후속 링크를 남겨 종료하고 원작자 커밋의 main 반영을 확인한다. 활성 앱·상품·서버·플랫폼 배포 사본·버전·릴리스는 별도 후속 작업이다.

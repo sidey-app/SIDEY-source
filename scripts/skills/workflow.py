@@ -39,7 +39,11 @@ from validation_scope import is_contributor_architecture_path, required_scopes
 # template.
 GENERAL_PR_TEMPLATE = GENERAL_TEMPLATE
 GENERAL_PR_MARKER = GENERAL_MARKER
-GITHUB_REPOSITORY = 'sidey-app/SIDEY'
+GITHUB_REPOSITORY = 'sidey-app/SIDEY-source'
+LEGACY_GITHUB_REPOSITORY = 'sidey-app/SIDEY'
+# The numeric ID survives renames and rejects a stale legacy remote after the
+# public distribution repository takes over the SIDEY name.
+GITHUB_REPOSITORY_ID = 1350230803
 LEGACY_MACOS_APP_NAMES = {'SIDEYAppStore': 'SIDEY'}
 
 
@@ -142,8 +146,21 @@ def head(root):
     return git(root, 'rev-parse', 'HEAD')
 
 
-def main_remote(root):
-    """Return the remote used to refresh canonical main."""
+def github_repository_metadata(root, repository):
+    """Return GitHub metadata used to bind a remote to a repository ID."""
+
+    metadata = json.loads(
+        run(root, 'gh', 'api', f'repos/{repository}')
+    )
+    if not isinstance(metadata, dict):
+        raise WorkflowError(
+            f'GitHub returned invalid repository metadata for {repository}'
+        )
+    return metadata
+
+
+def canonical_remote(root):
+    """Return the remote and live name of the canonical source repository."""
 
     remotes = git(root, 'remote').splitlines()
     for remote in ('upstream', 'origin'):
@@ -157,17 +174,48 @@ def main_remote(root):
             )
         except WorkflowError:
             continue
-        if repository.casefold() == GITHUB_REPOSITORY.casefold():
-            return remote
+        allowed_names = {GITHUB_REPOSITORY, LEGACY_GITHUB_REPOSITORY}
+        if repository.casefold() not in {
+            name.casefold() for name in allowed_names
+        }:
+            continue
+        metadata = github_repository_metadata(root, repository)
+        if metadata.get('id') != GITHUB_REPOSITORY_ID:
+            raise WorkflowError(
+                f'{remote} does not identify the canonical SIDEY source '
+                'repository'
+            )
+        live_repository = str(metadata.get('full_name') or '')
+        if live_repository.casefold() not in {
+            name.casefold() for name in allowed_names
+        }:
+            raise WorkflowError(
+                'Canonical SIDEY source repository has an unexpected name: '
+                f'{live_repository}'
+            )
+        return remote, live_repository
 
     if 'origin' in remotes:
         raise WorkflowError(
-            'Canonical main requires a remote for sidey-app/SIDEY; add it '
-            'as upstream when origin is a fork'
+            'Canonical main requires a remote for '
+            'sidey-app/SIDEY-source; add it as upstream when origin is a '
+            'fork'
         )
     raise WorkflowError(
-        'Add the SIDEY repository as an origin or upstream remote'
+        'Add the SIDEY source repository as an origin or upstream remote'
     )
+
+
+def main_remote(root):
+    """Return the remote used to refresh canonical main."""
+
+    return canonical_remote(root)[0]
+
+
+def source_repository(root):
+    """Return the canonical source repository's current GitHub name."""
+
+    return canonical_remote(root)[1]
 
 
 def fetch_main(root):
@@ -624,7 +672,27 @@ def publish_head(root, push_remote):
     """Return the owner-qualified pull request head for a remote."""
 
     repository = github_repository_from_remote(root, push_remote)
-    owner, _ = repository.split('/', 1)
+    metadata = github_repository_metadata(root, repository)
+    repository_id = metadata.get('id')
+    if repository_id != GITHUB_REPOSITORY_ID:
+        parent = metadata.get('parent')
+        source = metadata.get('source')
+        related_ids = {
+            candidate.get('id')
+            for candidate in (parent, source)
+            if isinstance(candidate, dict)
+        }
+        if metadata.get('private') is not True or GITHUB_REPOSITORY_ID not in related_ids:
+            raise WorkflowError(
+                'Push remote must be the canonical SIDEY source repository '
+                'or one of its private forks'
+            )
+    live_repository = str(metadata.get('full_name') or '')
+    if '/' not in live_repository:
+        raise WorkflowError(
+            f'GitHub returned an invalid repository name for {repository}'
+        )
+    owner, _ = live_repository.split('/', 1)
     return f'{owner}:{branch(root)}'
 
 
@@ -646,7 +714,7 @@ def task_pr_head(root, task):
     return published.get('head_ref') or f'{canonical_owner}:{branch(root)}'
 
 
-def pull_request_record(pull):
+def pull_request_record(pull, repository):
     """Normalize one GitHub REST pull request response."""
 
     head_repository = (pull['head'].get('repo') or {}).get(
@@ -658,15 +726,16 @@ def pull_request_record(pull):
         'number': pull['number'],
         'headRefOid': pull['head']['sha'],
         'isCrossRepository': (
-            head_repository.casefold() != GITHUB_REPOSITORY.casefold()
+            head_repository.casefold() != repository.casefold()
         ),
         'mergeCommit': {'oid': merge_commit} if merge_commit else None,
     }
 
 
-def task_prs(root, head_ref, *, state='open'):
+def task_prs(root, head_ref, *, state='open', repository=None):
     """List canonical-repository PRs for an owner-qualified head."""
 
+    repository = repository or source_repository(root)
     api_state = 'closed' if state == 'merged' else state
     output = run(
         root,
@@ -674,7 +743,7 @@ def task_prs(root, head_ref, *, state='open'):
         'api',
         '--method',
         'GET',
-        f'repos/{GITHUB_REPOSITORY}/pulls',
+        f'repos/{repository}/pulls',
         '-f',
         f'state={api_state}',
         '-f',
@@ -687,16 +756,16 @@ def task_prs(root, head_ref, *, state='open'):
     pulls = json.loads(output)
     if state == 'merged':
         pulls = [pull for pull in pulls if pull.get('merged_at')]
-    return [pull_request_record(pull) for pull in pulls]
+    return [pull_request_record(pull, repository) for pull in pulls]
 
 
-def open_task_prs(root, head_ref=None):
+def open_task_prs(root, head_ref=None, *, repository=None):
     """List open task PRs, including heads hosted in forks."""
 
     if head_ref is None:
         canonical_owner, _ = GITHUB_REPOSITORY.split('/', 1)
         head_ref = f'{canonical_owner}:{branch(root)}'
-    return task_prs(root, head_ref)
+    return task_prs(root, head_ref, repository=repository)
 
 
 def require_exact_task_pr(root, prs):
@@ -732,19 +801,14 @@ def publish(root, args):
     task = owned_task(root, args.task)
     if dirty_paths(root):
         raise WorkflowError('Publish requires a clean checked task worktree')
+    repository = source_repository(root)
     remote = fetch_main(root)
     attest(root, task, remote)
     paths = changed_paths(root, remote)
     validate_paths(branch(root), paths)
     push_remote = getattr(args, 'push_remote', None) or 'origin'
-    if hasattr(args, 'push_remote'):
-        head_ref = publish_head(root, push_remote)
-    else:
-        # Preserve the same-repository head used by older Python
-        # callers.
-        canonical_owner, _ = GITHUB_REPOSITORY.split('/', 1)
-        head_ref = f'{canonical_owner}:{branch(root)}'
-    prs = open_task_prs(root, head_ref)
+    head_ref = publish_head(root, push_remote)
+    prs = open_task_prs(root, head_ref, repository=repository)
     if len(prs) > 1:
         raise WorkflowError(
             'Task branch must identify at most one pull request'
@@ -770,7 +834,7 @@ def publish(root, args):
             'view',
             number,
             '--repo',
-            GITHUB_REPOSITORY,
+            repository,
             '--json',
             'title,body',
         ))
@@ -785,7 +849,7 @@ def publish(root, args):
             'pr',
             'create',
             '--repo',
-            GITHUB_REPOSITORY,
+            repository,
             '--base',
             'main',
             '--head',
@@ -795,7 +859,7 @@ def publish(root, args):
             '--body-file',
             str(body_path),
         )
-    prs = open_task_prs(root, head_ref)
+    prs = open_task_prs(root, head_ref, repository=repository)
     number = require_exact_task_pr(root, prs)
     details = json.loads(run(
         root,
@@ -804,7 +868,7 @@ def publish(root, args):
         'view',
         number,
         '--repo',
-        GITHUB_REPOSITORY,
+        repository,
         '--json',
         'title,body',
     ))
@@ -812,7 +876,7 @@ def publish(root, args):
     task.update(status='published', pr=number, published={
         'head': head(root),
         'base': remote,
-        'repository': GITHUB_REPOSITORY,
+        'repository': repository,
         'head_ref': head_ref,
         'push_remote': push_remote,
         'time': time.time(),
@@ -829,6 +893,7 @@ def finish(root, args):
             'publish '
             'the exact head first'
         )
+    repository = source_repository(root)
     remote = fetch_main(root)
     if task.get('status') not in ('integrated', 'main-updated', 'complete'):
         recovered = recover_merged_task(root, task, remote)
@@ -846,7 +911,7 @@ def finish(root, args):
                     '--windows-run applies only to an integrated Windows task'
                 )
             run_path = (
-                f'repos/{GITHUB_REPOSITORY}/actions/runs/'
+                f'repos/{repository}/actions/runs/'
                 f'{args.windows_run}'
             )
             metadata = json.loads(run(root, 'gh', 'api', run_path))
@@ -874,7 +939,11 @@ def finish(root, args):
     attest(root, task, remote)
     validate_paths(branch(root), changed_paths(root, remote))
     paths = changed_paths(root, remote)
-    prs = open_task_prs(root, task_pr_head(root, task))
+    prs = open_task_prs(
+        root,
+        task_pr_head(root, task),
+        repository=repository,
+    )
     if not prs:
         raise WorkflowError('No task PR exists; run publish before finish')
     number = require_exact_task_pr(root, prs)
@@ -888,7 +957,7 @@ def finish(root, args):
             'checks',
             number,
             '--repo',
-            GITHUB_REPOSITORY,
+            repository,
             '--json',
             'name,bucket,workflow',
         )
@@ -907,7 +976,7 @@ def finish(root, args):
         'checks',
         number,
         '--repo',
-        GITHUB_REPOSITORY,
+        repository,
         '--required',
     )
     checked_head = task['checked']['head']
@@ -920,7 +989,7 @@ def finish(root, args):
             'view',
             number,
             '--repo',
-            GITHUB_REPOSITORY,
+            repository,
             '--json',
             'title,body',
         )
@@ -937,7 +1006,7 @@ def finish(root, args):
                 'view',
                 number,
                 '--repo',
-                GITHUB_REPOSITORY,
+                repository,
                 '--json',
                 'title,body,headRefOid,baseRefName,mergeStateStatus',
             )
@@ -966,7 +1035,7 @@ def finish(root, args):
             root,
             number,
             checked_head,
-            repository=GITHUB_REPOSITORY,
+            repository=repository,
         )
         info = json.loads(
             run(
@@ -976,7 +1045,7 @@ def finish(root, args):
                 'view',
                 number,
                 '--repo',
-                GITHUB_REPOSITORY,
+                repository,
                 '--json',
                 'state,mergeCommit,headRefOid',
             )

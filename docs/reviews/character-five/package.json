@@ -24,7 +24,7 @@
     }
   ],
   "source": {
-    "pr_url": "https://github.com/sidey-app/SIDEY/pull/27",
+    "pr_url": "https://github.com/sidey-app/SIDEY-source/pull/27",
     "head_sha": "ec8dc51cbc0c3eb665c0bca76e2dd7d8ec42fb27",
     "asset_commit_sha": "f5f5e63cff7b348ab86433af9b4d72c26f05513f",
     "import_commit_sha": "a7e0af2406ce8b1ee0b2aeae653f66c4ed35087a",
@@ -45,7 +45,7 @@
     "original_path_template": "assets/v1/characters/{id}/{sheet}.png",
     "github_author_link_verified_from": "gh pr view 27 --json commits; authors[0].login = jungjiyu",
     "main_inclusion_verified": false,
-    "successor_pr": "https://github.com/sidey-app/SIDEY/pull/93",
+    "successor_pr": "https://github.com/sidey-app/SIDEY-source/pull/93",
     "github_import_author_verified": "gh api commits/a7e0af2406ce8b1ee0b2aeae653f66c4ed35087a author.login=jungjiyu"
   },
   "artifacts": [

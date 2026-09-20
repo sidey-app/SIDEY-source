@@ -1,6 +1,6 @@
 # SIDEY 픽셀 에셋 라이브러리
 
-이 폴더는 SIDEY에서 사용하는 승인된 픽셀 에셋의 원본입니다. 공개 규격은
+이 폴더는 SIDEY에서 사용하는 승인된 픽셀 에셋의 원본입니다. 기준 규격은
 [`v1/manifest.json`](v1/manifest.json)과 캐릭터별 `base.png`, `throw_hit.png`,
 말풍선별 `decoration.png`·`preview.png`, 투척물별 `sprite.png` 및 필요한
 별도 emitter·preview입니다.
@@ -8,10 +8,8 @@
 앱과 웹 폴더에 있는 같은 PNG 및 Windows BGRA 파일은 배포용 복사본입니다.
 해당 파일은 직접 편집하지 않고 이 폴더의 원본에서 갱신합니다.
 
-[공개 에셋 프리뷰어](https://sidey-app.github.io/SIDEY/contribute/asset-previewer/)는
-파일을 서버로 보내거나 저장하지 않고 현재 브라우저의 메모리에서만 처리합니다.
-SIDEY 웹 클라이언트가 아니라, 기존 에셋의 규격과 동작을 확인하는 검토 도구입니다.
-외부 에셋 기여는 받지 않습니다.
+에셋 검토 도구는 비공개 source 저장소의 로컬 개발 환경에서만 사용합니다. 외부 에셋
+기여는 받지 않습니다.
 
 ![햄스터 기본·throw/hit·패치 말랑공 공식 8배 참고 이미지](v1/reference/pixel_hamster_reference.png)
 
@@ -19,7 +17,7 @@ SIDEY 웹 클라이언트가 아니라, 기존 에셋의 규격과 동작을 확
 
 `v1/manifest.json`의 `licensing`에 등록된 유료 캐릭터·말풍선·투척물은
 [SIDEY Paid Asset License 1.0](PAID_ASSET_LICENSE.md)이 적용되는 독점 에셋입니다.
-소스가 공개되어 있어 열람할 수 있지만 오픈소스 에셋은 아닙니다.
+비공개 source 저장소에서 관리하며 오픈소스 에셋이 아닙니다.
 
 공식 SIDEY 앱이 계정의 사용 권한에 따라 표시하거나, SIDEY 개발·검토를 위해
 로컬에서 확인하는 범위만 허용합니다. 다른 앱이나 상품에서 복제·수정·재배포·판매할
@@ -27,7 +25,8 @@ SIDEY 웹 클라이언트가 아니라, 기존 에셋의 규격과 동작을 확
 
 이 라이선스는 manifest에 유료로 지정되지 않은 에셋이나 소프트웨어 코드에는
 적용되지 않습니다. 다른 에셋은 별도 라이선스가 명시되지 않았다면 기본 저작권
-조건을 따릅니다. SIDEY 소스 코드의 AGPLv3 적용 범위와 제3자 자료의 구분은
+조건을 따릅니다. 과거 공개 revision의 AGPLv3 적용 범위와 현재 독점 source,
+제3자 자료의 구분은
 [라이선스 안내](../LICENSING.md)를 확인해 주세요.
 
 ## 프레임 계약
@@ -107,9 +106,9 @@ particle burst 효과를 제안할 수 있습니다. 이러한 효과는 PNG 프
    `--target macos --check`는 번들 사본과 현재 StoreKit 상품 ID·비소모성 유형·가격을 검사합니다.
    StoreKit 등록·지역·심사 설정 전체를 생성기로 덮어쓰지 않습니다.
 5. 서버 반영이 필요한 상품 변경은 [비공개 backend 저장소](https://github.com/sidey-app/sidey-backend)의
-   현재 clone에서 진행합니다. 검토한 공개 커밋의 상품·manifest snapshot과 출처를 기록하고 서버용 매핑을
+   현재 clone에서 진행합니다. 검토한 비공개 source 커밋의 상품·manifest snapshot과 출처를 기록하고 서버용 매핑을
    생성·검증합니다. DB migration·verifier 검사·배포도 해당 저장소의 절차를 따릅니다.
-   공개 원본 변경만으로 운영 상품이나 결제 서버에 반영되지는 않습니다. 자세한 경계는
+   source 원본 변경만으로 운영 상품이나 결제 서버에 반영되지는 않습니다. 자세한 경계는
    [백엔드 개발 안내](../docs/BACKEND.md)를 참고합니다.
 6. 영어·일본어 유료 상품 소개는 `website/src/data/store-translations.ts`에서 관리합니다.
    번역 누락은 웹 빌드를 실패시킵니다. 기본 제공 7종은 상점의 명시 목록으로 유지합니다.

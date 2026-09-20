@@ -18,7 +18,8 @@ When `release/macos.json` uses the `appstore` channel, existing `docs/releases/v
 Read [references/evidence.md](references/evidence.md), then use the read-only
 [collector](../../../scripts/skills/release-notes/collect_release_evidence.py)
 to inventory first-parent integrations, associated pull requests, direct
-commits, authors and changed paths in the exact baseline-to-target range. The
+commits, authors and changed paths from the private source repository in the
+exact baseline-to-target range. The
 inventory is a routing aid, not sufficient evidence for release copy: inspect
 the relevant hunks, pull-request context and tests or artifact evidence.
 
@@ -28,7 +29,7 @@ Include only changes consumed by the target platform artifact. Keep macOS and Wi
 
 Read [references/format.md](references/format.md) before drafting. Translate implementation evidence into a short final-user summary followed by one-sentence change bullets. Preserve installation actions, compatibility limits, data-risk warnings, signing status and known limitations only when users need them or the user requests a separate section. Do not claim unverified functionality, security, signing, testing, availability or release completion.
 
-Write or revise `docs/releases/windows-v<version>.md` for Windows. Revise `docs/releases/v<version>.md` for macOS only when the exact target is a historical Direct GitHub Release. These repository files are the corresponding public GitHub Release bodies. For an explicitly evidenced App Store submission, do not touch a historical Direct note; prepare only the requested App Store Connect destination and localization. Unless the user explicitly requests another section, use only the requested preamble when present, the summary, `## 변경사항`, attributed bullets and the final comparison link for GitHub Release bodies; do not add a release title, date, installation or limitations section by habit.
+Write or revise `docs/releases/windows-v<version>.md` for Windows. Revise `docs/releases/v<version>.md` for macOS only when the exact target is a historical Direct GitHub Release. These repository files are the corresponding public GitHub Release bodies. For an explicitly evidenced App Store submission, do not touch a historical Direct note; prepare only the requested App Store Connect destination and localization. Unless the user explicitly requests another section, use only the requested preamble when present, the summary, `## 변경사항` and attributed bullets for GitHub Release bodies; do not add a release title, date, repository comparison link, installation or limitations section by habit. The public distribution repository does not contain source history, so a public `compare` URL is not an application changelog. Do not expose or link the private source repository from a public release body.
 
 Save the collector output outside tracked source, then run the
 [format validator](../../../scripts/skills/release-notes/validate_release_note.py)
@@ -45,7 +46,7 @@ Baseline tag and commit / exact comparison range
 Included: PR or commit, author, source evidence -> user-facing outcome
 Excluded: PR or commit, author, source evidence -> exclusion reason
 Canonical release-note path
-Validation: note format, attribution, comparison URL, manifest, links, deterministic checks
+Validation: note format, attribution, exact source range, manifest, links, deterministic checks
 Verdict: READY / ACTION REQUIRED / BLOCKED
 Unverified claims or missing evidence
 ```

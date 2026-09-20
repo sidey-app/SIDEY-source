@@ -2,7 +2,7 @@
 
 Status: Accepted
 Decided: 2026-09-03 17:56 KST
-Evidence: [commit 79f3afb](https://github.com/sidey-app/SIDEY/commit/79f3afbdfe2a76b4c3a156aa341a078ec0b64594)
+Evidence: [commit 79f3afb](https://github.com/sidey-app/SIDEY-source/commit/79f3afbdfe2a76b4c3a156aa341a078ec0b64594)
 
 ## Context
 

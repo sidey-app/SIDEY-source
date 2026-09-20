@@ -2,7 +2,7 @@
 
 Status: Accepted
 Decided: 2026-09-01 12:57 KST
-Evidence: [commit 12dff17](https://github.com/sidey-app/SIDEY/commit/12dff170b4f664ee942c0257ca369c8a1f742363)
+Evidence: [commit 12dff17](https://github.com/sidey-app/SIDEY-source/commit/12dff170b4f664ee942c0257ca369c8a1f742363)
 
 ## Context
 

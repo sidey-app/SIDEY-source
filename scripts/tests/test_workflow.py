@@ -256,10 +256,20 @@ class WorkflowTests(unittest.TestCase):
         with (
             patch.object(w, 'owned_task', return_value=task),
             patch.object(w, 'dirty_paths', return_value=[]),
+            patch.object(
+                w,
+                'source_repository',
+                return_value='sidey-app/SIDEY-source',
+            ),
             patch.object(w, 'fetch_main', return_value='base'),
             patch.object(w, 'attest'),
             patch.object(w, 'changed_paths', return_value=['docs/guide.md']),
             patch.object(w, 'validate_paths'),
+            patch.object(
+                w,
+                'publish_head',
+                return_value='sidey-app:shared/task',
+            ),
             patch.object(w, 'open_task_prs', side_effect=([old_pr], [current_pr])),
             patch.object(w, 'branch', return_value='shared/task'),
             patch.object(w, 'head', return_value='checked-head'),
@@ -317,10 +327,20 @@ class WorkflowTests(unittest.TestCase):
         with (
             patch.object(w, 'owned_task', return_value=task),
             patch.object(w, 'dirty_paths', return_value=[]),
+            patch.object(
+                w,
+                'source_repository',
+                return_value='sidey-app/SIDEY-source',
+            ),
             patch.object(w, 'fetch_main', return_value='base'),
             patch.object(w, 'attest'),
             patch.object(w, 'changed_paths', return_value=['docs/guide.md']),
             patch.object(w, 'validate_paths'),
+            patch.object(
+                w,
+                'publish_head',
+                return_value='sidey-app:shared/task',
+            ),
             patch.object(w, 'open_task_prs', side_effect=([], [current_pr])),
             patch.object(w, 'branch', return_value='shared/task'),
             patch.object(w, 'head', return_value='checked-head'),
