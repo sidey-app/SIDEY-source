@@ -85,13 +85,13 @@ struct AppSettingsView: View {
 
             SettingsSection(
                 title: "전역 단축키",
-                subtitle: "다른 앱을 사용하는 중에도 Control + Option과 아래 키로 실행합니다.",
+                subtitle: "다른 앱을 사용하는 중에도 \(GlobalShortcutAction.modifierDescription)와 아래 키를 함께 눌러 실행합니다.",
                 systemImage: "keyboard"
             ) {
                 ForEach(GlobalShortcutAction.allCases) { shortcut in
                     SettingsControlRow(
                         title: shortcut.title,
-                        description: model.globalShortcutStatuses[shortcut]?.notice ?? "Control + Option + \(shortcut.key)"
+                        description: model.globalShortcutStatuses[shortcut]?.notice ?? shortcut.descriptiveShortcut
                     ) {
                         Text(shortcut.displayShortcut)
                             .font(.body.monospaced())

@@ -21,7 +21,11 @@ enum GlobalShortcutAction: UInt32, CaseIterable, Identifiable {
         case .openHistory: "R"
         }
     }
-    var displayShortcut: String { "⌃⌥\(key)" }
+    static let modifierMask = UInt32(controlKey | optionKey | cmdKey)
+    static let modifierDescription = "Control + Option + Command"
+
+    var displayShortcut: String { "⌃⌥⌘\(key)" }
+    var descriptiveShortcut: String { "\(Self.modifierDescription) + \(key)" }
     var keyCode: UInt32 {
         switch self {
         case .toggleQuietMode: UInt32(kVK_ANSI_M)
@@ -149,7 +153,7 @@ final class CarbonGlobalShortcutRegistrar: GlobalShortcutRegistering {
     func register(_ action: GlobalShortcutAction) -> OSStatus {
         var reference: EventHotKeyRef?
         let result = RegisterEventHotKey(
-            action.keyCode, UInt32(controlKey | optionKey),
+            action.keyCode, GlobalShortcutAction.modifierMask,
             EventHotKeyID(signature: Self.signature, id: action.rawValue),
             GetApplicationEventTarget(), 0, &reference
         )

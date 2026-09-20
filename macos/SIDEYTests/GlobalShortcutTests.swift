@@ -5,6 +5,24 @@ import XCTest
 
 @MainActor
 final class GlobalShortcutTests: XCTestCase {
+    func testShortcutDefinitionsRequireControlOptionCommandFourKeyChords() {
+        XCTAssertEqual(
+            GlobalShortcutAction.modifierMask,
+            UInt32(controlKey | optionKey | cmdKey)
+        )
+        XCTAssertEqual(GlobalShortcutAction.toggleQuietMode.displayShortcut, "⌃⌥⌘M")
+        XCTAssertEqual(GlobalShortcutAction.toggleComposer.displayShortcut, "⌃⌥⌘I")
+        XCTAssertEqual(GlobalShortcutAction.openHistory.displayShortcut, "⌃⌥⌘R")
+        XCTAssertEqual(
+            GlobalShortcutAction.allCases.map(\.descriptiveShortcut),
+            [
+                "Control + Option + Command + M",
+                "Control + Option + Command + I",
+                "Control + Option + Command + R"
+            ]
+        )
+    }
+
     func testHoldingShortcutRunsOnceUntilReleaseAndDifferentShortcutsRemainIndependent() {
         let registrar = FakeGlobalShortcutRegistrar()
         var actions: [GlobalShortcutAction] = []
@@ -116,6 +134,8 @@ final class GlobalShortcutTests: XCTestCase {
         let quiet = try XCTUnwrap(menu.item(withTitle: "조용히 모드"))
         XCTAssertTrue(quiet.attributedTitle?.string.contains("단축키 사용 불가") == true)
         XCTAssertTrue(quiet.toolTip?.contains("다른 앱") == true)
+        let composer = try XCTUnwrap(menu.item(withTitle: "메시지 작성…"))
+        XCTAssertEqual(composer.toolTip, "Control + Option + Command + I")
     }
 }
 

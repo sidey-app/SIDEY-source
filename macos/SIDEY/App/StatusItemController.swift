@@ -162,7 +162,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         let title = item.title
         item.attributedTitle = NSAttributedString(string: "\(title)    \(suffix)")
         item.title = title
-        item.toolTip = unavailable ?? "Control + Option + \(action.key)"
+        item.toolTip = unavailable ?? action.descriptiveShortcut
     }
 
     private func makeRoomsMenu() -> NSMenu {
