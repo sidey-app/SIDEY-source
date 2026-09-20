@@ -85,17 +85,19 @@ struct AppSettingsView: View {
 
             SettingsSection(
                 title: "전역 단축키",
-                subtitle: "다른 앱을 사용하는 중에도 \(GlobalShortcutAction.modifierDescription)와 아래 키를 함께 눌러 실행합니다.",
+                subtitle: "수정 키를 하나 이상 선택하고 영문 또는 숫자 키를 지정합니다. 변경은 바로 적용됩니다.",
                 systemImage: "keyboard"
             ) {
                 ForEach(GlobalShortcutAction.allCases) { shortcut in
                     SettingsControlRow(
                         title: shortcut.title,
-                        description: model.globalShortcutStatuses[shortcut]?.notice ?? shortcut.descriptiveShortcut
+                        description: model.globalShortcutStatuses[shortcut]?.notice
+                            ?? model.preferences.globalShortcuts[shortcut].descriptiveShortcut
                     ) {
-                        Text(shortcut.displayShortcut)
-                            .font(.body.monospaced())
-                            .foregroundStyle(model.globalShortcutStatuses[shortcut]?.notice == nil ? .primary : .secondary)
+                        GlobalShortcutEditor(
+                            binding: shortcutBinding(shortcut),
+                            defaultBinding: shortcut.defaultBinding
+                        )
                     }
                     if shortcut != GlobalShortcutAction.allCases.last { Divider() }
                 }
@@ -230,6 +232,13 @@ struct AppSettingsView: View {
         )
     }
 
+    private func shortcutBinding(_ action: GlobalShortcutAction) -> Binding<GlobalShortcutBinding> {
+        Binding(
+            get: { model.preferences.globalShortcuts[action] },
+            set: { actions.onGlobalShortcutChanged(action, $0) }
+        )
+    }
+
     private var regionSpanBinding: Binding<OverlaySpan> {
         Binding(
             get: { model.preferences.overlayRegion.span },
@@ -248,6 +257,63 @@ struct AppSettingsView: View {
                 var preference = model.preferences.overlayRegion
                 preference.screenIdentifier = screenIdentifier
                 actions.onOverlayRegionChanged(preference)
+            }
+        )
+    }
+}
+
+private struct GlobalShortcutEditor: View {
+    @Binding var binding: GlobalShortcutBinding
+    let defaultBinding: GlobalShortcutBinding
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(GlobalShortcutModifier.allCases) { modifier in
+                Toggle(modifier.symbol, isOn: modifierBinding(modifier))
+                    .toggleStyle(.button)
+                    .controlSize(.small)
+                    .help(modifier.title)
+                    .accessibilityLabel(modifier.title)
+            }
+            Picker("키", selection: keyBinding) {
+                ForEach(GlobalShortcutKey.allCases) { key in
+                    Text(key.rawValue).tag(key)
+                }
+            }
+            .labelsHidden()
+            .frame(width: 64)
+
+            Button {
+                binding = defaultBinding
+            } label: {
+                Image(systemName: "arrow.counterclockwise")
+            }
+            .buttonStyle(.borderless)
+            .disabled(binding == defaultBinding)
+            .help("기본 단축키로 복원")
+            .accessibilityLabel("기본 단축키로 복원")
+        }
+        .font(.body.monospaced())
+    }
+
+    private func modifierBinding(_ modifier: GlobalShortcutModifier) -> Binding<Bool> {
+        Binding(
+            get: { binding.modifiers.contains(modifier) },
+            set: { enabled in
+                var updated = binding
+                updated.modifiers.set(modifier, enabled: enabled)
+                binding = updated
+            }
+        )
+    }
+
+    private var keyBinding: Binding<GlobalShortcutKey> {
+        Binding(
+            get: { binding.key },
+            set: { key in
+                var updated = binding
+                updated.key = key
+                binding = updated
             }
         )
     }

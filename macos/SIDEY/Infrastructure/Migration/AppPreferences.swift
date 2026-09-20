@@ -18,7 +18,7 @@ struct CodableRect: Codable, Equatable, Sendable {
 }
 
 struct AppPreferences: Codable, Equatable, Sendable {
-    static let currentSchemaVersion = 10
+    static let currentSchemaVersion = 11
     var characterSoundEffectsEnabled = true
     var treeMovementPaused = false
 
@@ -34,6 +34,7 @@ struct AppPreferences: Codable, Equatable, Sendable {
     var overlayLocked = true
     var overlayScale = 1.5
     var quietModeEnabled = false
+    var globalShortcuts = GlobalShortcutConfiguration.defaults
     var launchAtLogin = false
     var overlayFrame: CodableRect?
     var overlayScreenIdentifier: String?
@@ -59,6 +60,7 @@ struct AppPreferences: Codable, Equatable, Sendable {
         case overlayLocked
         case overlayScale
         case quietModeEnabled
+        case globalShortcuts
         case launchAtLogin
         case overlayFrame
         case overlayScreenIdentifier
@@ -94,6 +96,10 @@ struct AppPreferences: Codable, Equatable, Sendable {
         overlayLocked = try values.decodeIfPresent(Bool.self, forKey: .overlayLocked) ?? true
         overlayScale = try values.decodeIfPresent(Double.self, forKey: .overlayScale) ?? 1.5
         quietModeEnabled = try values.decodeIfPresent(Bool.self, forKey: .quietModeEnabled) ?? false
+        globalShortcuts = (try? values.decode(
+            GlobalShortcutConfiguration.self,
+            forKey: .globalShortcuts
+        )) ?? .defaults
         launchAtLogin = try values.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? false
         overlayFrame = try values.decodeIfPresent(CodableRect.self, forKey: .overlayFrame)
         overlayScreenIdentifier = try values.decodeIfPresent(String.self, forKey: .overlayScreenIdentifier)
