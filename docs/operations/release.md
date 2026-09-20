@@ -10,6 +10,13 @@ submission, upload, website deployment와 production backend deployment는 각�
 계속 배포하는 과거 AGPL binary에 필요한 source archive를 받는 배포 저장소다. Public
 저장소의 파일을 source-of-truth로 역수정하지 않는다.
 
+Private source는 GitHub Free 조직에서 운영하므로 publication job에 Actions environment를
+사용하지 않는다. `SIDEY_PUBLIC_PUBLISHER_APP_ID` repository variable과
+`SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY` repository secret으로 공개 저장소에만 설치된 GitHub
+App token을 만든다. App 설치 범위는 공개 `sidey-app/SIDEY` 하나로 제한하고 repository
+권한은 `Contents: read/write`, `Metadata: read`만 허용한다. Organization-level secret이나
+private environment 보호에는 의존하지 않는다.
+
 ## 1. 범위와 version 확인
 
 1. Target platform과 실제 shipped diff를 확정한다.

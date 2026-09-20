@@ -3,6 +3,7 @@
 Status: Accepted
 Decided: 2026-09-20 22:55 KST
 Supersedes: [코드 공개 라이선스와 에셋 기여 경계](202609171825-source-license-and-asset-boundary.md)
+Refined by: [GitHub Free 비공개 source 운영](20260921-free-private-source-controls.md)
 
 ## Context
 
