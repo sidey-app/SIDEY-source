@@ -45,7 +45,7 @@ class WorkflowStateTests(unittest.TestCase):
             "worktree": str(self.root),
             "branch": "shared/readability",
             "platform": "shared",
-            "app": "SIDEYAppStore",
+            "app": "SIDEY",
             "base": "base-sha",
             "status": "started",
         }
@@ -70,7 +70,7 @@ class WorkflowStateTests(unittest.TestCase):
             "worktree": str(resolved_destination),
             "branch": "shared/readability",
             "platform": "shared",
-            "app": "SIDEYAppStore",
+            "app": "SIDEY",
             "base": "remote-main",
             "status": "started",
         }
