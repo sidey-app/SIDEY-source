@@ -52,6 +52,7 @@ public sealed class TrayIconService : IDisposable
     private const uint RefreshMessage = 0x8000 + 52;
     private const uint NotificationMessage = 0x8000 + 53;
     private const uint GoogleSignInCompleteMessage = 0x8000 + 54;
+    private const uint HotkeySuspensionMessage = 0x8000 + 55;
     private const uint IconId = 1;
     private const uint NotifyIconMessage = 0x1;
     private const uint NotifyIconIcon = 0x2;
@@ -80,6 +81,7 @@ public sealed class TrayIconService : IDisposable
     private Exception? _startupError;
     private TrayMenuState _state = new(true, false, false, 0, [], null);
     private bool _disposed;
+    private bool _hotkeysSuspended;
 
     private TrayIconService()
     {
@@ -125,6 +127,18 @@ public sealed class TrayIconService : IDisposable
         if (_window != nint.Zero)
         {
             NativeMethods.PostMessage(_window, RefreshMessage, nint.Zero, nint.Zero);
+        }
+    }
+
+    public void SetHotkeysSuspended(bool suspended)
+    {
+        if (!_disposed && _window != nint.Zero)
+        {
+            NativeMethods.SendMessage(
+                _window,
+                HotkeySuspensionMessage,
+                suspended ? new nint(1) : nint.Zero,
+                nint.Zero);
         }
     }
 
@@ -328,6 +342,13 @@ public sealed class TrayIconService : IDisposable
 
     private void RefreshHotkeys()
     {
+        if (_hotkeysSuspended)
+        {
+            _hotkeys?.Dispose();
+            _hotkeys = null;
+            return;
+        }
+
         GlobalHotkeySettings settings = _state.GlobalHotkeys.Normalize();
         if (_hotkeys?.Settings == settings)
         {
@@ -718,6 +739,12 @@ public sealed class TrayIconService : IDisposable
                 NativeMethods.ShellNotifyIcon(1, ref data);
                 return nint.Zero;
             }
+            if (message == HotkeySuspensionMessage)
+            {
+                service._hotkeysSuspended = wParam != nint.Zero;
+                service.RefreshHotkeys();
+                return nint.Zero;
+            }
             if (message == GoogleSignInCompleteMessage)
             {
                 (string Title, string Body, TrayCommand ClickCommand) notification = GoogleSignInCompleteNotification();
@@ -922,6 +949,7 @@ public sealed class TrayIconService : IDisposable
         [DllImport("user32.dll")] public static extern bool TranslateMessage(ref NativeMessage message);
         [DllImport("user32.dll")] public static extern nint DispatchMessage(ref NativeMessage message);
         [DllImport("user32.dll")] public static extern bool PostMessage(nint window, uint message, nint wParam, nint lParam);
+        [DllImport("user32.dll")] public static extern nint SendMessage(nint window, uint message, nint wParam, nint lParam);
         [DllImport("user32.dll")] public static extern void PostQuitMessage(int exitCode);
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] public static extern nint GetModuleHandle(string? moduleName);
         [DllImport("shell32.dll", EntryPoint = "Shell_NotifyIconW", CharSet = CharSet.Unicode, SetLastError = true)] public static extern bool ShellNotifyIcon(uint message, ref NotifyIconData data);

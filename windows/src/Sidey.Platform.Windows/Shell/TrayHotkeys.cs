@@ -15,7 +15,7 @@ internal interface ITrayHotkeyNative
 internal sealed class TrayHotkeys : IDisposable
 {
     internal const uint Message = 0x0312; // WM_HOTKEY
-    internal const uint Modifiers = 0x0001 | 0x0002 | 0x4000; // ALT | CONTROL | NOREPEAT
+    internal const uint NoRepeat = 0x4000;
     private readonly nint _window;
     private readonly ITrayHotkeyNative _native;
     private readonly Dictionary<int, TrayCommand> _registered = [];
@@ -31,8 +31,12 @@ internal sealed class TrayHotkeys : IDisposable
         var failures = new List<TrayHotkeyFailure>();
         foreach (TrayCommand command in Commands)
         {
-            uint key = VirtualKey(command, Settings);
-            int error = _native.Register(window, (int)command, Modifiers, key);
+            GlobalHotkeyBinding binding = Settings.BindingFor(Action(command));
+            int error = _native.Register(
+                window,
+                (int)command,
+                (uint)binding.Modifiers | NoRepeat,
+                binding.VirtualKey);
             if (error == 0)
             {
                 _registered.Add((int)command, command);
@@ -71,11 +75,11 @@ internal sealed class TrayHotkeys : IDisposable
 
     internal static string Shortcut(TrayCommand command, GlobalHotkeySettings settings) =>
         Commands.Contains(command)
-            ? $"Ctrl+Alt+{settings.Normalize().KeyFor(Action(command))}"
+            ? settings.Normalize().BindingFor(Action(command)).ToDisplayText().Replace(" + ", "+", StringComparison.Ordinal)
             : string.Empty;
 
     internal static uint VirtualKey(TrayCommand command, GlobalHotkeySettings settings) =>
-        (uint)('A' + (int)settings.Normalize().KeyFor(Action(command)));
+        settings.Normalize().BindingFor(Action(command)).VirtualKey;
 
     internal static string MenuLabel(
         TrayCommand command,

@@ -74,7 +74,11 @@ public sealed class AtomicPreferencesStoreTests
                 GlobalHotkeyKey.O,
                 GlobalHotkeyKey.Q,
                 GlobalHotkeyKey.C,
-                GlobalHotkeyKey.L),
+                GlobalHotkeyKey.L).Assign(
+                    GlobalHotkeyAction.ToggleOverlay,
+                    new GlobalHotkeyBinding(
+                        GlobalHotkeyModifiers.Control | GlobalHotkeyModifiers.Shift,
+                        0x74)),
         };
 
         try
@@ -92,6 +96,49 @@ public sealed class AtomicPreferencesStoreTests
             {
                 Directory.Delete(directory, recursive: true);
             }
+        }
+    }
+
+    [Fact]
+    public async Task LegacyLetterOnlyHotkeysLoadAsControlAltShortcuts()
+    {
+        string directory = Path.Combine(Path.GetTempPath(), $"sidey-preferences-{Guid.NewGuid():N}");
+        string path = Path.Combine(directory, "preferences.json");
+        Directory.CreateDirectory(directory);
+        await File.WriteAllTextAsync(
+            path,
+            """
+            {
+              "schemaVersion": 6,
+              "onboardingCompleted": true,
+              "installationSeed": 1234,
+              "overlayVisible": true,
+              "quietMode": false,
+              "showOfflineMembers": true,
+              "startAtLogin": false,
+              "activeRoomId": null,
+              "overlayRegion": { "edge": "bottom", "span": "full", "monitorIdentifier": null },
+              "globalHotkeys": {
+                "toggleOverlay": "o",
+                "toggleQuietMode": "q",
+                "compose": "c",
+                "history": "l"
+              }
+            }
+            """);
+
+        try
+        {
+            AppPreferences preferences = await new AtomicPreferencesStore(path).LoadAsync();
+
+            Assert.Equal(AppPreferences.CurrentSchemaVersion, preferences.SchemaVersion);
+            Assert.Equal(
+                new GlobalHotkeyBinding(GlobalHotkeyModifiers.Control | GlobalHotkeyModifiers.Alt, 'O'),
+                preferences.GlobalHotkeys.BindingFor(GlobalHotkeyAction.ToggleOverlay));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
         }
     }
 }

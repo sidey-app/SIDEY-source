@@ -12,7 +12,6 @@ namespace Sidey.Presentation.ViewModels;
 public sealed partial class MainWindowViewModel : ObservableObject
 {
     private static readonly string[] s_supportedLanguages = [.. I18n.SupportedLanguages];
-    private static readonly string[] s_hotkeyKeys = Enum.GetNames<GlobalHotkeyKey>();
 
     private readonly IMainWindowCoordinator _coordinator;
     private readonly IMainWindowDialogService _dialogs;
@@ -29,6 +28,9 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private CancellationTokenSource? _soundSaveDelay;
     private Task _saveSoundSettingsTask = Task.CompletedTask;
     private Task _saveGlobalHotkeysTask = Task.CompletedTask;
+    private GlobalHotkeySettings _displayedGlobalHotkeys = GlobalHotkeySettings.Default;
+    private GlobalHotkeyAction? _recordingHotkeyAction;
+    private string? _hotkeyRecordingText;
     private readonly Guid _soundFeedbackScope = Guid.NewGuid();
     private bool _soundFeedbackPending;
 
@@ -281,22 +283,17 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public partial bool StartAtLogin { get; set; }
 
-    public IReadOnlyList<string> HotkeyKeys => s_hotkeyKeys;
-
     [ObservableProperty]
     public partial bool IsHotkeySelectionEnabled { get; set; } = true;
 
-    [ObservableProperty]
-    public partial int OverlayHotkeyIndex { get; set; } = (int)GlobalHotkeyKey.H;
-
-    [ObservableProperty]
-    public partial int QuietModeHotkeyIndex { get; set; } = (int)GlobalHotkeyKey.M;
-
-    [ObservableProperty]
-    public partial int ComposerHotkeyIndex { get; set; } = (int)GlobalHotkeyKey.I;
-
-    [ObservableProperty]
-    public partial int HistoryHotkeyIndex { get; set; } = (int)GlobalHotkeyKey.R;
+    public string OverlayHotkeyText => HotkeyText(GlobalHotkeyAction.ToggleOverlay);
+    public string QuietModeHotkeyText => HotkeyText(GlobalHotkeyAction.ToggleQuietMode);
+    public string ComposerHotkeyText => HotkeyText(GlobalHotkeyAction.Compose);
+    public string HistoryHotkeyText => HotkeyText(GlobalHotkeyAction.History);
+    public string OverlayHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyOverlay", OverlayHotkeyText);
+    public string QuietModeHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyQuietMode", QuietModeHotkeyText);
+    public string ComposerHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyComposer", ComposerHotkeyText);
+    public string HistoryHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyHistory", HistoryHotkeyText);
 
     [ObservableProperty]
     public partial int SelectedLanguageIndex { get; set; }
@@ -527,6 +524,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public void RefreshLocalizedText()
     {
         OnPropertyChanged(nameof(SoundMuteActionText));
+        NotifyHotkeyTextChanged();
         RefreshFeedbackPresentation();
         // Keep the existing items, selection, drafts and in-flight commands alive.
         foreach (CharacterSelectionItemViewModel character in CharacterSelections)
@@ -832,27 +830,50 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    partial void OnOverlayHotkeyIndexChanged(int value) =>
-        UpdateGlobalHotkey(GlobalHotkeyAction.ToggleOverlay, value);
-
-    partial void OnQuietModeHotkeyIndexChanged(int value) =>
-        UpdateGlobalHotkey(GlobalHotkeyAction.ToggleQuietMode, value);
-
-    partial void OnComposerHotkeyIndexChanged(int value) =>
-        UpdateGlobalHotkey(GlobalHotkeyAction.Compose, value);
-
-    partial void OnHistoryHotkeyIndexChanged(int value) =>
-        UpdateGlobalHotkey(GlobalHotkeyAction.History, value);
-
-    private void UpdateGlobalHotkey(GlobalHotkeyAction action, int value)
+    public void BeginHotkeyRecording(GlobalHotkeyAction action)
     {
-        if (_isApplyingState || !IsHotkeySelectionEnabled
-            || value < 0 || value >= s_hotkeyKeys.Length)
+        if (!IsHotkeySelectionEnabled)
+            return;
+        _recordingHotkeyAction = action;
+        _hotkeyRecordingText = I18n.Get("settings.hotkeyRecording");
+        NotifyHotkeyTextChanged();
+    }
+
+    public bool IsHotkeyRecording(GlobalHotkeyAction action) => _recordingHotkeyAction == action;
+
+    public void PreviewHotkeyModifiers(GlobalHotkeyAction action, GlobalHotkeyModifiers modifiers)
+    {
+        if (_recordingHotkeyAction != action)
+            return;
+        string modifiersText = GlobalHotkeyBinding.ModifierDisplayText(modifiers);
+        _hotkeyRecordingText = modifiersText.Length == 0
+            ? I18n.Get("settings.hotkeyRecording")
+            : $"{modifiersText} + …";
+        NotifyHotkeyTextChanged();
+    }
+
+    public void RejectHotkeyRecording(GlobalHotkeyAction action)
+    {
+        if (_recordingHotkeyAction != action)
+            return;
+        _hotkeyRecordingText = I18n.Get("settings.hotkeyNeedsModifier");
+        NotifyHotkeyTextChanged();
+    }
+
+    public void CancelHotkeyRecording(GlobalHotkeyAction action)
+    {
+        if (_recordingHotkeyAction != action)
+            return;
+        EndHotkeyRecording();
+    }
+
+    public void AssignGlobalHotkey(GlobalHotkeyAction action, GlobalHotkeyBinding binding)
+    {
+        if (_recordingHotkeyAction != action || !IsHotkeySelectionEnabled || !binding.IsValid())
             return;
 
-        GlobalHotkeySettings settings = _coordinator.State.Preferences.GlobalHotkeys.Assign(
-            action,
-            (GlobalHotkeyKey)value);
+        GlobalHotkeySettings settings = _displayedGlobalHotkeys.Assign(action, binding);
+        EndHotkeyRecording();
         _isApplyingState = true;
         try
         {
@@ -894,11 +915,34 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     private void ApplyHotkeySelections(GlobalHotkeySettings settings)
     {
-        GlobalHotkeySettings normalized = settings.Normalize();
-        OverlayHotkeyIndex = (int)normalized.ToggleOverlay;
-        QuietModeHotkeyIndex = (int)normalized.ToggleQuietMode;
-        ComposerHotkeyIndex = (int)normalized.Compose;
-        HistoryHotkeyIndex = (int)normalized.History;
+        _displayedGlobalHotkeys = settings.Normalize();
+        NotifyHotkeyTextChanged();
+    }
+
+    private string HotkeyText(GlobalHotkeyAction action) => _recordingHotkeyAction == action
+        ? _hotkeyRecordingText ?? I18n.Get("settings.hotkeyRecording")
+        : _displayedGlobalHotkeys.BindingFor(action).ToDisplayText();
+
+    private static string HotkeyAccessibleName(string actionKey, string shortcut) =>
+        $"{I18n.Get(actionKey)}: {shortcut}";
+
+    private void EndHotkeyRecording()
+    {
+        _recordingHotkeyAction = null;
+        _hotkeyRecordingText = null;
+        NotifyHotkeyTextChanged();
+    }
+
+    private void NotifyHotkeyTextChanged()
+    {
+        OnPropertyChanged(nameof(OverlayHotkeyText));
+        OnPropertyChanged(nameof(QuietModeHotkeyText));
+        OnPropertyChanged(nameof(ComposerHotkeyText));
+        OnPropertyChanged(nameof(HistoryHotkeyText));
+        OnPropertyChanged(nameof(OverlayHotkeyAccessibleName));
+        OnPropertyChanged(nameof(QuietModeHotkeyAccessibleName));
+        OnPropertyChanged(nameof(ComposerHotkeyAccessibleName));
+        OnPropertyChanged(nameof(HistoryHotkeyAccessibleName));
     }
 
     partial void OnSelectedLanguageIndexChanged(int value)

@@ -318,6 +318,7 @@ public partial class App : Application
         _mainWindow = new MainWindow(_coordinator, _updateService);
         StartupDiagnostics.Stage("settings-window-created result=success");
         _mainWindow.Closed += OnMainWindowClosed;
+        _mainWindow.HotkeyRecordingChanged += OnHotkeyRecordingChanged;
         _mainWindow.SetTrayAvailable(_tray is not null);
         StartStartupUpdateCheck();
         return _mainWindow;
@@ -1270,6 +1271,8 @@ public partial class App : Application
 
         bool shouldExit = mainWindow.ShouldExitOnClose;
         _pendingSettingsSave = mainWindow.ViewModel.FlushSettingsAsync();
+        mainWindow.HotkeyRecordingChanged -= OnHotkeyRecordingChanged;
+        _tray?.SetHotkeysSuspended(false);
         mainWindow.Closed -= OnMainWindowClosed;
         _mainWindow = null;
         if (ReferenceEquals(_window, mainWindow))
@@ -1282,6 +1285,9 @@ public partial class App : Application
             BeginShutdown();
         }
     }
+
+    private void OnHotkeyRecordingChanged(bool recording) =>
+        _tray?.SetHotkeysSuspended(recording);
 
     private Task _pendingSettingsSave = Task.CompletedTask;
 

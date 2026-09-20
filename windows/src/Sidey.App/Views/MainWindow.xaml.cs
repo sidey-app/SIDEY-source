@@ -1,3 +1,4 @@
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -10,6 +11,7 @@ using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
+using Windows.System;
 using Windows.UI.ViewManagement;
 
 namespace Sidey.App.Views;
@@ -37,6 +39,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
     private readonly HashSet<Guid> _roomExpansionAnimations = [];
     private bool _hideQueued;
     private bool _isClosed;
+    private bool _hotkeyRecordingActive;
     private string _currentNavigationTag = "profile";
     private readonly Stack<string> _navigationHistory = new();
     private readonly WindowsMinimumSizeController _minimumSizeController;
@@ -107,6 +110,101 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
     }
 
     public MainWindowViewModel ViewModel { get; }
+
+    public event Action<bool>? HotkeyRecordingChanged;
+
+    private void OnHotkeyRecorderClick(object sender, RoutedEventArgs args)
+    {
+        if (sender is not Button button || HotkeyActionFor(button) is not { } action)
+            return;
+        ViewModel.BeginHotkeyRecording(action);
+        SetHotkeyRecordingActive(true);
+        button.Focus(FocusState.Programmatic);
+    }
+
+    private void OnHotkeyRecorderPreviewKeyDown(object sender, KeyRoutedEventArgs args)
+    {
+        if (sender is not Button button || HotkeyActionFor(button) is not { } action)
+            return;
+        if (!ViewModel.IsHotkeyRecording(action))
+            return;
+
+        GlobalHotkeyModifiers modifiers = CurrentHotkeyModifiers();
+        uint virtualKey = (uint)args.Key;
+        if (args.Key == VirtualKey.Escape)
+        {
+            ViewModel.CancelHotkeyRecording(action);
+            SetHotkeyRecordingActive(false);
+            args.Handled = true;
+            return;
+        }
+        if (GlobalHotkeyBinding.IsModifierKey(virtualKey))
+        {
+            ViewModel.PreviewHotkeyModifiers(action, modifiers);
+            args.Handled = true;
+            return;
+        }
+
+        var binding = new GlobalHotkeyBinding(modifiers, virtualKey);
+        if (!binding.IsValid())
+        {
+            ViewModel.RejectHotkeyRecording(action);
+            args.Handled = true;
+            return;
+        }
+
+        ViewModel.AssignGlobalHotkey(action, binding);
+        SetHotkeyRecordingActive(false);
+        args.Handled = true;
+    }
+
+    private void OnHotkeyRecorderLostFocus(object sender, RoutedEventArgs args)
+    {
+        if (sender is Button button && HotkeyActionFor(button) is { } action)
+        {
+            ViewModel.CancelHotkeyRecording(action);
+            SetHotkeyRecordingActive(false);
+        }
+    }
+
+    private void SetHotkeyRecordingActive(bool active)
+    {
+        if (_hotkeyRecordingActive == active)
+            return;
+        _hotkeyRecordingActive = active;
+        HotkeyRecordingChanged?.Invoke(active);
+    }
+
+    private GlobalHotkeyAction? HotkeyActionFor(Button button)
+    {
+        if (ReferenceEquals(button, OverlayHotkeyRecorder))
+            return GlobalHotkeyAction.ToggleOverlay;
+        if (ReferenceEquals(button, QuietModeHotkeyRecorder))
+            return GlobalHotkeyAction.ToggleQuietMode;
+        if (ReferenceEquals(button, ComposerHotkeyRecorder))
+            return GlobalHotkeyAction.Compose;
+        if (ReferenceEquals(button, HistoryHotkeyRecorder))
+            return GlobalHotkeyAction.History;
+        return null;
+    }
+
+    private static GlobalHotkeyModifiers CurrentHotkeyModifiers()
+    {
+        GlobalHotkeyModifiers modifiers = GlobalHotkeyModifiers.None;
+        if (IsKeyDown(VirtualKey.Control))
+            modifiers |= GlobalHotkeyModifiers.Control;
+        if (IsKeyDown(VirtualKey.Menu))
+            modifiers |= GlobalHotkeyModifiers.Alt;
+        if (IsKeyDown(VirtualKey.Shift))
+            modifiers |= GlobalHotkeyModifiers.Shift;
+        if (IsKeyDown(VirtualKey.LeftWindows) || IsKeyDown(VirtualKey.RightWindows))
+            modifiers |= GlobalHotkeyModifiers.Windows;
+        return modifiers;
+    }
+
+    private static bool IsKeyDown(VirtualKey key) =>
+        (InputKeyboardSource.GetKeyStateForCurrentThread(key)
+            & Windows.UI.Core.CoreVirtualKeyStates.Down) != 0;
 
     private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
     {
@@ -1367,6 +1465,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
     {
         _ = sender;
         _ = args;
+        SetHotkeyRecordingActive(false);
         PrepareForClose();
         AppWindow.Closing -= OnAppWindowClosing;
         Closed -= OnWindowClosed;

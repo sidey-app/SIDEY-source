@@ -36,7 +36,7 @@ public sealed record AppPreferences(
     public bool CharacterSoundEffectsEnabled { get; init; } = true;
     public int CharacterSoundEffectsVolume { get; init; } = 100;
 
-    public const int CurrentSchemaVersion = 6;
+    public const int CurrentSchemaVersion = 7;
 
     public static AppPreferences CreateDefault(long? installationSeed = null) => new(
         SchemaVersion: CurrentSchemaVersion,

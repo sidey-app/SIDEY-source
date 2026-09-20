@@ -95,6 +95,24 @@ public sealed class TrayHotkeyTests
         Assert.Equal("Ctrl+Alt+O", TrayHotkeys.Shortcut(TrayCommand.ToggleOverlay, settings));
     }
 
+    [Fact]
+    public void CompleteShortcutRegistersItsModifiersAndVirtualKey()
+    {
+        var native = new FakeHotkeyNative();
+        GlobalHotkeySettings settings = GlobalHotkeySettings.Default.Assign(
+            GlobalHotkeyAction.ToggleOverlay,
+            new GlobalHotkeyBinding(
+                GlobalHotkeyModifiers.Control | GlobalHotkeyModifiers.Shift | GlobalHotkeyModifiers.Windows,
+                0x74));
+
+        using var hotkeys = new TrayHotkeys(42, settings, native);
+
+        (nint Window, int Id, uint Modifiers, uint Key) registration = native.Registrations[0];
+        Assert.Equal(0x400Eu, registration.Modifiers);
+        Assert.Equal(0x74u, registration.Key);
+        Assert.Equal("Ctrl+Shift+Win+F5", TrayHotkeys.Shortcut(TrayCommand.ToggleOverlay, settings));
+    }
+
     private static void AssertBinding(
         (nint Window, int Id, uint Modifiers, uint Key) binding,
         TrayCommand command,

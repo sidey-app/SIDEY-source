@@ -902,37 +902,41 @@
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                      <TextBlock Text="Ctrl + Alt +" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                      <ComboBox Width="72" ItemsSource="{Binding HotkeyKeys}" IsEnabled="{Binding IsHotkeySelectionEnabled}" SelectedIndex="{Binding OverlayHotkeyIndex, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" />
-                    </StackPanel>
+                    <Button x:Name="OverlayHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Content="{Binding OverlayHotkeyText, Mode=OneWay}" IsEnabled="{Binding IsHotkeySelectionEnabled}"
+                        Click="OnHotkeyRecorderClick" PreviewKeyDown="OnHotkeyRecorderPreviewKeyDown" LostFocus="OnHotkeyRecorderLostFocus"
+                        AutomationProperties.Name="{Binding OverlayHotkeyAccessibleName, Mode=OneWay}"
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}" />
                   </Grid>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                      <TextBlock Text="Ctrl + Alt +" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                      <ComboBox Width="72" ItemsSource="{Binding HotkeyKeys}" IsEnabled="{Binding IsHotkeySelectionEnabled}" SelectedIndex="{Binding QuietModeHotkeyIndex, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" />
-                    </StackPanel>
+                    <Button x:Name="QuietModeHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Content="{Binding QuietModeHotkeyText, Mode=OneWay}" IsEnabled="{Binding IsHotkeySelectionEnabled}"
+                        Click="OnHotkeyRecorderClick" PreviewKeyDown="OnHotkeyRecorderPreviewKeyDown" LostFocus="OnHotkeyRecorderLostFocus"
+                        AutomationProperties.Name="{Binding QuietModeHotkeyAccessibleName, Mode=OneWay}"
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}" />
                   </Grid>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                      <TextBlock Text="Ctrl + Alt +" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                      <ComboBox Width="72" ItemsSource="{Binding HotkeyKeys}" IsEnabled="{Binding IsHotkeySelectionEnabled}" SelectedIndex="{Binding ComposerHotkeyIndex, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" />
-                    </StackPanel>
+                    <Button x:Name="ComposerHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Content="{Binding ComposerHotkeyText, Mode=OneWay}" IsEnabled="{Binding IsHotkeySelectionEnabled}"
+                        Click="OnHotkeyRecorderClick" PreviewKeyDown="OnHotkeyRecorderPreviewKeyDown" LostFocus="OnHotkeyRecorderLostFocus"
+                        AutomationProperties.Name="{Binding ComposerHotkeyAccessibleName, Mode=OneWay}"
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}" />
                   </Grid>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                      <TextBlock Text="Ctrl + Alt +" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                      <ComboBox Width="72" ItemsSource="{Binding HotkeyKeys}" IsEnabled="{Binding IsHotkeySelectionEnabled}" SelectedIndex="{Binding HistoryHotkeyIndex, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" />
-                    </StackPanel>
+                    <Button x:Name="HistoryHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Content="{Binding HistoryHotkeyText, Mode=OneWay}" IsEnabled="{Binding IsHotkeySelectionEnabled}"
+                        Click="OnHotkeyRecorderClick" PreviewKeyDown="OnHotkeyRecorderPreviewKeyDown" LostFocus="OnHotkeyRecorderLostFocus"
+                        AutomationProperties.Name="{Binding HistoryHotkeyAccessibleName, Mode=OneWay}"
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}" />
                   </Grid>
                 </StackPanel>
               </Border>

@@ -92,11 +92,11 @@ public sealed class AppPreferencesTests
     [Fact]
     public void CustomGlobalHotkeysRoundTripWithOtherPreferences()
     {
-        var hotkeys = new GlobalHotkeySettings(
+        GlobalHotkeySettings hotkeys = new GlobalHotkeySettings(
             GlobalHotkeyKey.O,
             GlobalHotkeyKey.Q,
             GlobalHotkeyKey.C,
-            GlobalHotkeyKey.L);
+            GlobalHotkeyKey.L).Normalize();
         AppPreferences saved = AppPreferences.Default with { GlobalHotkeys = hotkeys };
 
         AppPreferences restored = JsonSerializer.Deserialize<AppPreferences>(

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using Sidey.Core.Abstractions;
 using Sidey.Core.Domain;
+using Sidey.Core.Localization;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
 
@@ -436,7 +437,7 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
-    public void HotkeySelectionSwapsAnOccupiedKeyAndPersistsOneCompleteMapping()
+    public void HotkeyRecordingSwapsAnOccupiedBindingAndPersistsOneCompleteMapping()
     {
         (FakeSideyCoordinator coordinator, CoordinatorState state) = CreateRoomState();
         coordinator.State = state with
@@ -446,17 +447,24 @@ public sealed class MainWindowViewModelTests
         var viewModel = new MainWindowViewModel(
             coordinator, new FakeMainWindowDialogService(), new FakeUpdateService());
 
-        Assert.Equal((int)GlobalHotkeyKey.H, viewModel.OverlayHotkeyIndex);
-        Assert.Equal((int)GlobalHotkeyKey.I, viewModel.ComposerHotkeyIndex);
+        Assert.Equal("Ctrl + Alt + H", viewModel.OverlayHotkeyText);
+        Assert.Equal("Ctrl + Alt + I", viewModel.ComposerHotkeyText);
+        Assert.Contains("Ctrl + Alt + H", viewModel.OverlayHotkeyAccessibleName, StringComparison.Ordinal);
         Assert.Equal(0, coordinator.SetGlobalHotkeysCallCount);
 
-        viewModel.OverlayHotkeyIndex = (int)GlobalHotkeyKey.I;
+        viewModel.BeginHotkeyRecording(GlobalHotkeyAction.ToggleOverlay);
+        Assert.True(viewModel.IsHotkeyRecording(GlobalHotkeyAction.ToggleOverlay));
+        Assert.Contains(I18n.Get("settings.hotkeyRecording"), viewModel.OverlayHotkeyAccessibleName, StringComparison.Ordinal);
+        viewModel.AssignGlobalHotkey(
+            GlobalHotkeyAction.ToggleOverlay,
+            GlobalHotkeyBinding.FromLegacy(GlobalHotkeyKey.I));
 
         Assert.Equal(1, coordinator.SetGlobalHotkeysCallCount);
         Assert.Equal(GlobalHotkeyKey.I, coordinator.State.Preferences.GlobalHotkeys.ToggleOverlay);
         Assert.Equal(GlobalHotkeyKey.H, coordinator.State.Preferences.GlobalHotkeys.Compose);
-        Assert.Equal((int)GlobalHotkeyKey.I, viewModel.OverlayHotkeyIndex);
-        Assert.Equal((int)GlobalHotkeyKey.H, viewModel.ComposerHotkeyIndex);
+        Assert.Equal("Ctrl + Alt + I", viewModel.OverlayHotkeyText);
+        Assert.Equal("Ctrl + Alt + H", viewModel.ComposerHotkeyText);
+        Assert.False(viewModel.IsHotkeyRecording(GlobalHotkeyAction.ToggleOverlay));
         Assert.True(viewModel.IsHotkeySelectionEnabled);
     }
 
@@ -469,7 +477,10 @@ public sealed class MainWindowViewModelTests
         var viewModel = new MainWindowViewModel(
             coordinator, new FakeMainWindowDialogService(), new FakeUpdateService());
 
-        viewModel.OverlayHotkeyIndex = (int)GlobalHotkeyKey.O;
+        viewModel.BeginHotkeyRecording(GlobalHotkeyAction.ToggleOverlay);
+        viewModel.AssignGlobalHotkey(
+            GlobalHotkeyAction.ToggleOverlay,
+            GlobalHotkeyBinding.FromLegacy(GlobalHotkeyKey.O));
         Task flush = viewModel.FlushSettingsAsync();
 
         Assert.False(viewModel.IsHotkeySelectionEnabled);
