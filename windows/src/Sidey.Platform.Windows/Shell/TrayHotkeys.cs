@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Sidey.Core.Domain;
 
 namespace Sidey.Platform.Windows.Shell;
 
@@ -15,24 +16,22 @@ internal sealed class TrayHotkeys : IDisposable
 {
     internal const uint Message = 0x0312; // WM_HOTKEY
     internal const uint Modifiers = 0x0001 | 0x0002 | 0x4000; // ALT | CONTROL | NOREPEAT
-    private static readonly (TrayCommand Command, uint Key)[] s_bindings =
-    [
-        (TrayCommand.ToggleQuietMode, 'M'),
-        (TrayCommand.Compose, 'I'),
-        (TrayCommand.History, 'R'),
-    ];
-
     private readonly nint _window;
     private readonly ITrayHotkeyNative _native;
     private readonly Dictionary<int, TrayCommand> _registered = [];
 
-    internal TrayHotkeys(nint window, ITrayHotkeyNative? native = null)
+    internal TrayHotkeys(
+        nint window,
+        GlobalHotkeySettings settings,
+        ITrayHotkeyNative? native = null)
     {
         _window = window;
         _native = native ?? new WindowsHotkeyNative();
+        Settings = settings.Normalize();
         var failures = new List<TrayHotkeyFailure>();
-        foreach ((TrayCommand command, uint key) in s_bindings)
+        foreach (TrayCommand command in Commands)
         {
+            uint key = VirtualKey(command, Settings);
             int error = _native.Register(window, (int)command, Modifiers, key);
             if (error == 0)
             {
@@ -40,7 +39,7 @@ internal sealed class TrayHotkeys : IDisposable
             }
             else
             {
-                failures.Add(new TrayHotkeyFailure(Shortcut(command), error));
+                failures.Add(new TrayHotkeyFailure(Shortcut(command, Settings), error));
             }
         }
         Failures = failures.AsReadOnly();
@@ -48,20 +47,42 @@ internal sealed class TrayHotkeys : IDisposable
 
     internal IReadOnlyList<TrayHotkeyFailure> Failures { get; }
 
+    internal GlobalHotkeySettings Settings { get; }
+
+    internal static TrayCommand[] Commands =>
+    [
+        TrayCommand.ToggleOverlay,
+        TrayCommand.ToggleQuietMode,
+        TrayCommand.Compose,
+        TrayCommand.History,
+    ];
+
     internal bool TryGetCommand(nint id, out TrayCommand command) =>
         _registered.TryGetValue((int)id, out command);
 
-    internal static string Shortcut(TrayCommand command) => command switch
+    internal static GlobalHotkeyAction Action(TrayCommand command) => command switch
     {
-        TrayCommand.ToggleQuietMode => "Ctrl+Alt+M",
-        TrayCommand.Compose => "Ctrl+Alt+I",
-        TrayCommand.History => "Ctrl+Alt+R",
-        _ => string.Empty,
+        TrayCommand.ToggleOverlay => GlobalHotkeyAction.ToggleOverlay,
+        TrayCommand.ToggleQuietMode => GlobalHotkeyAction.ToggleQuietMode,
+        TrayCommand.Compose => GlobalHotkeyAction.Compose,
+        TrayCommand.History => GlobalHotkeyAction.History,
+        _ => throw new ArgumentOutOfRangeException(nameof(command)),
     };
 
-    internal static string MenuLabel(TrayCommand command, string label)
+    internal static string Shortcut(TrayCommand command, GlobalHotkeySettings settings) =>
+        Commands.Contains(command)
+            ? $"Ctrl+Alt+{settings.Normalize().KeyFor(Action(command))}"
+            : string.Empty;
+
+    internal static uint VirtualKey(TrayCommand command, GlobalHotkeySettings settings) =>
+        (uint)('A' + (int)settings.Normalize().KeyFor(Action(command)));
+
+    internal static string MenuLabel(
+        TrayCommand command,
+        string label,
+        GlobalHotkeySettings settings)
     {
-        string shortcut = Shortcut(command);
+        string shortcut = Shortcut(command, settings);
         return shortcut.Length > 0 ? $"{label}\t{shortcut}" : label;
     }
 

@@ -40,6 +40,7 @@ public sealed class AppPreferencesTests
         Assert.Null(preferences.CachedCharacterId);
         Assert.Null(preferences.ActiveRoomId);
         Assert.Null(preferences.ComposerPlacement);
+        Assert.Equal(GlobalHotkeySettings.Default, preferences.GlobalHotkeys);
         Assert.Equal(OverlayRegionPreference.Default, preferences.OverlayRegion);
     }
 
@@ -75,6 +76,34 @@ public sealed class AppPreferencesTests
 
         Assert.Equal(AppPreferences.Default, restored);
         Assert.Null(restored.ComposerPlacement);
+    }
+
+    [Fact]
+    public void SettingsWithoutGlobalHotkeysUseCurrentDefaults()
+    {
+        JsonObject json = JsonSerializer.SerializeToNode(AppPreferences.Default)!.AsObject();
+        json.Remove(nameof(AppPreferences.GlobalHotkeys));
+
+        AppPreferences restored = json.Deserialize<AppPreferences>()!.Normalize();
+
+        Assert.Equal(GlobalHotkeySettings.Default, restored.GlobalHotkeys);
+    }
+
+    [Fact]
+    public void CustomGlobalHotkeysRoundTripWithOtherPreferences()
+    {
+        var hotkeys = new GlobalHotkeySettings(
+            GlobalHotkeyKey.O,
+            GlobalHotkeyKey.Q,
+            GlobalHotkeyKey.C,
+            GlobalHotkeyKey.L);
+        AppPreferences saved = AppPreferences.Default with { GlobalHotkeys = hotkeys };
+
+        AppPreferences restored = JsonSerializer.Deserialize<AppPreferences>(
+            JsonSerializer.Serialize(saved))!.Normalize();
+
+        Assert.Equal(hotkeys, restored.GlobalHotkeys);
+        Assert.Equal(saved with { GlobalHotkeys = hotkeys }, restored);
     }
 
     [Fact]

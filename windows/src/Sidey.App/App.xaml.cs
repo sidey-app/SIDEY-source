@@ -187,7 +187,7 @@ public partial class App : Application
         _singleInstance!.StartListening(RequestPrimaryActivation);
         try
         {
-            _tray = TrayIconService.Start();
+            _tray = TrayIconService.Start(coordinator.State.Preferences.GlobalHotkeys);
             _tray.CommandInvoked += OnTrayCommandInvoked;
             _tray.RoomSelected += OnTrayRoomSelected;
             _tray.DisplayTopologyChanged += OnDisplayTopologyChanged;
@@ -908,6 +908,7 @@ public partial class App : Application
                 state.ActiveRoomId)
             {
                 Theme = state.Preferences.Theme,
+                GlobalHotkeys = state.Preferences.GlobalHotkeys,
             });
         });
     }
@@ -1267,7 +1268,7 @@ public partial class App : Application
         }
 
         bool shouldExit = mainWindow.ShouldExitOnClose;
-        _pendingSettingsSave = mainWindow.ViewModel.FlushSoundSettingsAsync();
+        _pendingSettingsSave = mainWindow.ViewModel.FlushSettingsAsync();
         mainWindow.Closed -= OnMainWindowClosed;
         _mainWindow = null;
         if (ReferenceEquals(_window, mainWindow))
@@ -1299,7 +1300,7 @@ public partial class App : Application
         if (_mainWindow is not null)
         {
             MainWindow mainWindow = _mainWindow;
-            _pendingSettingsSave = mainWindow.ViewModel.FlushSoundSettingsAsync();
+            _pendingSettingsSave = mainWindow.ViewModel.FlushSettingsAsync();
             _mainWindow = null;
             mainWindow.Closed -= OnMainWindowClosed;
             mainWindow.CloseForExit();

@@ -41,6 +41,10 @@ public interface IMainWindowCoordinator : IOnboardingCoordinator
 
     public Task SetQuietModeAsync(bool enabled, CancellationToken cancellationToken = default);
 
+    public Task SetGlobalHotkeysAsync(
+        GlobalHotkeySettings settings,
+        CancellationToken cancellationToken = default);
+
     public Task SetShowOfflineMembersAsync(
         bool enabled,
         CancellationToken cancellationToken = default);

@@ -40,6 +40,7 @@ public sealed record TrayMenuState(
     Guid? ActiveRoomId)
 {
     public AppThemePreference Theme { get; init; } = AppThemePreference.System;
+    public GlobalHotkeySettings GlobalHotkeys { get; init; } = GlobalHotkeySettings.Default;
 }
 
 public sealed record TrayRoomMenuItem(Guid Id, string Name, int UnreadCount);
@@ -94,7 +95,7 @@ public sealed class TrayIconService : IDisposable
     public event Action<Guid>? RoomSelected;
     public event Action? DisplayTopologyChanged;
 
-    public static TrayIconService Start()
+    public static TrayIconService Start(GlobalHotkeySettings? globalHotkeys = null)
     {
         if (!OperatingSystem.IsWindows())
         {
@@ -102,6 +103,10 @@ public sealed class TrayIconService : IDisposable
         }
 
         var service = new TrayIconService();
+        service._state = service._state with
+        {
+            GlobalHotkeys = (globalHotkeys ?? GlobalHotkeySettings.Default).Normalize(),
+        };
         service._thread.Start();
         if (!service._started.Wait(TimeSpan.FromSeconds(10)))
         {
@@ -244,7 +249,7 @@ public sealed class TrayIconService : IDisposable
             _ownsUnreadIcon = _unreadIcon != nint.Zero;
             _icon = _baseIcon;
             AddIcon();
-            _hotkeys = new TrayHotkeys(_window);
+            _hotkeys = new TrayHotkeys(_window, _state.GlobalHotkeys);
             NotifyHotkeyFailures();
             _started.Set();
             while (NativeMethods.GetMessage(out NativeMessage message, nint.Zero, 0, 0) > 0)
@@ -319,6 +324,19 @@ public sealed class TrayIconService : IDisposable
         data.InfoFlags = NotifyInfoWarning;
         _notificationClickCommand = TrayCommand.Open;
         NativeMethods.ShellNotifyIcon(1, ref data);
+    }
+
+    private void RefreshHotkeys()
+    {
+        GlobalHotkeySettings settings = _state.GlobalHotkeys.Normalize();
+        if (_hotkeys?.Settings == settings)
+        {
+            return;
+        }
+
+        _hotkeys?.Dispose();
+        _hotkeys = new TrayHotkeys(_window, settings);
+        NotifyHotkeyFailures();
     }
 
     private NotifyIconData CreateIconData() => new()
@@ -598,7 +616,7 @@ public sealed class TrayIconService : IDisposable
         }
     }
 
-    private static void Append(
+    private void Append(
         nint menu,
         TrayCommand command,
         string label,
@@ -608,10 +626,10 @@ public sealed class TrayIconService : IDisposable
             menu,
             NativeMenuFlags(isChecked: false, isEnabled: isEnabled),
             (nuint)command,
-            TrayHotkeys.MenuLabel(command, label));
+            TrayHotkeys.MenuLabel(command, label, _state.GlobalHotkeys));
     }
 
-    private static void AppendToggle(
+    private void AppendToggle(
         nint menu,
         TrayCommand command,
         string label,
@@ -622,7 +640,7 @@ public sealed class TrayIconService : IDisposable
             menu,
             NativeMenuFlags(isChecked, isEnabled),
             (nuint)command,
-            TrayHotkeys.MenuLabel(command, label));
+            TrayHotkeys.MenuLabel(command, label, _state.GlobalHotkeys));
     }
 
     internal static uint NativeMenuFlags(bool isChecked, bool isEnabled) =>
@@ -691,6 +709,7 @@ public sealed class TrayIconService : IDisposable
             }
             if (message == RefreshMessage)
             {
+                service.RefreshHotkeys();
                 service._icon = service._state.UnreadCount > 0
                     && service._unreadIcon != nint.Zero
                     ? service._unreadIcon

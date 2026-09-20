@@ -39,6 +39,7 @@ public sealed class AtomicPreferencesStoreTests
             Assert.Null(preferences.Language);
             Assert.True(preferences.CharacterSoundEffectsEnabled);
             Assert.Equal(100, preferences.CharacterSoundEffectsVolume);
+            Assert.Equal(GlobalHotkeySettings.Default, preferences.GlobalHotkeys);
         }
         finally
         {
@@ -69,6 +70,11 @@ public sealed class AtomicPreferencesStoreTests
             CachedCharacterId = "pixel_penguin",
             ActiveRoomId = activeRoomId,
             OverlayRegion = new OverlayRegionPreference(OverlayEdge.Left, OverlaySpan.Half, "monitor-2"),
+            GlobalHotkeys = new GlobalHotkeySettings(
+                GlobalHotkeyKey.O,
+                GlobalHotkeyKey.Q,
+                GlobalHotkeyKey.C,
+                GlobalHotkeyKey.L),
         };
 
         try

@@ -1,3 +1,5 @@
+using Sidey.Core.Domain;
+
 namespace Sidey.Platform.Windows.Tests;
 
 public sealed class TrayHotkeyTests
@@ -6,11 +8,12 @@ public sealed class TrayHotkeyTests
     public void RegisteredShortcutsDispatchTheirCommandsWithoutKeyRepeat()
     {
         var native = new FakeHotkeyNative();
-        using var hotkeys = new TrayHotkeys(42, native);
+        using var hotkeys = new TrayHotkeys(42, GlobalHotkeySettings.Default, native);
 
         Assert.Empty(hotkeys.Failures);
         Assert.Collection(
             native.Registrations,
+            binding => AssertBinding(binding, TrayCommand.ToggleOverlay, 'H'),
             binding => AssertBinding(binding, TrayCommand.ToggleQuietMode, 'M'),
             binding => AssertBinding(binding, TrayCommand.Compose, 'I'),
             binding => AssertBinding(binding, TrayCommand.History, 'R'));
@@ -26,13 +29,14 @@ public sealed class TrayHotkeyTests
     public void ConflictingShortcutLeavesOtherShortcutsUsableAndReportsTheConflict()
     {
         var native = new FakeHotkeyNative { ConflictingId = (int)TrayCommand.Compose };
-        using var hotkeys = new TrayHotkeys(42, native);
+        using var hotkeys = new TrayHotkeys(42, GlobalHotkeySettings.Default, native);
 
         TrayHotkeyFailure failure = Assert.Single(hotkeys.Failures);
         Assert.Equal("Ctrl+Alt+I", failure.Shortcut);
         Assert.Equal(1409, failure.ErrorCode);
         Assert.False(hotkeys.TryGetCommand((int)TrayCommand.Compose, out _));
         Assert.True(hotkeys.TryGetCommand((int)TrayCommand.ToggleQuietMode, out _));
+        Assert.True(hotkeys.TryGetCommand((int)TrayCommand.ToggleOverlay, out _));
         Assert.True(hotkeys.TryGetCommand((int)TrayCommand.History, out _));
     }
 
@@ -40,26 +44,55 @@ public sealed class TrayHotkeyTests
     public void DisposalUnregistersOnlyOwnedShortcutsOnceAndStopsDispatch()
     {
         var native = new FakeHotkeyNative { ConflictingId = (int)TrayCommand.Compose };
-        var hotkeys = new TrayHotkeys(42, native);
+        var hotkeys = new TrayHotkeys(42, GlobalHotkeySettings.Default, native);
 
         hotkeys.Dispose();
         hotkeys.Dispose();
 
         Assert.Equal(
-            [((nint)42, (int)TrayCommand.ToggleQuietMode), ((nint)42, (int)TrayCommand.History)],
+            [
+                ((nint)42, (int)TrayCommand.ToggleOverlay),
+                ((nint)42, (int)TrayCommand.ToggleQuietMode),
+                ((nint)42, (int)TrayCommand.History),
+            ],
             native.Unregistrations);
         Assert.False(hotkeys.TryGetCommand((int)TrayCommand.ToggleQuietMode, out _));
         Assert.False(hotkeys.TryGetCommand((int)TrayCommand.History, out _));
     }
 
     [Theory]
+    [InlineData(TrayCommand.ToggleOverlay, "Quiet mode\tCtrl+Alt+H")]
     [InlineData(TrayCommand.ToggleQuietMode, "Quiet mode\tCtrl+Alt+M")]
     [InlineData(TrayCommand.Compose, "Quiet mode\tCtrl+Alt+I")]
     [InlineData(TrayCommand.History, "Quiet mode\tCtrl+Alt+R")]
     [InlineData(TrayCommand.Settings, "Quiet mode")]
     public void TrayMenuShowsTheShortcutBesideItsExistingLabel(TrayCommand command, string expected)
     {
-        Assert.Equal(expected, TrayHotkeys.MenuLabel(command, "Quiet mode"));
+        Assert.Equal(expected, TrayHotkeys.MenuLabel(
+            command,
+            "Quiet mode",
+            GlobalHotkeySettings.Default));
+    }
+
+    [Fact]
+    public void CustomMappingsRegisterAllActionsWithTheirSelectedKeys()
+    {
+        var native = new FakeHotkeyNative();
+        var settings = new GlobalHotkeySettings(
+            GlobalHotkeyKey.O,
+            GlobalHotkeyKey.Q,
+            GlobalHotkeyKey.C,
+            GlobalHotkeyKey.L);
+
+        using var hotkeys = new TrayHotkeys(42, settings, native);
+
+        Assert.Collection(
+            native.Registrations,
+            binding => AssertBinding(binding, TrayCommand.ToggleOverlay, 'O'),
+            binding => AssertBinding(binding, TrayCommand.ToggleQuietMode, 'Q'),
+            binding => AssertBinding(binding, TrayCommand.Compose, 'C'),
+            binding => AssertBinding(binding, TrayCommand.History, 'L'));
+        Assert.Equal("Ctrl+Alt+O", TrayHotkeys.Shortcut(TrayCommand.ToggleOverlay, settings));
     }
 
     private static void AssertBinding(

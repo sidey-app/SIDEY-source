@@ -173,6 +173,18 @@ internal sealed class FakeSideyCoordinator : IMainWindowCoordinator, IHistoryCoo
     public Task SetQuietModeAsync(bool enabled, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
+    public int SetGlobalHotkeysCallCount { get; private set; }
+    public Func<GlobalHotkeySettings, Task>? GlobalHotkeysHandler { get; set; }
+    public async Task SetGlobalHotkeysAsync(
+        GlobalHotkeySettings settings,
+        CancellationToken cancellationToken = default)
+    {
+        SetGlobalHotkeysCallCount++;
+        if (GlobalHotkeysHandler is not null)
+            await GlobalHotkeysHandler(settings);
+        State = State with { Preferences = State.Preferences with { GlobalHotkeys = settings } };
+    }
+
     public Task SetShowOfflineMembersAsync(
         bool enabled,
         CancellationToken cancellationToken = default) => Task.CompletedTask;

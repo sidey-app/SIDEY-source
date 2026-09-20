@@ -1041,6 +1041,29 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         await PersistPreferencesAsync(cancellationToken);
     }
 
+    public async Task SetGlobalHotkeysAsync(
+        GlobalHotkeySettings settings,
+        CancellationToken cancellationToken = default)
+    {
+        GlobalHotkeySettings previous = _state.Preferences.GlobalHotkeys;
+        SetState(_state with
+        {
+            Preferences = _state.Preferences with { GlobalHotkeys = settings.Normalize() },
+        });
+        try
+        {
+            await PersistPreferencesAsync(cancellationToken);
+        }
+        catch
+        {
+            SetState(_state with
+            {
+                Preferences = _state.Preferences with { GlobalHotkeys = previous },
+            });
+            throw;
+        }
+    }
+
     public async Task SetComposerPlacementAsync(ComposerPlacement placement, CancellationToken cancellationToken = default)
     {
         SetState(_state with { Preferences = _state.Preferences with { ComposerPlacement = placement } });

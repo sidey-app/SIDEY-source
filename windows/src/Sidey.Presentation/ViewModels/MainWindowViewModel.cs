@@ -12,6 +12,7 @@ namespace Sidey.Presentation.ViewModels;
 public sealed partial class MainWindowViewModel : ObservableObject
 {
     private static readonly string[] s_supportedLanguages = [.. I18n.SupportedLanguages];
+    private static readonly string[] s_hotkeyKeys = Enum.GetNames<GlobalHotkeyKey>();
 
     private readonly IMainWindowCoordinator _coordinator;
     private readonly IMainWindowDialogService _dialogs;
@@ -27,6 +28,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private int _lastNonzeroSoundVolume = 100;
     private CancellationTokenSource? _soundSaveDelay;
     private Task _saveSoundSettingsTask = Task.CompletedTask;
+    private Task _saveGlobalHotkeysTask = Task.CompletedTask;
     private readonly Guid _soundFeedbackScope = Guid.NewGuid();
     private bool _soundFeedbackPending;
 
@@ -107,6 +109,12 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         _soundSaveDelay?.Cancel();
         return _saveSoundSettingsTask;
+    }
+
+    public Task FlushSettingsAsync()
+    {
+        _soundSaveDelay?.Cancel();
+        return Task.WhenAll(_saveSoundSettingsTask, _saveGlobalHotkeysTask);
     }
 
     private async Task SaveSoundSettingsAsync()
@@ -272,6 +280,23 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     public partial bool StartAtLogin { get; set; }
+
+    public IReadOnlyList<string> HotkeyKeys => s_hotkeyKeys;
+
+    [ObservableProperty]
+    public partial bool IsHotkeySelectionEnabled { get; set; } = true;
+
+    [ObservableProperty]
+    public partial int OverlayHotkeyIndex { get; set; } = (int)GlobalHotkeyKey.H;
+
+    [ObservableProperty]
+    public partial int QuietModeHotkeyIndex { get; set; } = (int)GlobalHotkeyKey.M;
+
+    [ObservableProperty]
+    public partial int ComposerHotkeyIndex { get; set; } = (int)GlobalHotkeyKey.I;
+
+    [ObservableProperty]
+    public partial int HistoryHotkeyIndex { get; set; } = (int)GlobalHotkeyKey.R;
 
     [ObservableProperty]
     public partial int SelectedLanguageIndex { get; set; }
@@ -473,6 +498,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             ShowOfflineMembers = state.Preferences.ShowOfflineMembers;
             RequiresRightClickToThrow = state.Preferences.RequiresRightClickToThrow;
             StartAtLogin = state.Preferences.StartAtLogin;
+            ApplyHotkeySelections(state.Preferences.GlobalHotkeys);
             string selectedLanguage = state.Preferences.Language ?? I18n.Language;
             int selectedLanguageIndex = Array.FindIndex(
                 s_supportedLanguages,
@@ -804,6 +830,75 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             _ = RunCommandAsync(() => _coordinator.SetStartAtLoginAsync(value), null);
         }
+    }
+
+    partial void OnOverlayHotkeyIndexChanged(int value) =>
+        UpdateGlobalHotkey(GlobalHotkeyAction.ToggleOverlay, value);
+
+    partial void OnQuietModeHotkeyIndexChanged(int value) =>
+        UpdateGlobalHotkey(GlobalHotkeyAction.ToggleQuietMode, value);
+
+    partial void OnComposerHotkeyIndexChanged(int value) =>
+        UpdateGlobalHotkey(GlobalHotkeyAction.Compose, value);
+
+    partial void OnHistoryHotkeyIndexChanged(int value) =>
+        UpdateGlobalHotkey(GlobalHotkeyAction.History, value);
+
+    private void UpdateGlobalHotkey(GlobalHotkeyAction action, int value)
+    {
+        if (_isApplyingState || !IsHotkeySelectionEnabled
+            || value < 0 || value >= s_hotkeyKeys.Length)
+            return;
+
+        GlobalHotkeySettings settings = _coordinator.State.Preferences.GlobalHotkeys.Assign(
+            action,
+            (GlobalHotkeyKey)value);
+        _isApplyingState = true;
+        try
+        {
+            ApplyHotkeySelections(settings);
+        }
+        finally
+        {
+            _isApplyingState = false;
+        }
+        _saveGlobalHotkeysTask = SaveGlobalHotkeysAsync(settings);
+    }
+
+    private async Task SaveGlobalHotkeysAsync(GlobalHotkeySettings settings)
+    {
+        IsHotkeySelectionEnabled = false;
+        try
+        {
+            bool saved = await RunCommandAsync(
+                () => _coordinator.SetGlobalHotkeysAsync(settings),
+                successMessage: null);
+            if (!saved)
+            {
+                _isApplyingState = true;
+                try
+                {
+                    ApplyHotkeySelections(_coordinator.State.Preferences.GlobalHotkeys);
+                }
+                finally
+                {
+                    _isApplyingState = false;
+                }
+            }
+        }
+        finally
+        {
+            IsHotkeySelectionEnabled = true;
+        }
+    }
+
+    private void ApplyHotkeySelections(GlobalHotkeySettings settings)
+    {
+        GlobalHotkeySettings normalized = settings.Normalize();
+        OverlayHotkeyIndex = (int)normalized.ToggleOverlay;
+        QuietModeHotkeyIndex = (int)normalized.ToggleQuietMode;
+        ComposerHotkeyIndex = (int)normalized.Compose;
+        HistoryHotkeyIndex = (int)normalized.History;
     }
 
     partial void OnSelectedLanguageIndexChanged(int value)

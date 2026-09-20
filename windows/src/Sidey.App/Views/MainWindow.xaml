@@ -894,6 +894,50 @@
               </Border>
 
               <StackPanel Spacing="4">
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeysTitle}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeysDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+              </StackPanel>
+              <Border Style="{StaticResource SideySettingsCardStyle}">
+                <StackPanel Spacing="12">
+                  <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="Ctrl + Alt +" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                      <ComboBox Width="72" ItemsSource="{Binding HotkeyKeys}" IsEnabled="{Binding IsHotkeySelectionEnabled}" SelectedIndex="{Binding OverlayHotkeyIndex, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" />
+                    </StackPanel>
+                  </Grid>
+                  <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                  <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="Ctrl + Alt +" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                      <ComboBox Width="72" ItemsSource="{Binding HotkeyKeys}" IsEnabled="{Binding IsHotkeySelectionEnabled}" SelectedIndex="{Binding QuietModeHotkeyIndex, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" />
+                    </StackPanel>
+                  </Grid>
+                  <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                  <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="Ctrl + Alt +" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                      <ComboBox Width="72" ItemsSource="{Binding HotkeyKeys}" IsEnabled="{Binding IsHotkeySelectionEnabled}" SelectedIndex="{Binding ComposerHotkeyIndex, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" />
+                    </StackPanel>
+                  </Grid>
+                  <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                  <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="Ctrl + Alt +" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                      <ComboBox Width="72" ItemsSource="{Binding HotkeyKeys}" IsEnabled="{Binding IsHotkeySelectionEnabled}" SelectedIndex="{Binding HistoryHotkeyIndex, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" />
+                    </StackPanel>
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Spacing="4">
                 <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.displayTitle}, Mode=OneWay}" />
                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.displayDescription}, Mode=OneWay}" />
               </StackPanel>

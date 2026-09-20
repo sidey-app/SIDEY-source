@@ -436,6 +436,53 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
+    public void HotkeySelectionSwapsAnOccupiedKeyAndPersistsOneCompleteMapping()
+    {
+        (FakeSideyCoordinator coordinator, CoordinatorState state) = CreateRoomState();
+        coordinator.State = state with
+        {
+            Preferences = state.Preferences with { GlobalHotkeys = GlobalHotkeySettings.Default },
+        };
+        var viewModel = new MainWindowViewModel(
+            coordinator, new FakeMainWindowDialogService(), new FakeUpdateService());
+
+        Assert.Equal((int)GlobalHotkeyKey.H, viewModel.OverlayHotkeyIndex);
+        Assert.Equal((int)GlobalHotkeyKey.I, viewModel.ComposerHotkeyIndex);
+        Assert.Equal(0, coordinator.SetGlobalHotkeysCallCount);
+
+        viewModel.OverlayHotkeyIndex = (int)GlobalHotkeyKey.I;
+
+        Assert.Equal(1, coordinator.SetGlobalHotkeysCallCount);
+        Assert.Equal(GlobalHotkeyKey.I, coordinator.State.Preferences.GlobalHotkeys.ToggleOverlay);
+        Assert.Equal(GlobalHotkeyKey.H, coordinator.State.Preferences.GlobalHotkeys.Compose);
+        Assert.Equal((int)GlobalHotkeyKey.I, viewModel.OverlayHotkeyIndex);
+        Assert.Equal((int)GlobalHotkeyKey.H, viewModel.ComposerHotkeyIndex);
+        Assert.True(viewModel.IsHotkeySelectionEnabled);
+    }
+
+    [Fact]
+    public async Task SettingsFlushWaitsForPendingHotkeySave()
+    {
+        (FakeSideyCoordinator coordinator, _) = CreateRoomState();
+        var saveCompletion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        coordinator.GlobalHotkeysHandler = _ => saveCompletion.Task;
+        var viewModel = new MainWindowViewModel(
+            coordinator, new FakeMainWindowDialogService(), new FakeUpdateService());
+
+        viewModel.OverlayHotkeyIndex = (int)GlobalHotkeyKey.O;
+        Task flush = viewModel.FlushSettingsAsync();
+
+        Assert.False(viewModel.IsHotkeySelectionEnabled);
+        Assert.False(flush.IsCompleted);
+
+        saveCompletion.SetResult();
+        await flush;
+
+        Assert.True(viewModel.IsHotkeySelectionEnabled);
+        Assert.Equal(GlobalHotkeyKey.O, coordinator.State.Preferences.GlobalHotkeys.ToggleOverlay);
+    }
+
+    [Fact]
     public void CharacterPickerKeepsTheFiveFreeWindowsSelections()
     {
         (FakeSideyCoordinator coordinator, _) = CreateRoomState();
