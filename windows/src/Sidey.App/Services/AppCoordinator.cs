@@ -34,7 +34,8 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     public event Action? AnimationsChanged;
     private readonly IPreferencesStore _preferencesStore;
     private readonly ICredentialStore _credentialStore;
-    private readonly RoomSessionLifetime _roomSession = new();
+    private RoomSessionLifetime _roomSession = new();
+    private readonly SemaphoreSlim _accountSessionGate = new(1, 1);
     private readonly IWindowsStartupService _startup;
     private readonly DiagnosticDataExporter _diagnosticDataExporter = new();
     private readonly IActivityMonitor _activityMonitor = new WindowsActivityMonitor();
@@ -353,8 +354,24 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             _auth = auth;
             SetState(_state with { GoogleAuthentication = GoogleAuthenticationState.Checking });
             // Never bootstrap a replacement anonymous user. Restoring errors retain credentials.
-            AuthSession? restored = await auth.RestoreSessionAsync(cancellationToken);
-            if (restored is null || !await auth.HasGoogleIdentityAsync(cancellationToken))
+            AuthSession? restored;
+            bool hasGoogleIdentity;
+            try
+            {
+                restored = await auth.RestoreSessionAsync(cancellationToken);
+                hasGoogleIdentity = restored is not null
+                    && await auth.HasGoogleIdentityAsync(cancellationToken);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException)
+            {
+                SetState(_state with
+                {
+                    GoogleAuthentication = GoogleAuthenticationState.Required,
+                    ErrorMessage = exception.Message,
+                });
+                throw;
+            }
+            if (restored is null || !hasGoogleIdentity)
             {
                 SetState(_state with { GoogleAuthentication = GoogleAuthenticationState.Required });
                 return;
@@ -887,6 +904,116 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         RunRoomMutationAsync(
             token => RequiredBackend().LeaveRoomAsync(roomId, token),
             cancellationToken);
+
+    public Task SignOutAsync(CancellationToken cancellationToken = default) =>
+        EndAccountSessionAsync(deleteAccount: false, cancellationToken);
+
+    public Task DeleteAccountAsync(CancellationToken cancellationToken = default) =>
+        EndAccountSessionAsync(deleteAccount: true, cancellationToken);
+
+    private async Task EndAccountSessionAsync(
+        bool deleteAccount,
+        CancellationToken cancellationToken)
+    {
+        await _accountSessionGate.WaitAsync(cancellationToken);
+        try
+        {
+            if (_auth is not SupabaseAnonymousAuthService auth || !_state.GoogleVerified)
+            {
+                throw new InvalidOperationException(I18n.Get("auth.sessionMissing"));
+            }
+            if (_state.GroupOperation != GroupOperation.Idle)
+            {
+                throw new InvalidOperationException(I18n.Get("groups.operationBusy"));
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            Guid[] roomIds = [.. _state.Rooms.Select(room => room.Id).Distinct()];
+            _typingActivity.Stop();
+            CancelTreeMovementRequest();
+            if (deleteAccount)
+            {
+                await RequiredBackend().DeleteOwnAccountAsync(cancellationToken);
+            }
+
+            StopOverlayAudio();
+            CancellationToken cleanupToken = CancellationToken.None;
+
+            RoomSessionLifetime previousRoomSession = _roomSession;
+            await previousRoomSession.DisposeAsync().ConfigureAwait(false);
+            await Task.WhenAll(_treeMovementOperations).ConfigureAwait(false);
+            _treeMovementOperations.Clear();
+
+            if (_backend is SupabaseBackendGateway backend)
+            {
+                await backend.DisposeAsync().ConfigureAwait(false);
+            }
+            _backend = null;
+
+            await auth.SignOutAsync(cleanupToken).ConfigureAwait(false);
+            foreach (Guid roomId in roomIds)
+            {
+                try
+                {
+                    await _credentialStore.DeleteInviteCodeAsync(roomId, cleanupToken)
+                        .ConfigureAwait(false);
+                }
+                catch (Exception exception) when (exception is not OperationCanceledException)
+                {
+                    StartupDiagnostics.NonFatal("account-session-invite-cleanup", exception);
+                }
+            }
+
+            await _overlayVisibilityGate.WaitAsync(cleanupToken).ConfigureAwait(false);
+            try
+            {
+                _overlay?.Dispose();
+                _overlay = null;
+            }
+            finally
+            {
+                _overlayVisibilityGate.Release();
+            }
+
+            _roomSession = new RoomSessionLifetime();
+            _initializationTask = null;
+            _initialSnapshotReceived = false;
+            _previewRoomId = null;
+            _previewUserId = null;
+            _previewSnapshot = null;
+            _localPresence = PresenceState.Online;
+            _messages.Clear();
+            _bubbles.Clear();
+            _typing.Clear();
+            _basePresence.Clear();
+            _unreadByRoom.Clear();
+            _treeMovement.Clear();
+            _treeMovementAccountId = null;
+            _pendingPulses.Clear();
+            _pendingThrows.Clear();
+
+            AppPreferences preferences = _state.Preferences with
+            {
+                OnboardingCompleted = false,
+                CachedNickname = null,
+                CachedCharacterId = null,
+                ActiveRoomId = null,
+                TreeMovementPaused = false,
+            };
+            await _preferencesStore.SaveAsync(preferences, cleanupToken).ConfigureAwait(false);
+            IsRemoteContentLoading = false;
+            SetState(CoordinatorState.Initial with
+            {
+                Preferences = preferences,
+                GoogleAuthentication = GoogleAuthenticationState.Required,
+                ContentLoading = new(RemoteDataLoadState.Ready, RemoteDataLoadState.Ready),
+            });
+        }
+        finally
+        {
+            _accountSessionGate.Release();
+        }
+    }
 
     private async Task RunRoomMutationAsync(
         Func<CancellationToken, Task> mutation,
@@ -1507,6 +1634,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             _overlayVisibilityGate.Release();
         }
         await _activityMonitor.DisposeAsync().ConfigureAwait(false);
+        _accountSessionGate.Dispose();
     }
 
     private async Task<IReadOnlyList<ChatMessage>> PerformRoomSwitchAsync(

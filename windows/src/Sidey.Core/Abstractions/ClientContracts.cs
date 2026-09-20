@@ -120,6 +120,7 @@ public interface IBackendGateway
     public Task<string> RotateInviteCodeAsync(Guid roomId, CancellationToken cancellationToken = default);
     public Task RemoveRoomMemberAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default);
     public Task DeleteRoomAsync(Guid roomId, CancellationToken cancellationToken = default);
+    public Task DeleteOwnAccountAsync(CancellationToken cancellationToken = default);
     public Task<IReadOnlyList<ChatMessage>> FetchRecentMessagesAsync(Guid roomId, CancellationToken cancellationToken = default);
     public Task<MessageHistoryPage> FetchMessagePageAsync(
         Guid roomId,

@@ -758,6 +758,73 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         }
     }
 
+    public async Task<bool> ConfirmSignOutAsync()
+    {
+        if (ActiveXamlRoot() is not { } xamlRoot)
+            return false;
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = xamlRoot,
+            Title = I18n.Get("about.signOutTitle"),
+            Content = I18n.Get("about.signOutBody"),
+            PrimaryButtonText = I18n.Get("about.signOutPrimary"),
+            CloseButtonText = I18n.Get("common.cancel"),
+            DefaultButton = ContentDialogButton.Close,
+        };
+        try
+        {
+            return await dialog.ShowAsync() == ContentDialogResult.Primary;
+        }
+        catch (Exception) when (_isClosed)
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> ConfirmAccountDeletionAsync()
+    {
+        if (ActiveXamlRoot() is not { } xamlRoot)
+            return false;
+
+        var impactDialog = new ContentDialog
+        {
+            XamlRoot = xamlRoot,
+            Title = I18n.Get("about.deleteAccountTitle"),
+            Content = I18n.Get("about.deleteAccountBody"),
+            PrimaryButtonText = I18n.Get("about.deleteAccountContinue"),
+            CloseButtonText = I18n.Get("common.cancel"),
+            DefaultButton = ContentDialogButton.Close,
+        };
+        try
+        {
+            if (await impactDialog.ShowAsync() != ContentDialogResult.Primary)
+                return false;
+        }
+        catch (Exception) when (_isClosed)
+        {
+            return false;
+        }
+
+        var finalDialog = new ContentDialog
+        {
+            XamlRoot = xamlRoot,
+            Title = I18n.Get("about.deleteAccountFinalTitle"),
+            Content = I18n.Get("about.deleteAccountFinalBody"),
+            PrimaryButtonText = I18n.Get("about.deleteAccountPrimary"),
+            CloseButtonText = I18n.Get("common.cancel"),
+            DefaultButton = ContentDialogButton.Close,
+        };
+        try
+        {
+            return await finalDialog.ShowAsync() == ContentDialogResult.Primary;
+        }
+        catch (Exception) when (_isClosed)
+        {
+            return false;
+        }
+    }
+
     public async Task<bool> ConfirmUpdateDownloadAsync(string version)
     {
         if (ActiveXamlRoot() is not { } xamlRoot)

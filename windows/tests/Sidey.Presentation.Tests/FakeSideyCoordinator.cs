@@ -88,6 +88,10 @@ internal sealed class FakeSideyCoordinator : IMainWindowCoordinator, IHistoryCoo
 
     public int LeaveRoomCallCount { get; private set; }
 
+    public int SignOutCallCount { get; private set; }
+
+    public int DeleteAccountCallCount { get; private set; }
+
     public Guid? LastLeftRoomId { get; private set; }
 
     public Task<MessageHistoryPage> FetchMessagePageAsync(
@@ -161,6 +165,28 @@ internal sealed class FakeSideyCoordinator : IMainWindowCoordinator, IHistoryCoo
     {
         LeaveRoomCallCount++;
         LastLeftRoomId = roomId;
+        return Task.CompletedTask;
+    }
+
+    public Task SignOutAsync(CancellationToken cancellationToken = default)
+    {
+        SignOutCallCount++;
+        State = CoordinatorState.Initial with
+        {
+            Preferences = State.Preferences with { OnboardingCompleted = false },
+            GoogleAuthentication = GoogleAuthenticationState.Required,
+        };
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAccountAsync(CancellationToken cancellationToken = default)
+    {
+        DeleteAccountCallCount++;
+        State = CoordinatorState.Initial with
+        {
+            Preferences = State.Preferences with { OnboardingCompleted = false },
+            GoogleAuthentication = GoogleAuthenticationState.Required,
+        };
         return Task.CompletedTask;
     }
 
@@ -290,6 +316,10 @@ internal sealed class FakeMainWindowDialogService : IMainWindowDialogService
 
     public bool ConfirmRoomLeave { get; set; } = true;
 
+    public bool ConfirmSignOut { get; set; } = true;
+
+    public bool ConfirmAccountDeletion { get; set; } = true;
+
     public string? ConfirmedRemovalNickname { get; private set; }
 
     public string? ConfirmedLeaveRoomName { get; private set; }
@@ -316,6 +346,10 @@ internal sealed class FakeMainWindowDialogService : IMainWindowDialogService
         ConfirmedLeaveRoomIsOwner = isOwner;
         return Task.FromResult(ConfirmRoomLeave);
     }
+
+    public Task<bool> ConfirmSignOutAsync() => Task.FromResult(ConfirmSignOut);
+
+    public Task<bool> ConfirmAccountDeletionAsync() => Task.FromResult(ConfirmAccountDeletion);
 
     public Task<bool> ConfirmUpdateDownloadAsync(string version)
     {

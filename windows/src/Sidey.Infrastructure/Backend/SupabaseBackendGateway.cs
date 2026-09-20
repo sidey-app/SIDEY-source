@@ -392,6 +392,9 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         await _credentials.DeleteInviteCodeAsync(roomId, cancellationToken).ConfigureAwait(false);
     }
 
+    public Task DeleteOwnAccountAsync(CancellationToken cancellationToken = default) =>
+        RpcNoResultAsync("delete_own_account", new { }, cancellationToken);
+
     public async Task<IReadOnlyList<ChatMessage>> FetchRecentMessagesAsync(
         Guid roomId,
         CancellationToken cancellationToken = default)

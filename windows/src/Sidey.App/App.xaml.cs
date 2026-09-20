@@ -889,9 +889,30 @@ public partial class App : Application
 
             UpdateConnectionFailureNotification(state.Connected);
             _mainWindow?.ApplyState(state);
-            _onboardingWindow?.ApplyState(state);
-            if (!state.NeedsOnboarding && _onboardingWindow is not null)
+            if (state.NeedsOnboarding)
+            {
+                if (_onboardingWindow is null && coordinator is not null)
+                    CreateOnboardingWindow(coordinator);
+                _onboardingWindow?.ApplyState(state);
+                _mainWindow?.AppWindow.Hide();
+                if (_composer is not null)
+                {
+                    _composer.PlacementChanged -= OnComposerPlacementChanged;
+                    _composer.CloseForExit();
+                    _composer = null;
+                }
+                _historyWindow?.Close();
+                _historyWindow = null;
+                _historyComposer?.Dispose();
+                _historyComposer = null;
+                _window = _onboardingWindow;
+                _onboardingWindow?.ShowAndActivate();
+            }
+            else if (_onboardingWindow is not null)
+            {
+                _onboardingWindow.ApplyState(state);
                 OnOnboardingCompleted();
+            }
             _composer?.ApplyTheme(state.Preferences.Theme);
             if (_composer is not null)
                 ApplyComposerState(_composer.ViewModel, state);

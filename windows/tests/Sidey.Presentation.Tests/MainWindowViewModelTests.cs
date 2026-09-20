@@ -12,6 +12,52 @@ namespace Sidey.Presentation.Tests;
 public sealed class MainWindowViewModelTests
 {
     [Fact]
+    public async Task AccountActionsRequireConfirmationAndInvokeOnlyTheSelectedAction()
+    {
+        var coordinator = new FakeSideyCoordinator();
+        var dialogs = new FakeMainWindowDialogService
+        {
+            ConfirmSignOut = false,
+            ConfirmAccountDeletion = false,
+        };
+        var model = new MainWindowViewModel(coordinator, dialogs, new FakeUpdateService());
+
+        await model.SignOutCommand.ExecuteAsync(null);
+        await model.DeleteAccountCommand.ExecuteAsync(null);
+        Assert.Equal(0, coordinator.SignOutCallCount);
+        Assert.Equal(0, coordinator.DeleteAccountCallCount);
+
+        dialogs.ConfirmSignOut = true;
+        await model.SignOutCommand.ExecuteAsync(null);
+        Assert.Equal(1, coordinator.SignOutCallCount);
+        Assert.Equal(0, coordinator.DeleteAccountCallCount);
+
+        coordinator.State = coordinator.State with
+        {
+            GoogleAuthentication = GoogleAuthenticationState.Verified,
+        };
+        model.ApplyState(coordinator.State);
+        dialogs.ConfirmAccountDeletion = true;
+        await model.DeleteAccountCommand.ExecuteAsync(null);
+        Assert.Equal(1, coordinator.DeleteAccountCallCount);
+    }
+
+    [Fact]
+    public void AccountActionsAreDisabledDuringAnotherGroupMutation()
+    {
+        var coordinator = new FakeSideyCoordinator();
+        var model = new MainWindowViewModel(
+            coordinator,
+            new FakeMainWindowDialogService(),
+            new FakeUpdateService());
+
+        model.ApplyState(coordinator.State with { GroupOperation = GroupOperation.Mutating });
+
+        Assert.False(model.SignOutCommand.CanExecute(null));
+        Assert.False(model.DeleteAccountCommand.CanExecute(null));
+    }
+
+    [Fact]
     public async Task ConnectionStatusRetriesWhileDisconnectedAndDisablesAfterConnection()
     {
         var coordinator = new FakeSideyCoordinator();

@@ -342,6 +342,11 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(ExportDiagnosticDataCommand))]
     public partial bool IsExportingDiagnosticData { get; set; }
 
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SignOutCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteAccountCommand))]
+    public partial bool IsAccountActionPending { get; set; }
+
     public MainWindowViewModel(
         IMainWindowCoordinator coordinator,
         IMainWindowDialogService dialogs,
@@ -456,6 +461,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
             }
 
             _state = state;
+            SignOutCommand.NotifyCanExecuteChanged();
+            DeleteAccountCommand.NotifyCanExecuteChanged();
             RefreshCharacterSelections(state.ActiveEntitlementKeys);
             RefreshStoreProducts(state);
             if (shouldApplyProfileDraft)
@@ -774,6 +781,45 @@ public sealed partial class MainWindowViewModel : ObservableObject
         finally
         {
             IsExportingDiagnosticData = false;
+        }
+    }
+
+    private bool CanManageAccount() =>
+        !IsAccountActionPending
+        && _state.GoogleVerified
+        && _state.GroupOperation == GroupOperation.Idle;
+
+    [RelayCommand(CanExecute = nameof(CanManageAccount))]
+    private async Task SignOutAsync()
+    {
+        if (!await _dialogs.ConfirmSignOutAsync())
+            return;
+
+        IsAccountActionPending = true;
+        try
+        {
+            await RunCommandAsync(() => _coordinator.SignOutAsync(), successMessage: null);
+        }
+        finally
+        {
+            IsAccountActionPending = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanManageAccount))]
+    private async Task DeleteAccountAsync()
+    {
+        if (!await _dialogs.ConfirmAccountDeletionAsync())
+            return;
+
+        IsAccountActionPending = true;
+        try
+        {
+            await RunCommandAsync(() => _coordinator.DeleteAccountAsync(), successMessage: null);
+        }
+        finally
+        {
+            IsAccountActionPending = false;
         }
     }
 

@@ -115,6 +115,7 @@
             AutomationProperties.Name="{Binding BeginLabel}"
             Command="{Binding BeginCommand}"
             Content="{Binding BeginLabel}"
+            IsEnabled="{Binding CanBegin}"
             Style="{StaticResource AccentButtonStyle}" />
         <TextBlock HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
             Visibility="{Binding IsGooglePending, Converter={StaticResource BooleanToVisibilityConverter}}"

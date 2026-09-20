@@ -1170,6 +1170,36 @@
               </Border>
 
               <StackPanel Spacing="4">
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=about.accountTitle}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.accountDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+              </StackPanel>
+              <Border Style="{StaticResource SideySettingsCardStyle}" Padding="8">
+                <StackPanel Spacing="0">
+                  <Grid Padding="12" ColumnSpacing="16">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <FontIcon FontSize="22" Glyph="&#xE8AC;" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=about.signOut}, Mode=OneWay}" />
+                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.signOutDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding SignOutCommand}" Content="{Binding Value, Source={i18n:I18n Key=about.signOut}, Mode=OneWay}" />
+                  </Grid>
+                  <Rectangle Height="1" Margin="12,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                  <Grid Padding="12" ColumnSpacing="16">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <FontIcon FontSize="22" Foreground="{ThemeResource SystemFillColorCriticalBrush}" Glyph="&#xE74D;" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                      <TextBlock FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccount}, Mode=OneWay}" />
+                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccountDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding DeleteAccountCommand}">
+                      <TextBlock Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccount}, Mode=OneWay}" />
+                    </Button>
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Spacing="4">
                 <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=about.policiesTitle}, Mode=OneWay}" />
                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.policiesDescription}, Mode=OneWay}" />
               </StackPanel>
