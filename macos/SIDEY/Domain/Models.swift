@@ -16,6 +16,15 @@ enum LaunchRouter {
     }
 }
 
+enum DockVisibilityPolicy {
+    static func shouldShowDockIcon(
+        onboardingComplete: Bool,
+        firstRunPresentationActive: Bool = false
+    ) -> Bool {
+        firstRunPresentationActive || !onboardingComplete
+    }
+}
+
 enum ManualReopenPolicy {
     static func shouldOpenSettings(
         hasShownNativeLanding: Bool,

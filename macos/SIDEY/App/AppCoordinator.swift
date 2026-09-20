@@ -231,7 +231,7 @@ final class AppCoordinator {
             showSettings()
         case .loginItem:
             refreshStatusItem()
-            NSApplication.shared.setActivationPolicy(.accessory)
+            applyActivationPolicyForCurrentLifecycle()
         }
         activityMonitor.start()
         startBackend()
@@ -314,7 +314,7 @@ final class AppCoordinator {
         case .overlay:
             didCompleteFirstRunTransition = true
             landingWindow.close()
-            NSApplication.shared.setActivationPolicy(.accessory)
+            applyActivationPolicyForCurrentLifecycle()
             applyRequestedOverlayVisibility()
         case .recovery:
             didCompleteFirstRunTransition = true
@@ -324,7 +324,7 @@ final class AppCoordinator {
     }
 
     func showSettings() {
-        NSApplication.shared.setActivationPolicy(.regular)
+        applyActivationPolicyForCurrentLifecycle()
         settingsWindow.show()
         NSApplication.shared.activate(ignoringOtherApps: true)
     }
@@ -344,7 +344,15 @@ final class AppCoordinator {
     }
 
     private func settingsDidClose() {
-        NSApplication.shared.setActivationPolicy(.accessory)
+        applyActivationPolicyForCurrentLifecycle()
+    }
+
+    func applyActivationPolicyForCurrentLifecycle() {
+        let policy: NSApplication.ActivationPolicy = DockVisibilityPolicy.shouldShowDockIcon(
+            onboardingComplete: model.preferences.onboardingComplete,
+            firstRunPresentationActive: launchReason == .firstRun && !didCompleteFirstRunTransition
+        ) ? .regular : .accessory
+        NSApplication.shared.setActivationPolicy(policy)
     }
 
     private func toggleOverlay() {
@@ -498,7 +506,7 @@ final class AppCoordinator {
 
     private func showHistory() {
         markActiveRoomRead()
-        NSApplication.shared.setActivationPolicy(.regular)
+        applyActivationPolicyForCurrentLifecycle()
         historyWindow.show()
         NSApplication.shared.activate(ignoringOtherApps: true)
     }

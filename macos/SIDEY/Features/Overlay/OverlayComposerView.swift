@@ -10,17 +10,6 @@ struct OverlayComposerView: View {
     var body: some View {
         HStack(spacing: 8) {
             ComposerDragHandle().frame(width: 14, height: 34)
-            Button(action: onCancel) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 13, weight: .bold))
-                    .frame(width: 28, height: 34)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .accessibilityLabel("메시지 입력 닫기")
-            .accessibilityIdentifier("sidey.composer-close")
-
             ZStack(alignment: .leading) {
                 if model.draft.isEmpty {
                     Text("메시지를 입력해 주세요").foregroundStyle(.tertiary)

@@ -445,6 +445,7 @@ extension AppCoordinator {
     }
 
     func applyBackendSnapshot(_ snapshot: BackendSnapshot, currentUserID: UUID?) {
+        let wasOnboardingComplete = model.preferences.onboardingComplete
         if let activeRoomID = model.activeRoom?.id,
            !snapshot.rooms.contains(where: { $0.id == activeRoomID }) {
             overlayWindows.dismissComposer()
@@ -452,6 +453,9 @@ extension AppCoordinator {
             model.clearBubbles()
         }
         model.apply(snapshot: snapshot, currentUserID: currentUserID)
+        if wasOnboardingComplete != model.preferences.onboardingComplete {
+            applyActivationPolicyForCurrentLifecycle()
+        }
         migrateTreeMovementIfNeeded()
     }
 
