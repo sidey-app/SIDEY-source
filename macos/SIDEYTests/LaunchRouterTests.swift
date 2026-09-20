@@ -20,13 +20,10 @@ final class LaunchRouterTests: XCTestCase {
         )
     }
 
-    func testDockIconIsVisibleDuringFirstRunAndIncompleteOnboarding() {
-        XCTAssertTrue(DockVisibilityPolicy.shouldShowDockIcon(onboardingComplete: false))
-        XCTAssertFalse(DockVisibilityPolicy.shouldShowDockIcon(onboardingComplete: true))
-        XCTAssertTrue(DockVisibilityPolicy.shouldShowDockIcon(
-            onboardingComplete: true,
-            firstRunPresentationActive: true
-        ))
+    func testDockIconIsVisibleOnlyForFirstRunOrSettingsPresentation() {
+        XCTAssertFalse(DockVisibilityPolicy.shouldShowDockIcon())
+        XCTAssertTrue(DockVisibilityPolicy.shouldShowDockIcon(firstRunPresentationActive: true))
+        XCTAssertTrue(DockVisibilityPolicy.shouldShowDockIcon(settingsWindowPresented: true))
     }
 
     func testManualReopenDoesNotOpenSettingsWhileComposerIsVisible() {

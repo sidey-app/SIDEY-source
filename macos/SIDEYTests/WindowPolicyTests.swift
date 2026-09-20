@@ -276,6 +276,13 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(onboardingSize.height, 640)
     }
 
+    func testSettingsWindowMovesToTheActiveSpaceWhenPresented() {
+        let settings = SettingsWindowController(model: AppModel(preferences: .defaults))
+
+        XCTAssertTrue(settings.window?.collectionBehavior.contains(.moveToActiveSpace) ?? false)
+        XCTAssertFalse(settings.window?.collectionBehavior.contains(.canJoinAllSpaces) ?? true)
+    }
+
     func testWindowLevelsClickPolicyAndFixedComposerSize() {
         let model = AppModel(preferences: .defaults)
         let userID = UUID()

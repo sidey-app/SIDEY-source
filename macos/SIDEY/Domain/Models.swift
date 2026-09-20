@@ -18,10 +18,10 @@ enum LaunchRouter {
 
 enum DockVisibilityPolicy {
     static func shouldShowDockIcon(
-        onboardingComplete: Bool,
-        firstRunPresentationActive: Bool = false
+        firstRunPresentationActive: Bool = false,
+        settingsWindowPresented: Bool = false
     ) -> Bool {
-        firstRunPresentationActive || !onboardingComplete
+        firstRunPresentationActive || settingsWindowPresented
     }
 }
 

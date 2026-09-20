@@ -25,6 +25,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         window.titlebarSeparatorStyle = .automatic
         window.isReleasedWhenClosed = false
         window.level = .normal
+        window.collectionBehavior.insert(.moveToActiveSpace)
         window.minSize = NSSize(width: 860, height: 640)
         window.center()
         window.delegate = self

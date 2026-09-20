@@ -127,6 +127,7 @@ final class AppCoordinator {
     private var landingTask: Task<Void, Never>?
     private var landingDidComplete = false
     private var didCompleteFirstRunTransition = false
+    private var settingsWindowPresented = false
     var backendBootstrapState: BackendBootstrapState = .pending
     var backendConnectionStatus: BackendConnectionStatus?
     private lazy var activityMonitor = SystemActivityMonitor { [weak self] state in
@@ -324,6 +325,7 @@ final class AppCoordinator {
     }
 
     func showSettings() {
+        settingsWindowPresented = true
         applyActivationPolicyForCurrentLifecycle()
         settingsWindow.show()
         NSApplication.shared.activate(ignoringOtherApps: true)
@@ -344,13 +346,14 @@ final class AppCoordinator {
     }
 
     private func settingsDidClose() {
+        settingsWindowPresented = false
         applyActivationPolicyForCurrentLifecycle()
     }
 
     func applyActivationPolicyForCurrentLifecycle() {
         let policy: NSApplication.ActivationPolicy = DockVisibilityPolicy.shouldShowDockIcon(
-            onboardingComplete: model.preferences.onboardingComplete,
-            firstRunPresentationActive: launchReason == .firstRun && !didCompleteFirstRunTransition
+            firstRunPresentationActive: launchReason == .firstRun && !didCompleteFirstRunTransition,
+            settingsWindowPresented: settingsWindowPresented
         ) ? .regular : .accessory
         NSApplication.shared.setActivationPolicy(policy)
     }
