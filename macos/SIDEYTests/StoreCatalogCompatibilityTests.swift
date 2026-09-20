@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 @MainActor
 final class StoreCatalogCompatibilityTests: XCTestCase {

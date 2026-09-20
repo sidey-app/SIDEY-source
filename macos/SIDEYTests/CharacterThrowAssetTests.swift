@@ -1,7 +1,7 @@
 import CryptoKit
 import ImageIO
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 final class CharacterThrowAssetTests: XCTestCase {
     private let actionHashes = [

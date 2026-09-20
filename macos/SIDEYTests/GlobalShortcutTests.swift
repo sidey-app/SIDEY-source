@@ -1,7 +1,7 @@
 import AppKit
 import Carbon
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 @MainActor
 final class GlobalShortcutTests: XCTestCase {

@@ -1,5 +1,5 @@
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 final class LegacySettingsMigratorTests: XCTestCase {
     func testMigratesLegacyGodotSettingsOnce() throws {

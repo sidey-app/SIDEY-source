@@ -6,7 +6,7 @@
 
 최신 main 검토는 저장소 루트에서 `python3 scripts/skills/workflow.py open --scheme sidey-reals`를 실행한다. 작업 중 미리보기는 `--preview <worktree 절대경로>`를 추가한다. 프로젝트·scheme·소스·실행 프로세스·편집 창 준비 상태를 확인한 뒤 열림을 보고한다.
 
-Xcode 수동 작업은 `macos/Recording/SIDEYRecording.xcodeproj`의 `sidey-reals` scheme을 사용한다. Debug의 빌드 없는 실행도 현재 소스와 빌드 출처 검사를 통과해야 한다. 기본 `SIDEYAppStore` 앱과 프로젝트를 혼동하지 않는다.
+Xcode 수동 작업은 `macos/Recording/SIDEYRecording.xcodeproj`의 `sidey-reals` scheme을 사용한다. Debug의 빌드 없는 실행도 현재 소스와 빌드 출처 검사를 통과해야 한다. 기본 `SIDEY` 앱과 프로젝트를 혼동하지 않는다.
 
 배포하지 않는 독립 Release 앱은 `macos/Recording/build_reals.command`로 만든다. 결과는 같은 폴더의 `dist/sidey-reals.app`에 놓인다. 이 프로젝트에는 Supabase·Sparkle 패키지 또는 본 앱 타깃 의존성이 없다. 공유 렌더러·값 모델·화면 잠금 확인·픽셀/음원 리소스만 직접 참조한다.
 
