@@ -154,7 +154,7 @@ class WorkflowTests(unittest.TestCase):
             w.main(['--repo', str(path), 'open', '--task', 'task'])
         primary = self.primary.resolve()
         self.assertEqual(opened, [(primary, (str(primary / 'scripts/macos/open_current.sh'),
-            '--worktree', str(primary), '--scheme', 'SIDEYAppStore'))])
+            '--worktree', str(primary), '--scheme', 'SIDEY'))])
         completed = w.read_state(path)['task']
         self.assertEqual(completed['status'], 'complete')
         self.assertEqual(completed['app_review']['main'], remote)
@@ -165,7 +165,7 @@ class WorkflowTests(unittest.TestCase):
         invalid = [
             ('not integrated', {**task, 'status': 'started'}),
             ('wrong platform', {**task, 'platform': 'windows'}),
-            ('wrong app', {**task, 'app': 'SIDEY'}),
+            ('wrong app', {**task, 'app': 'sidey-reals'}),
             ('missing merge', {key: value for key, value in task.items() if key != 'merge'}),
             ('missing check', {key: value for key, value in task.items() if key != 'checked'}),
             ('missing checked head', {**task, 'checked': {}}),
@@ -185,6 +185,33 @@ class WorkflowTests(unittest.TestCase):
                         w.WorkflowError, 'integrated and awaiting'):
                     w.main(['--repo', str(path), 'open', '--task', 'task'])
                 self.assertEqual(w.read_state(path)['task'], state)
+
+    def test_open_accepts_legacy_app_name_in_existing_task_state(self):
+        path, task = self.squashed_macos_task()
+        task['app'] = 'SIDEYAppStore'
+        w.update_task(path, 'task', task)
+        real_run = w.run
+        opened = []
+
+        def response(root, *args, **kwargs):
+            if (
+                Path(args[0])
+                == self.primary.resolve() / 'scripts/macos/open_current.sh'
+            ):
+                opened.append(args)
+                return ''
+            return real_run(root, *args, **kwargs)
+
+        with (
+            patch.object(w, 'run', side_effect=response),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            w.main(
+                ['--repo', str(path), 'open', '--task', 'task']
+            )
+
+        self.assertEqual(len(opened), 1)
+        self.assertEqual(w.read_state(path)['task']['status'], 'complete')
 
     def test_merge_uses_github_squash_defaults_without_message_overrides(self):
         with patch.object(w, 'run') as run:

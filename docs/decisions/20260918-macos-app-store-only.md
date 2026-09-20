@@ -8,6 +8,9 @@
 
 macOS 직접 배포판의 개발·지원과 DMG, Sparkle, Homebrew 배포 경로를 종료한다.
 macOS는 Mac App Store판만 유지하고 Windows 지원·설치·업데이트는 유지한다.
+유지하는 macOS Xcode scheme과 app product 이름은 배포 채널 접미사 없이 `SIDEY`로
+통일한다. App Store bundle, signing, entitlement, StoreKit과 서버 검증 identity는
+기존 계약을 유지한다.
 
 ## 이유와 경계
 
