@@ -1,6 +1,11 @@
 import SwiftUI
 import AuthenticationServices
 
+enum AppSettingsLegalLinks {
+    static let privacyPolicy = URL(string: "https://sidey-app.github.io/SIDEY/privacy/")!
+    static let termsOfService = URL(string: "https://sidey-app.github.io/SIDEY/terms/")!
+}
+
 struct AppSettingsView: View {
     @Bindable var model: AppModel
     let actions: SettingsActions
@@ -173,11 +178,11 @@ struct AppSettingsView: View {
             HStack(spacing: 18) {
                 Link(
                     "개인정보 처리방침",
-                    destination: URL(string: "https://sidey-app.github.io/SIDEY/privacy.html")!
+                    destination: AppSettingsLegalLinks.privacyPolicy
                 )
                 Link(
                     "이용약관",
-                    destination: URL(string: "https://sidey-app.github.io/SIDEY/terms.html")!
+                    destination: AppSettingsLegalLinks.termsOfService
                 )
                 Spacer()
                 Button("구매 복원", action: actions.onRestorePurchases)
