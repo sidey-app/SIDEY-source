@@ -283,6 +283,51 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertFalse(settings.window?.collectionBehavior.contains(.canJoinAllSpaces) ?? true)
     }
 
+    func testSettingsCloseFinishesBeforeLifecycleCallback() async {
+        let closed = expectation(description: "settings close lifecycle")
+        var callbackRan = false
+        let settings = SettingsWindowController(
+            model: AppModel(preferences: .defaults),
+            onClose: {
+                callbackRan = true
+                closed.fulfill()
+            }
+        )
+        settings.show()
+
+        settings.window?.close()
+
+        XCTAssertFalse(callbackRan)
+        XCTAssertFalse(settings.window?.isVisible ?? true)
+        await fulfillment(of: [closed], timeout: 1)
+        XCTAssertTrue(callbackRan)
+    }
+
+    func testReopenedSettingsIgnoresStaleCloseLifecycleCallback() async {
+        var closeCallbacks = 0
+        let settings = SettingsWindowController(
+            model: AppModel(preferences: .defaults),
+            onClose: { closeCallbacks += 1 }
+        )
+        settings.show()
+
+        settings.window?.close()
+        settings.show()
+
+        let queueDrained = expectation(description: "main queue drained")
+        DispatchQueue.main.async { queueDrained.fulfill() }
+        await fulfillment(of: [queueDrained], timeout: 1)
+        XCTAssertEqual(closeCallbacks, 0)
+        XCTAssertTrue(settings.window?.isVisible ?? false)
+
+        settings.window?.close()
+        let cleanupDrained = expectation(description: "settings cleanup drained")
+        DispatchQueue.main.async { cleanupDrained.fulfill() }
+        await fulfillment(of: [cleanupDrained], timeout: 1)
+        XCTAssertEqual(closeCallbacks, 1)
+        XCTAssertFalse(settings.window?.isVisible ?? true)
+    }
+
     func testWindowLevelsClickPolicyAndFixedComposerSize() {
         let model = AppModel(preferences: .defaults)
         let userID = UUID()

@@ -64,7 +64,12 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
-        // Closing settings must never alter overlay visibility or ownership.
-        onClose()
+        // Do not change the app activation policy while AppKit is still closing
+        // the key window. Finish the close transaction first so removing SIDEY
+        // from the Dock cannot hand focus back to an app on another Space.
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.window?.isVisible != true else { return }
+            self.onClose()
+        }
     }
 }
