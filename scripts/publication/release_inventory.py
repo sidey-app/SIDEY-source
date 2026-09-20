@@ -92,29 +92,39 @@ def load_compliance_contract(path: Path) -> dict[str, Any]:
     return contract
 
 
-def comparable_release(release: dict[str, Any], assets: list[dict[str, Any]]) -> dict[str, Any]:
+def canonical_release_body(body: Any) -> str:
+    """Ignore only terminal line endings that GitHub strips during publication."""
+    return str(body or "").rstrip("\r\n")
+
+
+def comparable_release(
+    release: dict[str, Any], assets: list[dict[str, Any]], body: str
+) -> dict[str, Any]:
     return {
         **{
             key: release.get(key)
-            for key in ("tag", "name", "draft", "prerelease", "body_sha256")
+            for key in ("tag", "name", "draft", "prerelease")
         },
+        "body_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
         "assets": assets,
     }
 
 
 def compliance_assets_by_tag(
     contract: dict[str, Any] | None,
-) -> tuple[dict[str, list[dict[str, Any]]], list[str]]:
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, str], list[str]]:
     by_tag: dict[str, list[dict[str, Any]]] = {}
+    body_appends_by_tag: dict[str, str] = {}
     errors: list[str] = []
     if contract is None:
-        return by_tag, errors
+        return by_tag, body_appends_by_tag, errors
     if contract.get("schema") != 1 or not isinstance(contract.get("assets"), list):
-        return by_tag, ["unsupported compliance source contract"]
+        return by_tag, body_appends_by_tag, ["unsupported compliance source contract"]
     for asset in contract["assets"]:
         tag = str(asset.get("tag", ""))
         source_commit = str(asset.get("source_commit", ""))
         license_commit = str(asset.get("license_introduction_commit", ""))
+        body_append = asset.get("release_body_append")
         projected = {
             "name": str(asset.get("name", "")),
             "size": asset.get("size"),
@@ -133,13 +143,22 @@ def compliance_assets_by_tag(
             errors.append(
                 f"compliance source asset has invalid digest: {tag}/{projected['name']}"
             )
+        if body_append is not None:
+            if not isinstance(body_append, str) or not canonical_release_body(body_append):
+                errors.append(f"compliance release body append must be non-empty: {tag}")
+            else:
+                canonical_append = canonical_release_body(body_append)
+                existing_append = body_appends_by_tag.get(tag)
+                if existing_append is not None and existing_append != canonical_append:
+                    errors.append(f"conflicting compliance release body append: {tag}")
+                body_appends_by_tag[tag] = canonical_append
         by_tag.setdefault(tag, []).append(projected)
     for tag, assets in by_tag.items():
         names = [asset["name"] for asset in assets]
         if len(names) != len(set(names)):
             errors.append(f"duplicate compliance source asset name: {tag}")
         assets.sort(key=lambda item: item["name"])
-    return by_tag, errors
+    return by_tag, body_appends_by_tag, errors
 
 
 def verify(
@@ -157,7 +176,9 @@ def verify(
 
     source_by_tag = {release["tag"]: release for release in source["releases"]}
     target_by_tag = {release["tag"]: release for release in target["releases"]}
-    compliance_by_tag, errors = compliance_assets_by_tag(compliance_contract)
+    compliance_by_tag, body_appends_by_tag, errors = compliance_assets_by_tag(
+        compliance_contract
+    )
     for tag in sorted(compliance_by_tag.keys() - source_by_tag.keys()):
         errors.append(f"compliance source asset references unknown release: {tag}")
     if compliance_contract is not None:
@@ -195,8 +216,17 @@ def verify(
         actual_assets = sorted(
             target_by_tag[tag].get("assets", []), key=lambda item: item["name"]
         )
-        if comparable_release(source_by_tag[tag], expected_assets) != comparable_release(
-            target_by_tag[tag], actual_assets
+        expected_body = canonical_release_body(source_by_tag[tag].get("body"))
+        body_append = body_appends_by_tag.get(tag)
+        if body_append:
+            expected_body = (
+                f"{expected_body}\n\n{body_append}" if expected_body else body_append
+            )
+        actual_body = canonical_release_body(target_by_tag[tag].get("body"))
+        if comparable_release(
+            source_by_tag[tag], expected_assets, expected_body
+        ) != comparable_release(
+            target_by_tag[tag], actual_assets, actual_body
         ):
             errors.append(f"release metadata or assets differ: {tag}")
     if errors:

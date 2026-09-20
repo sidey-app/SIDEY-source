@@ -91,6 +91,25 @@ class ReleaseInventoryTests(unittest.TestCase):
         target = normalize([target_release], "sidey-app/SIDEY-public-staging")
         verify(source, target, "sidey-app/SIDEY-public-staging")
 
+    def test_verify_allows_github_to_strip_terminal_line_endings(self) -> None:
+        source_release = self.raw_release()
+        source_release["body"] = "변경 사항\r\n\n"
+        source = normalize([source_release], "sidey-app/SIDEY-source")
+        target_release = self.raw_release()
+        target_release["body"] = "변경 사항"
+        target = normalize([target_release], "sidey-app/SIDEY-public-staging")
+
+        verify(source, target, "sidey-app/SIDEY-public-staging")
+
+    def test_verify_rejects_non_terminal_release_body_change(self) -> None:
+        source = normalize([self.raw_release()], "sidey-app/SIDEY-source")
+        target_release = self.raw_release()
+        target_release["body"] = "변경 사항 수정"
+        target = normalize([target_release], "sidey-app/SIDEY-public-staging")
+
+        with self.assertRaisesRegex(ValueError, "metadata or assets differ"):
+            verify(source, target, "sidey-app/SIDEY-public-staging")
+
     def test_verify_rejects_asset_mismatch(self) -> None:
         source = normalize([self.raw_release()], "sidey-app/SIDEY-source")
         target = normalize(
@@ -132,6 +151,94 @@ class ReleaseInventoryTests(unittest.TestCase):
         verify(source, target, "sidey-app/SIDEY-public-staging", contract)
         with self.assertRaisesRegex(ValueError, "metadata or assets differ"):
             verify(source, target, "sidey-app/SIDEY-public-staging")
+
+    def test_verify_accepts_declared_compliance_release_body_append(self) -> None:
+        source_release = self.raw_release()
+        source_release["body"] = "변경 사항\n"
+        source = normalize([source_release], "sidey-app/SIDEY-source")
+        target_release = self.raw_release()
+        target_release["body"] = "변경 사항\n\n소스 코드 안내"
+        target = normalize([target_release], "sidey-app/SIDEY-public-staging")
+        compliance_asset = {
+            "name": "SIDEY-v1-corresponding-source.tar",
+            "size": 123,
+            "digest": "sha256:" + ("b" * 64),
+        }
+        target["releases"][0]["assets"].append(compliance_asset)
+        contract = {
+            "schema": 1,
+            "assets": [
+                {
+                    "tag": "v1.0.0",
+                    "source_commit": "a" * 40,
+                    "license_introduction_commit": "9" * 40,
+                    "release_body_append": "소스 코드 안내\n",
+                    **compliance_asset,
+                }
+            ],
+        }
+
+        verify(source, target, "sidey-app/SIDEY-public-staging", contract)
+
+        target["releases"][0]["body"] = "변경 사항\n\n소스 코드 안내 오타"
+        with self.assertRaisesRegex(ValueError, "metadata or assets differ"):
+            verify(source, target, "sidey-app/SIDEY-public-staging", contract)
+
+    def test_verify_accepts_declared_body_append_for_empty_source_body(self) -> None:
+        source_release = self.raw_release()
+        source_release["body"] = ""
+        source = normalize([source_release], "sidey-app/SIDEY-source")
+        target_release = self.raw_release()
+        target_release["body"] = "소스 코드 안내"
+        target = normalize([target_release], "sidey-app/SIDEY-public-staging")
+        contract = {
+            "schema": 1,
+            "assets": [
+                {
+                    "tag": "v1.0.0",
+                    "source_commit": "a" * 40,
+                    "license_introduction_commit": "9" * 40,
+                    "release_body_append": "소스 코드 안내",
+                    "name": "SIDEY-v1-corresponding-source.tar",
+                    "size": 123,
+                    "digest": "sha256:" + ("b" * 64),
+                }
+            ],
+        }
+        target["releases"][0]["assets"].append(
+            {
+                "name": "SIDEY-v1-corresponding-source.tar",
+                "size": 123,
+                "digest": "sha256:" + ("b" * 64),
+            }
+        )
+
+        verify(source, target, "sidey-app/SIDEY-public-staging", contract)
+
+    def test_verify_rejects_conflicting_body_appends_for_same_tag(self) -> None:
+        source = normalize([self.raw_release()], "sidey-app/SIDEY-source")
+        target = normalize([self.raw_release()], "sidey-app/SIDEY-public-staging")
+        contract_assets = []
+        for index, body_append in enumerate(("안내 1", "안내 2"), start=1):
+            contract_assets.append(
+                {
+                    "tag": "v1.0.0",
+                    "source_commit": "a" * 40,
+                    "license_introduction_commit": "9" * 40,
+                    "release_body_append": body_append,
+                    "name": f"SIDEY-source-{index}.tar",
+                    "size": index,
+                    "digest": "sha256:" + (str(index) * 64),
+                }
+            )
+
+        with self.assertRaisesRegex(ValueError, "conflicting compliance"):
+            verify(
+                source,
+                target,
+                "sidey-app/SIDEY-public-staging",
+                {"schema": 1, "assets": contract_assets},
+            )
 
     def test_verify_rejects_missing_declared_compliance_source_asset(self) -> None:
         source = normalize([self.raw_release()], "sidey-app/SIDEY-source")
