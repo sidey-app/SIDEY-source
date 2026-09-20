@@ -137,6 +137,51 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn('$expectedAssetNames = @($installerName) + $complianceAssetNames', workflow)
         self.assertIn('repository: ${{ env.PUBLIC_REPOSITORY }}', workflow)
         self.assertNotIn('actions/deploy-pages', workflow)
+        self.assertNotIn('    environment:', workflow)
+
+    def test_private_source_publication_uses_repository_credentials(self):
+        website = self.read('website-deployment.yml')
+        windows = self.read('windows-release.yml')
+
+        for workflow in (website, windows):
+            with self.subTest(workflow=workflow.splitlines()[0]):
+                self.assertNotIn('    environment:', workflow)
+                self.assertIn('actions/create-github-app-token@v2', workflow)
+                self.assertIn(
+                    '${{ vars.SIDEY_PUBLIC_PUBLISHER_APP_ID }}',
+                    workflow,
+                )
+                self.assertIn(
+                    '${{ secrets.SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY }}',
+                    workflow,
+                )
+                self.assertIn(
+                    'owner: ${{ steps.public_repository.outputs.owner }}',
+                    workflow,
+                )
+                self.assertIn(
+                    'repositories: ${{ steps.public_repository.outputs.name }}',
+                    workflow,
+                )
+
+        self.assertIn(
+            "if: github.event_name != 'pull_request' && "
+            "github.ref == 'refs/heads/main'",
+            website,
+        )
+        self.assertIn('git push origin HEAD:gh-pages', website)
+        self.assertIn(
+            'SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY:\n        required: true',
+            website,
+        )
+        self.assertIn("if: github.ref == 'refs/heads/main'", windows)
+        self.assertIn('needs: validate', windows)
+        self.assertIn('needs: publish', windows)
+        self.assertIn(
+            'SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY: '
+            '${{ secrets.SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY }}',
+            windows,
+        )
 
     def test_public_checkout_excludes_backend_sources(self):
         private_paths = (
