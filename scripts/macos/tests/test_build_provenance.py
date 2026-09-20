@@ -35,7 +35,7 @@ class ProvenanceTests(unittest.TestCase):
 
     def test_running_proof_rejects_same_version_other_build_scheme_and_old_process(self):
         ticket = dict(session='new-session', build_id='new-build', commit='new-commit', input_hash='new-input',
-                      target='SIDEYAppStore', configuration='Debug')
+                      target='SIDEY', configuration='Debug')
         receipt = {**ticket, 'executable': '/new/App', 'window_ready': True}
         verify_running(ticket, receipt, '/new/App', '/new/App')
         for key in ticket:
@@ -57,7 +57,7 @@ class ProvenanceTests(unittest.TestCase):
             source.write_text('struct New {}')
             derived = root / 'derived'
             app = root / 'Products/Test.app'
-            env = {'TARGET_NAME': 'SIDEYAppStore', 'CONFIGURATION': 'Release',
+            env = {'TARGET_NAME': 'SIDEY', 'CONFIGURATION': 'Release',
                    'PRODUCT_BUNDLE_IDENTIFIER': 'app.sidey.test', 'DERIVED_FILE_DIR': str(derived),
                    'TARGET_BUILD_DIR': str(app.parent), 'UNLOCALIZED_RESOURCES_FOLDER_PATH': 'Test.app/Contents/Resources',
                    'SECRET_TOKEN': 'never-include-this', 'SRCROOT': str(root)}
@@ -77,9 +77,9 @@ class ProvenanceTests(unittest.TestCase):
             self.assertNotIn(str(root), receipt)
             self.assertNotIn('never-include-this', receipt)
             (app / 'Contents/Info.plist').write_bytes(plistlib.dumps({'CFBundleIdentifier': 'app.sidey.test'}))
-            p.verify(app, root=root, target='SIDEYAppStore', configuration='Release')
+            p.verify(app, root=root, target='SIDEY', configuration='Release')
             with self.assertRaisesRegex(RuntimeError, 'different target'):
-                p.verify(app, root=root, target='SIDEY')
+                p.verify(app, root=root, target='OtherTarget')
             source.write_text('struct EditedAfterBuild {}')
             with self.assertRaisesRegex(RuntimeError, 'stale'):
                 p.verify(app, root=root)
@@ -97,10 +97,10 @@ class ProvenanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             directory = root / 'products'
-            p.claim_build_directory(directory, root, 'SIDEYAppStore', 'Debug')
-            p.claim_build_directory(directory, root, 'SIDEYAppStore', 'Debug')
-            for source, target, configuration in [(root / 'other', 'SIDEYAppStore', 'Debug'),
-                                                  (root, 'SIDEY', 'Debug'), (root, 'SIDEYAppStore', 'Release')]:
+            p.claim_build_directory(directory, root, 'SIDEY', 'Debug')
+            p.claim_build_directory(directory, root, 'SIDEY', 'Debug')
+            for source, target, configuration in [(root / 'other', 'SIDEY', 'Debug'),
+                                                  (root, 'OtherTarget', 'Debug'), (root, 'SIDEY', 'Release')]:
                 with self.subTest(target=target, source=source), self.assertRaisesRegex(RuntimeError, 'another worktree'):
                     p.claim_build_directory(directory, source, target, configuration)
 

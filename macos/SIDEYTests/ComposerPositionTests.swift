@@ -1,5 +1,5 @@
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 final class ComposerPositionTests: XCTestCase {
     private let main = OverlayScreenGeometry(identifier: "main", legacySignature: "main", name: "main",

@@ -2,7 +2,7 @@ import AppKit
 import SpriteKit
 import SwiftUI
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 @MainActor
 final class KeepsakeStoreTests: XCTestCase {
