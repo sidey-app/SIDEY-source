@@ -5,6 +5,7 @@
       "tag": "windows-v2.0.0",
       "source_commit": "92088b671cebd073623701d15442b1ba3c8638e8",
       "license_introduction_commit": "43c489ff2da69745c8bc7122795019f77ade6239",
+      "release_body_append": "## 소스 코드 및 라이선스\n\n이 릴리스에는 GNU AGPLv3 적용 코드가 포함되어 있습니다. 이 릴리스 태그(windows-v2.0.0, commit 92088b671cebd073623701d15442b1ba3c8638e8)에 대응하는 정확한 소스는 첨부된 SIDEY-windows-v2.0.0-corresponding-source.tar에서 확인할 수 있습니다. 라이선스 조건과 고지는 압축 파일의 LICENSE 및 LICENSING.md를 확인하세요.",
       "name": "SIDEY-windows-v2.0.0-corresponding-source.tar",
       "archive_prefix": "SIDEY-windows-v2.0.0-source/",
       "size": 51988480,
