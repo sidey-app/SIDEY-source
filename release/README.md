@@ -18,5 +18,6 @@ use the Mac App Store.
 
 macOS supports only the App Store target. Archive creation, App Store Connect upload,
 submission and publication are separate actions. Developer ID DMG releases, Sparkle feeds
-and Homebrew Cask updates are retired. Historical releases and purchase records remain intact.
+and Homebrew Cask updates are retired. Historical Direct GitHub Releases, assets and tags were
+removed and must not be republished. Purchase records and private source history remain intact.
 Backend tests and deployment run in the private backend repository.

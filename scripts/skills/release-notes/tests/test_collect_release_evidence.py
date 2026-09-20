@@ -129,6 +129,18 @@ class CollectReleaseEvidenceTests(unittest.TestCase):
                 runner=runner,
             )
 
+    def test_app_store_source_range_has_no_github_release_url(self):
+        runner = FakeRunner()
+
+        result = COLLECTOR.collect_evidence(
+            Path("."),
+            "windows-v1.0.0",
+            runner.direct_commit,
+            runner=runner,
+        )
+
+        self.assertIsNone(result["public_release_url"])
+
 
 if __name__ == "__main__":
     unittest.main()

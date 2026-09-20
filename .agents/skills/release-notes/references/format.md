@@ -1,8 +1,12 @@
 # SIDEY Release-note Format
 
-Read this reference before writing or revising a canonical macOS or Windows release note.
+Read this reference before writing or revising a canonical App Store or Windows release note.
 
-## Default GitHub Release body
+## Default Windows GitHub Release body
+
+Deleted macOS Direct releases must not be recreated or republished. Existing
+`docs/releases/v<version>.md` files are private historical copies only. The format below is
+for Windows GitHub Releases.
 
 Write a short final-user summary, then the exact `## 변경사항` heading and attributed bullets:
 
@@ -30,6 +34,10 @@ Do not add a repository comparison link. The public distribution repository does
 ## App Store Connect notes
 
 An App Store note is a separate artifact. Require the exact submitted build, prior published App Store build, App Store Connect evidence and requested localization before drafting it. Do not add a GitHub comparison link or write it over `docs/releases/v<version>.md`; those files preserve historical Direct GitHub Release bodies.
+Keep private PR numbers and commit IDs in the evidence ledger rather than the customer-facing
+App Store note. Follow the verified destination's current length and localization requirements.
+The historical Direct files are private copies of deleted releases and must not be revised or
+republished.
 
 ## User-requested preamble or sections
 
