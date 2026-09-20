@@ -9,6 +9,10 @@ final class PreferencesTests: XCTestCase {
         value.quietModeEnabled = true
         value.showOfflineMembers = false
         value.requiresRightClickToThrow = true
+        value.globalShortcuts[.toggleOverlay] = GlobalShortcutBinding(
+            key: .o,
+            modifiers: [.control, .shift]
+        )
         value.selectedCharacterID = "pixel_penguin"
         value.overlayRegion = OverlayRegionPreference(
             edge: .right,
@@ -42,6 +46,7 @@ final class PreferencesTests: XCTestCase {
         XCTAssertFalse(value.requiresRightClickToThrow)
         XCTAssertEqual(value.nickname, "민지")
         XCTAssertEqual(value.selectedCharacterID, "pixel_hamster")
+        XCTAssertEqual(value.globalShortcuts, .defaults)
     }
 
     func testLegacyScreenIdentifierMigratesIntoBottomFullRegion() throws {
@@ -84,5 +89,20 @@ final class PreferencesTests: XCTestCase {
         XCTAssertEqual(value.schemaVersion, AppPreferences.currentSchemaVersion)
         XCTAssertTrue(value.keychainTransitionComplete)
         XCTAssertFalse(value.requiresRightClickToThrow)
+        XCTAssertEqual(value.globalShortcuts, .defaults)
+    }
+
+    func testMalformedShortcutFieldsFallBackWithoutDroppingOtherPreferences() throws {
+        let json = #"{"schemaVersion":11,"nickname":"민지","globalShortcuts":{"toggleQuietMode":{"key":"?","modifiers":2304},"toggleComposer":{"key":"C","modifiers":0},"openHistory":{"key":"R","modifiers":2304},"toggleOverlay":{"key":"R","modifiers":2304}}}"#
+        let value = try JSONDecoder().decode(AppPreferences.self, from: Data(json.utf8))
+
+        XCTAssertEqual(value.nickname, "민지")
+        XCTAssertEqual(value.globalShortcuts[.toggleQuietMode], .init(key: .m))
+        XCTAssertEqual(value.globalShortcuts[.toggleComposer], .init(key: .i))
+        XCTAssertEqual(
+            value.globalShortcuts[.openHistory],
+            .init(key: .r, modifiers: [.option, .command])
+        )
+        XCTAssertEqual(value.globalShortcuts[.toggleOverlay], .init(key: .h))
     }
 }

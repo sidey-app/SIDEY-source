@@ -5,20 +5,25 @@ import XCTest
 
 @MainActor
 final class GlobalShortcutTests: XCTestCase {
-    func testShortcutDefinitionsRequireControlOptionCommandFourKeyChords() {
+    func testDefaultBindingsUseUniqueControlOptionCommandFourKeyChords() {
+        let configuration = GlobalShortcutConfiguration.defaults
+        XCTAssertEqual(Set(GlobalShortcutAction.allCases.map { configuration[$0] }).count, 4)
+        XCTAssertEqual(configuration[.toggleOverlay].displayShortcut, "⌃⌥⌘H")
+        XCTAssertEqual(configuration[.toggleQuietMode].displayShortcut, "⌃⌥⌘M")
+        XCTAssertEqual(configuration[.toggleComposer].displayShortcut, "⌃⌥⌘I")
+        XCTAssertEqual(configuration[.openHistory].displayShortcut, "⌃⌥⌘R")
         XCTAssertEqual(
-            GlobalShortcutAction.modifierMask,
+            configuration[.toggleOverlay].modifierMask,
             UInt32(controlKey | optionKey | cmdKey)
         )
-        XCTAssertEqual(GlobalShortcutAction.toggleQuietMode.displayShortcut, "⌃⌥⌘M")
-        XCTAssertEqual(GlobalShortcutAction.toggleComposer.displayShortcut, "⌃⌥⌘I")
-        XCTAssertEqual(GlobalShortcutAction.openHistory.displayShortcut, "⌃⌥⌘R")
+        XCTAssertEqual(configuration[.toggleOverlay].keyCode, UInt32(kVK_ANSI_H))
         XCTAssertEqual(
-            GlobalShortcutAction.allCases.map(\.descriptiveShortcut),
+            GlobalShortcutAction.allCases.map { configuration[$0].descriptiveShortcut },
             [
                 "Control + Option + Command + M",
                 "Control + Option + Command + I",
-                "Control + Option + Command + R"
+                "Control + Option + Command + R",
+                "Control + Option + Command + H"
             ]
         )
     }
@@ -31,12 +36,12 @@ final class GlobalShortcutTests: XCTestCase {
 
         registrar.send(.toggleComposer, pressed: true)
         registrar.send(.toggleComposer, pressed: true)
-        registrar.send(.toggleQuietMode, pressed: true)
+        registrar.send(.toggleOverlay, pressed: true)
         registrar.send(.toggleComposer, pressed: true)
         registrar.send(.toggleComposer, pressed: false)
         registrar.send(.toggleComposer, pressed: true)
 
-        XCTAssertEqual(actions, [.toggleComposer, .toggleQuietMode, .toggleComposer])
+        XCTAssertEqual(actions, [.toggleComposer, .toggleOverlay, .toggleComposer])
         controller.uninstall()
     }
 
@@ -50,13 +55,14 @@ final class GlobalShortcutTests: XCTestCase {
         )
         controller.install()
         registrar.send(.toggleQuietMode, pressed: true)
-        registrar.send(.openHistory, pressed: true)
+        registrar.send(.toggleOverlay, pressed: true)
 
-        XCTAssertEqual(actions, [.openHistory])
+        XCTAssertEqual(actions, [.toggleOverlay])
         XCTAssertEqual(statuses[.toggleQuietMode], .unavailable(OSStatus(eventHotKeyExistsErr)))
         XCTAssertTrue(statuses[.toggleQuietMode]?.notice?.contains("다른 앱") == true)
         XCTAssertEqual(statuses[.toggleComposer], .registered)
         XCTAssertEqual(statuses[.openHistory], .registered)
+        XCTAssertEqual(statuses[.toggleOverlay], .registered)
         controller.uninstall()
     }
 
@@ -72,9 +78,94 @@ final class GlobalShortcutTests: XCTestCase {
         registrar.send(.openHistory, pressed: true)
 
         XCTAssertTrue(registrar.registered.isEmpty)
-        XCTAssertEqual(statuses.count, 3)
+        XCTAssertEqual(statuses.count, GlobalShortcutAction.allCases.count)
         XCTAssertTrue(statuses.values.allSatisfy { $0 == .unavailable(OSStatus(eventInternalErr)) })
         XCTAssertTrue(statuses.values.allSatisfy { $0.notice?.contains("등록하지 못했습니다") == true })
+        controller.uninstall()
+    }
+
+    func testChangeAfterHandlerFailureIsRejectedWithoutRegisteringAnUnusableShortcut() {
+        let registrar = FakeGlobalShortcutRegistrar()
+        registrar.handlerResult = OSStatus(eventInternalErr)
+        var statuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
+        let controller = GlobalShortcutController(
+            registrar: registrar,
+            onAction: { _ in },
+            onStatusChanged: { statuses = $0 }
+        )
+        controller.install()
+
+        XCTAssertFalse(controller.update(.toggleOverlay, binding: .init(key: .o)))
+        XCTAssertTrue(registrar.replacements.isEmpty)
+        XCTAssertEqual(
+            statuses[.toggleOverlay],
+            .changeRejected(.unavailable(OSStatus(eventInternalErr)))
+        )
+        controller.uninstall()
+    }
+
+    func testLiveChangeUsesConfiguredBindingAndClearsHeldState() {
+        let registrar = FakeGlobalShortcutRegistrar()
+        var actions: [GlobalShortcutAction] = []
+        var statuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
+        let controller = GlobalShortcutController(
+            registrar: registrar, onAction: { actions.append($0) }, onStatusChanged: { statuses = $0 }
+        )
+        controller.install()
+        registrar.send(.toggleOverlay, pressed: true)
+
+        let replacement = GlobalShortcutBinding(key: .o, modifiers: [.control, .shift])
+        XCTAssertTrue(controller.update(.toggleOverlay, binding: replacement))
+        registrar.send(.toggleOverlay, pressed: true)
+
+        XCTAssertEqual(registrar.replacements.last?.action, .toggleOverlay)
+        XCTAssertEqual(registrar.replacements.last?.binding, replacement)
+        XCTAssertEqual(actions, [.toggleOverlay, .toggleOverlay])
+        XCTAssertEqual(statuses[.toggleOverlay], .registered)
+        controller.uninstall()
+    }
+
+    func testDuplicateAndRegistrationFailureKeepExistingBindingOperational() {
+        let registrar = FakeGlobalShortcutRegistrar()
+        var actions: [GlobalShortcutAction] = []
+        var statuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
+        let controller = GlobalShortcutController(
+            registrar: registrar, onAction: { actions.append($0) }, onStatusChanged: { statuses = $0 }
+        )
+        controller.install()
+
+        XCTAssertFalse(controller.update(.toggleOverlay, binding: .init(key: .m)))
+        XCTAssertEqual(
+            statuses[.toggleOverlay],
+            .changeRejected(.duplicate(.toggleQuietMode))
+        )
+        XCTAssertTrue(registrar.replacements.isEmpty)
+
+        registrar.replacementResults[.toggleOverlay] = OSStatus(eventHotKeyExistsErr)
+        XCTAssertFalse(controller.update(.toggleOverlay, binding: .init(key: .o)))
+        XCTAssertEqual(
+            statuses[.toggleOverlay],
+            .changeRejected(.unavailable(OSStatus(eventHotKeyExistsErr)))
+        )
+        registrar.send(.toggleOverlay, pressed: true)
+        XCTAssertEqual(actions, [.toggleOverlay])
+        controller.uninstall()
+    }
+
+    func testInvalidModifierChangeKeepsExistingBinding() {
+        let registrar = FakeGlobalShortcutRegistrar()
+        var statuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
+        let controller = GlobalShortcutController(
+            registrar: registrar, onAction: { _ in }, onStatusChanged: { statuses = $0 }
+        )
+        controller.install()
+
+        XCTAssertFalse(controller.update(
+            .toggleComposer,
+            binding: GlobalShortcutBinding(key: .c, modifiers: [])
+        ))
+        XCTAssertEqual(statuses[.toggleComposer], .changeRejected(.invalid))
+        XCTAssertTrue(registrar.replacements.isEmpty)
         controller.uninstall()
     }
 
@@ -87,7 +178,7 @@ final class GlobalShortcutTests: XCTestCase {
         )
         controller.install()
         controller.install()
-        XCTAssertEqual(registrar.registered, GlobalShortcutAction.allCases)
+        XCTAssertEqual(registrar.registered.map(\.action), GlobalShortcutAction.allCases)
         registrar.send(.toggleComposer, pressed: true)
         controller.uninstall()
         controller.uninstall()
@@ -114,36 +205,51 @@ final class GlobalShortcutTests: XCTestCase {
         registrar.send(.toggleComposer, pressed: true)
     }
 
-    func testMenuShowsShortcutAndConflictWithoutAnotherKeyDispatchPath() throws {
+    func testMenuShowsCurrentShortcutsAndConflictWithoutAnotherKeyDispatchPath() throws {
+        var configuration = GlobalShortcutConfiguration.defaults
+        configuration[.toggleComposer] = GlobalShortcutBinding(key: .c, modifiers: [.command, .shift])
         let controller = StatusItemController(onToggleOverlay: {}, onOpenSettings: {}, onQuit: {})
-        controller.update(overlayVisible: true, globalShortcutStatuses: [
-            .toggleQuietMode: .unavailable(OSStatus(eventHotKeyExistsErr)),
-            .toggleComposer: .registered,
-            .openHistory: .registered
-        ])
+        controller.update(
+            overlayVisible: true,
+            globalShortcuts: configuration,
+            globalShortcutStatuses: [
+                .toggleQuietMode: .unavailable(OSStatus(eventHotKeyExistsErr)),
+                .toggleComposer: .registered,
+                .openHistory: .registered,
+                .toggleOverlay: .registered
+            ]
+        )
         let menu = controller.makeMenu()
         for (title, action) in [
-            ("메시지 작성…", GlobalShortcutAction.toggleComposer),
+            ("오버레이 숨기기", GlobalShortcutAction.toggleOverlay),
+            ("메시지 작성…", .toggleComposer),
             ("조용히 모드", .toggleQuietMode),
             ("최근 기록…", .openHistory)
         ] {
             let item = try XCTUnwrap(menu.item(withTitle: title))
             XCTAssertEqual(item.keyEquivalent, "")
-            XCTAssertTrue(item.attributedTitle?.string.contains(action.displayShortcut) == true)
+            XCTAssertTrue(item.attributedTitle?.string.contains(configuration[action].displayShortcut) == true)
         }
         let quiet = try XCTUnwrap(menu.item(withTitle: "조용히 모드"))
         XCTAssertTrue(quiet.attributedTitle?.string.contains("단축키 사용 불가") == true)
         XCTAssertTrue(quiet.toolTip?.contains("다른 앱") == true)
         let composer = try XCTUnwrap(menu.item(withTitle: "메시지 작성…"))
-        XCTAssertEqual(composer.toolTip, "Control + Option + Command + I")
+        XCTAssertEqual(composer.toolTip, "Shift + Command + C")
     }
 }
 
 @MainActor
 private final class FakeGlobalShortcutRegistrar: GlobalShortcutRegistering {
+    struct Request: Equatable {
+        let action: GlobalShortcutAction
+        let binding: GlobalShortcutBinding
+    }
+
     var handlerResult: OSStatus = noErr
     var registrationResults: [GlobalShortcutAction: OSStatus] = [:]
-    var registered: [GlobalShortcutAction] = []
+    var replacementResults: [GlobalShortcutAction: OSStatus] = [:]
+    var registered: [Request] = []
+    var replacements: [Request] = []
     var unregisterCount = 0
     private var handler: ((GlobalShortcutAction, Bool) -> Void)?
 
@@ -151,13 +257,23 @@ private final class FakeGlobalShortcutRegistrar: GlobalShortcutRegistering {
         self.handler = handler
         return handlerResult
     }
-    func register(_ action: GlobalShortcutAction) -> OSStatus {
-        registered.append(action)
+
+    func register(_ action: GlobalShortcutAction, binding: GlobalShortcutBinding) -> OSStatus {
+        registered.append(Request(action: action, binding: binding))
         return registrationResults[action] ?? noErr
     }
+
+    func replace(_ action: GlobalShortcutAction, binding: GlobalShortcutBinding) -> OSStatus {
+        replacements.append(Request(action: action, binding: binding))
+        return replacementResults[action] ?? noErr
+    }
+
     func unregisterAll() {
         unregisterCount += 1
         // Keep the callback to simulate an already enqueued native event after teardown.
     }
-    func send(_ action: GlobalShortcutAction, pressed: Bool) { handler?(action, pressed) }
+
+    func send(_ action: GlobalShortcutAction, pressed: Bool) {
+        handler?(action, pressed)
+    }
 }
