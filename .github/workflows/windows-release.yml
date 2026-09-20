@@ -27,6 +27,7 @@ concurrency:
 jobs:
   validate:
     name: Build release candidate
+    if: github.ref == 'refs/heads/main'
     runs-on: windows-latest
     timeout-minutes: 25
     outputs:
@@ -142,7 +143,6 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: windows-production
     permissions:
       contents: read
     defaults:
