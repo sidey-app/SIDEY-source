@@ -17,7 +17,7 @@ import SiteTheme from "../components/SiteTheme.astro";
     <SiteTheme />
     <SiteFonts />
     <link rel="icon" type="image/png" href="../assets/app-icon.png">
-    <script src="../assets/checkout-result.js" type="module" is:inline></script>
+    <script src="../assets/checkout-result.js?v=c040b965d6cb" type="module" is:inline></script>
   </head>
   <body class="checkout-body">
     <a class="skip-link" href="#main">본문으로 건너뛰기</a>
@@ -27,7 +27,7 @@ import SiteTheme from "../components/SiteTheme.astro";
         <div class="checkout-state">
           <span id="result-icon" class="checkout-state-icon" aria-hidden="true">✦</span>
           <h1 id="result-title">결제 결과를 확인하고 있어요.</h1>
-          <p id="result-message">SIDEY 서버가 PortOne에서 결제 상태를 다시 조회합니다.</p>
+          <p id="result-message">잠시만 기다려주세요.</p>
           <a class="button button-secondary checkout-result-link" href="../ko/store/">상품 안내 보기</a>
         </div>
       </section>

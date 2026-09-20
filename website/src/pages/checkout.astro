@@ -21,7 +21,7 @@ import SiteTheme from "../components/SiteTheme.astro";
     <SiteFonts />
     <link rel="icon" type="image/png" href="../assets/app-icon.png">
     <script src="https://cdn.portone.io/v2/browser-sdk.js" defer is:inline></script>
-    <script src="../assets/checkout.js" type="module" is:inline></script>
+    <script src="../assets/checkout.js?v=ddbac67c85d8" type="module" is:inline></script>
   </head>
   <body class="checkout-body">
     <a class="skip-link" href="#main">본문으로 건너뛰기</a>
@@ -49,12 +49,9 @@ import SiteTheme from "../components/SiteTheme.astro";
             <div>
               <h1 id="checkout-order-name">SIDEY 디지털 꾸미기</h1>
               <p class="checkout-price"><span id="checkout-amount">0</span>원</p>
-              <p id="checkout-meta" class="checkout-meta">부가세 포함 · 1회 구매</p>
+              <p class="checkout-meta">부가세 포함</p>
             </div>
           </div>
-          <p class="checkout-note">
-            결제창 결과만으로 사용권을 지급하지 않습니다. SIDEY 서버가 PortOne에서 결제 금액과 상태를 다시 확인한 뒤 계정에 영구 귀속합니다.
-          </p>
           <p class="checkout-policy">
             <a href="../ko/store/" target="_blank" rel="noopener">상품 안내</a> ·
             <a href="../ko/terms/" target="_blank" rel="noopener">이용약관</a> ·
@@ -66,7 +63,7 @@ import SiteTheme from "../components/SiteTheme.astro";
             <span id="checkout-policy-notice">구매 조건과 환불 안내를 확인하고 동의합니다.</span>
           </label>
           <button id="checkout-pay" class="button button-primary checkout-pay" type="button" disabled>
-            동의하고 결제창 열기
+            결제하기
           </button>
           <p id="checkout-status" class="checkout-status" role="status"></p>
         </div>

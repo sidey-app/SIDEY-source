@@ -8,8 +8,8 @@ import { commerceProducts } from "./commerce-products.js";
   const results = {
     success: (name) => ({
       icon: "✦",
-      title: `${name} 사용권이 도착했어요.`,
-      message: "PortOne 결제 재조회와 디지털 꾸미기 사용권 지급이 끝났습니다. SIDEY 상점에서 보유 상태를 확인해 주세요.",
+      title: `${name} 구매가 완료됐어요.`,
+      message: "SIDEY 상점에서 구매한 상품을 사용해보세요.",
     }),
     canceled: () => ({
       icon: "!", title: "결제를 완료하지 않았어요.",
@@ -21,7 +21,7 @@ import { commerceProducts } from "./commerce-products.js";
     }),
     invalid: () => ({
       icon: "!", title: "결제 정보를 확인할 수 없어요.",
-      message: "SIDEY 앱 상점에서 새 주문을 만들어 다시 시도해 주세요.",
+      message: "SIDEY 상점에서 구매 상태를 확인해주세요.",
     }),
   };
 
