@@ -55,7 +55,7 @@ class WorkflowCommandSurfaceTests(unittest.TestCase):
             "start": (
                 "--platform {shared,macos,windows}",
                 "--worktree WORKTREE",
-                "--app {SIDEYAppStore,SIDEY,sidey-reals,windows}",
+                "--app {SIDEY,sidey-reals,windows}",
             ),
             "check": (
                 "--ci",
@@ -73,7 +73,7 @@ class WorkflowCommandSurfaceTests(unittest.TestCase):
                 "--task TASK",
                 "--preview PREVIEW",
                 "--offline",
-                "--scheme {SIDEYAppStore,SIDEY,sidey-reals}",
+                "--scheme {SIDEY,sidey-reals}",
             ),
         }
 
