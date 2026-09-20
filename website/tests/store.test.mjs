@@ -200,7 +200,7 @@ test("checkout and store share all current products and correct base-relative im
     }
   }
   for (const page of ["checkout", "checkout-result"]) {
-    assert.match(read(`${page}/index.html`), new RegExp(`type="module"[^>]*src="[^\"]*${page}\\.js"|src="[^\"]*${page}\\.js"[^>]*type="module"`));
+    assert.match(read(`${page}/index.html`), new RegExp(`type="module"[^>]*src="[^\"]*${page}\\.js\\?v=[a-f0-9]{12}"|src="[^\"]*${page}\\.js\\?v=[a-f0-9]{12}"[^>]*type="module"`));
   }
 });
 
@@ -488,7 +488,7 @@ test("generated checkout pages use external executable scripts under strict CSP"
     assert.doesNotMatch(policy, /'unsafe-inline'/, `${page}: inline script execution stays disabled`);
     assert.match(html, /<script[^>]+src="\/SIDEY\/assets\/site-theme\.js"[^>]*><\/script>/);
     assert.match(html, /<script[^>]+src="\/SIDEY\/assets\/site-header\.js"[^>]*><\/script>/);
-    assert.match(html, new RegExp(`<script[^>]+src="(?:/SIDEY/|\\.\\./)assets/${page}\\.js"[^>]*></script>`));
+    assert.match(html, new RegExp(`<script[^>]+src="(?:/SIDEY/|\\.\\./)assets/${page}\\.js\\?v=[a-f0-9]{12}"[^>]*></script>`));
     for (const [, attributes, body] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
       assert.match(attributes, /\bsrc="[^"]+"/, `${page}: every executable script has an external source`);
       assert.equal(body.trim(), "", `${page}: executable script body is empty`);
