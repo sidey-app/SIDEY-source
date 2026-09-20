@@ -1,7 +1,7 @@
 import LocalAuthentication
 import Security
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 final class KeychainStoreTests: XCTestCase {
     func testDefaultOperationReasonExplainsWhySIDEYUsesKeychain() {
@@ -127,7 +127,7 @@ final class KeychainStoreTests: XCTestCase {
 
     func testNativeBackendReadsGodotInviteCodeAccount() async throws {
         let store = KeychainStore(service: "app.sidey.desktop.tests.\(UUID().uuidString)")
-        let configuration = try RuntimeConfiguration.resolve(releaseChannel: .production, environment: [:])
+        let configuration = try RuntimeConfiguration.resolve(releaseChannel: .appStore, environment: [:])
         let roomID = try XCTUnwrap(UUID(uuidString: "A33009C1-B56D-4DEB-9CF2-ECEB778B658F"))
         let godotAccount = "room-invite:\(configuration.backendFingerprint):default:\(roomID.uuidString.lowercased())"
         defer { try? store.delete(account: godotAccount) }
@@ -142,7 +142,7 @@ final class KeychainStoreTests: XCTestCase {
 
     func testExistingLocalIdentityNeverCreatesReplacementAnonymousSession() async throws {
         let store = KeychainStore(service: "app.sidey.desktop.tests.\(UUID().uuidString)")
-        let configuration = try RuntimeConfiguration.resolve(releaseChannel: .production, environment: [:])
+        let configuration = try RuntimeConfiguration.resolve(releaseChannel: .appStore, environment: [:])
         let backend = SideyBackend(configuration: configuration, keychain: store)
 
         do {

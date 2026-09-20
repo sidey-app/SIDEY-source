@@ -4,7 +4,6 @@ import ServiceManagement
 @MainActor
 struct LaunchAtLoginController {
     enum Mode: Equatable {
-        case helper(identifier: String)
         case mainApp
     }
 
@@ -16,7 +15,6 @@ struct LaunchAtLoginController {
 
     private var service: SMAppService {
         switch mode {
-        case .helper(let identifier): SMAppService.loginItem(identifier: identifier)
         case .mainApp: SMAppService.mainApp
         }
     }

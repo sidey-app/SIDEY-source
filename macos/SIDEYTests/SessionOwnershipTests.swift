@@ -1,5 +1,5 @@
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class SessionOwnershipTests: XCTestCase {
@@ -10,14 +10,14 @@ final class SessionOwnershipTests: XCTestCase {
         let roomTask = Task<Void, Never> { try? await Task.sleep(for: .seconds(60)) }
         let purchaseTask = Task<Void, Never> { try? await Task.sleep(for: .seconds(60)) }
         let equipmentTask = Task<Void, Never> { try? await Task.sleep(for: .seconds(60)) }
-        room.typingTask = roomTask
+        room.bootstrapTask = roomTask
         commerce.productTasks["product"] = purchaseTask
         commerce.equipmentTasks[.bubble] = equipmentTask
         XCTAssertTrue(model.beginCosmeticEquipmentRequest(kind: .bubble, catalogItemID: "bubble_bunny_pink"))
 
         room.cancel()
         XCTAssertTrue(roomTask.isCancelled)
-        XCTAssertNil(room.typingTask)
+        XCTAssertNil(room.bootstrapTask)
         XCTAssertFalse(purchaseTask.isCancelled)
         XCTAssertFalse(equipmentTask.isCancelled)
         XCTAssertNotNil(model.cosmeticEquipmentRequest(for: .bubble))

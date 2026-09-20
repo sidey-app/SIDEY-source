@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 final class BackendIntegrationTests: XCTestCase {
     func testTwoNativeClientsMessageTypingPresenceAndCleanup() async throws {
@@ -38,7 +38,7 @@ final class BackendIntegrationTests: XCTestCase {
             return
         }
         let configuration = try RuntimeConfiguration.resolve(
-            releaseChannel: .development,
+            releaseChannel: .staging,
             environment: environment
         )
         guard !configuration.isProductionBackend else {

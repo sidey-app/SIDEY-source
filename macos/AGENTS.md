@@ -5,7 +5,7 @@ These instructions apply to `macos/**`. Read the repository-root `AGENTS.md` fir
 ## Ownership and scope
 
 - Make macOS implementation changes on a task-owned `macos/*` branch and worktree. Keep Windows implementation files out of the change, and prepare shared product, protocol, asset-source, website or repository-policy changes separately on `shared/*`.
-- Keep the client native in SwiftUI, AppKit and SpriteKit. Preserve the Direct and App Store distributions as separate products that share source while retaining their existing signing, entitlement, commerce and update boundaries.
+- Keep the client native in SwiftUI, AppKit and SpriteKit. The Mac App Store is the only maintained macOS distribution. Preserve its existing signing, entitlement, Apple authentication, Keychain and StoreKit identities. Do not restore Direct targets, Sparkle updates or DMG packaging. Keep the independent recording tool.
 - Treat `macos/SIDEY.xcodeproj`, its shared schemes, resolved package file, property lists and entitlements as executable contracts. Do not restate dependency or deployment versions in prose unless the version itself is being changed.
 - Preserve the product privacy boundary, explicit interaction mode, click-through overlay
   default, Keychain behavior and backend ownership defined by the root instructions,
@@ -13,13 +13,13 @@ These instructions apply to `macos/**`. Read the repository-root `AGENTS.md` fir
 
 ## Build and validation
 
-The `macOS build and tests` job in `.github/workflows/ci.yml` is the canonical automatic check. Start with the narrowest affected XCTest, Python asset/provenance test or structural check. When a change can affect either shipped macOS application, run the maintained native route from the repository root:
+The `macOS build and tests` job in `.github/workflows/ci.yml` is the canonical automatic check. Start with the narrowest affected XCTest, Python asset/provenance test or structural check. When a change can affect the shipped macOS application, run the maintained native route from the repository root:
 
 ```sh
 ./scripts/macos/tests/test_native.sh
 ```
 
-This route verifies content assets, runs the macOS Python tests, tests both `SIDEY` and `SIDEYAppStore`, and tests the recording tool. Read narrower scripts before invoking them and do not replace the maintained wrapper with an improvised build command for final evidence.
+This route verifies content assets, runs the macOS Python tests, runs all common XCTest coverage in `SIDEYAppStore`, and tests the recording tool. Read narrower scripts before invoking them and do not replace the maintained wrapper with an improvised build command for final evidence.
 
 Signing, notarization, packaging, app launch, Keychain prompts, StoreKit operations, release access, network-backed integration and other machine- or account-state changes require matching user authorization. A successful build does not prove runtime or distribution behavior that was not observed.
 

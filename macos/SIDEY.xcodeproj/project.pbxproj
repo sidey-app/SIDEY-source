@@ -7,37 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		100000000000000000000001 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 100000000000000000000041 /* Supabase */; };
-		100000000000000000000042 /* SIDEYLoginItem.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 10000000000000000000000C /* SIDEYLoginItem.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		100000000000000000000043 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 100000000000000000000045 /* Sparkle */; };
 		100000000000000000000046 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 100000000000000000000041 /* Supabase */; };
-		200000000000000000000001 /* SideyBuildStamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000003; };
 		200000000000000000000002 /* SideyBuildStamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000003; };
-		3000000000000000000000C8 /* CharacterStunTests.swift */ = {isa = PBXBuildFile; fileRef = 300000000000000000000064 /* CharacterStunTests.swift */; };
-		3000000000000000000000C9 /* CharacterImpactAudioTests.swift */ = {isa = PBXBuildFile; fileRef = 300000000000000000000065 /* CharacterImpactAudioTests.swift */; };
-		3000000000000000000000CA /* CharacterThrowAssetTests.swift */ = {isa = PBXBuildFile; fileRef = 300000000000000000000066 /* CharacterThrowAssetTests.swift */; };
-		3000000000000000000000CB /* PixelHamsterAssetTests.swift */ = {isa = PBXBuildFile; fileRef = 300000000000000000000067 /* PixelHamsterAssetTests.swift */; };
-		3000000000000000000000CC /* NewCharacterIntegrationTests.swift */ = {isa = PBXBuildFile; fileRef = 300000000000000000000068 /* NewCharacterIntegrationTests.swift */; };
-		3000000000000000000000CD /* TreeMovementTests.swift */ = {isa = PBXBuildFile; fileRef = 300000000000000000000069 /* TreeMovementTests.swift */; };
-		3000000000000000000000CE /* approved-impact-sounds.json */ = {isa = PBXBuildFile; fileRef = 30000000000000000000006A /* approved-impact-sounds.json */; };
-		3000000000000000000000CF /* StoreCatalogCompatibilityTests.swift */ = {isa = PBXBuildFile; fileRef = 30000000000000000000006B /* StoreCatalogCompatibilityTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		100000000000000000000002 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 100000000000000000000010 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 100000000000000000000020;
-			remoteInfo = SIDEY;
-		};
-		10000000000000000000000B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 100000000000000000000010 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 100000000000000000000027;
-			remoteInfo = SIDEYLoginItem;
-		};
 		300000000000000000000002 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 100000000000000000000010 /* Project object */;
@@ -48,34 +22,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		10000000000000000000000F /* Embed Login Items */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = Contents/Library/LoginItems;
-			dstSubfolderSpec = 1;
-			files = (
-				100000000000000000000042 /* SIDEYLoginItem.app in Embed Login Items */,
-			);
-			name = "Embed Login Items";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		100000000000000000000003 /* SIDEY.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIDEY.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		100000000000000000000004 /* SIDEYTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIDEYTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		10000000000000000000000C /* SIDEYLoginItem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIDEYLoginItem.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000047 /* SIDEY.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIDEY.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		200000000000000000000003 /* SideyBuildStamp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideyBuildStamp.swift; sourceTree = DERIVED_FILE_DIR; };
 		300000000000000000000004 /* SIDEYAppStoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIDEYAppStoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		300000000000000000000064 /* CharacterStunTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIDEYTests/CharacterStunTests.swift"; sourceTree = SOURCE_ROOT; };
-		300000000000000000000065 /* CharacterImpactAudioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIDEYTests/CharacterImpactAudioTests.swift"; sourceTree = SOURCE_ROOT; };
-		300000000000000000000066 /* CharacterThrowAssetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIDEYTests/CharacterThrowAssetTests.swift"; sourceTree = SOURCE_ROOT; };
-		300000000000000000000067 /* PixelHamsterAssetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIDEYTests/PixelHamsterAssetTests.swift"; sourceTree = SOURCE_ROOT; };
-		300000000000000000000068 /* NewCharacterIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIDEYTests/NewCharacterIntegrationTests.swift"; sourceTree = SOURCE_ROOT; };
-		300000000000000000000069 /* TreeMovementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIDEYTests/TreeMovementTests.swift"; sourceTree = SOURCE_ROOT; };
-		30000000000000000000006A /* approved-impact-sounds.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "SIDEYTests/Fixtures/approved-impact-sounds.json"; sourceTree = SOURCE_ROOT; };
-		30000000000000000000006B /* StoreCatalogCompatibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SIDEYTests/StoreCatalogCompatibilityTests.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 
@@ -91,37 +43,9 @@
 			path = SIDEYTests;
 			sourceTree = "<group>";
 		};
-		10000000000000000000000D /* SIDEYLoginItem */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SIDEYLoginItem;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		100000000000000000000007 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				100000000000000000000001 /* Supabase in Frameworks */,
-				100000000000000000000043 /* Sparkle in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		100000000000000000000008 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		10000000000000000000000E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		100000000000000000000048 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -144,9 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				100000000000000000000005 /* SIDEY */,
-				10000000000000000000000D /* SIDEYLoginItem */,
 				100000000000000000000006 /* SIDEYTests */,
-				300000000000000000000099 /* App Store Tests */,
 				10000000000000000000000A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -154,90 +76,15 @@
 		10000000000000000000000A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				100000000000000000000003 /* SIDEY.app */,
-				100000000000000000000004 /* SIDEYTests.xctest */,
 				300000000000000000000004 /* SIDEYAppStoreTests.xctest */,
-				10000000000000000000000C /* SIDEYLoginItem.app */,
 				100000000000000000000047 /* SIDEY.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		300000000000000000000099 /* App Store Tests */ = {isa = PBXGroup; children = (30000000000000000000006B /* StoreCatalogCompatibilityTests.swift */,300000000000000000000064 /* CharacterStunTests.swift */,300000000000000000000065 /* CharacterImpactAudioTests.swift */,300000000000000000000066 /* CharacterThrowAssetTests.swift */,300000000000000000000067 /* PixelHamsterAssetTests.swift */,300000000000000000000068 /* NewCharacterIntegrationTests.swift */,300000000000000000000069 /* TreeMovementTests.swift */,30000000000000000000006A /* approved-impact-sounds.json */,); name = "App Store Tests"; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		100000000000000000000020 /* SIDEY */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 100000000000000000000030 /* Build configuration list for PBXNativeTarget "SIDEY" */;
-			buildPhases = (
-				200000000000000000000004 /* Record build inputs */,
-				100000000000000000000021 /* Sources */,
-				100000000000000000000007 /* Frameworks */,
-				100000000000000000000022 /* Resources */,
-				10000000000000000000000F /* Embed Login Items */,
-				200000000000000000000005 /* Verify build inputs */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				10000000000000000000002A /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				100000000000000000000005 /* SIDEY */,
-			);
-			name = SIDEY;
-			packageProductDependencies = (
-				100000000000000000000041 /* Supabase */,
-				100000000000000000000045 /* Sparkle */,
-			);
-			productName = SIDEY;
-			productReference = 100000000000000000000003 /* SIDEY.app */;
-			productType = "com.apple.product-type.application";
-		};
-		100000000000000000000023 /* SIDEYTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 100000000000000000000033 /* Build configuration list for PBXNativeTarget "SIDEYTests" */;
-			buildPhases = (
-				100000000000000000000024 /* Sources */,
-				100000000000000000000008 /* Frameworks */,
-				100000000000000000000025 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				100000000000000000000026 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				100000000000000000000006 /* SIDEYTests */,
-			);
-			name = SIDEYTests;
-			productName = SIDEYTests;
-			productReference = 100000000000000000000004 /* SIDEYTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		100000000000000000000027 /* SIDEYLoginItem */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 100000000000000000000039 /* Build configuration list for PBXNativeTarget "SIDEYLoginItem" */;
-			buildPhases = (
-				100000000000000000000028 /* Sources */,
-				10000000000000000000000E /* Frameworks */,
-				100000000000000000000029 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				10000000000000000000000D /* SIDEYLoginItem */,
-			);
-			name = SIDEYLoginItem;
-			packageProductDependencies = (
-			);
-			productName = SIDEYLoginItem;
-			productReference = 10000000000000000000000C /* SIDEYLoginItem.app */;
-			productType = "com.apple.product-type.application";
-		};
 		100000000000000000000049 /* SIDEYAppStore */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 10000000000000000000004E /* Build configuration list for PBXNativeTarget "SIDEYAppStore" */;
@@ -265,6 +112,7 @@
 			productType = "com.apple.product-type.application";
 		};
 		300000000000000000000023 /* SIDEYAppStoreTests */ = {
+			fileSystemSynchronizedGroups = (100000000000000000000006 /* SIDEYTests */, );
 			isa = PBXNativeTarget;
 			buildConfigurationList = 300000000000000000000033 /* Build configuration list for PBXNativeTarget "SIDEYAppStoreTests" */;
 			buildPhases = (
@@ -292,19 +140,9 @@
 				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
-					100000000000000000000020 = {
-						CreatedOnToolsVersion = 26.5;
-					};
 					300000000000000000000023 = {
 						CreatedOnToolsVersion = 26.5;
 						TestTargetID = 100000000000000000000049;
-					};
-					100000000000000000000023 = {
-						CreatedOnToolsVersion = 26.5;
-						TestTargetID = 100000000000000000000020;
-					};
-					100000000000000000000027 = {
-						CreatedOnToolsVersion = 26.5;
 					};
 					100000000000000000000049 = {
 						CreatedOnToolsVersion = 26.5;
@@ -323,44 +161,19 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				100000000000000000000040 /* XCRemoteSwiftPackageReference "supabase-swift" */,
-				100000000000000000000044 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 10000000000000000000000A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				100000000000000000000020 /* SIDEY */,
 				100000000000000000000049 /* SIDEYAppStore */,
-				100000000000000000000027 /* SIDEYLoginItem */,
-				100000000000000000000023 /* SIDEYTests */,
 				300000000000000000000023 /* SIDEYAppStoreTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		100000000000000000000022 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		100000000000000000000025 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		100000000000000000000029 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		10000000000000000000004B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -372,7 +185,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3000000000000000000000CE /* approved-impact-sounds.json */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,28 +230,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		100000000000000000000021 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				200000000000000000000001 /* SideyBuildStamp.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		100000000000000000000024 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		100000000000000000000028 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		10000000000000000000004A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,29 +242,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3000000000000000000000C8 /* CharacterStunTests.swift */,
-				3000000000000000000000C9 /* CharacterImpactAudioTests.swift */,
-				3000000000000000000000CA /* CharacterThrowAssetTests.swift */,
-				3000000000000000000000CB /* PixelHamsterAssetTests.swift */,
-				3000000000000000000000CC /* NewCharacterIntegrationTests.swift */,
-				3000000000000000000000CD /* TreeMovementTests.swift */,
-				3000000000000000000000CF /* StoreCatalogCompatibilityTests.swift */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		100000000000000000000026 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 100000000000000000000020 /* SIDEY */;
-			targetProxy = 100000000000000000000002 /* PBXContainerItemProxy */;
-		};
-		10000000000000000000002A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 100000000000000000000027 /* SIDEYLoginItem */;
-			targetProxy = 10000000000000000000000B /* PBXContainerItemProxy */;
-		};
 		300000000000000000000026 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 100000000000000000000049 /* SIDEY */;
@@ -483,118 +256,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		100000000000000000000031 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 29;
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = NO;
-				ENABLE_TESTABILITY = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Config/SIDEY-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.2.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "$(SIDEY_APP_BUNDLE_IDENTIFIER)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SIDEY_APP_BUNDLE_IDENTIFIER = app.sidey.desktop.dev;
-				SIDEY_AUTH_URL_SCHEME = "sidey-dev";
-				SIDEY_DISPLAY_NAME = "Sidey-dev";
-				SIDEY_LOGIN_ITEM_BUNDLE_IDENTIFIER = "app.sidey.desktop.dev.login-item";
-				SIDEY_RELEASE_CHANNEL = development;
-				SIDEY_SUPABASE_PUBLISHABLE_KEY = "";
-				SIDEY_SUPABASE_URL = "";
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-			};
-			name = Debug;
-		};
-		100000000000000000000032 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 29;
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = NO;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Config/SIDEY-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.2.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "$(SIDEY_APP_BUNDLE_IDENTIFIER)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SIDEY_APP_BUNDLE_IDENTIFIER = app.sidey.desktop;
-				SIDEY_AUTH_URL_SCHEME = sidey;
-				SIDEY_DISPLAY_NAME = "SIDEY-DIRECT";
-				SIDEY_LOGIN_ITEM_BUNDLE_IDENTIFIER = "app.sidey.desktop.login-item";
-				SIDEY_RELEASE_CHANNEL = production;
-				SIDEY_SUPABASE_PUBLISHABLE_KEY = "";
-				SIDEY_SUPABASE_URL = "";
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-			};
-			name = Release;
-		};
-		100000000000000000000034 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Config/SIDEYTests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.sidey.desktop.tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SIDEY_RUN_BACKEND_INTEGRATION = 0;
-				SIDEY_SUPABASE_PUBLISHABLE_KEY = "";
-				SIDEY_SUPABASE_URL = "";
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SIDEY.app/Contents/MacOS/SIDEY";
-			};
-			name = Debug;
-		};
-		100000000000000000000035 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Config/SIDEYTests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.sidey.desktop.tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SIDEY_RUN_BACKEND_INTEGRATION = 0;
-				SIDEY_SUPABASE_PUBLISHABLE_KEY = "";
-				SIDEY_SUPABASE_URL = "";
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SIDEY.app/Contents/MacOS/SIDEY";
-			};
-			name = Release;
-		};
 		100000000000000000000037 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -617,58 +278,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
-			};
-			name = Release;
-		};
-		10000000000000000000003A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 29;
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "$(SIDEY_DISPLAY_NAME) Login Item";
-				INFOPLIST_KEY_LSUIElement = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.2.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "$(SIDEY_LOGIN_ITEM_BUNDLE_IDENTIFIER)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SIDEY_DISPLAY_NAME = "Sidey-dev";
-				SIDEY_LOGIN_ITEM_BUNDLE_IDENTIFIER = "app.sidey.desktop.dev.login-item";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-			};
-			name = Debug;
-		};
-		10000000000000000000003B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 29;
-				ENABLE_APP_SANDBOX = NO;
-				ENABLE_HARDENED_RUNTIME = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "$(SIDEY_DISPLAY_NAME) Login Item";
-				INFOPLIST_KEY_LSUIElement = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.2.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "$(SIDEY_LOGIN_ITEM_BUNDLE_IDENTIFIER)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SIDEY_DISPLAY_NAME = "SIDEY-DIRECT";
-				SIDEY_LOGIN_ITEM_BUNDLE_IDENTIFIER = "app.sidey.desktop.login-item";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -788,38 +397,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		100000000000000000000030 /* Build configuration list for PBXNativeTarget "SIDEY" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				100000000000000000000031 /* Debug */,
-				100000000000000000000032 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		100000000000000000000033 /* Build configuration list for PBXNativeTarget "SIDEYTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				100000000000000000000034 /* Debug */,
-				100000000000000000000035 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		100000000000000000000036 /* Build configuration list for PBXProject "SIDEY" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				100000000000000000000037 /* Debug */,
 				100000000000000000000038 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		100000000000000000000039 /* Build configuration list for PBXNativeTarget "SIDEYLoginItem" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				10000000000000000000003A /* Debug */,
-				10000000000000000000003B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -853,14 +435,6 @@
 				version = 2.55.1;
 			};
 		};
-		100000000000000000000044 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = exactVersion;
-				version = 2.9.6;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -868,11 +442,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 100000000000000000000040 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
-		};
-		100000000000000000000045 /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 100000000000000000000044 /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

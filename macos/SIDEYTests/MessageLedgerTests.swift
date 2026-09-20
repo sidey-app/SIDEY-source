@@ -1,5 +1,5 @@
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 final class MessageLedgerTests: XCTestCase {
     func testPostgresTimestampsDecodeFractionalAndWholeSecondsWithUTCOffsets() throws {
@@ -34,7 +34,7 @@ final class MessageLedgerTests: XCTestCase {
     }
 
     @MainActor
-    func testDistinctServerTimestampsRemainDistinctAndOrderHistoryNewestFirst() throws {
+    func testDistinctServerTimestampsRemainDistinctAndOrderHistoryOldestFirst() throws {
         let roomID = UUID()
         let senderID = UUID()
         let older = try DatabaseMessage(
@@ -60,7 +60,7 @@ final class MessageLedgerTests: XCTestCase {
                 roomID: roomID,
                 now: now
             ).map(\.body),
-            ["최신", "이전"]
+            ["이전", "최신"]
         )
     }
 
@@ -105,7 +105,7 @@ final class MessageLedgerTests: XCTestCase {
     }
 
     @MainActor
-    func testHistoryOrdersNewestMessageFirstWithoutLegacyTwentyRowCap() {
+    func testHistoryOrdersOldestMessageFirstWithoutLegacyTwentyRowCap() {
         let roomID = UUID()
         let now = Date()
         var ledger = MessageLedger()
@@ -126,8 +126,8 @@ final class MessageLedgerTests: XCTestCase {
             roomID: roomID
         )
         XCTAssertEqual(entries.count, 24)
-        XCTAssertEqual(entries.first?.body, "메시지 23")
-        XCTAssertEqual(entries.last?.body, "메시지 0")
+        XCTAssertEqual(entries.first?.body, "메시지 0")
+        XCTAssertEqual(entries.last?.body, "메시지 23")
     }
 
     func testActiveBubblesKeepTwoPerSenderWithoutGlobalEvictionAndExpireIndependently() {

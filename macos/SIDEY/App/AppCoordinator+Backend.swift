@@ -34,7 +34,7 @@ extension AppCoordinator {
                 let userID = await backend.currentUserID()
                 guard !Task.isCancelled else { return }
                 applyBackendSnapshot(snapshot, currentUserID: userID)
-                if releaseChannel == .appStore, userID != nil {
+                if releaseChannel.requiresAppleAuthentication, userID != nil {
                     await configureAppStoreCommerce(backend: backend)
                 }
                 refreshCommerceState()
@@ -233,6 +233,7 @@ extension AppCoordinator {
     }
 
     func leaveRoom(_ roomID: UUID) {
+        if model.activeRoom?.id == roomID { stopAllTyping() }
         guard let backend else { return }
         let roomName = model.rooms.first(where: { $0.id == roomID })?.name ?? "그룹"
         runMutation(successMessage: "‘\(roomName)’ 그룹에서 나갔습니다.") {
@@ -241,6 +242,7 @@ extension AppCoordinator {
     }
 
     func deleteRoom(_ roomID: UUID) {
+        if model.activeRoom?.id == roomID { stopAllTyping() }
         guard let backend else { return }
         let roomName = model.rooms.first(where: { $0.id == roomID })?.name ?? "그룹"
         runMutation(successMessage: "‘\(roomName)’ 그룹을 삭제했습니다.") {
@@ -261,8 +263,9 @@ extension AppCoordinator {
         if model.activeRoom?.id == roomID, model.groupOperation == .idle { return }
         overlayWindows.dismissComposer()
         overlayWindows.invalidateThrowInteraction()
-        typingChanged(false)
+        stopAllTyping()
         model.errorMessage = nil
+        model.historySendError = nil
         roomSession.switchPipeline.request(roomID)
     }
 
@@ -299,21 +302,40 @@ extension AppCoordinator {
         refreshStatusItem()
     }
 
-    func sendMessage(_ body: String) {
-        guard let backend, let roomID = model.activeRoom?.id else {
-            model.errorMessage = SideyBackendError.noActiveRoom.localizedDescription
-            model.draft = body
-            overlayWindows.presentComposer()
+    func sendMessage(_ body: String, source: MessageInputSource = .overlay) {
+        guard let backend else {
+            stopAllTyping()
+            rejectMessage(body, source: source, message: SideyBackendError.noActiveRoom.localizedDescription)
+            return
+        }
+        sendMessage(body, source: source) { roomID, body, messageID in
+            try await backend.sendMessage(roomID: roomID, body: body, id: messageID)
+        }
+    }
+
+    func sendMessage(
+        _ body: String,
+        source: MessageInputSource,
+        send: @escaping (UUID, String, UUID) async throws -> ChatMessage
+    ) {
+        stopAllTyping()
+        // Guard again at the transport boundary: callers must not send to the
+        // previously active room while a room switch is in flight.
+        guard model.groupOperation == .idle, !model.isWorking else {
+            rejectMessage(body, source: source, message: "그룹 전환이 끝난 뒤 전송해 주세요.")
+            return
+        }
+        guard let roomID = model.activeRoom?.id else {
+            rejectMessage(body, source: source, message: SideyBackendError.noActiveRoom.localizedDescription)
             return
         }
         guard let senderID = model.currentUserID else {
-            model.errorMessage = "현재 사용자 정보를 확인하지 못했습니다."
-            model.draft = body
-            overlayWindows.presentComposer()
+            rejectMessage(body, source: source, message: "현재 사용자 정보를 확인하지 못했습니다.")
             return
         }
         let messageID = UUID()
         let revealMessage = !model.preferences.quietModeEnabled
+        model.historySendError = nil
         model.stageMessage(
             id: messageID,
             roomID: roomID,
@@ -325,16 +347,32 @@ extension AppCoordinator {
         Task { [weak self] in
             guard let self else { return }
             do {
-                let message = try await backend.sendMessage(roomID: roomID, body: body, id: messageID)
-                model.confirmMessage(message, revealBubble: revealMessage)
+                let message = try await send(roomID, body, messageID)
+                let revealConfirmation = revealMessage && !model.preferences.quietModeEnabled
+                    && model.activeRoom?.id == roomID
+                model.confirmMessage(message, revealBubble: revealConfirmation)
+                if revealConfirmation { scheduleBubbleExpiry() }
                 model.errorMessage = nil
             } catch {
-                model.errorMessage = "전송 실패: \(error.localizedDescription)"
+                let errorMessage = "전송 실패: \(error.localizedDescription)"
+                model.errorMessage = errorMessage
                 _ = model.failMessage(id: messageID, roomID: roomID)
-                if model.activeRoom?.id == roomID {
+                if source == .history {
+                    if model.realtimeActiveRoomID == roomID { model.historySendError = errorMessage }
+                } else if model.activeRoom?.id == roomID, model.groupOperation == .idle {
                     overlayWindows.presentComposer()
                 }
             }
+        }
+    }
+
+    private func rejectMessage(_ body: String, source: MessageInputSource, message: String) {
+        model.errorMessage = message
+        if model.draft.isEmpty { model.draft = body }
+        if source == .history {
+            model.historySendError = message
+        } else {
+            overlayWindows.presentComposer()
         }
     }
 
@@ -410,7 +448,7 @@ extension AppCoordinator {
         if let activeRoomID = model.activeRoom?.id,
            !snapshot.rooms.contains(where: { $0.id == activeRoomID }) {
             overlayWindows.dismissComposer()
-            typingChanged(false)
+            stopAllTyping()
             model.clearBubbles()
         }
         model.apply(snapshot: snapshot, currentUserID: currentUserID)
@@ -441,7 +479,9 @@ extension AppCoordinator {
             refreshStatusItem()
         case .messageDeleted(let roomID, let messageID):
             model.removeMessage(id: messageID, roomID: roomID)
+            removeHistoryMessage(id: messageID, roomID: roomID)
         case .messagesInvalidated(let roomID):
+            reloadHistory(roomID: roomID)
             guard let backend else { return }
             Task { [weak self] in
                 guard let self else { return }
@@ -454,6 +494,7 @@ extension AppCoordinator {
             }
         case .messagesReplaced(let roomID, let messages):
             model.replaceMessages(roomID: roomID, with: messages)
+            reloadHistory(roomID: roomID)
         case .presence(let roomID, let userID, let state):
             model.updatePresence(roomID: roomID, userID: userID, state: state)
             overlayWindows.refreshThrowHotspots()
@@ -524,30 +565,18 @@ extension AppCoordinator {
         }
     }
 
-    func typingChanged(_ active: Bool) {
-        if let roomID = model.activeRoom?.id, let userID = model.currentUserID {
-            model.updateTyping(roomID: roomID, userID: userID, active: active)
+    func typingChanged(_ active: Bool, source: MessageInputSource = .overlay) {
+        guard model.updateTypingInput(active: active, source: source) else { return }
+        guard active, let roomID = model.activeRoom?.id else {
+            typingActivity.stop()
+            return
         }
-        guard let backend else { return }
-        let actions = roomSession.typingLease.update(active: active, roomID: model.activeRoom?.id)
-        for action in actions {
-            switch action {
-            case .stop(let stoppedRoomID):
-                roomSession.typingTask?.cancel()
-                roomSession.typingTask = nil
-                Task { try? await backend.broadcastTyping(roomID: stoppedRoomID, event: "typing_stop") }
-            case .start(let startedRoomID):
-                roomSession.typingTask?.cancel()
-                roomSession.typingTask = Task {
-                    try? await backend.broadcastTyping(roomID: startedRoomID, event: "typing_start")
-                    while !Task.isCancelled {
-                        try? await Task.sleep(for: .seconds(2))
-                        guard !Task.isCancelled else { return }
-                        try? await backend.broadcastTyping(roomID: startedRoomID, event: "typing_keepalive")
-                    }
-                }
-            }
-        }
+        typingActivity.edited(roomID: roomID, hasText: true)
+    }
+
+    func stopAllTyping() {
+        model.resetTypingInput()
+        typingActivity.stop()
     }
 
     func characterDoubleClicked() {

@@ -16,6 +16,15 @@ enum LaunchRouter {
     }
 }
 
+enum DockVisibilityPolicy {
+    static func shouldShowDockIcon(
+        firstRunPresentationActive: Bool = false,
+        settingsWindowPresented: Bool = false
+    ) -> Bool {
+        firstRunPresentationActive || settingsWindowPresented
+    }
+}
+
 enum ManualReopenPolicy {
     static func shouldOpenSettings(
         hasShownNativeLanding: Bool,
@@ -491,30 +500,6 @@ enum PresencePublicationPlan {
 struct PresenceUpdate: Equatable, Sendable {
     let userID: UUID
     let state: PresenceState
-}
-
-enum TypingLeaseAction: Equatable, Sendable {
-    case start(UUID)
-    case stop(UUID)
-}
-
-struct TypingLease: Equatable, Sendable {
-    private(set) var roomID: UUID?
-
-    mutating func update(active: Bool, roomID requestedRoomID: UUID?) -> [TypingLeaseAction] {
-        guard active, let requestedRoomID else {
-            guard let roomID else { return [] }
-            self.roomID = nil
-            return [.stop(roomID)]
-        }
-
-        guard roomID != requestedRoomID else { return [] }
-        var actions: [TypingLeaseAction] = []
-        if let roomID { actions.append(.stop(roomID)) }
-        roomID = requestedRoomID
-        actions.append(.start(requestedRoomID))
-        return actions
-    }
 }
 
 enum PresenceChangePlan {

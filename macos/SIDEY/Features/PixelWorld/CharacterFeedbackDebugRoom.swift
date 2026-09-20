@@ -1,4 +1,4 @@
-#if DEBUG && !APP_STORE
+#if DEBUG
 import AppKit
 import SpriteKit
 
