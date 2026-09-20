@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 final class BackendIntegrationTests: XCTestCase {
     func testTwoNativeClientsMessageTypingPresenceAndCleanup() async throws {

@@ -1,6 +1,6 @@
 import Synchronization
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 @MainActor
 final class BackendEventLifecycleTests: XCTestCase {

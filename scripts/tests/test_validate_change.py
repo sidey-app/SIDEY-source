@@ -93,6 +93,8 @@ class GateTests(unittest.TestCase):
 
     def test_renamed_platform_workflows_keep_their_ownership(self):
         expected_platforms = {
+            "release/macos.json": "macos",
+            "release/windows.json": "windows",
             ".github/workflows/macos-build-and-tests.yml": "macos",
             ".github/workflows/validate-macos.yml": "macos",
             ".github/workflows/windows-build-and-tests.yml": "windows",

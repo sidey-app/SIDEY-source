@@ -148,6 +148,12 @@ class WorkflowCommandSurfaceTests(unittest.TestCase):
             "workflow: CI requires explicit --base and --branch\n",
         )
 
+    def test_finish_uses_gh_cli_supported_pr_base_field(self):
+        source = WORKFLOW_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("baseRefName", source)
+        self.assertNotIn("baseRefOid", source)
+
 
 if __name__ == "__main__":
     unittest.main()

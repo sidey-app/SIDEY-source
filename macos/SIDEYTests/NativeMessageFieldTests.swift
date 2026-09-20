@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 import XCTest
-@testable import SIDEYAppStore
+@testable import SIDEY
 
 @MainActor
 final class NativeMessageFieldTests: XCTestCase {

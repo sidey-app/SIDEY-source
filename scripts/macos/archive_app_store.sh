@@ -26,7 +26,7 @@ PYVERSIONS
 )
 SIDEY_EXPECTED_MARKETING_VERSION=${SIDEY_EXPECTED_MARKETING_VERSION:-${SIDEY_SOURCE_VERSIONS% *}}
 SIDEY_EXPECTED_BUILD_VERSION=${SIDEY_EXPECTED_BUILD_VERSION:-${SIDEY_SOURCE_VERSIONS##* }}
-SIDEY_ARCHIVE_PATH=${1:-$SIDEY_REPO_ROOT/build/app-store/SIDEYAppStore.xcarchive}
+SIDEY_ARCHIVE_PATH=${1:-$SIDEY_REPO_ROOT/build/app-store/SIDEY.xcarchive}
 SIDEY_DERIVED_DATA=${SIDEY_DERIVED_DATA:-$SIDEY_REPO_ROOT/build/app-store-derived}
 
 if [ -z "$SIDEY_APP_STORE_VERIFIER_URL" ]; then
@@ -63,7 +63,7 @@ fi
 
 xcodebuild \
 	-project "$SIDEY_REPO_ROOT/macos/SIDEY.xcodeproj" \
-	-scheme SIDEYAppStore \
+	-scheme SIDEY \
 	-configuration Release \
 	-destination 'generic/platform=macOS' \
 	-derivedDataPath "$SIDEY_DERIVED_DATA" \

@@ -17,7 +17,7 @@
 			containerPortal = 100000000000000000000010 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 100000000000000000000049;
-			remoteInfo = SIDEYAppStore;
+			remoteInfo = SIDEY;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -27,7 +27,7 @@
 /* Begin PBXFileReference section */
 		100000000000000000000047 /* SIDEY.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIDEY.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		200000000000000000000003 /* SideyBuildStamp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideyBuildStamp.swift; sourceTree = DERIVED_FILE_DIR; };
-		300000000000000000000004 /* SIDEYAppStoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIDEYAppStoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		300000000000000000000004 /* SIDEYTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIDEYTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 
@@ -76,7 +76,7 @@
 		10000000000000000000000A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				300000000000000000000004 /* SIDEYAppStoreTests.xctest */,
+				300000000000000000000004 /* SIDEYTests.xctest */,
 				100000000000000000000047 /* SIDEY.app */,
 			);
 			name = Products;
@@ -85,9 +85,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		100000000000000000000049 /* SIDEYAppStore */ = {
+		100000000000000000000049 /* SIDEY */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 10000000000000000000004E /* Build configuration list for PBXNativeTarget "SIDEYAppStore" */;
+			buildConfigurationList = 10000000000000000000004E /* Build configuration list for PBXNativeTarget "SIDEY" */;
 			buildPhases = (
 				200000000000000000000004 /* Record build inputs */,
 				10000000000000000000004A /* Sources */,
@@ -103,18 +103,18 @@
 			fileSystemSynchronizedGroups = (
 				100000000000000000000005 /* SIDEY */,
 			);
-			name = SIDEYAppStore;
+			name = SIDEY;
 			packageProductDependencies = (
 				100000000000000000000041 /* Supabase */,
 			);
-			productName = SIDEYAppStore;
+			productName = SIDEY;
 			productReference = 100000000000000000000047 /* SIDEY.app */;
 			productType = "com.apple.product-type.application";
 		};
-		300000000000000000000023 /* SIDEYAppStoreTests */ = {
+		300000000000000000000023 /* SIDEYTests */ = {
 			fileSystemSynchronizedGroups = (100000000000000000000006 /* SIDEYTests */, );
 			isa = PBXNativeTarget;
-			buildConfigurationList = 300000000000000000000033 /* Build configuration list for PBXNativeTarget "SIDEYAppStoreTests" */;
+			buildConfigurationList = 300000000000000000000033 /* Build configuration list for PBXNativeTarget "SIDEYTests" */;
 			buildPhases = (
 				300000000000000000000024 /* Sources */,
 				300000000000000000000008 /* Frameworks */,
@@ -125,9 +125,9 @@
 			dependencies = (
 				300000000000000000000026 /* PBXTargetDependency */,
 			);
-			name = SIDEYAppStoreTests;
-			productName = SIDEYAppStoreTests;
-			productReference = 300000000000000000000004 /* SIDEYAppStoreTests.xctest */;
+			name = SIDEYTests;
+			productName = SIDEYTests;
+			productReference = 300000000000000000000004 /* SIDEYTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -167,8 +167,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				100000000000000000000049 /* SIDEYAppStore */,
-				300000000000000000000023 /* SIDEYAppStoreTests */,
+				100000000000000000000049 /* SIDEY */,
+				300000000000000000000023 /* SIDEYTests */,
 			);
 		};
 /* End PBXProject section */
@@ -286,26 +286,26 @@
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Config/SIDEYAppStore.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Config/SIDEY.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = 5T933W86GZ;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Config/SIDEYAppStore-Info.plist";
+				INFOPLIST_FILE = "Config/SIDEY-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.sidey.desktop.appstore;
 				PRODUCT_NAME = SIDEY;
-				PRODUCT_MODULE_NAME = SIDEYAppStore;
+				PRODUCT_MODULE_NAME = SIDEY;
 				SIDEY_APP_STORE_VERIFIER_URL = "https://sidey-app-store-verifier-sandbox-802687666602.asia-northeast3.run.app";
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE DEBUG $(inherited)";
@@ -320,26 +320,26 @@
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Config/SIDEYAppStore.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Config/SIDEY.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 5T933W86GZ;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Config/SIDEYAppStore-Info.plist";
+				INFOPLIST_FILE = "Config/SIDEY-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.sidey.desktop.appstore;
 				PRODUCT_NAME = SIDEY;
-				PRODUCT_MODULE_NAME = SIDEYAppStore;
+				PRODUCT_MODULE_NAME = SIDEY;
 				SIDEY_APP_STORE_VERIFIER_URL = "https://sidey-app-store-verifier-production-eu3layugaq-du.a.run.app";
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE $(inherited)";
@@ -406,7 +406,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		10000000000000000000004E /* Build configuration list for PBXNativeTarget "SIDEYAppStore" */ = {
+		10000000000000000000004E /* Build configuration list for PBXNativeTarget "SIDEY" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				10000000000000000000004C /* Debug */,
@@ -415,7 +415,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		300000000000000000000033 /* Build configuration list for PBXNativeTarget "SIDEYAppStoreTests" */ = {
+		300000000000000000000033 /* Build configuration list for PBXNativeTarget "SIDEYTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				300000000000000000000034 /* Debug */,
