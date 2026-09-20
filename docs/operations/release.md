@@ -22,11 +22,13 @@ backend 저장소의 절차로 수행하며 이 저장소에서 대신 실행하
 
 1. 변경 경로에 해당하는 integration check와 platform test를 정확한 candidate commit에
    실행한다.
-2. Project version, release manifest, update source, website metadata와 release note의
-   일치는 `python3 scripts/skills/verify_release_consistency.py`로 검사한다.
-3. [`docs/releases/`](../releases/)의 해당 platform note를
+2. Project version, release manifest, update source와 website metadata의 일치는
+   `python3 scripts/skills/verify_release_consistency.py`로 검사한다.
+3. Windows GitHub Release note는 [`docs/releases/`](../releases/)에
    [release-notes skill](../../.agents/skills/release-notes/SKILL.md)의 commit/PR evidence로
-   작성하고 link와 attribution을 검증한다.
+   작성하고 link와 attribution을 검증한다. App Store release note는 정확한 제출 build와
+   App Store Connect 기록을 기준으로 작성하며, 같은 marketing version의 과거 Direct
+   GitHub Release note를 재사용하거나 덮어쓰지 않는다.
 4. 서명, 공증, installer 실행, store purchase 또는 실제 장시간 test처럼 수행하지 않은
    검사를 통과했다고 기록하지 않는다.
 
@@ -55,7 +57,7 @@ release를 대체하지 않는다.
 1. App Store 게시 상태 또는 Windows 공개 release artifact와 기대 hash를 다시 확인한다.
 2. macOS 링크가 App Store를 가리키는지, Windows update manifest와 website가
    같은 공개 release를 가리키는지 확인한다.
-3. Platform release note와 comparison link가 공개 결과와 일치하는지 확인한다.
+3. App Store Connect 또는 GitHub의 platform release note가 공개 결과와 일치하는지 확인한다.
 4. 별도 승인된 경우에만 store submission, website deployment 또는 backend deployment를
    수행하고 각각의 결과를 해당 system에서 검증한다.
 

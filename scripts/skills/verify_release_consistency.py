@@ -210,6 +210,11 @@ def main() -> int:
     parser.add_argument("--platform", choices=("all", "macos", "windows"), default="all")
     parser.add_argument("--github-output", type=Path)
     parser.add_argument(
+        "--allow-pending-appcast",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
         "--allow-unreleased-source",
         action="store_true",
         help="allow a Windows source version newer than the current public manifest",
@@ -218,6 +223,10 @@ def main() -> int:
 
     outputs: dict[str, str] = {}
     try:
+        require(
+            not args.allow_pending_appcast,
+            "the direct macOS release workflow is retired; use archive_app_store.sh",
+        )
         if args.platform in ("all", "macos"):
             outputs = validate_macos()
         if args.platform in ("all", "windows"):

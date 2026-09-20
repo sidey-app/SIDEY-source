@@ -25,7 +25,7 @@ These instructions apply to `docs/**`. They also govern the root `README.md` whe
 ## Release documentation contract
 
 - `release/macos.json` records the App Store target version/build, not public review or publication status. `release/windows.json` owns the public Windows version. Native project settings and Windows update metadata are validated mirrors.
-- `docs/releases/v<version>.md` is the canonical macOS release body and `docs/releases/windows-v<version>.md` is the canonical Windows release body. Keep platform releases independent and do not copy an unverified change between them.
+- Existing `docs/releases/v<version>.md` files are historical direct-distribution GitHub Release bodies. Do not rewrite one as an App Store note merely because the marketing version matches; App Store release notes require the exact submitted build and App Store Connect evidence. `docs/releases/windows-v<version>.md` remains the canonical Windows release body.
 - Release notes lead with a short verified user outcome, use the exact `## 변경사항` section, attribute every change bullet to its pull request or direct commit and GitHub author, and end with the exact platform comparison URL. Follow the format and evidence rules in the release-notes skill rather than copying a historical note whose layout may be obsolete.
 - Add installation steps, required warnings or limitations only when the user requests a separate section or verified user action or risk makes the information necessary. Keep implementation details only when users must act on them.
 - Use the official website and GitHub Releases URLs. Do not claim signing, testing, compatibility, availability or release completion without evidence from the exact target commit and artifact.

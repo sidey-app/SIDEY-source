@@ -120,13 +120,15 @@ async function createCheckoutHarness({ fetchResponse, requestPayment } = {}) {
 
 for (const locale of ["ko", "en", "ja"]) {
   for (const category of Object.keys(included)) {
-    test(`${locale}/${category}: complete catalog, exact direct prices, assets, separate keepsakes`, () => {
+    test(`${locale}/${category}: complete catalog, exact Windows direct prices, assets, separate keepsakes`, () => {
       const html = read(`${locale}/store/${category}/index.html`);
       const cards = [...html.matchAll(/<button class="store-product-card"[^>]*>[\s\S]*?<\/button>/g)].map(([card]) => card);
       const paid = catalog.filter((entry) => entry.kind === category.slice(0, -1));
       assert.equal(cards.length, paid.length + included[category]);
       assert.match(html, /store-price-basis/);
       assert.match(html, /App Store/);
+      assert.match(html, /Windows/);
+      assert.doesNotMatch(html, /direct macOS edition|macOS 직배포판|macOS直接配布版/);
       for (const entry of paid) {
         const card = cards.find((candidate) => candidate.includes(`data-product-id="${entry.id}"`));
         assert.ok(card, entry.id);

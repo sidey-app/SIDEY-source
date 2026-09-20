@@ -2,6 +2,8 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr
+from io import StringIO
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'skills'))
@@ -115,3 +117,9 @@ class ReleaseDisplayTests(unittest.TestCase):
         (self.root / v.README_PATHS[-1]).unlink()
         with self.assertRaisesRegex(v.ConsistencyError, "translation is missing"):
             v.validate_readme_release_links("windows")
+
+    def test_retired_pending_appcast_option_fails_safely(self):
+        with patch.object(sys, "argv", ["verify_release_consistency.py", "--allow-pending-appcast"]):
+            with redirect_stderr(StringIO()) as error:
+                self.assertEqual(v.main(), 1)
+        self.assertIn("direct macOS release workflow is retired", error.getvalue())
