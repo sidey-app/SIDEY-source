@@ -247,6 +247,49 @@ final class HistoryInteractionTests: XCTestCase {
         coordinator.overlayWindows.setVisible(false)
     }
 
+    func testOverlayShortcutTogglesRequestedVisibilityAndPersistsIt() {
+        let saved = SavedPreferencesBox()
+        let coordinator = AppCoordinator(
+            preferencesStore: PreferencesStore(
+                load: { .defaults },
+                save: { saved.value = $0 }
+            ),
+            legacyMigrator: .none,
+            keychainAccessSession: KeychainAccessSession(),
+            releaseChannel: .appStore,
+            arguments: []
+        )
+
+        coordinator.handleGlobalShortcut(.toggleOverlay)
+        XCTAssertFalse(coordinator.model.overlayVisible)
+        XCTAssertFalse(saved.value?.overlayVisible ?? true)
+
+        coordinator.handleGlobalShortcut(.toggleOverlay)
+        XCTAssertTrue(coordinator.model.overlayVisible)
+        XCTAssertTrue(saved.value?.overlayVisible ?? false)
+        coordinator.overlayWindows.setVisible(false)
+    }
+
+    func testShortcutChangeUpdatesPreferencesAndPersistsImmediately() {
+        let saved = SavedPreferencesBox()
+        let coordinator = AppCoordinator(
+            preferencesStore: PreferencesStore(
+                load: { .defaults },
+                save: { saved.value = $0 }
+            ),
+            legacyMigrator: .none,
+            keychainAccessSession: KeychainAccessSession(),
+            releaseChannel: .appStore,
+            arguments: []
+        )
+        let binding = GlobalShortcutBinding(key: .o, modifiers: [.control, .shift])
+
+        coordinator.setGlobalShortcut(.toggleOverlay, binding: binding)
+
+        XCTAssertEqual(coordinator.model.preferences.globalShortcuts[.toggleOverlay], binding)
+        XCTAssertEqual(saved.value?.globalShortcuts[.toggleOverlay], binding)
+    }
+
     private func makeModel() -> AppModel {
         let model = AppModel(preferences: .defaults)
         configure(model)
@@ -298,4 +341,8 @@ final class HistoryInteractionTests: XCTestCase {
     }
 
     private struct SendFailure: Error {}
+}
+
+private final class SavedPreferencesBox: @unchecked Sendable {
+    var value: AppPreferences?
 }
