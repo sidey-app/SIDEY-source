@@ -1,10 +1,6 @@
 import Foundation
 import XCTest
-#if APP_STORE
 @testable import SIDEYAppStore
-#else
-@testable import SIDEY
-#endif
 
 @MainActor
 final class StoreCatalogCompatibilityTests: XCTestCase {
@@ -130,7 +126,7 @@ final class StoreCatalogCompatibilityTests: XCTestCase {
     }
 
     func testPurchaseEntryRejectsUnavailableAndOtherNonPurchasableStates() {
-        let blocked: [CommercePurchaseState] = [.unavailable, .owned, .error("failure"), .confirming, .openingCheckout, .googleConnectionRequired]
+        let blocked: [CommercePurchaseState] = [.unavailable, .owned, .error("failure"), .confirming, .openingCheckout]
         for state in blocked {
             XCTAssertFalse(state.canStartPurchase)
         }

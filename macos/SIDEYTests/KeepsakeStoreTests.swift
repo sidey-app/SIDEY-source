@@ -2,7 +2,7 @@ import AppKit
 import SpriteKit
 import SwiftUI
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class KeepsakeStoreTests: XCTestCase {
@@ -99,7 +99,7 @@ final class KeepsakeStoreTests: XCTestCase {
     func testPairSheetFitsBothPurchaseCardsForAllOwnershipStates() throws {
         for product in CommerceCatalog.characterProducts {
             let item = try XCTUnwrap(CommerceCatalog.keepsake(for: product.id))
-            for availability in [StoreAvailability.direct, .appStore] {
+            for availability in [StoreAvailability.appStore] {
                 for ownsCharacter in [false, true] {
                     for ownsItem in [false, true] {
                         let view = NSHostingView(rootView: StoreProductDetailSheet(

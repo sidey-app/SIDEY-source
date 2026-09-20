@@ -11,7 +11,7 @@ extension AppCoordinator {
     }
 
     func toggleTreeMovement() {
-        guard !model.accountOperationInProgress, commerceSession.authenticationTask == nil,
+        guard !model.accountOperationInProgress,
               model.selectedCharacterID == PixelCharacterCatalog.pixelTreeID,
               let userID = model.currentUserID,
               let value = model.treeMovement.confirmed[userID] else { return }
@@ -32,7 +32,7 @@ extension AppCoordinator {
     }
 
     private func saveTreeMovement(userID: UUID, paused: Bool, migrating: Bool = false) {
-        guard !model.accountOperationInProgress, commerceSession.authenticationTask == nil,
+        guard !model.accountOperationInProgress,
               let backend,
               let request = model.treeMovement.begin(userID: userID, paused: paused, migrating: migrating)
         else { return }

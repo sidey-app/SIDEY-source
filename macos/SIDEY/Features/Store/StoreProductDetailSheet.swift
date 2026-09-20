@@ -5,7 +5,7 @@ struct StoreProductDetailSheet: View {
     var relatedProductState: CommerceProductState? = nil
     var isPurchaseInProgress = false
     let actions: SettingsActions
-    var availability: StoreAvailability = .direct
+    var availability: StoreAvailability = .appStore
     let onClose: () -> Void
     @State private var playsPreviewSound = true
     @State private var contentHeight: CGFloat = 640
@@ -149,8 +149,7 @@ private struct StoreDetailPurchaseCard: View {
             Button {
                 actions.onPurchase(state.id)
             } label: {
-                Text(state.purchaseState == .googleConnectionRequired ? "Google 계정 연결"
-                     : "\(kindLabel) · \(state.formattedPrice) 구매")
+                Text("\(kindLabel) · \(state.formattedPrice) 구매")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)

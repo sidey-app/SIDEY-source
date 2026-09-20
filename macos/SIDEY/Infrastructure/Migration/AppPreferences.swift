@@ -18,7 +18,7 @@ struct CodableRect: Codable, Equatable, Sendable {
 }
 
 struct AppPreferences: Codable, Equatable, Sendable {
-    static let currentSchemaVersion = 9
+    static let currentSchemaVersion = 10
     var characterSoundEffectsEnabled = true
     var treeMovementPaused = false
 
@@ -37,6 +37,7 @@ struct AppPreferences: Codable, Equatable, Sendable {
     var launchAtLogin = false
     var overlayFrame: CodableRect?
     var overlayScreenIdentifier: String?
+    var composerPosition: ComposerPositionPreference?
     var nickname = "나"
     var selectedCharacterID = PixelCharacterCatalog.pixelHamsterID
     var activeRoomID: UUID?
@@ -61,6 +62,7 @@ struct AppPreferences: Codable, Equatable, Sendable {
         case launchAtLogin
         case overlayFrame
         case overlayScreenIdentifier
+        case composerPosition
         case nickname
         case selectedCharacterID
         case activeRoomID
@@ -95,6 +97,7 @@ struct AppPreferences: Codable, Equatable, Sendable {
         launchAtLogin = try values.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? false
         overlayFrame = try values.decodeIfPresent(CodableRect.self, forKey: .overlayFrame)
         overlayScreenIdentifier = try values.decodeIfPresent(String.self, forKey: .overlayScreenIdentifier)
+        composerPosition = try values.decodeIfPresent(ComposerPositionPreference.self, forKey: .composerPosition)
         overlayRegion = try values.decodeIfPresent(
             OverlayRegionPreference.self,
             forKey: .overlayRegion

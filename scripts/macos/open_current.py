@@ -67,7 +67,7 @@ end run'''
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--worktree', type=Path)
-    parser.add_argument('--scheme', default='SIDEYAppStore', choices=['SIDEYAppStore', 'SIDEY', 'sidey-reals'])
+    parser.add_argument('--scheme', default='SIDEYAppStore', choices=['SIDEYAppStore', 'sidey-reals'])
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--build-only', action='store_true')
     args = parser.parse_args()

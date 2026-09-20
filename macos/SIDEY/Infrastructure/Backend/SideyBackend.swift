@@ -7,7 +7,6 @@ actor SideyBackend {
 
     private let client: SupabaseClient
     private let keychain: KeychainStore
-    private let authCallbackURL: URL
     private let legacyRefreshAccount: String
     private let inviteAccountPrefix: String
     private let eventContinuation: AsyncStream<BackendEvent>.Continuation
@@ -43,7 +42,6 @@ actor SideyBackend {
     init(
         configuration: RuntimeConfiguration,
         keychain: KeychainStore = KeychainStore(),
-        authCallbackURL: URL = SideyAuthCallback.callbackURL(),
         networkPathMonitor: any NetworkPathMonitoring = SystemNetworkPathMonitor()
     ) {
         let eventPair = AsyncStream<BackendEvent>.makeStream(
@@ -54,7 +52,6 @@ actor SideyBackend {
         let fingerprint = configuration.backendFingerprint
         let legacyRefreshAccount = "supabase-refresh:\(fingerprint):default"
         self.keychain = keychain
-        self.authCallbackURL = authCallbackURL
         self.networkPathMonitor = networkPathMonitor
         self.legacyRefreshAccount = legacyRefreshAccount
         self.inviteAccountPrefix = "room-invite:\(fingerprint):default:"
@@ -140,7 +137,7 @@ actor SideyBackend {
                 event: event == "typing_keepalive" ? "typing_start" : event,
                 eventID: nil
             )
-        ).execute()
+        ).retry(enabled: false).execute()
     }
 
     func broadcastCharacterPulse(roomID: UUID, eventID: UUID) async throws {
@@ -326,36 +323,7 @@ actor SideyBackend {
         return value.domain
     }
 
-#if !APP_STORE
-    func googleIdentityLinkURL() async throws -> URL {
-        let response = try await client.auth.getLinkIdentityURL(
-            provider: .google,
-            redirectTo: authCallbackURL
-        )
-        return response.url
-    }
 
-    func handleAuthCallback(_ url: URL) async throws {
-        guard SideyAuthCallback.matches(url, scheme: authCallbackURL.scheme) else {
-            throw SideyBackendError.remote("지원하지 않는 인증 응답입니다.")
-        }
-        let previousUserID = client.auth.currentUser?.id
-        let session = try await client.auth.session(from: url)
-        guard previousUserID == nil || session.user.id == previousUserID else {
-            throw SideyBackendError.remote("Google 연결 중 SIDEY 계정이 바뀌었습니다.")
-        }
-    }
-
-    func createCommerceOrder(
-        productID: String = CommerceCatalog.starlightUpalupaProductID
-    ) async throws -> CommerceCheckout {
-        let response: CommerceOrderResponse = try await client.functions.invoke(
-            "commerce-order",
-            options: FunctionInvokeOptions(body: CommerceOrderRequest(productID: productID))
-        )
-        return CommerceCheckout(orderID: response.orderID, checkoutURL: response.checkoutURL)
-    }
-#endif
 
     @discardableResult
     func upsertProfile(nickname: String, characterID: String = "pixel_hamster") async throws -> Profile {
@@ -1361,7 +1329,7 @@ actor SideyBackend {
         emit(.typing(roomID: roomID, userID: typing.userID, active: active))
         guard active else { return }
         typingExpiryTasks[key] = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(4))
+            try? await Task.sleep(for: .seconds(6))
             guard !Task.isCancelled else { return }
             await self?.expireTyping(
                 roomID: roomID,

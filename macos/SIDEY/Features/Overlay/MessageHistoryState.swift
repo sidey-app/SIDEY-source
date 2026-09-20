@@ -37,6 +37,7 @@ final class MessageHistoryStore {
     private var requestTask: Task<Void, Never>?
     private var generation: UInt64 = 0
     private var isActive = false
+    private var deletedMessageIDs: Set<UUID> = []
 
     convenience init(loadPage: @escaping MessageHistoryPageLoader) {
         self.init(pageSize: Self.defaultPageSize, loadPage: loadPage)
@@ -91,7 +92,7 @@ final class MessageHistoryStore {
                 else { return }
                 self.messages = MessageHistoryMerge.mergeConfirmed(
                     self.messages,
-                    with: page.messages,
+                    with: page.messages.filter { !self.deletedMessageIDs.contains($0.id) },
                     roomID: roomID
                 )
                 self.nextCursor = page.nextCursor
@@ -115,6 +116,18 @@ final class MessageHistoryStore {
         guard case .failed = olderState else { return }
         olderState = .idle
         loadNextPage()
+    }
+
+    func remove(messageID: UUID, roomID: UUID) {
+        guard isActive, self.roomID == roomID else { return }
+        deletedMessageIDs.insert(messageID)
+        messages.removeAll { $0.id == messageID }
+    }
+
+    func reload(roomID: UUID) {
+        guard isActive, self.roomID == roomID else { return }
+        deletedMessageIDs.removeAll(keepingCapacity: true)
+        startInitialLoad(roomID: roomID)
     }
 
     private func transition(to roomID: UUID?) {
@@ -147,7 +160,7 @@ final class MessageHistoryStore {
                 else { return }
                 self.messages = MessageHistoryMerge.mergeConfirmed(
                     [],
-                    with: page.messages,
+                    with: page.messages.filter { !self.deletedMessageIDs.contains($0.id) },
                     roomID: roomID
                 )
                 self.nextCursor = page.nextCursor
@@ -173,6 +186,7 @@ final class MessageHistoryStore {
         requestTask = nil
         self.roomID = roomID
         messages.removeAll(keepingCapacity: false)
+        deletedMessageIDs.removeAll(keepingCapacity: false)
         nextCursor = nil
         initialState = .idle
         olderState = .idle
@@ -233,7 +247,7 @@ enum MessageHistoryMerge {
                 state: message.state == .pending ? .pending : .failed
             )
         }
-        return byID.values.sorted(by: newestFirst)
+        return byID.values.sorted(by: displayOrder)
     }
 
     private static func newestFirst(_ lhs: ChatMessage, _ rhs: ChatMessage) -> Bool {
@@ -246,6 +260,17 @@ enum MessageHistoryMerge {
         lhs.createdAt == rhs.createdAt
             ? lhs.id.uuidString > rhs.id.uuidString
             : lhs.createdAt > rhs.createdAt
+    }
+
+    private static func displayOrder(_ lhs: MessageLedgerEntry, _ rhs: MessageLedgerEntry) -> Bool {
+        let lhsIsLocal = lhs.state != .confirmed
+        let rhsIsLocal = rhs.state != .confirmed
+        if lhsIsLocal != rhsIsLocal {
+            // The device clock can lag behind the server. Keep unresolved local
+            // sends after confirmed history so their pending/failed state stays visible.
+            return !lhsIsLocal
+        }
+        return newestFirst(rhs, lhs)
     }
 }
 

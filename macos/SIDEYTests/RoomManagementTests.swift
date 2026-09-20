@@ -1,5 +1,5 @@
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 final class RoomManagementTests: XCTestCase {
     func testProductLimitsMatchRoomAndMessagePolicies() {

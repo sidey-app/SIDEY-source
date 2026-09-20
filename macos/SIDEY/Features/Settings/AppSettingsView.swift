@@ -57,7 +57,7 @@ struct AppSettingsView: View {
             ) {
                 SettingsToggleRow(
                     title: "조용히 모드",
-                    description: "메시지 본문 말풍선은 숨기고 타이핑 상태와 미확인 수는 유지합니다.",
+                    description: "메시지 본문과 타이핑 점을 숨기고 연결 상태와 미확인 수는 유지합니다.",
                     isOn: Binding(
                         get: { model.preferences.quietModeEnabled },
                         set: { actions.onQuietModeChanged($0) }
@@ -83,6 +83,24 @@ struct AppSettingsView: View {
                 )
             }
 
+            SettingsSection(
+                title: "전역 단축키",
+                subtitle: "다른 앱을 사용하는 중에도 \(GlobalShortcutAction.modifierDescription)와 아래 키를 함께 눌러 실행합니다.",
+                systemImage: "keyboard"
+            ) {
+                ForEach(GlobalShortcutAction.allCases) { shortcut in
+                    SettingsControlRow(
+                        title: shortcut.title,
+                        description: model.globalShortcutStatuses[shortcut]?.notice ?? shortcut.descriptiveShortcut
+                    ) {
+                        Text(shortcut.displayShortcut)
+                            .font(.body.monospaced())
+                            .foregroundStyle(model.globalShortcutStatuses[shortcut]?.notice == nil ? .primary : .secondary)
+                    }
+                    if shortcut != GlobalShortcutAction.allCases.last { Divider() }
+                }
+            }
+
             SettingsSection(title: "소리", subtitle: "캐릭터 효과음 재생을 설정합니다.", systemImage: "speaker.wave.2") {
                 SettingsToggleRow(
                     title: "캐릭터 효과음",
@@ -90,23 +108,6 @@ struct AppSettingsView: View {
                     isOn: Binding(get: { model.preferences.characterSoundEffectsEnabled },
                                   set: { actions.onCharacterSoundEffectsChanged($0) })
                 )
-            }
-
-            if !storeAvailability.usesAppStore {
-                SettingsSection(
-                    title: "업데이트",
-                    subtitle: "새로운 SIDEY 버전이 있는지 확인할 수 있습니다.",
-                    systemImage: "arrow.triangle.2.circlepath"
-                ) {
-                    SettingsControlRow(
-                        title: "업데이트 확인",
-                        description: "새 버전이 있으면 안전하게 내려받아 설치할 수 있습니다."
-                    ) {
-                        Button("지금 확인", action: actions.onCheckForUpdates)
-                            .buttonStyle(.glassProminent)
-                            .disabled(!actions.canCheckForUpdates())
-                    }
-                }
             }
 
             SettingsSection(
@@ -142,7 +143,7 @@ struct AppSettingsView: View {
                 Divider()
                 SettingsControlRow(
                     title: "모니터",
-                    description: "픽셀 월드와 메시지 입력창을 표시할 화면을 선택합니다."
+                    description: "픽셀 월드를 표시할 화면을 선택합니다. 입력창은 왼쪽 손잡이로 따로 이동할 수 있습니다."
                 ) {
                     Picker("모니터", selection: regionScreenBinding) {
                         ForEach(model.availableScreens) { screen in

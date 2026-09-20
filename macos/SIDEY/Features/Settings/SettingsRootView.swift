@@ -8,8 +8,6 @@ struct SettingsActions {
     var onRequiresRightClickToThrowChanged: (Bool) -> Void
     var onQuietModeChanged: (Bool) -> Void
     var onLaunchAtLoginChanged: (Bool) -> Void
-    var onCheckForUpdates: () -> Void
-    var canCheckForUpdates: () -> Bool
     var onPurchase: (String) -> Void
     var onRefreshCommerceState: (String?) -> Void
     var onSetEquippedCosmetic: (CommerceProductKind, String?) -> Void
@@ -39,8 +37,6 @@ struct SettingsActions {
         onRequiresRightClickToThrowChanged: { _ in },
         onQuietModeChanged: { _ in },
         onLaunchAtLoginChanged: { _ in },
-        onCheckForUpdates: {},
-        canCheckForUpdates: { false },
         onPurchase: { _ in },
         onRefreshCommerceState: { _ in },
         onSetEquippedCosmetic: { _, _ in },

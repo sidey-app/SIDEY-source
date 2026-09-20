@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class SettingsInteractionTests: XCTestCase {
