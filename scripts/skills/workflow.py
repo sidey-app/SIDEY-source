@@ -40,6 +40,11 @@ from validation_scope import is_contributor_architecture_path, required_scopes
 GENERAL_PR_TEMPLATE = GENERAL_TEMPLATE
 GENERAL_PR_MARKER = GENERAL_MARKER
 GITHUB_REPOSITORY = 'sidey-app/SIDEY'
+LEGACY_MACOS_APP_NAMES = {'SIDEYAppStore': 'SIDEY'}
+
+
+def app_names_match(recorded, requested):
+    return LEGACY_MACOS_APP_NAMES.get(recorded, recorded) == requested
 
 
 def git(root, *args):
@@ -1023,8 +1028,8 @@ def main(argv=None):
     start.add_argument('--worktree', required=True)
     start.add_argument(
         '--app',
-        default='SIDEYAppStore',
-        choices=['SIDEYAppStore', 'SIDEY', 'sidey-reals', 'windows'],
+        default='SIDEY',
+        choices=['SIDEY', 'sidey-reals', 'windows'],
     )
     for command in ('sync', 'check', 'publish', 'finish'):
         sub = subs.add_parser(command)
@@ -1059,8 +1064,8 @@ def main(argv=None):
     opener.add_argument('--offline', action='store_true')
     opener.add_argument(
         '--scheme',
-        default='SIDEYAppStore',
-        choices=['SIDEYAppStore', 'SIDEY', 'sidey-reals'],
+        default='SIDEY',
+        choices=['SIDEY', 'sidey-reals'],
     )
     args = parser.parse_args(argv)
     root = root_at(args.repo)
@@ -1190,7 +1195,7 @@ def main(argv=None):
             not task
             or task.get('status') != 'main-updated'
             or task.get('platform') != 'macos'
-            or task.get('app') != args.scheme
+            or not app_names_match(task.get('app'), args.scheme)
             or not task.get('merge')
             or not task.get('checked', {}).get('head')
             or not is_ancestor(root, task['merge'], remote)
