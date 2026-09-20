@@ -48,7 +48,8 @@ archive를 만든다. App Store target의 bundle identity, sandbox entitlement, 
 StoreKit 환경을 확인한다. 서명 정보와 App Store Connect 자격 증명은 저장소나 CI log에
 넣지 않는다. Archive 검사 후 별도 승인된 App Store Connect upload·submission을 수행하고
 심사·게시 상태를 확인한다. 직접 배포 DMG, Sparkle feed와 Homebrew Cask를 생성하거나
-갱신하지 않는다. 과거 release 기록과 고객 데이터는 삭제하지 않는다.
+갱신하지 않는다. 삭제된 Direct release, 자산과 태그를 복원하거나 재게시하지 않는다.
+사용자 계정·메시지·구매 원본은 삭제하지 않는다.
 
 ### Windows
 
@@ -75,5 +76,5 @@ release migration 기록에 고정한다. 이 조건을 충족하지 못하면 �
 4. 별도 승인된 경우에만 store submission, website deployment 또는 backend deployment를
    수행하고 각각의 결과를 해당 system에서 검증한다.
 
-과거 특정 release의 시행착오와 일회성 checklist는 Git/PR 및 GitHub Release history에
-맡긴다.
+과거 특정 release의 시행착오와 일회성 checklist는 private source의 Git/PR 이력에
+맡긴다. 삭제된 macOS Direct GitHub Release를 이 목적으로 복원하지 않는다.

@@ -64,8 +64,9 @@ App Store 제품 페이지로 연결한다.
 Windows 공개 version은 [`release/windows.json`](../release/windows.json)이 소유한다.
 네이티브 project 설정, Windows update manifest와 웹 download metadata는 검증되는
 mirror다. 검증된 installer, release metadata, website output과 해당 release에 필요한
-historical license material만 공개 `SIDEY` 저장소로 게시한다. 과거 macOS 직접 배포
-release와 feed는 기록으로 보존하고 새로 갱신하지 않는다.
+historical license material만 공개 `SIDEY` 저장소로 게시한다. 지원이 종료된 macOS Direct
+release, 설치 자산과 태그는 공개 저장소에서 삭제하며 서명된 feed는 private source의
+과거 기록으로만 보존하고 갱신하거나 게시하지 않는다.
 
 ## 권위 순서
 

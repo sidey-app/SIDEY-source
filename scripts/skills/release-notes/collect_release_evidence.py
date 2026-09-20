@@ -299,8 +299,9 @@ def collect_evidence(
             "commit": target,
         },
         "public_release_url": (
-            f"https://github.com/{public_repository}/releases/tag/"
-            f"{release_target}"
+            f"https://github.com/{public_repository}/releases/tag/{target_tag}"
+            if target_tag
+            else None
         ),
         "net_changed_paths": sorted(
             path for path in net_path_source.split("\0") if path

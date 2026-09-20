@@ -23,9 +23,10 @@ binary version은 [`windows/src/Sidey.App/Sidey.App.csproj`](../../windows/src/S
 
 macOS는 Mac App Store판만 개발·지원한다. 설치와 업데이트는 App Store가 담당하며
 구매와 복원은 StoreKit 및 기존 서버 검증을 따른다. 직접 배포 DMG, Sparkle 업데이트와
-Homebrew Cask는 지원하지 않는다. 기존 직접 배포판과 관련된 과거 release 기록, 사용자
-계정·메시지·구매 원본은 보존한다. App Store 설치가 기존 직접 배포판의 Keychain 또는
-sandbox storage를 자동으로 이전한다는 보장은 하지 않는다.
+Homebrew Cask는 지원하지 않는다. 기존 직접 배포판의 공개 GitHub Releases, 설치 자산과
+연결 태그는 삭제했으며 재게시하지 않는다. 사용자 계정·메시지·구매 원본과 private source의
+Git 이력은 보존한다. App Store 설치가 기존 직접 배포판의 Keychain 또는 sandbox storage를
+자동으로 이전한다는 보장은 하지 않는다.
 
 App Store archive 생성, submission, review와 게시 완료는 별도 단계다.
 
