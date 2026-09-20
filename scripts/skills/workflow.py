@@ -934,13 +934,13 @@ def finish(root, args):
                 '--repo',
                 GITHUB_REPOSITORY,
                 '--json',
-                'title,body,headRefOid,baseRefOid,mergeStateStatus',
+                'title,body,headRefOid,baseRefName,mergeStateStatus',
             )
         )
         attest(root, task, remote)
         source_changed = (
             source['headRefOid'] != checked_head
-            or source['baseRefOid'] != remote
+            or source['baseRefName'] != 'main'
             or source['mergeStateStatus'] != 'CLEAN'
             or source['title'] != details['title']
             or source.get('body') != details.get('body')
