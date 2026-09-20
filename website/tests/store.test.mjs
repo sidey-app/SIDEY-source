@@ -67,7 +67,7 @@ async function createCheckoutHarness({ fetchResponse, requestPayment } = {}) {
 
   const elements = Object.fromEntries([
     "loading", "error", "error-message", "product", "product-image", "preview-frame",
-    "order-name", "amount", "meta", "consent", "policy-notice", "pay", "status",
+    "order-name", "amount", "consent", "policy-notice", "pay", "status",
   ].map(id => [`#checkout-${id}`, new Element()]));
   elements["#checkout-error"].hidden = true;
   elements["#checkout-product"].hidden = true;
@@ -320,7 +320,7 @@ test("checkout rejects unsupported server payment methods before invoking PortOn
     });
     harness.elements["#checkout-consent"].checked = true;
     await harness.elements["#checkout-pay"].listeners.click();
-    assert.match(harness.elements["#checkout-status"].textContent, /결제 요청을 준비하지 못했습니다/, String(payMethod));
+    assert.match(harness.elements["#checkout-status"].textContent, /결제를 시작하지 못했습니다/, String(payMethod));
     assert.equal(harness.paymentRequests.length, 0, String(payMethod));
   }
 });
@@ -339,7 +339,7 @@ test("checkout rejects authorization details that differ from the prepared order
     });
     harness.elements["#checkout-consent"].checked = true;
     await harness.elements["#checkout-pay"].listeners.click();
-    assert.match(harness.elements["#checkout-status"].textContent, /결제 요청을 준비하지 못했습니다/, field);
+    assert.match(harness.elements["#checkout-status"].textContent, /결제를 시작하지 못했습니다/, field);
     assert.equal(harness.paymentRequests.length, 0, field);
   }
 });
@@ -353,7 +353,7 @@ test("checkout distinguishes authorization failures from payment SDK failures", 
   });
   authorizationFailure.elements["#checkout-consent"].checked = true;
   await authorizationFailure.elements["#checkout-pay"].listeners.click();
-  assert.match(authorizationFailure.elements["#checkout-status"].textContent, /결제 요청을 준비하지 못했습니다/);
+  assert.match(authorizationFailure.elements["#checkout-status"].textContent, /결제를 시작하지 못했습니다/);
 
   const sdkFailure = await createCheckoutHarness({
     requestPayment: async () => { throw new Error("sdk_fixture_failure"); },
@@ -361,7 +361,7 @@ test("checkout distinguishes authorization failures from payment SDK failures", 
   sdkFailure.elements["#checkout-consent"].checked = true;
   await sdkFailure.elements["#checkout-pay"].listeners.click();
   assert.match(sdkFailure.elements["#checkout-status"].textContent, /결제창을 열거나 진행하지 못했습니다/);
-  assert.match(sdkFailure.elements["#checkout-status"].textContent, /sdk_fixture_failure/);
+  assert.doesNotMatch(sdkFailure.elements["#checkout-status"].textContent, /sdk_fixture_failure/);
 });
 
 test("checkout locks controls and ignores duplicate clicks and consent changes while authorizing", async () => {

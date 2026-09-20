@@ -13,7 +13,6 @@ import { commerceProducts } from "./commerce-products.js";
   const previewFrame = document.querySelector("#checkout-preview-frame");
   const orderName = document.querySelector("#checkout-order-name");
   const amount = document.querySelector("#checkout-amount");
-  const meta = document.querySelector("#checkout-meta");
   const consent = document.querySelector("#checkout-consent");
   const policyNotice = document.querySelector("#checkout-policy-notice");
   const payButton = document.querySelector("#checkout-pay");
@@ -97,7 +96,7 @@ import { commerceProducts } from "./commerce-products.js";
     apiBase = productionAPIBase;
     window.history.replaceState(null, "", window.location.pathname);
     if (!/^[A-Za-z0-9_-]{43}$/.test(token) || !apiBase) {
-      showError("SIDEY 앱에서 새 주문을 만들어 접근해 주세요. 공개 구매 링크는 지원하지 않습니다.");
+      showError("SIDEY 상점에서 구매할 상품을 선택해주세요.");
       return;
     }
 
@@ -111,8 +110,7 @@ import { commerceProducts } from "./commerce-products.js";
       productImage.alt = prepared.order_name;
       previewFrame.dataset.productKind = preview.kind;
       policyNotice.textContent = prepared.policy_notice;
-      meta.textContent = `부가세 포함 · 1회 구매 · PortOne ${prepared.payment_environment === "test" ? "테스트" : "실결제"}`;
-      payButton.textContent = `${amount.textContent}원 동의하고 결제창 열기`;
+      payButton.textContent = `${amount.textContent}원 결제하기`;
       updateControls();
       loading.hidden = true;
       product.hidden = false;
@@ -120,7 +118,7 @@ import { commerceProducts } from "./commerce-products.js";
       console.error(requestError);
       showError(requestError.status === 410
         ? "주문 링크가 만료되었거나 이미 처리되었습니다. SIDEY 앱 상점에서 다시 시도해 주세요."
-        : "서버에서 주문을 확인하지 못했습니다. SIDEY 앱 상점에서 다시 시도해 주세요.");
+        : "주문을 확인하지 못했습니다. SIDEY 상점에서 다시 시도해주세요.");
     }
   }
 
@@ -134,7 +132,7 @@ import { commerceProducts } from "./commerce-products.js";
     inFlight = true;
     updateControls();
     let phase = "authorize";
-    status.textContent = "PortOne 결제창을 준비하고 있어요…";
+    status.textContent = "결제창을 준비하고 있어요…";
     try {
       const config = await request("commerce-checkout", {
         token,
@@ -162,15 +160,15 @@ import { commerceProducts } from "./commerce-products.js";
       phase = "confirm";
       awaitingConfirmation = true;
       if (response?.paymentId !== config.payment_id) throw new Error("payment_id_mismatch");
-      status.textContent = "SIDEY 서버가 결제 상태를 확인하고 있어요…";
+      status.textContent = "결제를 확인하고 있어요…";
       await completePayment(config, response.paymentId);
     } catch (paymentError) {
       console.error(paymentError);
       status.textContent = phase === "confirm"
-        ? "결제 결과를 서버에서 확인하지 못했습니다. 다시 결제하지 말고 SIDEY 상점에서 구매 상태를 확인해 주세요."
+        ? "결제 결과를 확인하지 못했습니다. 다시 결제하지 말고 SIDEY 상점에서 구매 상태를 확인해주세요."
         : phase === "payment"
-          ? `결제창을 열거나 진행하지 못했습니다. ${paymentError.message || "잠시 후 다시 시도해 주세요."} 승인 알림을 받았다면 다시 결제하지 말고 SIDEY 상점에서 구매 상태를 확인해 주세요.`
-          : "결제 요청을 준비하지 못했습니다. SIDEY 앱 상점에서 새 주문으로 다시 시도해 주세요.";
+          ? "결제창을 열거나 진행하지 못했습니다. 승인 알림을 받았다면 다시 결제하지 말고 SIDEY 상점에서 구매 상태를 확인해주세요."
+          : "결제를 시작하지 못했습니다. SIDEY 상점에서 다시 시도해주세요.";
     } finally {
       inFlight = false;
       updateControls();
