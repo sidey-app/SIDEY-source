@@ -210,6 +210,38 @@ final class HistoryInteractionTests: XCTestCase {
         XCTAssertFalse(coordinator.overlayWindows.composerVisible)
     }
 
+    func testComposerShortcutRevealsHiddenOverlayBeforeFocusingAndStillTogglesClosed() {
+        var preferences = AppPreferences.defaults
+        preferences.hasShownNativeLanding = true
+        preferences.onboardingComplete = true
+        preferences.overlayVisible = false
+        let loadedPreferences = preferences
+        let coordinator = AppCoordinator(
+            preferencesStore: PreferencesStore(load: { loadedPreferences }, save: { _ in }),
+            legacyMigrator: .none,
+            keychainAccessSession: KeychainAccessSession(),
+            releaseChannel: .appStore,
+            arguments: []
+        )
+        configure(coordinator.model)
+        coordinator.backendBootstrapState = .ready
+        coordinator.applyRequestedOverlayVisibility()
+
+        XCTAssertFalse(coordinator.model.overlayVisible)
+        XCTAssertFalse(coordinator.overlayWindows.composerVisible)
+
+        coordinator.toggleMessageComposer()
+
+        XCTAssertTrue(coordinator.model.overlayVisible)
+        XCTAssertTrue(coordinator.overlayWindows.composerVisible)
+
+        coordinator.toggleMessageComposer()
+
+        XCTAssertTrue(coordinator.model.overlayVisible)
+        XCTAssertFalse(coordinator.overlayWindows.composerVisible)
+        coordinator.overlayWindows.setVisible(false)
+    }
+
     private func makeModel() -> AppModel {
         let model = AppModel(preferences: .defaults)
         configure(model)

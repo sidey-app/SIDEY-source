@@ -97,7 +97,7 @@ final class AppCoordinator {
     )
     private lazy var statusItemController = StatusItemController(
         onToggleOverlay: { [weak self] in self?.toggleOverlay() },
-        onFocusMessage: { [weak self] in self?.overlayWindows.toggleComposer() },
+        onFocusMessage: { [weak self] in self?.toggleMessageComposer() },
         onSelectRoom: { [weak self] roomID in self?.selectRoom(roomID) },
         onToggleQuietMode: { [weak self] in self?.setQuietMode(!(self?.model.preferences.quietModeEnabled ?? false)) },
         onOpenHistory: { [weak self] in self?.showHistory() },
@@ -112,7 +112,7 @@ final class AppCoordinator {
             guard let self else { return }
             switch action {
             case .toggleQuietMode: self.setQuietMode(!self.model.preferences.quietModeEnabled)
-            case .toggleComposer: self.overlayWindows.toggleComposer()
+            case .toggleComposer: self.toggleMessageComposer()
             case .openHistory: self.showHistory()
             }
         },
@@ -362,7 +362,11 @@ final class AppCoordinator {
         setOverlayVisible(!model.overlayVisible)
     }
 
-    private func focusMessageField() {
+    func toggleMessageComposer() {
+        if overlayWindows.composerVisible {
+            overlayWindows.dismissComposer()
+            return
+        }
         if !model.overlayVisible { setOverlayVisible(true) }
         overlayWindows.focusMessageField()
     }
