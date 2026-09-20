@@ -40,6 +40,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private var unreadCounts: [UUID: Int] = [:]
     private var quietModeEnabled = false
     private var launchAtLogin = false
+    private var globalShortcutStatuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
 
     init(
         onToggleOverlay: @escaping () -> Void,
@@ -79,7 +80,8 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         activeRoomID: UUID? = nil,
         unreadCounts: [UUID: Int] = [:],
         quietModeEnabled: Bool = false,
-        launchAtLogin: Bool = false
+        launchAtLogin: Bool = false,
+        globalShortcutStatuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
     ) {
         self.overlayVisible = overlayVisible
         self.rooms = rooms
@@ -87,6 +89,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         self.unreadCounts = unreadCounts
         self.quietModeEnabled = quietModeEnabled
         self.launchAtLogin = launchAtLogin
+        self.globalShortcutStatuses = globalShortcutStatuses
         updateStatusIcon()
         statusItem?.menu = makeMenu()
     }
@@ -103,6 +106,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(overlay)
 
         let message = NSMenuItem(title: "메시지 작성…", action: #selector(focusMessage), keyEquivalent: "")
+        annotateShortcut(.toggleComposer, on: message)
         message.target = self
         message.isEnabled = !rooms.isEmpty
         menu.addItem(message)
@@ -115,11 +119,13 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(groups)
 
         let quiet = NSMenuItem(title: "조용히 모드", action: #selector(toggleQuietMode), keyEquivalent: "")
+        annotateShortcut(.toggleQuietMode, on: quiet)
         quiet.target = self
         quiet.state = quietModeEnabled ? .on : .off
         menu.addItem(quiet)
 
         let history = NSMenuItem(title: "최근 기록…", action: #selector(openHistory), keyEquivalent: "")
+        annotateShortcut(.openHistory, on: history)
         history.target = self
         history.isEnabled = !rooms.isEmpty
         menu.addItem(history)
@@ -147,6 +153,16 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         quit.target = self
         menu.addItem(quit)
         return menu
+    }
+
+    private func annotateShortcut(_ action: GlobalShortcutAction, on item: NSMenuItem) {
+        // Carbon owns dispatch. A menu key equivalent would create a second execution path.
+        let unavailable = globalShortcutStatuses[action]?.notice
+        let suffix = unavailable == nil ? action.displayShortcut : "\(action.displayShortcut) · 단축키 사용 불가"
+        let title = item.title
+        item.attributedTitle = NSAttributedString(string: "\(title)    \(suffix)")
+        item.title = title
+        item.toolTip = unavailable ?? "Control + Option + \(action.key)"
     }
 
     private func makeRoomsMenu() -> NSMenu {

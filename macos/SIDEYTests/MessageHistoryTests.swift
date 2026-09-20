@@ -107,6 +107,7 @@ final class MessageHistoryTests: XCTestCase {
             now: serverMessage.createdAt.addingTimeInterval(4)
         )
 
+        XCTAssertEqual(entries.map(\.id), [serverMessage.id, realtimeMessage.id, pendingID, failedID])
         XCTAssertEqual(entries.count, 4)
         XCTAssertEqual(Set(entries.map(\.id)).count, entries.count)
         XCTAssertEqual(entries.first(where: { $0.id == serverMessage.id })?.state, .confirmed)

@@ -340,7 +340,7 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertFalse(controller.isVisible)
     }
 
-    func testCharacterHotspotDoubleClickKeepsComposerOpenAndRequestsPulse() {
+    func testCharacterHotspotDoubleClickPreservesComposerVisibilityAndRequestsPulse() {
         let model = AppModel(preferences: .defaults)
         let roomID = UUID()
         model.rooms = [Room(
@@ -359,7 +359,28 @@ final class WindowPolicyTests: XCTestCase {
         group.handleCharacterClick(clickCount: 2)
 
         XCTAssertEqual(pulseRequests, 1)
+        XCTAssertFalse(group.composerVisible)
+        group.presentComposer()
+        group.handleCharacterClick(clickCount: 1)
+        group.handleCharacterClick(clickCount: 2)
+        XCTAssertEqual(pulseRequests, 2)
         XCTAssertTrue(group.composerVisible)
+        group.setVisible(false)
+    }
+
+    func testExplicitComposerDismissCancelsPendingCharacterClick() async throws {
+        let model = AppModel(preferences: .defaults)
+        let roomID = UUID()
+        model.rooms = [Room(id: roomID, name: "테스트", ownerID: UUID(), members: [], inviteCodeHint: "TEST")]
+        model.preferences.activeRoomID = roomID
+        let group = OverlayWindowGroup(model: model)
+        group.setVisible(true)
+        group.handleCharacterClick(clickCount: 1)
+        group.dismissComposer()
+        // Wait beyond the system click classification window, not an arbitrary UI delay.
+        try await Task.sleep(for: .seconds(NSEvent.doubleClickInterval + 0.1))
+        XCTAssertFalse(group.composerVisible)
+        group.setVisible(false)
     }
 
     func testCharacterClickFocusesMessageFieldAfterMouseEventCompletes() async {
@@ -386,12 +407,13 @@ final class WindowPolicyTests: XCTestCase {
     func testComposerRequestsDismissWhenAnotherWindowBecomesKey() async {
         let model = AppModel(preferences: .defaults)
         var dismissRequests = 0
+        var typingStops = 0
         let scheduler = TestComposerFocusLossScheduler()
         let controller = OverlayInteractionWindowController(
             model: model,
             onSend: { _ in },
             onInputActivity: {},
-            onTypingChanged: { _ in },
+            onTypingChanged: { if !$0 { typingStops += 1 } },
             onCancel: { dismissRequests += 1 },
             focusLossScheduler: scheduler,
             isApplicationActive: { false }
@@ -417,6 +439,7 @@ final class WindowPolicyTests: XCTestCase {
 
         XCTAssertEqual(dismissRequests, 0)
         XCTAssertEqual(scheduler.latestDelay, .milliseconds(250))
+        XCTAssertGreaterThan(typingStops, 0, "Typing ends as soon as the key window changes")
         XCTAssertTrue(controller.hasPendingFocusLossDismiss)
         scheduler.fireLatest()
         XCTAssertEqual(dismissRequests, 1)

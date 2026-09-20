@@ -49,7 +49,7 @@ final class CharacterImpactAudioTests: XCTestCase {
     func testVersionEightDefaultsSoundOnAndOffSurvivesRoundTrip() throws {
         let json = #"{"schemaVersion":8,"quietModeEnabled":true,"nickname":"콩이"}"#
         var preferences = try JSONDecoder().decode(AppPreferences.self, from: Data(json.utf8))
-        XCTAssertEqual(preferences.schemaVersion, 9)
+        XCTAssertEqual(preferences.schemaVersion, AppPreferences.currentSchemaVersion)
         XCTAssertTrue(preferences.characterSoundEffectsEnabled)
         XCTAssertTrue(preferences.quietModeEnabled)
         preferences.characterSoundEffectsEnabled = false

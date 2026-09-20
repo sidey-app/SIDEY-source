@@ -8,7 +8,8 @@ struct OverlayComposerView: View {
     let onCancel: () -> Void
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
+            ComposerDragHandle().frame(width: 14, height: 34)
             Button(action: onCancel) {
                 Image(systemName: "xmark")
                     .font(.system(size: 13, weight: .bold))
@@ -29,7 +30,8 @@ struct OverlayComposerView: View {
                     onInputActivity: onInputActivity,
                     onSubmit: send,
                     onCancel: onCancel,
-                    onTextEdited: onTypingChanged
+                    onTextEdited: onTypingChanged,
+                    onFocusLost: { onTypingChanged(false) }
                 )
             }
             .frame(maxWidth: .infinity, minHeight: 34, maxHeight: 40)
@@ -39,7 +41,7 @@ struct OverlayComposerView: View {
                     .font(.title2)
             }
             .buttonStyle(.plain)
-            .disabled(!MessageValidator.isValid(MessageValidator.normalized(model.draft)))
+            .disabled(!model.canSubmitDraft)
             .accessibilityLabel("메시지 전송")
         }
         .font(.system(size: 16, weight: .medium))

@@ -87,6 +87,7 @@ struct NativeMessageField: NSViewRepresentable {
     let onSubmit: () -> Void
     let onCancel: () -> Void
     var onTextEdited: (Bool) -> Void = { _ in }
+    var onFocusLost: () -> Void = {}
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -145,6 +146,10 @@ struct NativeMessageField: NSViewRepresentable {
             self.parent = parent
         }
 
+        func textDidEndEditing(_ notification: Notification) {
+            parent.onFocusLost()
+        }
+
         func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else { return }
             parent.onInputActivity()
@@ -185,6 +190,9 @@ struct NativeMessageField: NSViewRepresentable {
                 return true
             }
             guard commandSelector == #selector(NSResponder.insertNewline(_:)) else { return false }
+            // The input manager owns Return while a Korean/Japanese composition
+            // is marked; it commits the composition without sending the draft.
+            guard !textView.hasMarkedText() else { return false }
             if NSApplication.shared.currentEvent?.modifierFlags.contains(.shift) == true {
                 let candidate = (textView.string as NSString).replacingCharacters(
                     in: textView.selectedRange(),
