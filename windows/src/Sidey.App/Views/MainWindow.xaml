@@ -894,6 +894,54 @@
               </Border>
 
               <StackPanel Spacing="4">
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeysTitle}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeysDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+              </StackPanel>
+              <Border Style="{StaticResource SideySettingsCardStyle}">
+                <StackPanel Spacing="12">
+                  <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <Button x:Name="OverlayHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Content="{Binding OverlayHotkeyText, Mode=OneWay}" IsEnabled="{Binding IsHotkeySelectionEnabled}"
+                        Click="OnHotkeyRecorderClick" PreviewKeyDown="OnHotkeyRecorderPreviewKeyDown" LostFocus="OnHotkeyRecorderLostFocus"
+                        AutomationProperties.Name="{Binding OverlayHotkeyAccessibleName, Mode=OneWay}"
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}" />
+                  </Grid>
+                  <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                  <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <Button x:Name="QuietModeHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Content="{Binding QuietModeHotkeyText, Mode=OneWay}" IsEnabled="{Binding IsHotkeySelectionEnabled}"
+                        Click="OnHotkeyRecorderClick" PreviewKeyDown="OnHotkeyRecorderPreviewKeyDown" LostFocus="OnHotkeyRecorderLostFocus"
+                        AutomationProperties.Name="{Binding QuietModeHotkeyAccessibleName, Mode=OneWay}"
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}" />
+                  </Grid>
+                  <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                  <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <Button x:Name="ComposerHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Content="{Binding ComposerHotkeyText, Mode=OneWay}" IsEnabled="{Binding IsHotkeySelectionEnabled}"
+                        Click="OnHotkeyRecorderClick" PreviewKeyDown="OnHotkeyRecorderPreviewKeyDown" LostFocus="OnHotkeyRecorderLostFocus"
+                        AutomationProperties.Name="{Binding ComposerHotkeyAccessibleName, Mode=OneWay}"
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}" />
+                  </Grid>
+                  <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                  <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <Button x:Name="HistoryHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Content="{Binding HistoryHotkeyText, Mode=OneWay}" IsEnabled="{Binding IsHotkeySelectionEnabled}"
+                        Click="OnHotkeyRecorderClick" PreviewKeyDown="OnHotkeyRecorderPreviewKeyDown" LostFocus="OnHotkeyRecorderLostFocus"
+                        AutomationProperties.Name="{Binding HistoryHotkeyAccessibleName, Mode=OneWay}"
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Spacing="4">
                 <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.displayTitle}, Mode=OneWay}" />
                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.displayDescription}, Mode=OneWay}" />
               </StackPanel>
@@ -1119,6 +1167,36 @@
                   </StackPanel>
                   <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding ExportDiagnosticDataCommand}" Content="{Binding Value, Source={i18n:I18n Key=about.exportDiagnostics}, Mode=OneWay}" />
                 </Grid>
+              </Border>
+
+              <StackPanel Spacing="4">
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=about.accountTitle}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.accountDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+              </StackPanel>
+              <Border Style="{StaticResource SideySettingsCardStyle}" Padding="8">
+                <StackPanel Spacing="0">
+                  <Grid Padding="12" ColumnSpacing="16">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <FontIcon FontSize="22" Glyph="&#xE8AC;" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=about.signOut}, Mode=OneWay}" />
+                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.signOutDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding SignOutCommand}" Content="{Binding Value, Source={i18n:I18n Key=about.signOut}, Mode=OneWay}" />
+                  </Grid>
+                  <Rectangle Height="1" Margin="12,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                  <Grid Padding="12" ColumnSpacing="16">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <FontIcon FontSize="22" Foreground="{ThemeResource SystemFillColorCriticalBrush}" Glyph="&#xE74D;" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                      <TextBlock FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccount}, Mode=OneWay}" />
+                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccountDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding DeleteAccountCommand}">
+                      <TextBlock Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccount}, Mode=OneWay}" />
+                    </Button>
+                  </Grid>
+                </StackPanel>
               </Border>
 
               <StackPanel Spacing="4">

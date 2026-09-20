@@ -24,6 +24,27 @@ public sealed class AppCoordinatorPreferenceTests
         Assert.Equal(registered ? 1 : 0, startup.UpgradeAttempts);
     }
 
+    [Fact]
+    public async Task HotkeySaveFailureRestoresThePreviouslyActiveMapping()
+    {
+        AppPreferences original = AppPreferences.Default;
+        var store = new SaveFailingPreferences(original);
+        await using var coordinator = new AppCoordinator(
+            store,
+            startupService: new FakeStartupService(false));
+        await coordinator.LoadCachedStateAsync();
+        var changed = new GlobalHotkeySettings(
+            GlobalHotkeyKey.O,
+            GlobalHotkeyKey.Q,
+            GlobalHotkeyKey.C,
+            GlobalHotkeyKey.L);
+
+        await Assert.ThrowsAsync<IOException>(() => coordinator.SetGlobalHotkeysAsync(changed));
+
+        Assert.Equal(original.GlobalHotkeys, coordinator.State.Preferences.GlobalHotkeys);
+        Assert.Equal(1, store.SaveAttempts);
+    }
+
     private sealed class FakeStartupService(bool enabled) : IWindowsStartupService
     {
         public int UpgradeAttempts { get; private set; }

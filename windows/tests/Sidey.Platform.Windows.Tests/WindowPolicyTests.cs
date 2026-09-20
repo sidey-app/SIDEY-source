@@ -62,7 +62,7 @@ public sealed class WindowPolicyTests
     [Fact]
     public void CurrentWindowsSourceVersionIsOneThreeOne()
     {
-        Assert.Equal("1.4.0", WindowsUpdateService.CurrentVersion);
+        Assert.Equal("2.0.0", WindowsUpdateService.CurrentVersion);
     }
 
     [Theory]

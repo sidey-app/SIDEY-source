@@ -8,6 +8,28 @@ namespace Sidey.Presentation.Tests;
 public sealed class OnboardingViewModelTests
 {
     [Fact]
+    public async Task GoogleButtonStaysDisabledWhileTheStoredSessionIsBeingChecked()
+    {
+        var coordinator = new FakeSideyCoordinator { State = CoordinatorState.Initial };
+        using var viewModel = new OnboardingViewModel(coordinator);
+
+        Assert.True(viewModel.IsGoogleChecking);
+        Assert.False(viewModel.CanBegin);
+        Assert.False(viewModel.BeginCommand.CanExecute(null));
+
+        await viewModel.BeginCommand.ExecuteAsync(null);
+
+        Assert.Equal(0, coordinator.GoogleStartCount);
+        coordinator.State = coordinator.State with
+        {
+            GoogleAuthentication = GoogleAuthenticationState.Required,
+        };
+        viewModel.ApplyState(coordinator.State);
+        Assert.False(viewModel.IsGoogleChecking);
+        Assert.True(viewModel.BeginCommand.CanExecute(null));
+    }
+
+    [Fact]
     public async Task UnverifiedCompletedInstallationMustConnectBeforeSetupOrFinish()
     {
         var coordinator = new FakeSideyCoordinator

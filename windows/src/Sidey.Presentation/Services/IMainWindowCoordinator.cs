@@ -35,11 +35,19 @@ public interface IMainWindowCoordinator : IOnboardingCoordinator
 
     public Task LeaveRoomAsync(Guid roomId, CancellationToken cancellationToken = default);
 
+    public Task SignOutAsync(CancellationToken cancellationToken = default);
+
+    public Task DeleteAccountAsync(CancellationToken cancellationToken = default);
+
     public Task<bool> CopyInviteCodeAsync(Guid roomId, CancellationToken cancellationToken = default);
 
     public Task SetOverlayVisibleAsync(bool visible, CancellationToken cancellationToken = default);
 
     public Task SetQuietModeAsync(bool enabled, CancellationToken cancellationToken = default);
+
+    public Task SetGlobalHotkeysAsync(
+        GlobalHotkeySettings settings,
+        CancellationToken cancellationToken = default);
 
     public Task SetShowOfflineMembersAsync(
         bool enabled,

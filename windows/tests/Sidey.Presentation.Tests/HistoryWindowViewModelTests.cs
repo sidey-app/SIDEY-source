@@ -40,7 +40,7 @@ public sealed class HistoryWindowViewModelTests
 
         await viewModel.ActivateAsync();
 
-        Assert.Equal("최근 메시지 · 테스트", viewModel.Title);
+        Assert.Equal("최근 기록", viewModel.Title);
         Assert.Equal(["최신", "이전"], viewModel.Items.Select(item => item.Body));
         Assert.Equal(
             newerTime.ToLocalTime().ToString("g", CultureInfo.CurrentCulture),

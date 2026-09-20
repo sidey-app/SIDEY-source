@@ -1,3 +1,4 @@
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -10,9 +11,7 @@ using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
-using Windows.Graphics.Imaging;
-using Windows.Storage;
-using Windows.Storage.Streams;
+using Windows.System;
 using Windows.UI.ViewManagement;
 
 namespace Sidey.App.Views;
@@ -40,6 +39,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
     private readonly HashSet<Guid> _roomExpansionAnimations = [];
     private bool _hideQueued;
     private bool _isClosed;
+    private bool _hotkeyRecordingActive;
     private string _currentNavigationTag = "profile";
     private readonly Stack<string> _navigationHistory = new();
     private readonly WindowsMinimumSizeController _minimumSizeController;
@@ -110,6 +110,101 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
     }
 
     public MainWindowViewModel ViewModel { get; }
+
+    public event Action<bool>? HotkeyRecordingChanged;
+
+    private void OnHotkeyRecorderClick(object sender, RoutedEventArgs args)
+    {
+        if (sender is not Button button || HotkeyActionFor(button) is not { } action)
+            return;
+        ViewModel.BeginHotkeyRecording(action);
+        SetHotkeyRecordingActive(true);
+        button.Focus(FocusState.Programmatic);
+    }
+
+    private void OnHotkeyRecorderPreviewKeyDown(object sender, KeyRoutedEventArgs args)
+    {
+        if (sender is not Button button || HotkeyActionFor(button) is not { } action)
+            return;
+        if (!ViewModel.IsHotkeyRecording(action))
+            return;
+
+        GlobalHotkeyModifiers modifiers = CurrentHotkeyModifiers();
+        uint virtualKey = (uint)args.Key;
+        if (args.Key == VirtualKey.Escape)
+        {
+            ViewModel.CancelHotkeyRecording(action);
+            SetHotkeyRecordingActive(false);
+            args.Handled = true;
+            return;
+        }
+        if (GlobalHotkeyBinding.IsModifierKey(virtualKey))
+        {
+            ViewModel.PreviewHotkeyModifiers(action, modifiers);
+            args.Handled = true;
+            return;
+        }
+
+        var binding = new GlobalHotkeyBinding(modifiers, virtualKey);
+        if (!binding.IsValid())
+        {
+            ViewModel.RejectHotkeyRecording(action);
+            args.Handled = true;
+            return;
+        }
+
+        ViewModel.AssignGlobalHotkey(action, binding);
+        SetHotkeyRecordingActive(false);
+        args.Handled = true;
+    }
+
+    private void OnHotkeyRecorderLostFocus(object sender, RoutedEventArgs args)
+    {
+        if (sender is Button button && HotkeyActionFor(button) is { } action)
+        {
+            ViewModel.CancelHotkeyRecording(action);
+            SetHotkeyRecordingActive(false);
+        }
+    }
+
+    private void SetHotkeyRecordingActive(bool active)
+    {
+        if (_hotkeyRecordingActive == active)
+            return;
+        _hotkeyRecordingActive = active;
+        HotkeyRecordingChanged?.Invoke(active);
+    }
+
+    private GlobalHotkeyAction? HotkeyActionFor(Button button)
+    {
+        if (ReferenceEquals(button, OverlayHotkeyRecorder))
+            return GlobalHotkeyAction.ToggleOverlay;
+        if (ReferenceEquals(button, QuietModeHotkeyRecorder))
+            return GlobalHotkeyAction.ToggleQuietMode;
+        if (ReferenceEquals(button, ComposerHotkeyRecorder))
+            return GlobalHotkeyAction.Compose;
+        if (ReferenceEquals(button, HistoryHotkeyRecorder))
+            return GlobalHotkeyAction.History;
+        return null;
+    }
+
+    private static GlobalHotkeyModifiers CurrentHotkeyModifiers()
+    {
+        GlobalHotkeyModifiers modifiers = GlobalHotkeyModifiers.None;
+        if (IsKeyDown(VirtualKey.Control))
+            modifiers |= GlobalHotkeyModifiers.Control;
+        if (IsKeyDown(VirtualKey.Menu))
+            modifiers |= GlobalHotkeyModifiers.Alt;
+        if (IsKeyDown(VirtualKey.Shift))
+            modifiers |= GlobalHotkeyModifiers.Shift;
+        if (IsKeyDown(VirtualKey.LeftWindows) || IsKeyDown(VirtualKey.RightWindows))
+            modifiers |= GlobalHotkeyModifiers.Windows;
+        return modifiers;
+    }
+
+    private static bool IsKeyDown(VirtualKey key) =>
+        (InputKeyboardSource.GetKeyStateForCurrentThread(key)
+            & Windows.UI.Core.CoreVirtualKeyStates.Down) != 0;
 
     private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
     {
@@ -184,500 +279,6 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
     }
 
     public bool ShouldExitOnClose => _allowClose || !_trayAvailable;
-
-    internal async Task VerifyExternalAssetsSmokeAsync()
-    {
-        Activate();
-        var image = (BitmapImage)((ImageIconSource)AppTitleBar.IconSource).ImageSource;
-        StorageFile iconFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(image.UriSource.LocalPath);
-        using IRandomAccessStreamWithContentType iconStream = await iconFile.OpenReadAsync();
-        BitmapDecoder decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(iconStream);
-        if (decoder.PixelWidth != 20 || decoder.PixelHeight != 20)
-        {
-            throw new InvalidOperationException("The external title bar icon file is not 20x20.");
-        }
-        DateTimeOffset deadline = DateTimeOffset.UtcNow.AddSeconds(15);
-        while (image.PixelWidth == 0 && DateTimeOffset.UtcNow < deadline)
-        {
-            await Task.Delay(25);
-        }
-        // XAML may decode the displayed icon at its rendered size for the current DPI.
-        // Validate the source dimensions above and successful UI decoding separately.
-        StartupDiagnostics.Stage($"external-assets-smoke-decoded width={image.PixelWidth} height={image.PixelHeight}");
-        if (image.PixelWidth <= 0 || image.PixelHeight <= 0)
-        {
-            throw new InvalidOperationException("The external title bar icon did not decode for display.");
-        }
-        StartupDiagnostics.Stage("external-assets-smoke-complete titlebar-icon=20x20");
-    }
-
-    internal void VerifyLocalCatalogLoadingSmoke()
-    {
-        if (!ViewModel.IsRemoteContentLoading
-            || CharacterSelector.Visibility != Visibility.Visible
-            || BubbleSelector.Visibility != Visibility.Visible
-            || ThrowableSelector.Visibility != Visibility.Visible
-            || !ViewModel.CharacterSelections.Select(character => character.Id)
-                .SequenceEqual(
-                    PixelCharacterCatalog.Selectable.Select(character => character.Id),
-                    StringComparer.Ordinal)
-            || ViewModel.BubbleSelections.Count != 1
-            || ViewModel.ThrowableSelections.Count != 1)
-        {
-            throw new InvalidOperationException(
-                "Local catalog smoke: default selections were hidden during remote loading.");
-        }
-
-        string cachedCharacterId = PixelCharacterCatalog.NormalizeId(
-            _coordinator.State.Preferences.CachedCharacterId);
-        bool cachedCharacterIsFree = PixelCharacterCatalog.Selectable.Any(character =>
-            StringComparer.Ordinal.Equals(character.Id, cachedCharacterId));
-        CharacterSelectionItemViewModel[] selectedCharacters = [.. ViewModel.CharacterSelections.Where(
-            character => character.IsSelected)];
-        if (cachedCharacterIsFree
-            ? selectedCharacters.Length != 1
-                || !StringComparer.Ordinal.Equals(selectedCharacters[0].Id, cachedCharacterId)
-            : selectedCharacters.Length != 0)
-        {
-            throw new InvalidOperationException(
-                "Local catalog smoke: cached character selection was guessed incorrectly.");
-        }
-
-        StartupDiagnostics.Stage("local-catalog-loading-smoke-complete");
-    }
-
-    internal async Task VerifySoundControlsSmokeAsync()
-    {
-        ShowPage("settings");
-        await Task.Delay(60);
-        if (CharacterSoundVolumeSlider.CompletionThumbCount == 0)
-            throw new InvalidOperationException("Sound controls smoke: slider Thumb completion is not connected.");
-        int originalVolume = _coordinator.State.Preferences.CharacterSoundEffectsVolume;
-        bool originalEnabled = _coordinator.State.Preferences.CharacterSoundEffectsEnabled;
-        try
-        {
-            CharacterSoundVolumeSlider.Value = 37;
-            DateTimeOffset deadline = DateTimeOffset.UtcNow.AddSeconds(2);
-            while (ViewModel.CharacterSoundEffectsVolume != 37 && DateTimeOffset.UtcNow < deadline)
-                await Task.Delay(10);
-            await ViewModel.FlushSoundSettingsAsync();
-            if (_coordinator.State.Preferences.CharacterSoundEffectsVolume != 37
-                || ViewModel.CharacterSoundVolumeLabel != "37%")
-            {
-                StartupDiagnostics.Stage($"sound-controls-failed slider={CharacterSoundVolumeSlider.Value} model={ViewModel.CharacterSoundEffectsVolume} saved={_coordinator.State.Preferences.CharacterSoundEffectsVolume}");
-                throw new InvalidOperationException("Sound controls smoke: slider did not save its value.");
-            }
-            ViewModel.CompleteSoundVolumeAdjustment();
-            await ExportSoundCardSmokeAsync("enabled");
-            SoundMuteButton.Command.Execute(null);
-            await ViewModel.FlushSoundSettingsAsync();
-            if (ViewModel.CharacterSoundEffectsEnabled || ViewModel.CharacterSoundEffectsVolume != 37)
-                throw new InvalidOperationException("Sound controls smoke: mute button lost volume or did not mute.");
-            await ExportSoundCardSmokeAsync("muted");
-            SoundMuteButton.Command.Execute(null);
-            await ViewModel.FlushSoundSettingsAsync();
-            if (!ViewModel.CharacterSoundEffectsEnabled || ViewModel.CharacterSoundEffectsVolume != 37)
-                throw new InvalidOperationException("Sound controls smoke: unmute button failed.");
-            CharacterSoundVolumeSlider.Value = 0;
-            await Task.Delay(30);
-            await ViewModel.FlushSoundSettingsAsync();
-            if (ViewModel.CharacterSoundEffectsEnabled || !CharacterSoundVolumeSlider.IsEnabled)
-                throw new InvalidOperationException("Sound controls smoke: zero volume did not mute or slider was disabled.");
-            CharacterSoundVolumeSlider.Value = 25;
-            await Task.Delay(30);
-            await ViewModel.FlushSoundSettingsAsync();
-            if (!ViewModel.CharacterSoundEffectsEnabled || !_coordinator.State.Preferences.CharacterSoundEffectsEnabled)
-                throw new InvalidOperationException("Sound controls smoke: positive volume did not enable sound.");
-            ViewModel.CompleteSoundVolumeAdjustment();
-            StartupDiagnostics.Stage("sound-controls-smoke-complete slider=0,25,37 mute-button=true");
-        }
-        finally
-        {
-            ViewModel.StopSoundVolumeFeedback();
-            await _coordinator.SaveCharacterSoundEffectsAsync(originalEnabled, originalVolume);
-            _coordinator.ApplyCharacterSoundEffects(originalEnabled, originalVolume);
-            ViewModel.ApplyState(_coordinator.State);
-        }
-    }
-
-    private async Task ExportSoundCardSmokeAsync(string state)
-    {
-        string? root = Environment.GetEnvironmentVariable("SIDEY_STARTUP_SMOKE_DATA_ROOT");
-        if (string.IsNullOrEmpty(root))
-            return;
-        var rendered = new RenderTargetBitmap();
-        await rendered.RenderAsync(SoundSettingsCard);
-        using var stream = new Windows.Storage.Streams.InMemoryRandomAccessStream();
-        BitmapEncoder encoder = await Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(Windows.Graphics.Imaging.BitmapEncoder.PngEncoderId, stream);
-        IBuffer buffer = await rendered.GetPixelsAsync();
-        byte[] pixels = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(buffer);
-        encoder.SetPixelData(Windows.Graphics.Imaging.BitmapPixelFormat.Bgra8,
-            Windows.Graphics.Imaging.BitmapAlphaMode.Premultiplied, (uint)rendered.PixelWidth, (uint)rendered.PixelHeight, 96, 96, pixels);
-        await encoder.FlushAsync();
-        stream.Seek(0);
-        using var reader = new Windows.Storage.Streams.DataReader(stream);
-        await reader.LoadAsync((uint)stream.Size);
-        byte[] png = new byte[(int)stream.Size];
-        reader.ReadBytes(png);
-        await File.WriteAllBytesAsync(Path.Combine(root, $"sound-settings-{state}.png"), png);
-    }
-
-    internal async Task VerifyLiveLanguageSmokeAsync()
-    {
-        ShowPage("about");
-        ViewModel.Nickname = "draft";
-        ViewModel.InviteCode = "ABCDEF";
-        ViewModel.CreateRoomName = "room draft";
-        CharacterSelectionItemViewModel characterItem = ViewModel.CharacterSelections[0];
-        CosmeticSelectionItemViewModel bubbleItem = ViewModel.BubbleSelections[0];
-        StoreProductPreviewViewModel productItem = ViewModel.StoreProducts[0];
-        nint handle = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        var composer = new ComposerWindow(new ComposerViewModel());
-        try
-        {
-            composer.Activate();
-            composer.ViewModel.Draft = "language draft";
-            var input = (TextBox)((FrameworkElement)composer.Content).FindName("MessageInput");
-            await Task.Delay(100);
-            for (int repeat = 0; repeat < 2; repeat++)
-            {
-                foreach ((string? language, int index) in new[]
-                {
-                    ("en-US", 1), ("ja-JP", 2), ("zh-CN", 3), ("zh-TW", 4),
-                    ("uk-UA", 5), ("ru-RU", 6), ("ko-KR", 0),
-                })
-                {
-                    LanguageComboBox.SelectedIndex = index;
-                    DateTimeOffset deadline = DateTimeOffset.UtcNow.AddSeconds(4);
-                    while ((I18n.Language != language || !ViewModel.IsLanguageSelectionEnabled)
-                           && DateTimeOffset.UtcNow < deadline)
-                        await Task.Delay(25);
-                    await Task.Delay(40);
-                    if (I18n.Language != language
-                        || LanguageDescriptionText.Text != I18n.Get("settings.languageDescription")
-                        || ((NavigationViewItem)RootNavigation.MenuItems[0]).Content as string != I18n.Get("navigation.profile")
-                        || characterItem.DisplayName != Sidey.Core.Domain.PixelCharacterCatalog.Get(characterItem.Id).DisplayName
-                        || bubbleItem.DisplayName != I18n.Get("profile.defaultBubble")
-                        || !ReferenceEquals(productItem, ViewModel.StoreProducts[0]))
-                    {
-                        StartupDiagnostics.Stage($"live-language-smoke-failed expected={language} actual={I18n.Language} selected={LanguageComboBox.SelectedIndex} model={ViewModel.SelectedLanguageIndex} enabled={ViewModel.IsLanguageSelectionEnabled} text={LanguageDescriptionText.Text == I18n.Get("settings.languageDescription")}");
-                        throw new InvalidOperationException("Live language smoke: text or selection did not update in place.");
-                    }
-                    if (handle != WinRT.Interop.WindowNative.GetWindowHandle(this)
-                        || ViewModel.Nickname != "draft" || ViewModel.InviteCode != "ABCDEF"
-                        || ViewModel.CreateRoomName != "room draft" || composer.ViewModel.Draft != "language draft"
-                        || input.PlaceholderText != I18n.Get("composer.placeholder"))
-                        throw new InvalidOperationException("Live language smoke: window or draft was replaced.");
-                }
-            }
-        }
-        finally { composer.Close(); }
-        StartupDiagnostics.Stage("live-language-smoke-complete changes=6 drafts-preserved=true");
-    }
-
-    internal async Task VerifyStoreScrollingSmokeAsync()
-    {
-        bool wasLoading = ViewModel.IsStoreLoading;
-        int originalKind = ViewModel.SelectedStoreKindIndex;
-        double originalWidth = StorePage.Width;
-        double originalHeight = StorePage.Height;
-        StoreProductPreviewViewModel longNameProduct = ViewModel.StoreProducts.First(
-            product => product.Kind == CommerceProductKind.Throwable);
-        string originalName = longNameProduct.DisplayName;
-        try
-        {
-            ShowPage("store");
-            ViewModel.IsStoreLoading = false;
-            ViewModel.SelectedStoreKindIndex = (int)CommerceProductKind.Throwable;
-            longNameProduct.DisplayName = string.Concat(Enumerable.Repeat("긴 상품 이름 ", 12));
-            StorePage.Height = 360;
-            foreach (double width in new[] { 620d, 400d })
-            {
-                StorePage.Width = width;
-                StorePage.ChangeView(null, 0, null, disableAnimation: true);
-                StorePage.UpdateLayout();
-                await WaitForNextFrameAsync();
-                StorePage.UpdateLayout();
-                double extent = StorePage.ExtentHeight;
-                double bottom = StorePage.ScrollableHeight;
-                IReadOnlyList<StoreProductPreviewViewModel> products = ViewModel.VisibleStoreProducts;
-                if (products.Count < 2 || !products.Contains(longNameProduct))
-                    throw new InvalidOperationException("Store scrolling smoke requires the unfiltered throwable catalog.");
-                var positions = new Dictionary<int, Windows.Foundation.Point>();
-                int steps = Math.Max(1, (int)Math.Ceiling(bottom / (StorePage.ViewportHeight * .75)));
-                double[] offsets = [.. Enumerable.Range(0, steps + 1).Select(step => bottom * step / steps)];
-                foreach (double requested in offsets.Concat(offsets.Reverse()).Concat([bottom + 224, 0]))
-                {
-                    double target = Math.Min(requested, bottom);
-                    StorePage.ChangeView(null, requested, null, disableAnimation: true);
-                    await WaitForNextFrameAsync();
-                    await WaitForNextFrameAsync();
-                    StorePage.UpdateLayout();
-                    if (!ReferenceEquals(products, ViewModel.VisibleStoreProducts)
-                        || Math.Abs(StorePage.ExtentHeight - extent) > 1
-                        || Math.Abs(StorePage.VerticalOffset - target) > 1)
-                    {
-                        StartupDiagnostics.Stage($"store-scroll-unstable width={width} target={target} offset={StorePage.VerticalOffset} extent={StorePage.ExtentHeight} initial={extent} products={ViewModel.VisibleStoreProducts.Count} initial-products={products.Count}");
-                        throw new InvalidOperationException("Store scrolling changed the content extent or jumped away from its requested position.");
-                    }
-                    var visibleCards = new List<Windows.Foundation.Rect>();
-                    for (int index = 0; index < products.Count; index++)
-                    {
-                        if (StoreProductRepeater.TryGetElement(index) is not FrameworkElement card)
-                            continue;
-                        Windows.Foundation.Rect visibleBounds = card.TransformToVisual(StorePage).TransformBounds(
-                            new Windows.Foundation.Rect(0, 0, card.ActualWidth, card.ActualHeight));
-                        if (visibleBounds.Bottom <= 0 || visibleBounds.Top >= StorePage.ViewportHeight)
-                            continue;
-                        if (visibleCards.Any(bounds => visibleBounds.Left < bounds.Right - 1
-                            && visibleBounds.Right > bounds.Left + 1
-                            && visibleBounds.Top < bounds.Bottom - 1
-                            && visibleBounds.Bottom > bounds.Top + 1))
-                            throw new InvalidOperationException("Store scrolling overlapped visible product cards.");
-                        visibleCards.Add(visibleBounds);
-                        if (!ReferenceEquals(card.DataContext, products[index]))
-                        {
-                            StartupDiagnostics.Stage($"store-scroll-wrong-product index={index}");
-                            throw new InvalidOperationException("Store scrolling recycled a card with the wrong product.");
-                        }
-                        Windows.Foundation.Point position = card.TransformToVisual(StoreResultsHost)
-                            .TransformPoint(new Windows.Foundation.Point());
-                        if (positions.TryGetValue(index, out Windows.Foundation.Point previous)
-                            && (Math.Abs(previous.X - position.X) > 1 || Math.Abs(previous.Y - position.Y) > 1))
-                        {
-                            StartupDiagnostics.Stage($"store-scroll-moved index={index} old-x={previous.X} old-y={previous.Y} new-x={position.X} new-y={position.Y}");
-                            throw new InvalidOperationException("Store scrolling moved an existing product to a different row.");
-                        }
-                        positions[index] = position;
-                        TextBlock name = FindStoreText(card, "StoreProductName")
-                            ?? throw new InvalidOperationException("Store product name is missing.");
-                        TextBlock price = FindStoreText(card, "StoreProductPrice")
-                            ?? throw new InvalidOperationException("Store product price is missing.");
-                        double nameBottom = name.TransformToVisual(card).TransformPoint(new Windows.Foundation.Point()).Y + name.ActualHeight;
-                        double priceTop = price.TransformToVisual(card).TransformPoint(new Windows.Foundation.Point()).Y;
-                        if (name.MaxLines != 2 || name.TextWrapping != TextWrapping.Wrap
-                            || name.TextTrimming != TextTrimming.CharacterEllipsis
-                            || nameBottom > priceTop + 1 || priceTop + price.ActualHeight > card.ActualHeight + 1)
-                            throw new InvalidOperationException("Store name and price do not fit inside the card.");
-                        if (ReferenceEquals(products[index], longNameProduct)
-                            && (!name.IsTextTrimmed || name.ActualHeight < name.FontSize * 2))
-                            throw new InvalidOperationException("A long store name did not occupy two lines with an ellipsis.");
-                    }
-                }
-                if (positions.Count != products.Count)
-                    throw new InvalidOperationException("Store scrolling did not reach every product.");
-                StartupDiagnostics.Stage($"store-scroll-width-complete width={width} products={positions.Count} extent={extent}");
-            }
-            StartupDiagnostics.Stage("store-scroll-smoke-complete");
-        }
-        finally
-        {
-            StorePage.Width = originalWidth;
-            StorePage.Height = originalHeight;
-            longNameProduct.DisplayName = originalName;
-            ViewModel.SelectedStoreKindIndex = originalKind;
-            ViewModel.IsStoreLoading = wasLoading;
-            StorePage.ChangeView(null, 0, null, disableAnimation: true);
-        }
-    }
-
-    private static T? FindVisualChild<T>(DependencyObject root) where T : DependencyObject
-    {
-        for (int index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
-        {
-            DependencyObject child = VisualTreeHelper.GetChild(root, index);
-            if (child is T match)
-                return match;
-            if (FindVisualChild<T>(child) is { } nested)
-                return nested;
-        }
-        return null;
-    }
-
-    private static TextBlock? FindStoreText(DependencyObject root, string automationId)
-    {
-        for (int index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
-        {
-            DependencyObject child = VisualTreeHelper.GetChild(root, index);
-            if (child is TextBlock text
-                && Microsoft.UI.Xaml.Automation.AutomationProperties.GetAutomationId(text) == automationId)
-                return text;
-            if (FindStoreText(child, automationId) is { } match)
-                return match;
-        }
-        return null;
-    }
-
-    private static async Task WaitForNextFrameAsync()
-    {
-        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        void OnRendering(object? sender, object args) => completion.TrySetResult();
-        CompositionTarget.Rendering += OnRendering;
-        try
-        {
-            await completion.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        }
-        finally
-        {
-            CompositionTarget.Rendering -= OnRendering;
-        }
-    }
-
-    internal async Task VerifyStoreFilterToggleSmokeAsync()
-    {
-        string originalSearchText = ViewModel.StoreSearchText;
-        int originalKindIndex = ViewModel.SelectedStoreKindIndex;
-        int originalSortIndex = ViewModel.SelectedStoreSortIndex;
-        bool originallyHidesOwned = ViewModel.HidesOwnedStoreProducts;
-        try
-        {
-            ShowPage("store");
-            if (StoreCharacterKindChip.IsChecked != true)
-            {
-                throw new InvalidOperationException(
-                    "Store filter smoke: character was not the default product kind.");
-            }
-
-            StoreFilterToggle.IsChecked = false;
-            SetStoreFilterPanelExpanded(false);
-            StoreFilterToggle.UpdateLayout();
-            ContentPresenter? filterPresenter = FindNamedDescendant<ContentPresenter>(
-                StoreFilterToggle,
-                "FilterTogglePresenter");
-            if (filterPresenter is null
-                || !IsTransparentBrush(filterPresenter.Background)
-                || filterPresenter.BorderThickness.Left != 0
-                || StoreResetFiltersButton.BorderThickness.Left == 0)
-            {
-                throw new InvalidOperationException(
-                    "Store filter smoke: closed and reset button surfaces are incorrect.");
-            }
-
-            StoreFilterToggle.IsChecked = true;
-            OnStoreFilterToggleClick(StoreFilterToggle, new RoutedEventArgs());
-            await _storeFilterTransition;
-            StoreFilterToggle.UpdateLayout();
-            filterPresenter = FindNamedDescendant<ContentPresenter>(
-                StoreFilterToggle,
-                "FilterTogglePresenter");
-            if (StoreFilterPanel.Visibility != Visibility.Visible)
-            {
-                throw new InvalidOperationException("Store filter smoke: panel did not open.");
-            }
-            if (StoreFilterChevron.RenderTransform is not RotateTransform { Angle: 180 })
-            {
-                throw new InvalidOperationException("Store filter smoke: chevron did not rotate open.");
-            }
-            if (filterPresenter is null
-                || IsTransparentBrush(filterPresenter.Background)
-                || filterPresenter.BorderThickness.Left == 0)
-            {
-                throw new InvalidOperationException(
-                    "Store filter smoke: open filter did not use a neutral surface.");
-            }
-
-            StorePage.UpdateLayout();
-            double initialContentWidth = StorePageContent.ActualWidth;
-            double initialContentOffset = StorePageContent
-                .TransformToVisual(StorePage)
-                .TransformPoint(new Windows.Foundation.Point())
-                .X;
-
-            await WaitForLoadedAsync(StoreSearchTextBox);
-            if (!StoreSearchTextBox.Focus(FocusState.Programmatic))
-            {
-                throw new InvalidOperationException("Store filter smoke: search input did not receive focus.");
-            }
-
-            StoreSearchTextBox.Text = "x";
-            QueueStoreSearchUpdate();
-            StoreSearchTextBox.Text = "xz";
-            QueueStoreSearchUpdate();
-            StoreSearchTextBox.Text = "xz-no-sidey-product";
-            QueueStoreSearchUpdate();
-            await WaitForDispatcherTurnAsync();
-            StorePage.UpdateLayout();
-            double emptyContentOffset = StorePageContent
-                .TransformToVisual(StorePage)
-                .TransformPoint(new Windows.Foundation.Point())
-                .X;
-            if (!StringComparer.Ordinal.Equals(ViewModel.StoreSearchText, "xz-no-sidey-product")
-                || ViewModel.HasVisibleStoreProducts
-                || Math.Abs(StorePageContent.ActualWidth - initialContentWidth) > 0.5
-                || Math.Abs(emptyContentOffset - initialContentOffset) > 0.5
-                || StoreFilterPanel.Visibility != Visibility.Visible)
-            {
-                throw new InvalidOperationException(
-                    "Store filter smoke: empty search results changed the content frame.");
-            }
-
-            ViewModel.SelectedStoreSortIndex = 2;
-            ViewModel.HidesOwnedStoreProducts = true;
-            StoreThrowableKindChip.IsChecked = true;
-            OnResetStoreFiltersClick(StoreResetFiltersButton, new RoutedEventArgs());
-            if (StoreSearchTextBox.Text.Length != 0
-                || ViewModel.StoreSearchText.Length != 0
-                || ViewModel.SelectedStoreKindIndex != (int)CommerceProductKind.Throwable
-                || StoreThrowableKindChip.IsChecked != true
-                || ViewModel.SelectedStoreSortIndex != 0
-                || ViewModel.HidesOwnedStoreProducts)
-            {
-                throw new InvalidOperationException(
-                    "Store filter smoke: reset did not restore filters while preserving product kind.");
-            }
-            StoreSearchTextBox.Text = "xz-no-sidey-product";
-            QueueStoreSearchUpdate();
-            await WaitForDispatcherTurnAsync();
-
-            StoreFilterToggle.IsChecked = false;
-            OnStoreFilterToggleClick(StoreFilterToggle, new RoutedEventArgs());
-            await _storeFilterTransition;
-            StoreFilterToggle.UpdateLayout();
-            filterPresenter = FindNamedDescendant<ContentPresenter>(
-                StoreFilterToggle,
-                "FilterTogglePresenter");
-            if (StoreFilterPanel.Visibility != Visibility.Collapsed
-                || !StringComparer.Ordinal.Equals(StoreSearchTextBox.Text, "xz-no-sidey-product")
-                || !StringComparer.Ordinal.Equals(ViewModel.StoreSearchText, "xz-no-sidey-product")
-                || StoreFilterChevron.RenderTransform is not RotateTransform { Angle: 0 }
-                || filterPresenter is null
-                || !IsTransparentBrush(filterPresenter.Background)
-                || filterPresenter.BorderThickness.Left != 0)
-            {
-                StartupDiagnostics.Stage(
-                    $"store-filter-toggle-smoke-failed visibility={StoreFilterPanel.Visibility} query-retained={StringComparer.Ordinal.Equals(StoreSearchTextBox.Text, "xz-no-sidey-product")} query-applied={StringComparer.Ordinal.Equals(ViewModel.StoreSearchText, "xz-no-sidey-product")}");
-                throw new InvalidOperationException(
-                    "Store filter smoke: focused search did not close while preserving its query.");
-            }
-
-            StartupDiagnostics.Stage(
-                "store-filter-toggle-smoke-complete focused-search=true query-preserved=true");
-        }
-        finally
-        {
-            ViewModel.StoreSearchText = originalSearchText;
-            // A collapsed search field can still have a queued TextChanged callback.
-            // Restore its input as well as the model before the next smoke test runs.
-            StoreSearchTextBox.Text = originalSearchText;
-            ViewModel.SelectedStoreSortIndex = originalSortIndex;
-            ViewModel.HidesOwnedStoreProducts = originallyHidesOwned;
-            RadioButton originalKindChip = originalKindIndex switch
-            {
-                (int)CommerceProductKind.Bubble => StoreBubbleKindChip,
-                (int)CommerceProductKind.Throwable => StoreThrowableKindChip,
-                _ => StoreCharacterKindChip,
-            };
-            originalKindChip.IsChecked = true;
-            StoreFilterToggle.IsChecked = false;
-            SetStoreFilterPanelExpanded(false);
-            await WaitForDispatcherTurnAsync();
-            if (!StringComparer.Ordinal.Equals(ViewModel.StoreSearchText, originalSearchText)
-                || !StringComparer.Ordinal.Equals(StoreSearchTextBox.Text, originalSearchText))
-            {
-                throw new InvalidOperationException("Store filter smoke: search state was not restored.");
-            }
-        }
-    }
 
     public void ApplyState(CoordinatorState state)
     {
@@ -917,112 +518,6 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         return content;
     }
 
-    internal static async Task VerifyStorePreviewLayoutAsync(ContentDialog dialog)
-    {
-        var scroll = (ScrollViewer)dialog.Content;
-        if (!scroll.IsLoaded)
-        {
-            var loaded = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            void OnLoaded(object sender, RoutedEventArgs args) => loaded.TrySetResult();
-            scroll.Loaded += OnLoaded;
-            try
-            {
-                await loaded.Task.WaitAsync(TimeSpan.FromSeconds(10));
-            }
-            finally
-            {
-                scroll.Loaded -= OnLoaded;
-            }
-        }
-        scroll.UpdateLayout();
-        var content = (StackPanel)scroll.Content;
-        if (scroll.ViewportWidth <= 0 || content.ActualWidth > scroll.ViewportWidth + 1)
-        {
-            throw new InvalidOperationException("Store detail content exceeds its viewport width.");
-        }
-        async Task VerifyChildrenAsync(DependencyObject parent)
-        {
-            for (int index = 0; index < VisualTreeHelper.GetChildrenCount(parent); index++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(parent, index);
-                if (child is Viewbox { Child: StorePreviewStage stage })
-                {
-                    Windows.Foundation.Rect bounds = stage.TransformToVisual(content).TransformBounds(
-                        new Windows.Foundation.Rect(0, 0, stage.ActualWidth, stage.ActualHeight));
-                    if (bounds.Left < -1 || bounds.Right > content.ActualWidth + 1)
-                    {
-                        throw new InvalidOperationException("Store preview stage is clipped horizontally.");
-                    }
-                }
-                if (child is StoreProductArtwork artwork)
-                {
-                    Windows.Foundation.Point position = artwork.TransformToVisual(content).TransformPoint(new Windows.Foundation.Point());
-                    if (position.X < -1 || position.X + artwork.ActualWidth > content.ActualWidth + 1)
-                    {
-                        throw new InvalidOperationException("Store detail artwork is clipped horizontally.");
-                    }
-                    scroll.ChangeView(null, position.Y, null, disableAnimation: true);
-                    scroll.UpdateLayout();
-                    await artwork.VerifyRenderedArtworkAsync();
-                }
-                else
-                {
-                    await VerifyChildrenAsync(child);
-                }
-            }
-        }
-        await VerifyChildrenAsync(content);
-        scroll.ChangeView(null, 0, null, disableAnimation: true);
-        StartupDiagnostics.Stage("store-detail-layout-smoke-complete");
-    }
-
-    internal static async Task VerifyStorePurchaseButtonAsync(XamlRoot xamlRoot)
-    {
-        CommerceProduct catalogProduct = WindowsCommerceCatalog.Products[0];
-        int calls = 0;
-        var invoked = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var product = new StoreProductPreviewViewModel(catalogProduct, "Purchase smoke", "", "",
-            () => { calls++; invoked.TrySetResult(); return Task.CompletedTask; }, () => { });
-        var state = new CommerceProductState(catalogProduct, GoogleConnected: true, CommercePurchaseState.Available);
-        product.Apply(state, commerceEnabled: true, isOwned: false);
-        Border card = CreateStoreDetailCard(product, isKeepsake: false);
-        var dialog = new ContentDialog { XamlRoot = xamlRoot, Content = card, CloseButtonText = "Close" };
-        var opened = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        dialog.Opened += (_, _) => opened.TrySetResult();
-        Windows.Foundation.IAsyncOperation<ContentDialogResult> showing = dialog.ShowAsync();
-        try
-        {
-            await opened.Task.WaitAsync(TimeSpan.FromSeconds(10));
-            var footer = (StackPanel)((Grid)card.Child).Children.Last();
-            if (footer.Children.Last() is not Button button
-                || !ReferenceEquals(button.Command, product.ActionCommand)
-                || !button.IsEnabled || !Equals(button.Content, product.DetailStatusText))
-                throw new InvalidOperationException("Store purchase button is not connected.");
-            var peer = new Microsoft.UI.Xaml.Automation.Peers.ButtonAutomationPeer(button);
-            var invoke = (Microsoft.UI.Xaml.Automation.Provider.IInvokeProvider)peer.GetPattern(
-                Microsoft.UI.Xaml.Automation.Peers.PatternInterface.Invoke);
-            invoke.Invoke();
-            await invoked.Task.WaitAsync(TimeSpan.FromSeconds(10));
-            if (calls != 1)
-                throw new InvalidOperationException("Store purchase button did not invoke exactly once.");
-            product.Apply(state with { IsWorking = true }, commerceEnabled: true, isOwned: false);
-            if (button.IsEnabled)
-                throw new InvalidOperationException("Working store product remains purchasable.");
-            product.Apply(state, commerceEnabled: true, isOwned: true);
-            if (button.IsEnabled || !Equals(button.Content, product.DetailStatusText))
-                throw new InvalidOperationException("Owned store product remains purchasable.");
-            product.Apply(state, commerceEnabled: false, isOwned: false);
-            if (button.IsEnabled)
-                throw new InvalidOperationException("Preview-only store product remains purchasable.");
-            StartupDiagnostics.Stage("store-purchase-button-smoke-complete");
-        }
-        finally
-        {
-            dialog.Hide();
-            await showing;
-        }
-    }
-
     private static Border CreateStoreDetailCard(StoreProductPreviewViewModel product, bool isKeepsake)
     {
         var content = new Grid { RowSpacing = 12 };
@@ -1250,6 +745,73 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             Title = I18n.Get("dialogs.deleteRoomFinalTitle"),
             Content = I18n.Format("dialogs.deleteRoomFinalBody", roomName),
             PrimaryButtonText = I18n.Get("common.delete"),
+            CloseButtonText = I18n.Get("common.cancel"),
+            DefaultButton = ContentDialogButton.Close,
+        };
+        try
+        {
+            return await finalDialog.ShowAsync() == ContentDialogResult.Primary;
+        }
+        catch (Exception) when (_isClosed)
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> ConfirmSignOutAsync()
+    {
+        if (ActiveXamlRoot() is not { } xamlRoot)
+            return false;
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = xamlRoot,
+            Title = I18n.Get("about.signOutTitle"),
+            Content = I18n.Get("about.signOutBody"),
+            PrimaryButtonText = I18n.Get("about.signOutPrimary"),
+            CloseButtonText = I18n.Get("common.cancel"),
+            DefaultButton = ContentDialogButton.Close,
+        };
+        try
+        {
+            return await dialog.ShowAsync() == ContentDialogResult.Primary;
+        }
+        catch (Exception) when (_isClosed)
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> ConfirmAccountDeletionAsync()
+    {
+        if (ActiveXamlRoot() is not { } xamlRoot)
+            return false;
+
+        var impactDialog = new ContentDialog
+        {
+            XamlRoot = xamlRoot,
+            Title = I18n.Get("about.deleteAccountTitle"),
+            Content = I18n.Get("about.deleteAccountBody"),
+            PrimaryButtonText = I18n.Get("about.deleteAccountContinue"),
+            CloseButtonText = I18n.Get("common.cancel"),
+            DefaultButton = ContentDialogButton.Close,
+        };
+        try
+        {
+            if (await impactDialog.ShowAsync() != ContentDialogResult.Primary)
+                return false;
+        }
+        catch (Exception) when (_isClosed)
+        {
+            return false;
+        }
+
+        var finalDialog = new ContentDialog
+        {
+            XamlRoot = xamlRoot,
+            Title = I18n.Get("about.deleteAccountFinalTitle"),
+            Content = I18n.Get("about.deleteAccountFinalBody"),
+            PrimaryButtonText = I18n.Get("about.deleteAccountPrimary"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
@@ -1538,11 +1100,6 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
 
         return null;
     }
-
-    private static bool IsTransparentBrush(Brush? brush) =>
-        brush is null
-        || brush.Opacity <= 0
-        || brush is SolidColorBrush { Color.A: 0 };
 
     private static Task AnimateChevronAsync(FontIcon? chevron, bool expanding)
     {
@@ -1916,27 +1473,6 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         await completion.Task.WaitAsync(TimeSpan.FromSeconds(2));
     }
 
-    private static async Task WaitForLoadedAsync(FrameworkElement element)
-    {
-        if (element.IsLoaded)
-        {
-            return;
-        }
-
-        var completion = new TaskCompletionSource(
-            TaskCreationOptions.RunContinuationsAsynchronously);
-        RoutedEventHandler onLoaded = (_, _) => completion.TrySetResult();
-        element.Loaded += onLoaded;
-        try
-        {
-            await completion.Task.WaitAsync(TimeSpan.FromSeconds(2));
-        }
-        finally
-        {
-            element.Loaded -= onLoaded;
-        }
-    }
-
     private void OnNoticeRaised(NoticeMessage notice)
     {
         if (_isClosed)
@@ -1996,6 +1532,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
     {
         _ = sender;
         _ = args;
+        SetHotkeyRecordingActive(false);
         PrepareForClose();
         AppWindow.Closing -= OnAppWindowClosing;
         Closed -= OnWindowClosed;

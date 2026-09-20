@@ -74,7 +74,9 @@ public sealed partial class OnboardingViewModel : ObservableObject, IDisposable
     public partial string? ErrorMessage { get; set; }
 
     public bool IsGooglePending => _state.GoogleAuthentication == GoogleAuthenticationState.SigningIn;
-    public bool CanBegin => !IsWorking && !IsGooglePending;
+    public bool IsGoogleChecking => _state.GoogleAuthentication == GoogleAuthenticationState.Checking;
+    public bool CanBegin => !IsWorking
+        && _state.GoogleAuthentication is GoogleAuthenticationState.Required or GoogleAuthenticationState.Verified;
     public string BeginLabel => I18n.Get(_state.GoogleVerified ? "onboarding.getStarted" : "onboarding.googleContinue");
 
     public bool IsLanding => Step == 0;
@@ -135,6 +137,7 @@ public sealed partial class OnboardingViewModel : ObservableObject, IDisposable
         else if (becameVerified && !state.Preferences.OnboardingCompleted)
             Step = 1;
         OnPropertyChanged(nameof(IsGooglePending));
+        OnPropertyChanged(nameof(IsGoogleChecking));
         OnPropertyChanged(nameof(CanBegin));
         OnPropertyChanged(nameof(BeginLabel));
         BeginCommand.NotifyCanExecuteChanged();

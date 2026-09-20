@@ -25,6 +25,10 @@ public sealed record AppPreferences(
 {
     public bool TreeMovementPaused { get; init; }
 
+    public ComposerPlacement? ComposerPlacement { get; init; }
+
+    public GlobalHotkeySettings GlobalHotkeys { get; init; } = GlobalHotkeySettings.Default;
+
     public string? Language { get; init; }
 
     public AppThemePreference Theme { get; init; } = AppThemePreference.System;
@@ -32,7 +36,7 @@ public sealed record AppPreferences(
     public bool CharacterSoundEffectsEnabled { get; init; } = true;
     public int CharacterSoundEffectsVolume { get; init; } = 100;
 
-    public const int CurrentSchemaVersion = 5;
+    public const int CurrentSchemaVersion = 7;
 
     public static AppPreferences CreateDefault(long? installationSeed = null) => new(
         SchemaVersion: CurrentSchemaVersion,
@@ -65,5 +69,7 @@ public sealed record AppPreferences(
             ? null
             : PixelCharacterCatalog.NormalizeId(CachedCharacterId),
         OverlayRegion = OverlayRegion ?? OverlayRegionPreference.Default,
+        ComposerPlacement = ComposerPlacement?.Normalize(),
+        GlobalHotkeys = (GlobalHotkeys ?? GlobalHotkeySettings.Default).Normalize(),
     };
 }

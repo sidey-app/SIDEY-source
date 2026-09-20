@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
@@ -39,6 +40,7 @@ public sealed record TrayMenuState(
     Guid? ActiveRoomId)
 {
     public AppThemePreference Theme { get; init; } = AppThemePreference.System;
+    public GlobalHotkeySettings GlobalHotkeys { get; init; } = GlobalHotkeySettings.Default;
 }
 
 public sealed record TrayRoomMenuItem(Guid Id, string Name, int UnreadCount);
@@ -50,6 +52,7 @@ public sealed class TrayIconService : IDisposable
     private const uint RefreshMessage = 0x8000 + 52;
     private const uint NotificationMessage = 0x8000 + 53;
     private const uint GoogleSignInCompleteMessage = 0x8000 + 54;
+    private const uint HotkeySuspensionMessage = 0x8000 + 55;
     private const uint IconId = 1;
     private const uint NotifyIconMessage = 0x1;
     private const uint NotifyIconIcon = 0x2;
@@ -65,6 +68,7 @@ public sealed class TrayIconService : IDisposable
 
     private readonly ManualResetEventSlim _started = new(false);
     private readonly Thread _thread;
+    private TrayHotkeys? _hotkeys;
     private nint _window;
     private nint _icon;
     private nint _baseIcon;
@@ -77,6 +81,7 @@ public sealed class TrayIconService : IDisposable
     private Exception? _startupError;
     private TrayMenuState _state = new(true, false, false, 0, [], null);
     private bool _disposed;
+    private bool _hotkeysSuspended;
 
     private TrayIconService()
     {
@@ -92,7 +97,7 @@ public sealed class TrayIconService : IDisposable
     public event Action<Guid>? RoomSelected;
     public event Action? DisplayTopologyChanged;
 
-    public static TrayIconService Start()
+    public static TrayIconService Start(GlobalHotkeySettings? globalHotkeys = null)
     {
         if (!OperatingSystem.IsWindows())
         {
@@ -100,6 +105,10 @@ public sealed class TrayIconService : IDisposable
         }
 
         var service = new TrayIconService();
+        service._state = service._state with
+        {
+            GlobalHotkeys = (globalHotkeys ?? GlobalHotkeySettings.Default).Normalize(),
+        };
         service._thread.Start();
         if (!service._started.Wait(TimeSpan.FromSeconds(10)))
         {
@@ -118,6 +127,18 @@ public sealed class TrayIconService : IDisposable
         if (_window != nint.Zero)
         {
             NativeMethods.PostMessage(_window, RefreshMessage, nint.Zero, nint.Zero);
+        }
+    }
+
+    public void SetHotkeysSuspended(bool suspended)
+    {
+        if (!_disposed && _window != nint.Zero)
+        {
+            NativeMethods.SendMessage(
+                _window,
+                HotkeySuspensionMessage,
+                suspended ? new nint(1) : nint.Zero,
+                nint.Zero);
         }
     }
 
@@ -242,6 +263,8 @@ public sealed class TrayIconService : IDisposable
             _ownsUnreadIcon = _unreadIcon != nint.Zero;
             _icon = _baseIcon;
             AddIcon();
+            _hotkeys = new TrayHotkeys(_window, _state.GlobalHotkeys);
+            NotifyHotkeyFailures();
             _started.Set();
             while (NativeMethods.GetMessage(out NativeMessage message, nint.Zero, 0, 0) > 0)
             {
@@ -256,6 +279,7 @@ public sealed class TrayIconService : IDisposable
         }
         finally
         {
+            _hotkeys?.Dispose();
             if (_window != nint.Zero)
             {
                 RemoveIcon();
@@ -293,6 +317,47 @@ public sealed class TrayIconService : IDisposable
     {
         NotifyIconData data = CreateIconData();
         NativeMethods.ShellNotifyIcon(2, ref data);
+    }
+
+    private void NotifyHotkeyFailures()
+    {
+        if (_hotkeys is null || _hotkeys.Failures.Count == 0)
+        {
+            return;
+        }
+        foreach (TrayHotkeyFailure failure in _hotkeys.Failures)
+        {
+            Trace.TraceWarning("SIDEY could not register {0}: Win32 error {1}.", failure.Shortcut, failure.ErrorCode);
+        }
+        NotifyIconData data = CreateIconData();
+        data.Flags |= NotifyIconInfo;
+        data.InfoTitle = "SIDEY";
+        data.Info = I18n.Format(
+            "tray.hotkeyRegistrationFailedBody",
+            string.Join(", ", _hotkeys.Failures.Select(failure => failure.Shortcut)));
+        data.InfoFlags = NotifyInfoWarning;
+        _notificationClickCommand = TrayCommand.Open;
+        NativeMethods.ShellNotifyIcon(1, ref data);
+    }
+
+    private void RefreshHotkeys()
+    {
+        if (_hotkeysSuspended)
+        {
+            _hotkeys?.Dispose();
+            _hotkeys = null;
+            return;
+        }
+
+        GlobalHotkeySettings settings = _state.GlobalHotkeys.Normalize();
+        if (_hotkeys?.Settings == settings)
+        {
+            return;
+        }
+
+        _hotkeys?.Dispose();
+        _hotkeys = new TrayHotkeys(_window, settings);
+        NotifyHotkeyFailures();
     }
 
     private NotifyIconData CreateIconData() => new()
@@ -572,7 +637,7 @@ public sealed class TrayIconService : IDisposable
         }
     }
 
-    private static void Append(
+    private void Append(
         nint menu,
         TrayCommand command,
         string label,
@@ -582,10 +647,10 @@ public sealed class TrayIconService : IDisposable
             menu,
             NativeMenuFlags(isChecked: false, isEnabled: isEnabled),
             (nuint)command,
-            label);
+            TrayHotkeys.MenuLabel(command, label, _state.GlobalHotkeys));
     }
 
-    private static void AppendToggle(
+    private void AppendToggle(
         nint menu,
         TrayCommand command,
         string label,
@@ -596,7 +661,7 @@ public sealed class TrayIconService : IDisposable
             menu,
             NativeMenuFlags(isChecked, isEnabled),
             (nuint)command,
-            label);
+            TrayHotkeys.MenuLabel(command, label, _state.GlobalHotkeys));
     }
 
     internal static uint NativeMenuFlags(bool isChecked, bool isEnabled) =>
@@ -633,9 +698,15 @@ public sealed class TrayIconService : IDisposable
 
     private static nint WndProc(nint window, uint message, nint wParam, nint lParam)
     {
-        _ = wParam;
         if (s_instances.TryGetValue(window, out TrayIconService? service))
         {
+            if (message == TrayHotkeys.Message
+                && service._hotkeys is not null
+                && service._hotkeys.TryGetCommand(wParam, out TrayCommand hotkeyCommand))
+            {
+                service.CommandInvoked?.Invoke(hotkeyCommand);
+                return nint.Zero;
+            }
             if (message == TrayMessage)
             {
                 uint mouseMessage = unchecked((uint)(long)lParam) & 0xffff;
@@ -659,12 +730,19 @@ public sealed class TrayIconService : IDisposable
             }
             if (message == RefreshMessage)
             {
+                service.RefreshHotkeys();
                 service._icon = service._state.UnreadCount > 0
                     && service._unreadIcon != nint.Zero
                     ? service._unreadIcon
                     : service._baseIcon;
                 NotifyIconData data = service.CreateIconData();
                 NativeMethods.ShellNotifyIcon(1, ref data);
+                return nint.Zero;
+            }
+            if (message == HotkeySuspensionMessage)
+            {
+                service._hotkeysSuspended = wParam != nint.Zero;
+                service.RefreshHotkeys();
                 return nint.Zero;
             }
             if (message == GoogleSignInCompleteMessage)
@@ -721,6 +799,7 @@ public sealed class TrayIconService : IDisposable
             }
             if (message == 0x0010)
             {
+                service._hotkeys?.Dispose();
                 service.RemoveIcon();
                 NativeMethods.DestroyWindow(window);
                 return nint.Zero;
@@ -870,6 +949,7 @@ public sealed class TrayIconService : IDisposable
         [DllImport("user32.dll")] public static extern bool TranslateMessage(ref NativeMessage message);
         [DllImport("user32.dll")] public static extern nint DispatchMessage(ref NativeMessage message);
         [DllImport("user32.dll")] public static extern bool PostMessage(nint window, uint message, nint wParam, nint lParam);
+        [DllImport("user32.dll")] public static extern nint SendMessage(nint window, uint message, nint wParam, nint lParam);
         [DllImport("user32.dll")] public static extern void PostQuitMessage(int exitCode);
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] public static extern nint GetModuleHandle(string? moduleName);
         [DllImport("shell32.dll", EntryPoint = "Shell_NotifyIconW", CharSet = CharSet.Unicode, SetLastError = true)] public static extern bool ShellNotifyIcon(uint message, ref NotifyIconData data);

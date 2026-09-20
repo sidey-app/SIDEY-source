@@ -1,13 +1,11 @@
 using System.Diagnostics;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
-using Windows.Foundation;
 
 namespace Sidey.App;
 
@@ -25,6 +23,9 @@ public partial class App : Application
     private OnboardingWindow? _onboardingWindow;
     private HistoryWindow? _historyWindow;
     private ComposerWindow? _composer;
+    private ComposerViewModel? _historyComposer;
+    private readonly ComposerTypingOwner _typingOwner = new();
+    private Task _pendingComposerPlacementSave = Task.CompletedTask;
     private AppCoordinator? _coordinator;
     private SingleInstanceGuard? _singleInstance;
     private TrayIconService? _tray;
@@ -105,8 +106,9 @@ public partial class App : Application
                 ? Environment.GetEnvironmentVariable("SIDEY_STARTUP_SMOKE_DATA_ROOT") : null);
         if (!_singleInstance.IsPrimary)
         {
-            _singleInstance.Signal(processArguments);
-            StartupDiagnostics.Stage("secondary-instance-request request=activate");
+            bool delivered = _singleInstance.Signal(processArguments);
+            StartupDiagnostics.Stage(
+                $"secondary-instance-request request=activate delivered={delivered.ToString().ToLowerInvariant()}");
             _singleInstance.Dispose();
             _singleInstance = null;
             StartupDiagnostics.CompleteSession();
@@ -161,7 +163,6 @@ public partial class App : Application
         coordinator.PulseRequested += RequestPulse;
         coordinator.TreeMovementToggleRequested += RequestTreeMovementToggle;
         coordinator.CharacterThrowRequested += RequestCharacterThrow;
-        coordinator.SendFailed += RestoreFailedDraft;
         coordinator.RenderingFailed += OnRenderingFailed;
         coordinator.GroupSetupRequested += OnGroupSetupRequested;
         coordinator.StateChanged += OnCoordinatorStateChanged;
@@ -183,35 +184,11 @@ public partial class App : Application
         if (Environment.GetEnvironmentVariable(WindowsVersionGuard.StartupSmokeEnvironmentVariable) == "1")
         {
             _startupUpdateCheckStarted = true;
-            await EnsureMainWindow().VerifyExternalAssetsSmokeAsync();
-            EnsureMainWindow().VerifyLocalCatalogLoadingSmoke();
-            await EnsureMainWindow().VerifyStoreFilterToggleSmokeAsync();
-            await EnsureMainWindow().VerifyStoreScrollingSmokeAsync();
-            await EnsureMainWindow().VerifySkeletonLoadingSmokeAsync();
-            await EnsureMainWindow().VerifyResponsiveWindowSmokeAsync();
         }
-        await RunStorePreviewStartupSmokeIfRequestedAsync();
-        if (Environment.GetEnvironmentVariable(WindowsVersionGuard.StartupSmokeEnvironmentVariable) == "1"
-            && Environment.GetEnvironmentVariable("SIDEY_OVERLAY_STARTUP_SMOKE") == "1")
-            await coordinator.VerifyStartupOverlaySmokeAsync();
-        if (Environment.GetEnvironmentVariable(WindowsVersionGuard.StartupSmokeEnvironmentVariable) == "1"
-            && Environment.GetEnvironmentVariable("SIDEY_IMPACT_AUDIO_SMOKE") == "1")
-        {
-            await coordinator.VerifyImpactAudioSmokeAsync();
-            await EnsureMainWindow().VerifySoundControlsSmokeAsync();
-        }
-        if (Environment.GetEnvironmentVariable(WindowsVersionGuard.StartupSmokeEnvironmentVariable) == "1"
-            && Environment.GetEnvironmentVariable("SIDEY_LANGUAGE_SMOKE") == "1")
-        {
-            // Exercise local settings and bindings without starting an update request.
-            _startupUpdateCheckStarted = true;
-            await EnsureMainWindow().VerifyLiveLanguageSmokeAsync();
-        }
-        await RunComposerStartupSmokeIfRequestedAsync();
         _singleInstance!.StartListening(RequestPrimaryActivation);
         try
         {
-            _tray = TrayIconService.Start();
+            _tray = TrayIconService.Start(coordinator.State.Preferences.GlobalHotkeys);
             _tray.CommandInvoked += OnTrayCommandInvoked;
             _tray.RoomSelected += OnTrayRoomSelected;
             _tray.DisplayTopologyChanged += OnDisplayTopologyChanged;
@@ -341,6 +318,7 @@ public partial class App : Application
         _mainWindow = new MainWindow(_coordinator, _updateService);
         StartupDiagnostics.Stage("settings-window-created result=success");
         _mainWindow.Closed += OnMainWindowClosed;
+        _mainWindow.HotkeyRecordingChanged += OnHotkeyRecordingChanged;
         _mainWindow.SetTrayAvailable(_tray is not null);
         StartStartupUpdateCheck();
         return _mainWindow;
@@ -508,192 +486,58 @@ public partial class App : Application
 
         if (_composer is null)
         {
-            var viewModel = new ComposerViewModel();
-            viewModel.SendRequested += OnSendRequested;
-            viewModel.TypingChanged += OnTypingChanged;
+            ComposerViewModel viewModel = CreateComposerViewModel(autoCloseAfterSend: true);
             try
             {
                 StartupDiagnostics.Stage("composer-window-create-started");
                 _composer = new ComposerWindow(viewModel);
+                _composer.PlacementChanged += OnComposerPlacementChanged;
                 _composer.ApplyTheme(_coordinator.State.Preferences.Theme);
                 StartupDiagnostics.Stage("composer-window-created");
             }
             catch (Exception exception)
             {
-                viewModel.SendRequested -= OnSendRequested;
-                viewModel.TypingChanged -= OnTypingChanged;
                 viewModel.Dispose();
                 StartupDiagnostics.NonFatal("composer-window-create", exception);
                 return;
             }
         }
 
+        ApplyComposerState(_composer.ViewModel, _coordinator.State);
         _composer.ShowAndFocus(
-            _coordinator.State.Preferences.OverlayRegion.MonitorIdentifier);
+            _coordinator.State.Preferences.OverlayRegion.MonitorIdentifier,
+            _coordinator.State.Preferences.ComposerPlacement);
     }
 
-    private async Task RunStorePreviewStartupSmokeIfRequestedAsync()
+    private ComposerViewModel CreateComposerViewModel(bool autoCloseAfterSend)
     {
-        if (Environment.GetEnvironmentVariable(WindowsVersionGuard.StartupSmokeEnvironmentVariable) != "1"
-            || Environment.GetEnvironmentVariable("SIDEY_STORE_PREVIEW_SMOKE") != "1")
-            return;
-        var window = new Window { Title = "SIDEY Store Preview Smoke" };
-        try
+        var viewModel = new ComposerViewModel(
+            (roomId, body) => _coordinator is { } coordinator && !_shuttingDown
+                ? coordinator.SendMessageAsync(roomId, body)
+                : Task.FromException(new InvalidOperationException(I18n.Get("error.serverNotConfigured"))),
+            autoCloseAfterSend);
+        viewModel.TypingChanged += active =>
         {
-            var host = new Microsoft.UI.Xaml.Controls.Grid();
-            window.Content = host;
-            window.Activate();
-            await Task.Delay(80);
-            await MainWindow.VerifyStorePurchaseButtonAsync(host.XamlRoot);
-            async Task VerifyDialogAsync(Controls.StorePreviewStage stage)
-            {
-                stage.CharacterImpact += _coordinator!.PlayImpactSound;
-                stage.StopSounds += scope => _coordinator.StopImpactSounds(scope);
-                StoreProductPreviewViewModel? product = EnsureMainWindow().ViewModel.StoreProducts.FirstOrDefault(
-                    product => product.Kind == stage.ProductKind && product.CatalogItemId == stage.CatalogItemId);
-                ContentDialog dialog = MainWindow.CreateStorePreviewDialog(product, stage, host.XamlRoot);
-                var opened = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-                dialog.Opened += (_, _) => opened.TrySetResult();
-                stage.BeginPresentation();
-                IAsyncOperation<ContentDialogResult> showing = dialog.ShowAsync();
-                try
-                {
-                    await opened.Task.WaitAsync(TimeSpan.FromSeconds(10));
-                    await MainWindow.VerifyStorePreviewLayoutAsync(dialog);
-                    await stage.VerifyInteractionSmokeAsync();
-                }
-                finally
-                {
-                    stage.EndPresentation();
-                    dialog.Hide();
-                    await showing;
-                    dialog.Content = null;
-                }
-            }
-            foreach (string? character in Sidey.Core.Domain.PixelCharacterCatalog.All.Select(definition => definition.Id))
-            {
-                var stage = new Controls.StorePreviewStage(Sidey.Core.Domain.CommerceProductKind.Character, character, character);
-                await VerifyDialogAsync(stage);
-            }
-            foreach (CommerceProduct? product in Sidey.Core.Domain.WindowsCommerceCatalog.Products.Where(
-                product => product.Kind == Sidey.Core.Domain.CommerceProductKind.Throwable))
-            {
-                await VerifyDialogAsync(new Controls.StorePreviewStage(
-                    product.Kind, product.EffectiveCatalogItemId, "pixel_hamster"));
-            }
-            await VerifyDialogAsync(new Controls.StorePreviewStage(
-                Sidey.Core.Domain.CommerceProductKind.Bubble, "bubble_bunny_pink", "pixel_hamster"));
-        }
-        finally { window.Close(); }
-    }
-
-    private static async Task RunComposerStartupSmokeIfRequestedAsync()
-    {
-        if (!string.Equals(
-                Environment.GetEnvironmentVariable(
-                    WindowsVersionGuard.StartupSmokeEnvironmentVariable),
-                "1",
-                StringComparison.Ordinal))
-        {
-            return;
-        }
-
-        for (int windowIndex = 0; windowIndex < 5; windowIndex++)
-        {
-            var viewModel = new ComposerViewModel();
-            var composer = new ComposerWindow(viewModel);
-            var input = (Microsoft.UI.Xaml.Controls.TextBox)
-                ((FrameworkElement)composer.Content).FindName("MessageInput");
-            viewModel.Draft = "한글 입력 테스트 ABC";
-            for (int cycle = 0; cycle < 10; cycle++)
-            {
-                composer.ShowAndFocus(monitorIdentifier: null);
-                await Task.Delay(150);
-                if (composer.AppWindow.ClientSize.Width != composer.AppWindow.Size.Width
-                    || composer.AppWindow.ClientSize.Height != composer.AppWindow.Size.Height
-                    || input.FocusState == FocusState.Unfocused
-                    || input.Text != viewModel.Draft)
-                {
-                    StartupDiagnostics.Stage(
-                        $"composer-smoke-check window={composer.AppWindow.Size.Width}x{composer.AppWindow.Size.Height} " +
-                        $"client={composer.AppWindow.ClientSize.Width}x{composer.AppWindow.ClientSize.Height} " +
-                        $"focus={input.FocusState} draft-match={input.Text == viewModel.Draft}");
-                    throw new InvalidOperationException(
-                        "The startup composer probe lost its borderless layout, focus, or draft.");
-                }
-
-                // Exercise explicit hiding and the same command used by X/Escape.
-                if (cycle % 2 == 0)
-                {
-                    composer.HideComposer();
-                }
-                else
-                {
-                    viewModel.CloseCommand.Execute(null);
-                }
-                await Task.Delay(70);
-                if (composer.AppWindow.IsVisible)
-                {
-                    throw new InvalidOperationException("The startup composer probe did not hide.");
-                }
-            }
-
-            if (windowIndex == 0)
-            {
-                composer.ShowAndFocus(monitorIdentifier: null);
-                await Task.Delay(150);
-                viewModel.Draft = "자동 닫기 테스트";
-                // No SendRequested subscriber: exercise the real five-second UI path offline.
-                viewModel.SendCommand.Execute(null);
-                await Task.Delay(TimeSpan.FromSeconds(5.5));
-                if (composer.AppWindow.IsVisible)
-                {
-                    throw new InvalidOperationException("The composer did not auto-hide after sending.");
-                }
-
-                composer.ShowAndFocus(monitorIdentifier: null);
-                viewModel.Draft = "다음 메시지";
-                await Task.Delay(150);
-                if (input.Text != viewModel.Draft || input.FocusState == FocusState.Unfocused)
-                {
-                    throw new InvalidOperationException("The composer could not be reused after auto-hiding.");
-                }
-                composer.HideComposer();
-                StartupDiagnostics.Stage("composer-auto-close-smoke-complete");
-            }
-
-            composer.CloseForExit();
-            await Task.Delay(70);
-        }
-
-        StartupDiagnostics.Stage("composer-smoke-complete");
-    }
-
-    private void OnSendRequested(string body) => _ = SendAsync(body);
-
-    private async Task SendAsync(string body)
-    {
-        if (_coordinator is null)
-        {
-            return;
-        }
-
-        try
-        {
-            await _coordinator.SendMessageAsync(body);
-        }
-        catch
-        {
-            // AppCoordinator restores the exact draft through SendFailed.
-        }
-    }
-
-    private void OnTypingChanged(bool active)
-    {
+            if (_coordinator is null || _shuttingDown)
+                return;
+            bool? change = _typingOwner.Update(viewModel, active,
+                viewModel.RoomId == _coordinator.State.ActiveRoomId && viewModel.CanCompose);
+            if (change is { } typing)
+                _ = RunCoordinatorCommandAsync(() => _coordinator.SetTypingAsync(typing));
+        };
         if (_coordinator is not null)
-        {
-            _ = RunCoordinatorCommandAsync(() => _coordinator.SetTypingAsync(active));
-        }
+            ApplyComposerState(viewModel, _coordinator.State);
+        return viewModel;
+    }
+
+    private static void ApplyComposerState(ComposerViewModel composer, CoordinatorState state) =>
+        composer.ApplyRoom(state.ActiveRoomId,
+            state.ActiveRoomId is not null && !state.NeedsOnboarding && state.GroupOperation == GroupOperation.Idle);
+
+    private void OnComposerPlacementChanged(ComposerPlacement placement)
+    {
+        if (_coordinator is { } coordinator && !_shuttingDown)
+            _pendingComposerPlacementSave = RunCoordinatorCommandAsync(() => coordinator.SetComposerPlacementAsync(placement));
     }
 
     private void RequestPulse()
@@ -769,30 +613,6 @@ public partial class App : Application
             {
                 StartupDiagnostics.NonFatal("character-throw", exception);
             }
-        });
-    }
-
-    private void RestoreFailedDraft(string body, Exception exception)
-    {
-        if (_shuttingDown)
-        {
-            return;
-        }
-
-        _dispatcherQueue.TryEnqueue(() =>
-        {
-            if (_shuttingDown)
-            {
-                return;
-            }
-
-            ShowComposer();
-            _composer?.RestoreDraftAndFocus(body);
-            MainWindow mainWindow = EnsureMainWindow();
-            mainWindow.ShowFatalError(new InvalidOperationException(
-                I18n.Format("error.messageSendFailed", exception.Message),
-                exception));
-            ShowPrimaryWindow();
         });
     }
 
@@ -1069,10 +889,35 @@ public partial class App : Application
 
             UpdateConnectionFailureNotification(state.Connected);
             _mainWindow?.ApplyState(state);
-            _onboardingWindow?.ApplyState(state);
-            if (!state.NeedsOnboarding && _onboardingWindow is not null)
+            if (state.NeedsOnboarding)
+            {
+                if (_onboardingWindow is null && coordinator is not null)
+                    CreateOnboardingWindow(coordinator);
+                _onboardingWindow?.ApplyState(state);
+                _mainWindow?.AppWindow.Hide();
+                if (_composer is not null)
+                {
+                    _composer.PlacementChanged -= OnComposerPlacementChanged;
+                    _composer.CloseForExit();
+                    _composer = null;
+                }
+                _historyWindow?.Close();
+                _historyWindow = null;
+                _historyComposer?.Dispose();
+                _historyComposer = null;
+                _window = _onboardingWindow;
+                _onboardingWindow?.ShowAndActivate();
+            }
+            else if (_onboardingWindow is not null)
+            {
+                _onboardingWindow.ApplyState(state);
                 OnOnboardingCompleted();
+            }
             _composer?.ApplyTheme(state.Preferences.Theme);
+            if (_composer is not null)
+                ApplyComposerState(_composer.ViewModel, state);
+            if (_historyComposer is not null)
+                ApplyComposerState(_historyComposer, state);
             _historyWindow?.ApplyState(state);
             _tray?.SetState(new TrayMenuState(
                 state.Preferences.OverlayVisible,
@@ -1086,6 +931,7 @@ public partial class App : Application
                 state.ActiveRoomId)
             {
                 Theme = state.Preferences.Theme,
+                GlobalHotkeys = state.Preferences.GlobalHotkeys,
             });
         });
     }
@@ -1398,7 +1244,8 @@ public partial class App : Application
         }
         if (_historyWindow is null)
         {
-            _historyWindow = new HistoryWindow(new HistoryWindowViewModel(_coordinator));
+            _historyComposer ??= CreateComposerViewModel(autoCloseAfterSend: false);
+            _historyWindow = new HistoryWindow(new HistoryWindowViewModel(_coordinator, _historyComposer));
             _historyWindow.Closed += (_, _) => _historyWindow = null;
         }
         _historyWindow.ShowAndActivate();
@@ -1444,7 +1291,9 @@ public partial class App : Application
         }
 
         bool shouldExit = mainWindow.ShouldExitOnClose;
-        _pendingSettingsSave = mainWindow.ViewModel.FlushSoundSettingsAsync();
+        _pendingSettingsSave = mainWindow.ViewModel.FlushSettingsAsync();
+        mainWindow.HotkeyRecordingChanged -= OnHotkeyRecordingChanged;
+        _tray?.SetHotkeysSuspended(false);
         mainWindow.Closed -= OnMainWindowClosed;
         _mainWindow = null;
         if (ReferenceEquals(_window, mainWindow))
@@ -1457,6 +1306,9 @@ public partial class App : Application
             BeginShutdown();
         }
     }
+
+    private void OnHotkeyRecordingChanged(bool recording) =>
+        _tray?.SetHotkeysSuspended(recording);
 
     private Task _pendingSettingsSave = Task.CompletedTask;
 
@@ -1476,7 +1328,7 @@ public partial class App : Application
         if (_mainWindow is not null)
         {
             MainWindow mainWindow = _mainWindow;
-            _pendingSettingsSave = mainWindow.ViewModel.FlushSoundSettingsAsync();
+            _pendingSettingsSave = mainWindow.ViewModel.FlushSettingsAsync();
             _mainWindow = null;
             mainWindow.Closed -= OnMainWindowClosed;
             mainWindow.CloseForExit();
@@ -1502,14 +1354,15 @@ public partial class App : Application
         }
         if (_composer is not null)
         {
-            _composer.ViewModel.SendRequested -= OnSendRequested;
-            _composer.ViewModel.TypingChanged -= OnTypingChanged;
+            _composer.PlacementChanged -= OnComposerPlacementChanged;
             _composer.CloseForExit();
             _composer = null;
         }
 
         _historyWindow?.Close();
         _historyWindow = null;
+        _historyComposer?.Dispose();
+        _historyComposer = null;
         if (_onboardingWindow is not null)
         {
             _onboardingWindow.Completed -= OnOnboardingCompleted;
@@ -1522,11 +1375,11 @@ public partial class App : Application
             try
             { await _pendingSettingsSave; }
             catch (Exception exception) { StartupDiagnostics.NonFatal("shutdown-settings-save", exception); }
+            await _pendingComposerPlacementSave;
             _coordinator.ComposerRequested -= RequestComposer;
             _coordinator.PulseRequested -= RequestPulse;
             _coordinator.TreeMovementToggleRequested -= RequestTreeMovementToggle;
             _coordinator.CharacterThrowRequested -= RequestCharacterThrow;
-            _coordinator.SendFailed -= RestoreFailedDraft;
             _coordinator.RenderingFailed -= OnRenderingFailed;
             _coordinator.GroupSetupRequested -= OnGroupSetupRequested;
             _coordinator.StateChanged -= OnCoordinatorStateChanged;

@@ -92,7 +92,7 @@ public sealed partial class StoreProductPreviewViewModel : ObservableObject
         ActionText = isOwned ? I18n.Get("store.owned") : state.PurchaseState switch
         {
             CommercePurchaseState.Unavailable when commerceEnabled => I18n.Get("store.retry"),
-            CommercePurchaseState.GoogleConnectionRequired => I18n.Get("store.connectGoogle"),
+            CommercePurchaseState.GoogleConnectionRequired => I18n.Get("store.retry"),
             CommercePurchaseState.Available or CommercePurchaseState.Refunded =>
                 I18n.Format("store.purchase", FormattedPrice),
             CommercePurchaseState.OpeningCheckout => I18n.Get("store.openingCheckout"),

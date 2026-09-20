@@ -93,10 +93,6 @@ public sealed class NativePixelWorldSession : IOverlayHost, IDisposable
     }
 
     public bool IsVisible { get; private set; } = true;
-    public bool HasPresentedFrame => _renderer.HasPresentedFrame;
-
-    public void VerifyMemberVisualsForSmoke(IEnumerable<Guid> expectedIds, byte red, byte green, byte blue) =>
-        _renderer.VerifyMemberVisualsForSmoke(expectedIds, red, green, blue);
 
     public string? ValidationMetricsPath => _metrics?.OutputPath;
 
@@ -268,6 +264,39 @@ public sealed class NativePixelWorldSession : IOverlayHost, IDisposable
             }
         }
         return ValueTask.CompletedTask;
+    }
+
+    public async Task FadeOutAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (!IsVisible)
+        {
+            return;
+        }
+
+        IsVisible = false;
+        _windows.SetHotspotBounds(_lastSelfHotspot, visible: false);
+        _selfWindowShown = false;
+        _renderer.ResetFeedback();
+        lock (_throwGate)
+        {
+            CancelThrowTargetingWithinGate();
+            _windows.HideTargetHotspots();
+            Array.Clear(_targetWindowsShown);
+        }
+        await _renderer.FadeOutAsync(cancellationToken).ConfigureAwait(false);
+        if (_disposed)
+        {
+            return;
+        }
+        try
+        {
+            _windows.SetVisible(false);
+        }
+        catch (ObjectDisposedException) when (_disposed)
+        {
+        }
     }
 
     public void ConfigureThrowInteraction(bool requiresRightClickToThrow, bool realtimeConnected)

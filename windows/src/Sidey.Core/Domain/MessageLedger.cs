@@ -102,6 +102,8 @@ public sealed class MessageLedger
     public bool Remove(Guid roomId, Guid messageId) =>
         _entries.RemoveAll(entry => entry.RoomId == roomId && entry.Id == messageId) > 0;
 
+    public void Clear() => _entries.Clear();
+
     public MessageLedgerEntry? LatestIn(Guid roomId) =>
         _entries.LastOrDefault(entry => entry.RoomId == roomId);
 

@@ -27,6 +27,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private int _lastNonzeroSoundVolume = 100;
     private CancellationTokenSource? _soundSaveDelay;
     private Task _saveSoundSettingsTask = Task.CompletedTask;
+    private Task _saveGlobalHotkeysTask = Task.CompletedTask;
+    private GlobalHotkeySettings _displayedGlobalHotkeys = GlobalHotkeySettings.Default;
+    private GlobalHotkeyAction? _recordingHotkeyAction;
+    private string? _hotkeyRecordingText;
     private readonly Guid _soundFeedbackScope = Guid.NewGuid();
     private bool _soundFeedbackPending;
 
@@ -107,6 +111,12 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         _soundSaveDelay?.Cancel();
         return _saveSoundSettingsTask;
+    }
+
+    public Task FlushSettingsAsync()
+    {
+        _soundSaveDelay?.Cancel();
+        return Task.WhenAll(_saveSoundSettingsTask, _saveGlobalHotkeysTask);
     }
 
     private async Task SaveSoundSettingsAsync()
@@ -274,6 +284,18 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public partial bool StartAtLogin { get; set; }
 
     [ObservableProperty]
+    public partial bool IsHotkeySelectionEnabled { get; set; } = true;
+
+    public string OverlayHotkeyText => HotkeyText(GlobalHotkeyAction.ToggleOverlay);
+    public string QuietModeHotkeyText => HotkeyText(GlobalHotkeyAction.ToggleQuietMode);
+    public string ComposerHotkeyText => HotkeyText(GlobalHotkeyAction.Compose);
+    public string HistoryHotkeyText => HotkeyText(GlobalHotkeyAction.History);
+    public string OverlayHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyOverlay", OverlayHotkeyText);
+    public string QuietModeHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyQuietMode", QuietModeHotkeyText);
+    public string ComposerHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyComposer", ComposerHotkeyText);
+    public string HistoryHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyHistory", HistoryHotkeyText);
+
+    [ObservableProperty]
     public partial int SelectedLanguageIndex { get; set; }
 
     [ObservableProperty]
@@ -319,6 +341,11 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ExportDiagnosticDataCommand))]
     public partial bool IsExportingDiagnosticData { get; set; }
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SignOutCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteAccountCommand))]
+    public partial bool IsAccountActionPending { get; set; }
 
     public MainWindowViewModel(
         IMainWindowCoordinator coordinator,
@@ -434,6 +461,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
             }
 
             _state = state;
+            SignOutCommand.NotifyCanExecuteChanged();
+            DeleteAccountCommand.NotifyCanExecuteChanged();
             RefreshCharacterSelections(state.ActiveEntitlementKeys);
             RefreshStoreProducts(state);
             if (shouldApplyProfileDraft)
@@ -473,6 +502,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             ShowOfflineMembers = state.Preferences.ShowOfflineMembers;
             RequiresRightClickToThrow = state.Preferences.RequiresRightClickToThrow;
             StartAtLogin = state.Preferences.StartAtLogin;
+            ApplyHotkeySelections(state.Preferences.GlobalHotkeys);
             string selectedLanguage = state.Preferences.Language ?? I18n.Language;
             int selectedLanguageIndex = Array.FindIndex(
                 s_supportedLanguages,
@@ -501,6 +531,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public void RefreshLocalizedText()
     {
         OnPropertyChanged(nameof(SoundMuteActionText));
+        NotifyHotkeyTextChanged();
         RefreshFeedbackPresentation();
         // Keep the existing items, selection, drafts and in-flight commands alive.
         foreach (CharacterSelectionItemViewModel character in CharacterSelections)
@@ -753,6 +784,45 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    private bool CanManageAccount() =>
+        !IsAccountActionPending
+        && _state.GoogleVerified
+        && _state.GroupOperation == GroupOperation.Idle;
+
+    [RelayCommand(CanExecute = nameof(CanManageAccount))]
+    private async Task SignOutAsync()
+    {
+        if (!await _dialogs.ConfirmSignOutAsync())
+            return;
+
+        IsAccountActionPending = true;
+        try
+        {
+            await RunCommandAsync(() => _coordinator.SignOutAsync(), successMessage: null);
+        }
+        finally
+        {
+            IsAccountActionPending = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanManageAccount))]
+    private async Task DeleteAccountAsync()
+    {
+        if (!await _dialogs.ConfirmAccountDeletionAsync())
+            return;
+
+        IsAccountActionPending = true;
+        try
+        {
+            await RunCommandAsync(() => _coordinator.DeleteAccountAsync(), successMessage: null);
+        }
+        finally
+        {
+            IsAccountActionPending = false;
+        }
+    }
+
     [RelayCommand]
     private async Task OpenExternalLinkAsync(string url)
     {
@@ -804,6 +874,121 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             _ = RunCommandAsync(() => _coordinator.SetStartAtLoginAsync(value), null);
         }
+    }
+
+    public void BeginHotkeyRecording(GlobalHotkeyAction action)
+    {
+        if (!IsHotkeySelectionEnabled)
+            return;
+        _recordingHotkeyAction = action;
+        _hotkeyRecordingText = I18n.Get("settings.hotkeyRecording");
+        NotifyHotkeyTextChanged();
+    }
+
+    public bool IsHotkeyRecording(GlobalHotkeyAction action) => _recordingHotkeyAction == action;
+
+    public void PreviewHotkeyModifiers(GlobalHotkeyAction action, GlobalHotkeyModifiers modifiers)
+    {
+        if (_recordingHotkeyAction != action)
+            return;
+        string modifiersText = GlobalHotkeyBinding.ModifierDisplayText(modifiers);
+        _hotkeyRecordingText = modifiersText.Length == 0
+            ? I18n.Get("settings.hotkeyRecording")
+            : $"{modifiersText} + …";
+        NotifyHotkeyTextChanged();
+    }
+
+    public void RejectHotkeyRecording(GlobalHotkeyAction action)
+    {
+        if (_recordingHotkeyAction != action)
+            return;
+        _hotkeyRecordingText = I18n.Get("settings.hotkeyNeedsModifier");
+        NotifyHotkeyTextChanged();
+    }
+
+    public void CancelHotkeyRecording(GlobalHotkeyAction action)
+    {
+        if (_recordingHotkeyAction != action)
+            return;
+        EndHotkeyRecording();
+    }
+
+    public void AssignGlobalHotkey(GlobalHotkeyAction action, GlobalHotkeyBinding binding)
+    {
+        if (_recordingHotkeyAction != action || !IsHotkeySelectionEnabled || !binding.IsValid())
+            return;
+
+        GlobalHotkeySettings settings = _displayedGlobalHotkeys.Assign(action, binding);
+        EndHotkeyRecording();
+        _isApplyingState = true;
+        try
+        {
+            ApplyHotkeySelections(settings);
+        }
+        finally
+        {
+            _isApplyingState = false;
+        }
+        _saveGlobalHotkeysTask = SaveGlobalHotkeysAsync(settings);
+    }
+
+    private async Task SaveGlobalHotkeysAsync(GlobalHotkeySettings settings)
+    {
+        IsHotkeySelectionEnabled = false;
+        try
+        {
+            bool saved = await RunCommandAsync(
+                () => _coordinator.SetGlobalHotkeysAsync(settings),
+                successMessage: null);
+            if (!saved)
+            {
+                _isApplyingState = true;
+                try
+                {
+                    ApplyHotkeySelections(_coordinator.State.Preferences.GlobalHotkeys);
+                }
+                finally
+                {
+                    _isApplyingState = false;
+                }
+            }
+        }
+        finally
+        {
+            IsHotkeySelectionEnabled = true;
+        }
+    }
+
+    private void ApplyHotkeySelections(GlobalHotkeySettings settings)
+    {
+        _displayedGlobalHotkeys = settings.Normalize();
+        NotifyHotkeyTextChanged();
+    }
+
+    private string HotkeyText(GlobalHotkeyAction action) => _recordingHotkeyAction == action
+        ? _hotkeyRecordingText ?? I18n.Get("settings.hotkeyRecording")
+        : _displayedGlobalHotkeys.BindingFor(action).ToDisplayText();
+
+    private static string HotkeyAccessibleName(string actionKey, string shortcut) =>
+        $"{I18n.Get(actionKey)}: {shortcut}";
+
+    private void EndHotkeyRecording()
+    {
+        _recordingHotkeyAction = null;
+        _hotkeyRecordingText = null;
+        NotifyHotkeyTextChanged();
+    }
+
+    private void NotifyHotkeyTextChanged()
+    {
+        OnPropertyChanged(nameof(OverlayHotkeyText));
+        OnPropertyChanged(nameof(QuietModeHotkeyText));
+        OnPropertyChanged(nameof(ComposerHotkeyText));
+        OnPropertyChanged(nameof(HistoryHotkeyText));
+        OnPropertyChanged(nameof(OverlayHotkeyAccessibleName));
+        OnPropertyChanged(nameof(QuietModeHotkeyAccessibleName));
+        OnPropertyChanged(nameof(ComposerHotkeyAccessibleName));
+        OnPropertyChanged(nameof(HistoryHotkeyAccessibleName));
     }
 
     partial void OnSelectedLanguageIndexChanged(int value)
@@ -913,18 +1098,17 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         CommerceProductState? state = _coordinator.State.CommerceProducts.FirstOrDefault(product =>
             StringComparer.Ordinal.Equals(product.Product.Id, productId));
-        if (state?.PurchaseState is null or CommercePurchaseState.Unavailable)
+        if (state?.PurchaseState is null or CommercePurchaseState.Unavailable
+            || !state.GoogleConnected)
         {
-            // Reload first; a retry after a failed catalog request must not create an order.
+            // Account setup belongs to onboarding. Refresh stale account/catalog state
+            // without starting a separate sign-in flow or creating an order here.
             await RunCommandAsync(() => _coordinator.RefreshStoreAsync(), successMessage: null);
             return;
         }
-        string successMessage = state?.GoogleConnected == true
-            ? I18n.Get("store.purchaseCompleted")
-            : I18n.Get("store.googleConnectionOpened");
         await RunCommandAsync(
             () => _coordinator.ActivateStoreProductAsync(productId),
-            successMessage);
+            I18n.Get("store.purchaseCompleted"));
     }
 
     private async Task SaveCharacterSelectionAsync(string characterId)

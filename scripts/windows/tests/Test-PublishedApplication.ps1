@@ -119,11 +119,9 @@ try {
                 $lastStageObservation = $stageObservation
             }
             if ($log -match "$pidPattern fatal ") {
-                throw "SIDEY startup composer probe failed.`n$log"
+                throw "SIDEY startup failed.`n$log"
             }
-            $hasCompleted = (
-                $log -match "$pidPattern .*stage=composer-smoke-complete" -and
-                $log -match "$pidPattern .*stage=external-assets-smoke-complete")
+            $hasCompleted = $log -match "$pidPattern startup-complete"
             $observation = Resolve-SideyStartupSmokeObservation `
                 -State $timeoutState `
                 -ObservedAt ([DateTimeOffset]::UtcNow) `
@@ -158,7 +156,7 @@ try {
         else {
             "$TimeoutSeconds seconds without progress"
         }
-        throw "SIDEY.exe did not complete its startup composer probe before $timeout.`n$tail"
+        throw "SIDEY.exe did not complete startup before $timeout.`n$tail"
     }
     Write-Host "StartupSmokeTest=true"
     Write-Host "ProcessId=$($process.Id)"

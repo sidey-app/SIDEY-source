@@ -90,9 +90,20 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
             StoredSupabaseSession? stored = await ReadStoredSessionAsync(cancellationToken).ConfigureAwait(false);
             if (stored is not null)
             {
-                using HttpRequestMessage request = CreateRequest(HttpMethod.Post, "/auth/v1/logout", stored.AccessToken);
-                using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-                _ = response.IsSuccessStatusCode;
+                try
+                {
+                    using HttpRequestMessage request = CreateRequest(
+                        HttpMethod.Post,
+                        "/auth/v1/logout?scope=local",
+                        stored.AccessToken);
+                    using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken)
+                        .ConfigureAwait(false);
+                    _ = response.IsSuccessStatusCode;
+                }
+                catch (Exception exception) when (exception is not OperationCanceledException)
+                {
+                    // Local sign-out must still complete when the network is unavailable.
+                }
             }
 
             await _credentials.DeleteAsync(CredentialKey.SupabaseSession, cancellationToken)

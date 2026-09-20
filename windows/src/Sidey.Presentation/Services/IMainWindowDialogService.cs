@@ -12,5 +12,9 @@ public interface IMainWindowDialogService
 
     public Task<bool> ConfirmRoomDeletionAsync(string roomName);
 
+    public Task<bool> ConfirmSignOutAsync();
+
+    public Task<bool> ConfirmAccountDeletionAsync();
+
     public Task<bool> ConfirmUpdateDownloadAsync(string version);
 }

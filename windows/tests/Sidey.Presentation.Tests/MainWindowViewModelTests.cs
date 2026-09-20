@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using Sidey.Core.Abstractions;
 using Sidey.Core.Domain;
+using Sidey.Core.Localization;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
 
@@ -10,6 +11,52 @@ namespace Sidey.Presentation.Tests;
 [Collection("Language refresh")]
 public sealed class MainWindowViewModelTests
 {
+    [Fact]
+    public async Task AccountActionsRequireConfirmationAndInvokeOnlyTheSelectedAction()
+    {
+        var coordinator = new FakeSideyCoordinator();
+        var dialogs = new FakeMainWindowDialogService
+        {
+            ConfirmSignOut = false,
+            ConfirmAccountDeletion = false,
+        };
+        var model = new MainWindowViewModel(coordinator, dialogs, new FakeUpdateService());
+
+        await model.SignOutCommand.ExecuteAsync(null);
+        await model.DeleteAccountCommand.ExecuteAsync(null);
+        Assert.Equal(0, coordinator.SignOutCallCount);
+        Assert.Equal(0, coordinator.DeleteAccountCallCount);
+
+        dialogs.ConfirmSignOut = true;
+        await model.SignOutCommand.ExecuteAsync(null);
+        Assert.Equal(1, coordinator.SignOutCallCount);
+        Assert.Equal(0, coordinator.DeleteAccountCallCount);
+
+        coordinator.State = coordinator.State with
+        {
+            GoogleAuthentication = GoogleAuthenticationState.Verified,
+        };
+        model.ApplyState(coordinator.State);
+        dialogs.ConfirmAccountDeletion = true;
+        await model.DeleteAccountCommand.ExecuteAsync(null);
+        Assert.Equal(1, coordinator.DeleteAccountCallCount);
+    }
+
+    [Fact]
+    public void AccountActionsAreDisabledDuringAnotherGroupMutation()
+    {
+        var coordinator = new FakeSideyCoordinator();
+        var model = new MainWindowViewModel(
+            coordinator,
+            new FakeMainWindowDialogService(),
+            new FakeUpdateService());
+
+        model.ApplyState(coordinator.State with { GroupOperation = GroupOperation.Mutating });
+
+        Assert.False(model.SignOutCommand.CanExecute(null));
+        Assert.False(model.DeleteAccountCommand.CanExecute(null));
+    }
+
     [Fact]
     public async Task ConnectionStatusRetriesWhileDisconnectedAndDisablesAfterConnection()
     {
@@ -436,6 +483,63 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
+    public void HotkeyRecordingSwapsAnOccupiedBindingAndPersistsOneCompleteMapping()
+    {
+        (FakeSideyCoordinator coordinator, CoordinatorState state) = CreateRoomState();
+        coordinator.State = state with
+        {
+            Preferences = state.Preferences with { GlobalHotkeys = GlobalHotkeySettings.Default },
+        };
+        var viewModel = new MainWindowViewModel(
+            coordinator, new FakeMainWindowDialogService(), new FakeUpdateService());
+
+        Assert.Equal("Ctrl + Alt + H", viewModel.OverlayHotkeyText);
+        Assert.Equal("Ctrl + Alt + I", viewModel.ComposerHotkeyText);
+        Assert.Contains("Ctrl + Alt + H", viewModel.OverlayHotkeyAccessibleName, StringComparison.Ordinal);
+        Assert.Equal(0, coordinator.SetGlobalHotkeysCallCount);
+
+        viewModel.BeginHotkeyRecording(GlobalHotkeyAction.ToggleOverlay);
+        Assert.True(viewModel.IsHotkeyRecording(GlobalHotkeyAction.ToggleOverlay));
+        Assert.Contains(I18n.Get("settings.hotkeyRecording"), viewModel.OverlayHotkeyAccessibleName, StringComparison.Ordinal);
+        viewModel.AssignGlobalHotkey(
+            GlobalHotkeyAction.ToggleOverlay,
+            GlobalHotkeyBinding.FromLegacy(GlobalHotkeyKey.I));
+
+        Assert.Equal(1, coordinator.SetGlobalHotkeysCallCount);
+        Assert.Equal(GlobalHotkeyKey.I, coordinator.State.Preferences.GlobalHotkeys.ToggleOverlay);
+        Assert.Equal(GlobalHotkeyKey.H, coordinator.State.Preferences.GlobalHotkeys.Compose);
+        Assert.Equal("Ctrl + Alt + I", viewModel.OverlayHotkeyText);
+        Assert.Equal("Ctrl + Alt + H", viewModel.ComposerHotkeyText);
+        Assert.False(viewModel.IsHotkeyRecording(GlobalHotkeyAction.ToggleOverlay));
+        Assert.True(viewModel.IsHotkeySelectionEnabled);
+    }
+
+    [Fact]
+    public async Task SettingsFlushWaitsForPendingHotkeySave()
+    {
+        (FakeSideyCoordinator coordinator, _) = CreateRoomState();
+        var saveCompletion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        coordinator.GlobalHotkeysHandler = _ => saveCompletion.Task;
+        var viewModel = new MainWindowViewModel(
+            coordinator, new FakeMainWindowDialogService(), new FakeUpdateService());
+
+        viewModel.BeginHotkeyRecording(GlobalHotkeyAction.ToggleOverlay);
+        viewModel.AssignGlobalHotkey(
+            GlobalHotkeyAction.ToggleOverlay,
+            GlobalHotkeyBinding.FromLegacy(GlobalHotkeyKey.O));
+        Task flush = viewModel.FlushSettingsAsync();
+
+        Assert.False(viewModel.IsHotkeySelectionEnabled);
+        Assert.False(flush.IsCompleted);
+
+        saveCompletion.SetResult();
+        await flush;
+
+        Assert.True(viewModel.IsHotkeySelectionEnabled);
+        Assert.Equal(GlobalHotkeyKey.O, coordinator.State.Preferences.GlobalHotkeys.ToggleOverlay);
+    }
+
+    [Fact]
     public void CharacterPickerKeepsTheFiveFreeWindowsSelections()
     {
         (FakeSideyCoordinator coordinator, _) = CreateRoomState();
@@ -629,7 +733,7 @@ public sealed class MainWindowViewModelTests
     }
 
     [Theory]
-    [InlineData(CommercePurchaseState.GoogleConnectionRequired, "Google 계정 연결")]
+    [InlineData(CommercePurchaseState.GoogleConnectionRequired, "다시 시도")]
     [InlineData(CommercePurchaseState.OpeningCheckout, "결제창 여는 중…")]
     [InlineData(CommercePurchaseState.Confirming, "결제 확인 중…")]
     [InlineData(CommercePurchaseState.Owned, "보유 중")]
@@ -684,7 +788,7 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
-    public async Task DevelopmentStoreStartsGoogleLinkingBeforePurchase()
+    public async Task StoreRefreshesStaleAccountStateWithoutStartingGoogleLinking()
     {
         (FakeSideyCoordinator coordinator, CoordinatorState state) = CreateRoomState();
         coordinator.State = state with
@@ -708,11 +812,10 @@ public sealed class MainWindowViewModelTests
 
         Assert.False(product.IsPreviewOnlyVisible);
         Assert.True(product.IsActionEnabled);
-        Assert.Equal("Google 계정 연결", product.ActionText);
-        Assert.Equal(1, coordinator.ActivateStoreProductCallCount);
-        Assert.NotNull(notice);
-        Assert.Equal(NoticeKind.Success, notice.Kind);
-        Assert.Contains("Google", notice.Message, StringComparison.Ordinal);
+        Assert.Equal("다시 시도", product.ActionText);
+        Assert.Equal(0, coordinator.ActivateStoreProductCallCount);
+        Assert.Equal(1, coordinator.RefreshStoreCallCount);
+        Assert.Null(notice);
     }
 
     [Fact]
