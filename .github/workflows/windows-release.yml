@@ -8,9 +8,17 @@ on:
         description: 'release/windows.json의 버전을 정확히 입력하세요.'
         required: true
         type: string
+      public_repository:
+        description: '게시할 Public owner/repository를 입력하세요.'
+        required: false
+        default: sidey-app/SIDEY
+        type: string
 
 permissions:
   contents: read
+
+env:
+  PUBLIC_REPOSITORY: ${{ inputs.public_repository }}
 
 concurrency:
   group: windows-release
@@ -136,7 +144,7 @@ jobs:
     timeout-minutes: 15
     environment: windows-production
     permissions:
-      contents: write
+      contents: read
     defaults:
       run:
         shell: pwsh
@@ -153,10 +161,33 @@ jobs:
           name: windows-release-candidate-${{ needs.validate.outputs.version }}
           path: release-assets
 
+      - name: Resolve public repository
+        id: public_repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="${PUBLIC_REPOSITORY%%/*}"
+          name="${PUBLIC_REPOSITORY#*/}"
+          if [[ -z "$owner" || -z "$name" || "$owner" == "$name" || "$name" == */* ]]; then
+            echo "Invalid public repository: $PUBLIC_REPOSITORY" >&2
+            exit 1
+          fi
+          echo "owner=$owner" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Create scoped public publisher token
+        id: public_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.SIDEY_PUBLIC_PUBLISHER_APP_ID }}
+          private-key: ${{ secrets.SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY }}
+          owner: ${{ steps.public_repository.outputs.owner }}
+          repositories: ${{ steps.public_repository.outputs.name }}
+
       - name: Create, verify, and publish release
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ steps.public_token.outputs.token }}
+          GH_REPO: ${{ env.PUBLIC_REPOSITORY }}
         run: |
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
@@ -173,7 +204,7 @@ jobs:
           }
 
           gh release create $tag $candidate `
-            --target '${{ needs.validate.outputs.commit }}' `
+            --target main `
             --title "SIDEY Windows v${{ needs.validate.outputs.version }}" `
             --notes-file '${{ needs.validate.outputs.release_notes }}' `
             --draft
@@ -211,8 +242,8 @@ jobs:
   deploy_website:
     name: Update release website
     needs: publish
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     uses: ./.github/workflows/website-deployment.yml
+    with:
+      public_repository: ${{ inputs.public_repository }}
+    secrets:
+      SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY: ${{ secrets.SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY }}
