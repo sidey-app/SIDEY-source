@@ -12,6 +12,7 @@ import shutil
 
 
 APP_STORE_URL = "https://apps.apple.com/kr/app/sidey/id6808528060?mt=12"
+DEFAULT_PUBLIC_REPOSITORY = "sidey-app/SIDEY"
 LOCALES = ("ko", "en", "ja")
 
 
@@ -21,7 +22,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--windows-release-manifest", type=Path, required=True)
     parser.add_argument("--windows-release-installer", type=Path, required=True)
+    parser.add_argument(
+        "--public-repository",
+        default=DEFAULT_PUBLIC_REPOSITORY,
+        help="Public GitHub owner/repository used in release download URLs.",
+    )
     return parser.parse_args()
+
+
+def validate_repository(repository: str) -> str:
+    if re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository) is None:
+        raise ValueError(f"Invalid GitHub repository: {repository}")
+    return repository
 
 
 def read_manifest(path: Path, platform: str) -> dict[str, object]:
@@ -57,6 +69,21 @@ def require_anchor(html: str, element_id: str, **attributes: str) -> None:
         raise ValueError(f"Verified download link is missing: {element_id}")
 
 
+def replace_anchor_attribute(
+    html: str, element_id: str, attribute: str, value: str
+) -> str:
+    pattern = re.compile(
+        rf'(<a(?=[^>]*\bid="{re.escape(element_id)}")[^>]*\b'
+        rf'{re.escape(attribute)}=")[^"]*(")'
+    )
+    updated, replacements = pattern.subn(rf"\g<1>{value}\g<2>", html)
+    if replacements != 1:
+        raise ValueError(
+            f"Expected one {attribute} attribute for verified link: {element_id}"
+        )
+    return updated
+
+
 def replace_checksum(html: str, platform: str, digest: str) -> str:
     element_id = f"{platform}-download-sha256"
     pattern = re.compile(
@@ -74,11 +101,13 @@ def prepare(
     output_dir: Path,
     windows_release_manifest: Path,
     windows_release_installer: Path,
+    public_repository: str = DEFAULT_PUBLIC_REPOSITORY,
 ) -> tuple[str, str]:
     website_dir = website_dir.resolve(strict=True)
     windows_release_manifest = windows_release_manifest.resolve(strict=True)
     windows_release_installer = windows_release_installer.resolve(strict=True)
     output_dir = output_dir.resolve()
+    public_repository = validate_repository(public_repository)
 
     windows_manifest = read_manifest(windows_release_manifest, "windows")
     windows_version = str(windows_manifest["version"])
@@ -95,7 +124,7 @@ def prepare(
     shutil.copytree(website_dir, output_dir, dirs_exist_ok=True)
     windows_hash = sha256(windows_release_installer)
     windows_url = (
-        "https://github.com/sidey-app/SIDEY/releases/download/"
+        f"https://github.com/{public_repository}/releases/download/"
         f"windows-v{windows_version}/{windows_name}"
     )
     published_windows_manifest = {
@@ -117,6 +146,12 @@ def prepare(
         if not path.is_file():
             raise ValueError(f"Localized landing page is missing: {relative_path.as_posix()}")
         html = path.read_text(encoding="utf-8")
+        html = replace_anchor_attribute(
+            html, "primary-download-action", "data-windows-url", windows_url
+        )
+        html = replace_anchor_attribute(
+            html, "windows-download-action", "href", windows_url
+        )
         require_anchor(
             html,
             "primary-download-action",
@@ -138,6 +173,7 @@ def main() -> int:
         args.output_dir,
         args.windows_release_manifest,
         args.windows_release_installer,
+        args.public_repository,
     )
     print("ReleaseMetadataPrepared=true")
     print(f"WindowsVersion={windows_version}")

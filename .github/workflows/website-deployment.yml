@@ -15,17 +15,34 @@ on:
       - 'website/pnpm-workspace.yaml'
       - 'website/tsconfig.json'
       - 'scripts/pages/**'
+      - 'scripts/publication/**'
       - '.github/workflows/website-deployment.yml'
   workflow_dispatch:
+    inputs:
+      public_repository:
+        description: '게시할 Public owner/repository를 입력하세요.'
+        required: false
+        default: sidey-app/SIDEY
+        type: string
   workflow_call:
+    inputs:
+      public_repository:
+        description: '게시할 Public owner/repository'
+        required: false
+        default: sidey-app/SIDEY
+        type: string
+    secrets:
+      SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY:
+        required: true
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+
+env:
+  PUBLIC_REPOSITORY: ${{ inputs.public_repository || 'sidey-app/SIDEY' }}
 
 concurrency:
-  group: pages
+  group: pages-${{ inputs.public_repository || 'sidey-app/SIDEY' }}
   cancel-in-progress: true
 
 jobs:
@@ -68,6 +85,9 @@ jobs:
       - name: Validate release metadata preparation
         run: python3 -m unittest discover -s scripts/pages/tests
 
+      - name: Validate public artifact guard
+        run: python3 -m unittest scripts.tests.test_publication
+
       - name: Upload tested website build
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v5
@@ -84,7 +104,6 @@ jobs:
     needs: test
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -98,11 +117,34 @@ jobs:
           name: pages-website-dist
           path: website/dist
 
+      - name: Resolve public repository
+        id: public_repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="${PUBLIC_REPOSITORY%%/*}"
+          name="${PUBLIC_REPOSITORY#*/}"
+          if [[ -z "$owner" || -z "$name" || "$owner" == "$name" || "$name" == */* ]]; then
+            echo "Invalid public repository: $PUBLIC_REPOSITORY" >&2
+            exit 1
+          fi
+          echo "owner=$owner" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Create scoped public publisher token
+        id: public_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.SIDEY_PUBLIC_PUBLISHER_APP_ID }}
+          private-key: ${{ secrets.SIDEY_PUBLIC_PUBLISHER_PRIVATE_KEY }}
+          owner: ${{ steps.public_repository.outputs.owner }}
+          repositories: ${{ steps.public_repository.outputs.name }}
+
       - name: Prepare verified release metadata
         shell: pwsh
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ steps.public_token.outputs.token }}
+          GH_REPO: ${{ env.PUBLIC_REPOSITORY }}
         run: |
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
@@ -116,9 +158,24 @@ jobs:
           if ($release.isDraft -or $release.isPrerelease) {
             throw "Windows release must be a published regular release: $tag"
           }
+          $complianceContract = Get-Content `
+            ./scripts/publication/compliance-source-assets.json -Raw |
+            ConvertFrom-Json
+          $complianceAssetNames = @(
+            $complianceContract.assets |
+              Where-Object { [string]$_.tag -ceq $tag } |
+              ForEach-Object { [string]$_.name }
+          )
+          $expectedAssetNames = @($installerName) + $complianceAssetNames
           $assetNames = @($release.assets | ForEach-Object { [string]$_.name })
-          if ($assetNames.Count -ne 1 -or $assetNames[0] -cne $installerName) {
-            throw "Windows release must contain only $installerName"
+          $unexpectedAssetNames = @($assetNames | Where-Object {
+            $expectedAssetNames -cnotcontains $_
+          })
+          $missingAssetNames = @($expectedAssetNames | Where-Object {
+            $assetNames -cnotcontains $_
+          })
+          if ($unexpectedAssetNames.Count -ne 0 -or $missingAssetNames.Count -ne 0) {
+            throw "Windows release assets do not match the installer and compliance contract: $tag"
           }
 
           New-Item -ItemType Directory -Path ./build/windows-pages-release -Force |
@@ -132,17 +189,46 @@ jobs:
             --website-dir ./website/dist `
             --output-dir ./build/pages-site `
             --windows-release-manifest ./release/windows.json `
-            --windows-release-installer "./build/windows-pages-release/$installerName"
+            --windows-release-installer "./build/windows-pages-release/$installerName" `
+            --public-repository $env:PUBLIC_REPOSITORY
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
+      - name: Reject private files from public artifact
+        run: >-
+          python3 ./scripts/publication/validate_public_tree.py
+          --root ./build/pages-site
+          --repository "$PUBLIC_REPOSITORY"
 
-      - name: Upload website artifact
-        uses: actions/upload-pages-artifact@v5
+      - name: Check out public distribution repository
+        uses: actions/checkout@v7
         with:
-          path: build/pages-site
-          include-hidden-files: true
+          repository: ${{ env.PUBLIC_REPOSITORY }}
+          ref: main
+          path: build/public-repository
+          token: ${{ steps.public_token.outputs.token }}
+          fetch-depth: 0
+          persist-credentials: true
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+      - name: Publish tested website to public gh-pages branch
+        shell: bash
+        working-directory: build/public-repository
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin refs/heads/gh-pages:refs/remotes/origin/gh-pages
+            git switch --force-create gh-pages origin/gh-pages
+          else
+            git switch --orphan gh-pages
+          fi
+          git rm -r --ignore-unmatch .
+          cp -R ../pages-site/. .
+          git add --all
+          if git diff --cached --quiet; then
+            echo 'Public website is already current.'
+            exit 0
+          fi
+          git config user.name 'SIDEY Public Publisher'
+          git config user.email 'sidey-public-publisher[bot]@users.noreply.github.com'
+          git commit -m "Publish SIDEY website from ${SOURCE_SHA}"
+          git push origin HEAD:gh-pages

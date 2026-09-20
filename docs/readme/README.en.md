@@ -20,7 +20,7 @@
   <span> · </span>
   <a href="https://github.com/sidey-app/SIDEY/releases">Release notes</a>
   <span> · </span>
-  <a href="https://github.com/sidey-app/SIDEY/issues">Bugs and suggestions</a>
+  <a href="https://github.com/sidey-app/SIDEY/issues">Bug reports</a>
 </p>
 
 <p align="center">
@@ -92,32 +92,21 @@ SIDEY is a desktop messenger for macOS and Windows that lets you chat with frien
 
 </details>
 
-## Bugs and suggestions
+## Bug reports
 
-Found a bug or have a feature in mind? Let us know on [GitHub Issues](https://github.com/sidey-app/SIDEY/issues).
+Found a bug? Report it on [GitHub Issues](https://github.com/sidey-app/SIDEY/issues) with reproduction steps and your SIDEY and operating-system versions. The public repository is for distribution and bug reports; feature proposals and external pull requests are not accepted.
 
-## Contribute
-
-We welcome bug fixes, feature improvements, documentation improvements, and translations. We do not accept character or asset contributions.
-
-Before you begin, read the [contribution guide](../../CONTRIBUTING.md) for the discussion, branch, commit, validation, and pull request workflow.
-
-- Before starting a new feature, open an [issue](https://github.com/sidey-app/SIDEY/issues) to discuss what it’s for and how it should work.
-- For code and documentation changes, use the [general PR template](../../.github/PULL_REQUEST_TEMPLATE/general.md) to explain your changes and how you checked them.
+Do not include access tokens, invite codes, message contents, or personal information in logs or screenshots. See the [bug-reporting guide](../../CONTRIBUTING.md) for details.
 
 ## Special thanks
 
 Thank you to everyone who has helped develop SIDEY and create its characters.
 
-<a href="https://github.com/sidey-app/SIDEY/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=sidey-app/SIDEY" alt="SIDEY contributors" />
-</a>
-
 And thank you to everyone who reports bugs, improves the wording, and shares their experience with SIDEY.
 
 ## License
 
-Unless otherwise noted, SIDEY source code is provided under [GNU AGPL v3.0 only (AGPL-3.0-only)](../../LICENSE). See the [licensing guide](../../LICENSING.md) for its scope.
+Current SIDEY source code is private proprietary software. AGPLv3 permissions granted for revisions published before the license transition are not withdrawn. See the [licensing guide](../../LICENSING.md) for the boundary between current code and historical public revisions.
 
 Branding, assets, and third-party materials remain subject to their separate existing terms. For asset copying, modification, redistribution, and commercial use, see the [SIDEY Paid Asset License 1.0](../../assets/PAID_ASSET_LICENSE.md).
 

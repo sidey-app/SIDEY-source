@@ -20,7 +20,7 @@
   <span> · </span>
   <a href="https://github.com/sidey-app/SIDEY/releases">版本資訊</a>
   <span> · </span>
-  <a href="https://github.com/sidey-app/SIDEY/issues">問題回報與建議</a>
+  <a href="https://github.com/sidey-app/SIDEY/issues">錯誤回報</a>
 </p>
 
 <p align="center">
@@ -92,32 +92,21 @@ SIDEY 是一款適用於 macOS 和 Windows 的桌面聊天應用程式，讓你�
 
 </details>
 
-## 問題回報與建議
+## 錯誤回報
 
-如果你發現了問題，或有想要的功能，歡迎到 [GitHub Issues](https://github.com/sidey-app/SIDEY/issues) 告訴我們。
+如果你發現了錯誤，請在 [GitHub Issues](https://github.com/sidey-app/SIDEY/issues) 中提供重現步驟以及 SIDEY 和作業系統版本。公開儲存庫僅用於發佈和錯誤回報，不接受功能建議或外部 Pull Request。
 
-## 參與貢獻
-
-歡迎提交錯誤修正、功能改善、文件改善和翻譯。我們不接受角色或素材貢獻。
-
-開始前，請先閱讀[貢獻指南](../../CONTRIBUTING.md)，了解討論、分支、提交、驗證和 Pull Request 流程。
-
-- 提出新功能前，請先在 [Issue](https://github.com/sidey-app/SIDEY/issues) 中一起討論它的用途和具體行為。
-- 修改程式碼或文件時，請使用[通用 PR 範本](../../.github/PULL_REQUEST_TEMPLATE/general.md)，說明修改原因和驗證情況。
+請勿在記錄或螢幕截圖中包含存取權杖、邀請碼、訊息內容或個人資料。詳情請參閱[錯誤回報指南](../../CONTRIBUTING.md)。
 
 ## 特別感謝
 
 感謝所有參與 SIDEY 開發和角色製作的朋友。
 
-<a href="https://github.com/sidey-app/SIDEY/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=sidey-app/SIDEY" alt="SIDEY 貢獻者" />
-</a>
-
 也感謝每一位幫忙回報問題、潤飾文字、分享使用體驗的朋友。
 
 ## 授權條款
 
-除非另有說明，SIDEY 原始碼採用 [GNU AGPL 僅限第 3.0 版（AGPL-3.0-only）](../../LICENSE)。適用範圍請參閱[授權說明](../../LICENSING.md)。
+目前的 SIDEY 原始碼是非公開專有軟體。授權轉換前公開版本已授予的 AGPLv3 權利不會被撤銷。目前程式碼與歷史公開版本的界線請參閱[授權說明](../../LICENSING.md)。
 
 品牌、素材和第三方內容仍分別適用其現有條款。有關素材的重製、修改、再散布和商業使用條件，請參閱 [SIDEY Paid Asset License 1.0](../../assets/PAID_ASSET_LICENSE.md)。
 

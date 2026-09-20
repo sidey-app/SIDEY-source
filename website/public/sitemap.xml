@@ -149,8 +149,4 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://sidey-app.github.io/SIDEY/en/refund/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://sidey-app.github.io/SIDEY/ja/refund/"/>
   </url>
-  <url>
-    <loc>https://sidey-app.github.io/SIDEY/contribute/asset-previewer/</loc>
-    <lastmod>2026-09-06</lastmod>
-  </url>
 </urlset>

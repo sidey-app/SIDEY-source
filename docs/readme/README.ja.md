@@ -20,7 +20,7 @@
   <span> · </span>
   <a href="https://github.com/sidey-app/SIDEY/releases">リリースノート</a>
   <span> · </span>
-  <a href="https://github.com/sidey-app/SIDEY/issues">不具合の報告・提案</a>
+  <a href="https://github.com/sidey-app/SIDEY/issues">不具合の報告</a>
 </p>
 
 <p align="center">
@@ -92,32 +92,21 @@ SIDEYは、画面の端にいる2Dピクセル動物を通じて友だちと会�
 
 </details>
 
-## 不具合の報告・提案
+## 不具合の報告
 
-不具合を見つけたり、提案したい機能があったりしたら、[GitHub Issues](https://github.com/sidey-app/SIDEY/issues)にお寄せください。
+不具合を見つけた場合は、再現手順とSIDEY・OSのバージョンを[GitHub Issues](https://github.com/sidey-app/SIDEY/issues)にお寄せください。公開リポジトリは配布と不具合報告のためのもので、機能提案や外部からのPull Requestは受け付けていません。
 
-## コントリビュート
-
-バグ修正、機能改善、ドキュメントの改善、翻訳への貢献を歓迎します。キャラクターやアセットの提供は受け付けていません。
-
-作業を始める前に、議論、ブランチ、コミット、検証、PR の手順をまとめた[コントリビューションガイド](../../CONTRIBUTING.md)をご確認ください。
-
-- 新しい機能を提案する際は、まず[Issue](https://github.com/sidey-app/SIDEY/issues)で用途や動作について一緒に相談してください。
-- コードやドキュメントの変更では、[一般PRテンプレート](../../.github/PULL_REQUEST_TEMPLATE/general.md)に沿って、変更の理由と確認した内容を記入してください。
+ログやスクリーンショットにアクセストークン、招待コード、メッセージ内容、個人情報を含めないでください。詳しくは[不具合報告ガイド](../../CONTRIBUTING.md)をご確認ください。
 
 ## 謝辞
 
 SIDEYの開発やキャラクター制作に参加してくださった皆さんに感謝します。
 
-<a href="https://github.com/sidey-app/SIDEY/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=sidey-app/SIDEY" alt="SIDEYのコントリビューター" />
-</a>
-
 不具合を報告し、文章を磨き、使ってみた感想を共有してくださる皆さんにも感謝します。
 
 ## ライセンス
 
-別途記載がない限り、SIDEYのソースコードは[GNU AGPL v3.0のみ（AGPL-3.0-only）](../../LICENSE)で提供しています。適用範囲は[ライセンスガイド](../../LICENSING.md)をご確認ください。
+現在のSIDEYソースコードは非公開のプロプライエタリソフトウェアです。ライセンス移行前に公開されたrevisionに付与されたAGPLv3の権利は撤回されません。現在のコードと過去の公開revisionの境界は[ライセンスガイド](../../LICENSING.md)をご確認ください。
 
 ブランド、アセット、第三者の素材には、それぞれ既存の別の条件が適用されます。アセットの複製・改変・再配布・商用利用の条件は、[SIDEY Paid Asset License 1.0](../../assets/PAID_ASSET_LICENSE.md)をご確認ください。
 

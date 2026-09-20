@@ -5,6 +5,11 @@
 submission, upload, website deployment와 production backend deployment는 각각 명시적인
 사용자 승인이 필요하다.
 
+현재 source와 release workflow는 비공개 `sidey-app/SIDEY-source`에서 관리한다. 공개
+`sidey-app/SIDEY`는 website output, 공개 정책, release metadata, 설치 artifact와
+계속 배포하는 과거 AGPL binary에 필요한 source archive를 받는 배포 저장소다. Public
+저장소의 파일을 source-of-truth로 역수정하지 않는다.
+
 ## 1. 범위와 version 확인
 
 1. Target platform과 실제 shipped diff를 확정한다.
@@ -14,7 +19,7 @@ submission, upload, website deployment와 production backend deployment는 각�
    일치시킨다. macOS manifest는 App Store target build 계약이며 공개 게시 여부는
    App Store Connect에서 별도로 확인한다. Windows manifest는 공개 release를 따른다.
 
-Commerce 또는 backend contract가 바뀌는 release라면 공개 catalog의 검토된 commit과
+Commerce 또는 backend contract가 바뀌는 release라면 private source catalog의 검토된 commit과
 backend snapshot provenance를 먼저 확인한다. Backend migration과 배포는 비공개
 backend 저장소의 절차로 수행하며 이 저장소에서 대신 실행하지 않는다.
 
@@ -47,10 +52,19 @@ StoreKit 환경을 확인한다. 서명 정보와 App Store Connect 자격 증�
 
 ### Windows
 
-`main`의 수동 [SIDEY Windows release workflow](../../.github/workflows/windows-release.yml)를
+Private source `main`의 수동
+[SIDEY Windows release workflow](../../.github/workflows/windows-release.yml)를
 사용한다. Workflow가 전체 Windows 검사, installer 생성, draft asset 재다운로드와 hash
-대조를 한 runner에서 마친 뒤에만 publish한다. Local build나 artifact 존재만으로 공개
-release를 대체하지 않는다.
+대조를 한 runner에서 마친 뒤에만 공개 배포 저장소에 publish한다. Local build나 artifact
+존재만으로 공개 release를 대체하지 않는다. 교차 저장소 게시 자격 증명은 공개
+`SIDEY`의 content만 쓸 수 있는 최소 권한으로 제한하며 source repository 접근 권한을
+부여하지 않는다.
+
+AGPL-covered historical binary를 계속 공개하는 release에는 binary를 만든 정확한 commit의
+Corresponding Source archive, AGPL license와 필요한 notice가 함께 있어야 한다. Archive가
+현재 private revision을 포함하지 않는지 확인하고 source commit, filename, size와 SHA-256을
+release migration 기록에 고정한다. 이 조건을 충족하지 못하면 해당 binary를 공개 저장소로
+이관하지 않는다.
 
 ## 4. 게시 후 확인
 
