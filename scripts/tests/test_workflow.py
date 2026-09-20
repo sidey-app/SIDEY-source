@@ -382,6 +382,18 @@ class WorkflowTests(unittest.TestCase):
             with self.assertRaises(w.WorkflowError):
                 w.validate_paths(name, ['docs/architecture.md'])
 
+    def test_platform_release_manifests_follow_their_native_branches(self):
+        self.assertEqual(w.platform_for('release/macos.json'), 'macos')
+        self.assertEqual(w.platform_for('release/windows.json'), 'windows')
+        self.assertEqual(
+            w.validate_paths('macos/release', ['release/macos.json']),
+            'macos',
+        )
+        self.assertEqual(
+            w.validate_paths('windows/release', ['release/windows.json']),
+            'windows',
+        )
+
     def test_shared_commits_already_in_main_are_excluded(self):
         task = self.start(platform='macos')
         (task / 'macos').mkdir()

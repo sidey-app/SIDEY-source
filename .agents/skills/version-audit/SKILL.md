@@ -17,11 +17,13 @@ class, but do not accept one below the evidence-based minimum.
 Start with `release/macos.json` or `release/windows.json`. For macOS, obtain App Store
 Connect publication/build evidence and the exact source provenance of the last shipped
 App Store artifact; the manifest describes the target build, not publication status. Do not
-use an archived Developer ID tag as proof of an App Store release. For Windows, confirm the
-matching `windows-v<version>` tag is a published regular release. If a target is intentionally
-staged ahead of publication, identify the previous shipped platform artifact as the comparison
-baseline. If baseline, target, artifact impact or provenance cannot be established, return
-`BLOCKED` with the missing evidence.
+use an archived Developer ID tag as proof of an App Store release. The maintained macOS
+Xcode scheme and app product are both named `SIDEY`; the old Xcode identifier
+`SIDEYAppStore` is not current target evidence. For Windows, confirm the matching
+`windows-v<version>` tag is a
+published regular release. If a target is intentionally staged ahead of publication, identify
+the previous shipped platform artifact as the comparison baseline. If baseline, target,
+artifact impact or provenance cannot be established, return `BLOCKED` with the missing evidence.
 
 ## Audit
 

@@ -50,6 +50,10 @@ def changed_paths(
 def platform_for(path: str) -> str:
     """Return the branch platform that owns *path*."""
 
+    if path == "release/macos.json":
+        return "macos"
+    if path == "release/windows.json":
+        return "windows"
     if path.startswith(("macos/", "scripts/macos/")):
         return "macos"
     if path in {
