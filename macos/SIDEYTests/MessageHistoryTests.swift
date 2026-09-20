@@ -116,6 +116,42 @@ final class MessageHistoryTests: XCTestCase {
         XCTAssertTrue(entries.contains(where: { $0.id == realtimeMessage.id }))
     }
 
+    func testDisplayMergeKeepsUnresolvedLocalSendAfterNewerServerHistory() {
+        let roomID = UUID()
+        let senderID = UUID()
+        let serverMessage = Self.message(10, roomID: roomID, senderID: senderID)
+        var outbox = MessageOutbox()
+        let failedID = Self.uuid(899)
+        outbox.stage(
+            id: failedID,
+            roomID: roomID,
+            senderID: senderID,
+            body: "먼저 실패한 메시지",
+            createdAt: serverMessage.createdAt.addingTimeInterval(-61)
+        )
+        _ = outbox.fail(id: failedID, roomID: roomID)
+        let pendingID = Self.uuid(900)
+        outbox.stage(
+            id: pendingID,
+            roomID: roomID,
+            senderID: senderID,
+            body: "시계가 느린 기기에서 보낸 메시지",
+            createdAt: serverMessage.createdAt.addingTimeInterval(-60)
+        )
+
+        let entries = MessageHistoryMerge.entries(
+            pagedMessages: [serverMessage],
+            ledger: MessageLedger(),
+            outbox: outbox,
+            roomID: roomID,
+            now: serverMessage.createdAt.addingTimeInterval(1)
+        )
+
+        XCTAssertEqual(entries.map(\.id), [serverMessage.id, failedID, pendingID])
+        XCTAssertEqual(entries.dropFirst().map(\.state), [.failed, .pending])
+        XCTAssertEqual(entries.last?.state, .pending)
+    }
+
     func testMissingSenderUsesSafeHamsterFallback() {
         let senderID = UUID()
         let participant = MessageHistoryParticipantResolver.resolve(
@@ -203,6 +239,54 @@ final class MessageHistoryTests: XCTestCase {
 
         XCTAssertEqual(store.messages.first?.body, "메시지 119")
         XCTAssertEqual(store.messages.last?.body, "메시지 0")
+    }
+
+    @MainActor
+    func testStoreDeletionRemovesLoadedMessageAndFiltersLaterPage() async throws {
+        let roomID = UUID()
+        let deleted = Self.message(10, roomID: roomID, senderID: UUID())
+        let retained = Self.message(11, roomID: roomID, senderID: UUID())
+        let older = Self.message(9, roomID: roomID, senderID: UUID())
+        let cursor = MessageHistoryCursor(rawCreatedAt: "cursor", id: deleted.id)
+        let store = MessageHistoryStore { _, requestedCursor, _ in
+            if requestedCursor == nil {
+                return MessageHistoryPage(messages: [deleted, retained], nextCursor: cursor)
+            }
+            return MessageHistoryPage(messages: [deleted, older], nextCursor: nil)
+        }
+
+        store.activate(roomID: roomID)
+        try await Self.waitUntil { store.initialState == .loaded }
+        store.remove(messageID: deleted.id, roomID: roomID)
+        XCTAssertEqual(store.messages.map(\.id), [retained.id])
+
+        store.loadNextPage()
+        try await Self.waitUntil { store.olderState == .exhausted }
+        XCTAssertEqual(Set(store.messages.map(\.id)), Set([retained.id, older.id]))
+        XCTAssertFalse(store.messages.contains(where: { $0.id == deleted.id }))
+    }
+
+    @MainActor
+    func testStoreReloadReplacesInvalidatedPagesFromServer() async throws {
+        let roomID = UUID()
+        let stale = Self.message(10, roomID: roomID, senderID: UUID())
+        let current = Self.message(11, roomID: roomID, senderID: UUID())
+        var loadCount = 0
+        let store = MessageHistoryStore { _, _, _ in
+            loadCount += 1
+            return MessageHistoryPage(
+                messages: loadCount == 1 ? [stale] : [current],
+                nextCursor: nil
+            )
+        }
+
+        store.activate(roomID: roomID)
+        try await Self.waitUntil { store.messages.map(\.id) == [stale.id] }
+        store.reload(roomID: roomID)
+        try await Self.waitUntil { store.messages.map(\.id) == [current.id] }
+
+        XCTAssertEqual(loadCount, 2)
+        XCTAssertEqual(store.initialState, .loaded)
     }
 
     @MainActor

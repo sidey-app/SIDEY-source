@@ -479,7 +479,9 @@ extension AppCoordinator {
             refreshStatusItem()
         case .messageDeleted(let roomID, let messageID):
             model.removeMessage(id: messageID, roomID: roomID)
+            removeHistoryMessage(id: messageID, roomID: roomID)
         case .messagesInvalidated(let roomID):
+            reloadHistory(roomID: roomID)
             guard let backend else { return }
             Task { [weak self] in
                 guard let self else { return }
@@ -492,6 +494,7 @@ extension AppCoordinator {
             }
         case .messagesReplaced(let roomID, let messages):
             model.replaceMessages(roomID: roomID, with: messages)
+            reloadHistory(roomID: roomID)
         case .presence(let roomID, let userID, let state):
             model.updatePresence(roomID: roomID, userID: userID, state: state)
             overlayWindows.refreshThrowHotspots()

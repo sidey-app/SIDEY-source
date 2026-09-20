@@ -39,7 +39,13 @@ final class AppCoordinator {
         onRegionChanged: { [weak self] in self?.persistPreferences() },
         onTreeMovementToggle: { [weak self] in self?.toggleTreeMovement() }
     )
-    private lazy var historyWindow = makeHistoryWindow()
+    private var historyWindowStorage: HistoryWindowController?
+    private var historyWindow: HistoryWindowController {
+        if let historyWindowStorage { return historyWindowStorage }
+        let historyWindow = makeHistoryWindow()
+        historyWindowStorage = historyWindow
+        return historyWindow
+    }
     lazy var settingsWindow = SettingsWindowController(
         model: model,
         actions: SettingsActions(
@@ -516,6 +522,14 @@ final class AppCoordinator {
         applyActivationPolicyForCurrentLifecycle()
         historyWindow.show()
         NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+
+    func removeHistoryMessage(id: UUID, roomID: UUID) {
+        historyWindowStorage?.historyStore.remove(messageID: id, roomID: roomID)
+    }
+
+    func reloadHistory(roomID: UUID) {
+        historyWindowStorage?.historyStore.reload(roomID: roomID)
     }
 
 }

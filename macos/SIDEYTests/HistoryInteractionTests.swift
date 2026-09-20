@@ -107,8 +107,13 @@ final class HistoryInteractionTests: XCTestCase {
         let original = item(1, senderID: userID)
         var pending = original.entry
         pending.state = .pending
-        update(view, items: [HistoryTimelineItem(entry: pending, participant: original.participant)] + messages)
+        update(view, items: messages + [HistoryTimelineItem(entry: pending, participant: original.participant)])
         XCTAssertTrue(view.isAtBottom)
+        let pendingFrame = try XCTUnwrap(view.frameForMessage(pending.id))
+        XCTAssertTrue(
+            pendingFrame.intersects(view.contentView.bounds),
+            "The pending card must remain visible after following the local send"
+        )
     }
 
     func testIncomingAppendFollowsWhenAlreadyAtBottom() {
