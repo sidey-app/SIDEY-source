@@ -31,8 +31,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private let onOpenStore: () -> Void
     private let onToggleLaunchAtLogin: () -> Void
     private let onOpenGroupSettings: () -> Void
-    private let onCheckForUpdates: () -> Void
-    private let canCheckForUpdates: () -> Bool
     private let onOpenSettings: () -> Void
     private let onQuit: () -> Void
     private var statusItem: NSStatusItem?
@@ -42,6 +40,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private var unreadCounts: [UUID: Int] = [:]
     private var quietModeEnabled = false
     private var launchAtLogin = false
+    private var globalShortcutStatuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
 
     init(
         onToggleOverlay: @escaping () -> Void,
@@ -52,8 +51,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         onOpenStore: @escaping () -> Void = {},
         onToggleLaunchAtLogin: @escaping () -> Void = {},
         onOpenGroupSettings: @escaping () -> Void = {},
-        onCheckForUpdates: @escaping () -> Void = {},
-        canCheckForUpdates: @escaping () -> Bool = { true },
         onOpenSettings: @escaping () -> Void,
         onQuit: @escaping () -> Void
     ) {
@@ -65,8 +62,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         self.onOpenStore = onOpenStore
         self.onToggleLaunchAtLogin = onToggleLaunchAtLogin
         self.onOpenGroupSettings = onOpenGroupSettings
-        self.onCheckForUpdates = onCheckForUpdates
-        self.canCheckForUpdates = canCheckForUpdates
         self.onOpenSettings = onOpenSettings
         self.onQuit = onQuit
     }
@@ -85,7 +80,8 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         activeRoomID: UUID? = nil,
         unreadCounts: [UUID: Int] = [:],
         quietModeEnabled: Bool = false,
-        launchAtLogin: Bool = false
+        launchAtLogin: Bool = false,
+        globalShortcutStatuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
     ) {
         self.overlayVisible = overlayVisible
         self.rooms = rooms
@@ -93,6 +89,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         self.unreadCounts = unreadCounts
         self.quietModeEnabled = quietModeEnabled
         self.launchAtLogin = launchAtLogin
+        self.globalShortcutStatuses = globalShortcutStatuses
         updateStatusIcon()
         statusItem?.menu = makeMenu()
     }
@@ -109,6 +106,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(overlay)
 
         let message = NSMenuItem(title: "메시지 작성…", action: #selector(focusMessage), keyEquivalent: "")
+        annotateShortcut(.toggleComposer, on: message)
         message.target = self
         message.isEnabled = !rooms.isEmpty
         menu.addItem(message)
@@ -121,11 +119,13 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(groups)
 
         let quiet = NSMenuItem(title: "조용히 모드", action: #selector(toggleQuietMode), keyEquivalent: "")
+        annotateShortcut(.toggleQuietMode, on: quiet)
         quiet.target = self
         quiet.state = quietModeEnabled ? .on : .off
         menu.addItem(quiet)
 
         let history = NSMenuItem(title: "최근 기록…", action: #selector(openHistory), keyEquivalent: "")
+        annotateShortcut(.openHistory, on: history)
         history.target = self
         history.isEnabled = !rooms.isEmpty
         menu.addItem(history)
@@ -144,11 +144,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(login)
         menu.addItem(.separator())
 
-        let updates = NSMenuItem(title: "업데이트 확인…", action: #selector(checkForUpdates), keyEquivalent: "")
-        updates.target = self
-        updates.isEnabled = canCheckForUpdates()
-        menu.addItem(updates)
-
         let settings = NSMenuItem(title: "설정…", action: #selector(openSettings), keyEquivalent: ",")
         settings.target = self
         menu.addItem(settings)
@@ -160,8 +155,14 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         return menu
     }
 
-    func menuWillOpen(_ menu: NSMenu) {
-        menu.item(withTitle: "업데이트 확인…")?.isEnabled = canCheckForUpdates()
+    private func annotateShortcut(_ action: GlobalShortcutAction, on item: NSMenuItem) {
+        // Carbon owns dispatch. A menu key equivalent would create a second execution path.
+        let unavailable = globalShortcutStatuses[action]?.notice
+        let suffix = unavailable == nil ? action.displayShortcut : "\(action.displayShortcut) · 단축키 사용 불가"
+        let title = item.title
+        item.attributedTitle = NSAttributedString(string: "\(title)    \(suffix)")
+        item.title = title
+        item.toolTip = unavailable ?? action.descriptiveShortcut
     }
 
     private func makeRoomsMenu() -> NSMenu {
@@ -205,7 +206,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     @objc private func openStore() { onOpenStore() }
     @objc private func toggleLaunchAtLogin() { onToggleLaunchAtLogin() }
     @objc private func openGroupSettings() { onOpenGroupSettings() }
-    @objc private func checkForUpdates() { onCheckForUpdates() }
     @objc private func openSettings() { onOpenSettings() }
     @objc private func quit() { onQuit() }
 }

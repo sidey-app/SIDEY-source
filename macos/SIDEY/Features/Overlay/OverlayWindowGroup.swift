@@ -174,7 +174,8 @@ final class OverlayWindowGroup {
         onSend: { [weak self] body in self?.submitComposerMessage(body) },
         onInputActivity: { [weak self] in self?.composerDidReceiveInput() },
         onTypingChanged: { [weak self] active in self?.composerTypingChanged(active) },
-        onCancel: { [weak self] in self?.dismissComposer() }
+        onCancel: { [weak self] in self?.dismissComposer() },
+        onFrameChanged: { [weak self] frame, finished in self?.composerFrameChanged(frame, finished: finished) }
     )
     private lazy var hotspotWindow = CharacterHotspotWindowController(
         onClick: { [weak self] clickCount in self?.handleCharacterClick(clickCount: clickCount) },
@@ -183,6 +184,10 @@ final class OverlayWindowGroup {
             self.onTreeMovementToggle()
         },
         onDoubleRightClick: { [weak self] in self?.activateThrowTargeting() }
+    )
+    private lazy var characterClicks = CharacterRightClickCoordinator(
+        onSingle: { [weak self] in self?.toggleComposer() },
+        onDouble: { [weak self] in self?.onCharacterDoubleClick() }
     )
     private var targetHotspotWindows: [UUID: CharacterHotspotWindowController] = [:]
     private var screenObserver: ScreenObserverToken?
@@ -239,7 +244,10 @@ final class OverlayWindowGroup {
     }
 
     func setVisible(_ visible: Bool) {
-        if !visible { model.characterImpactAudio.stopAll() }
+        if !visible {
+            characterClicks.cancel()
+            model.characterImpactAudio.stopAll()
+        }
         overlayVisible = visible
         if visible {
             apply(preference: model.preferences.overlayRegion, persistFallback: true)
@@ -259,15 +267,13 @@ final class OverlayWindowGroup {
     }
 
     func presentComposer() {
+        characterClicks.cancel()
         guard overlayVisible, model.activeRoom != nil else { return }
         cancelComposerAutoDismiss()
         composerVisible = true
         worldWindow.setComposerVisible(true)
         interactionWindow.setVisible(true)
         interactionWindow.focusMessageField()
-        if !MessageValidator.normalized(model.draft).isEmpty {
-            onTypingChanged(true)
-        }
     }
 
     func dismissComposer() {
@@ -279,17 +285,7 @@ final class OverlayWindowGroup {
     }
 
     func handleCharacterClick(clickCount: Int) {
-        switch clickCount {
-        case 1:
-            toggleComposer()
-        case 2:
-            // The first click in the sequence already performed the existing
-            // single-click behavior. Keep the composer open after the second.
-            presentComposer()
-            onCharacterDoubleClick()
-        default:
-            break
-        }
+        characterClicks.handle(clickCount: clickCount)
     }
 
     func playCharacterPulse(_ event: CharacterPulseEvent) {
@@ -389,7 +385,9 @@ final class OverlayWindowGroup {
             renderFrame: frames.renderFrame,
             localActivityFrame: frames.localActivityFrame
         )
-        interactionWindow.setScreenFrame(screen.visibleFrame)
+        interactionWindow.setFrame(ComposerPositionLayout.frame(
+            preference: model.preferences.composerPosition, screens: screens, fallback: screen
+        ))
         positionHotspot()
 
         if persistFallback,
@@ -397,6 +395,15 @@ final class OverlayWindowGroup {
             model.preferences.overlayRegion = resolved
             onRegionChanged()
         }
+    }
+
+    private func composerFrameChanged(_ frame: CGRect, finished: Bool) {
+        worldWindow.setComposerFrame(frame.offsetBy(dx: -renderFrame.minX, dy: -renderFrame.minY))
+        guard finished, let screen = ComposerPositionLayout.screen(for: frame, screens: screenGeometries) else { return }
+        let clamped = ComposerPositionLayout.clamp(frame, to: screen.visibleFrame)
+        model.preferences.composerPosition = ComposerPositionLayout.preference(frame: clamped, screen: screen)
+        interactionWindow.setFrame(clamped)
+        onRegionChanged()
     }
 
     private func screensDidChange() {
@@ -411,6 +418,7 @@ final class OverlayWindowGroup {
     }
 
     private func dismissComposer(sendTypingStop: Bool) {
+        characterClicks.cancel()
         cancelComposerAutoDismiss()
         guard composerVisible || interactionWindow.isVisible else { return }
         composerVisible = false
@@ -434,6 +442,7 @@ final class OverlayWindowGroup {
         currentUserLocalFrame = model.currentUserID.flatMap { frames[$0] }
         let localFrame = currentUserLocalFrame
         guard localFrame != nil else {
+            characterClicks.cancel()
             hotspotWindow.setFrame(nil)
             dismissComposer()
             resetThrowTargeting()

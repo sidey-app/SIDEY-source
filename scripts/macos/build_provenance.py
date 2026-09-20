@@ -12,7 +12,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
-INPUT_DIRS = ('macos/SIDEY', 'macos/SIDEYLoginItem', 'macos/Config', 'macos/SIDEY.xcodeproj', 'scripts/macos', 'macos/Recording')
+INPUT_DIRS = ('macos/SIDEY', 'macos/Config', 'macos/SIDEY.xcodeproj', 'scripts/macos', 'macos/Recording')
 EXCLUDED = {'xcuserdata', 'build', 'DerivedData', '__pycache__', '.git', 'node_modules', 'dist'}
 
 

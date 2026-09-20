@@ -86,6 +86,8 @@ struct NativeMessageField: NSViewRepresentable {
     let onInputActivity: () -> Void
     let onSubmit: () -> Void
     let onCancel: () -> Void
+    var onTextEdited: (Bool) -> Void = { _ in }
+    var onFocusLost: () -> Void = {}
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -144,11 +146,17 @@ struct NativeMessageField: NSViewRepresentable {
             self.parent = parent
         }
 
+        func textDidEndEditing(_ notification: Notification) {
+            parent.onFocusLost()
+        }
+
         func textDidChange(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else { return }
             parent.onInputActivity()
-            guard let textView = notification.object as? NSTextView,
-                  !textView.hasMarkedText()
-            else { return }
+            if textView.hasMarkedText() {
+                parent.onTextEdited(!textView.string.isEmpty)
+                return
+            }
             let candidate = textView.string
             guard MessageValidator.isValidDraft(candidate) else {
                 // Replacing the string emits a synchronous selection-change
@@ -164,6 +172,7 @@ struct NativeMessageField: NSViewRepresentable {
             lastValidText = candidate
             lastValidSelection = textView.selectedRange()
             parent.text = candidate
+            parent.onTextEdited(!candidate.isEmpty)
             (textView as? VerticallyCenteredMessageTextView)?.revealSelection()
         }
 
@@ -181,6 +190,9 @@ struct NativeMessageField: NSViewRepresentable {
                 return true
             }
             guard commandSelector == #selector(NSResponder.insertNewline(_:)) else { return false }
+            // The input manager owns Return while a Korean/Japanese composition
+            // is marked; it commits the composition without sending the draft.
+            guard !textView.hasMarkedText() else { return false }
             if NSApplication.shared.currentEvent?.modifierFlags.contains(.shift) == true {
                 let candidate = (textView.string as NSString).replacingCharacters(
                     in: textView.selectedRange(),

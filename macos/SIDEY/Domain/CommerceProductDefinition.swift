@@ -24,11 +24,7 @@ struct CommerceProductDefinition: Decodable, Sendable {
         case relatedCharacterProductID = "related_character_product_id", renderAssetID = "render_asset_id"
     }
     var product: CommerceProduct {
-        #if APP_STORE
         let price = appStorePrice
-        #else
-        let price = directPrice
-        #endif
         return CommerceProduct(id: id, displayName: name, description: description, kind: kind,
             catalogItemID: itemID, characterID: characterID, entitlementKey: entitlement,
             sortOrder: sortOrder, amountKRW: price, currency: "KRW", taxInclusive: true)

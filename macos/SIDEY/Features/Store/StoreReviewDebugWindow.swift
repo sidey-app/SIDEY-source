@@ -71,7 +71,6 @@ final class StoreReviewDebugWindow: NSWindowController {
 private final class StoreReviewSelection: ObservableObject {
     @Published var selectedID = CommerceProduct.pig.id
     @Published var ownership = 0
-    @Published var usesAppStore = true
     @Published var notice = ""
     let audio = CharacterImpactAudio()
     func state(_ product: CommerceProduct) -> CommerceProductState {
@@ -79,7 +78,7 @@ private final class StoreReviewSelection: ObservableObject {
             || (ownership == 2 && product.isKeepsake)
         let price = CommerceCatalog.definition(id: product.id)?.appStorePrice ?? product.amountKRW
         return CommerceProductState(product: product, purchaseState: owns ? .owned : .available,
-            isWorking: false, localizedPrice: usesAppStore ? "\(price.formatted())원" : nil)
+            isWorking: false, localizedPrice: "\(price.formatted())원")
     }
     var actions: SettingsActions {
         var actions = SettingsActions.empty
@@ -103,14 +102,13 @@ private struct StoreReviewDebugView: View {
                     Text("미보유").tag(0); Text("캐릭터만").tag(1)
                     Text("물건만").tag(2); Text("둘 다").tag(3)
                 }.frame(width: 150)
-                Toggle("App Store", isOn: $review.usesAppStore)
             }.padding(12)
             if !review.notice.isEmpty { Text(review.notice).font(.caption) }
             Divider()
             if let product = CommerceCatalog.product(id: review.selectedID) {
                 StoreProductDetailSheet(productState: review.state(product),
                     relatedProductState: CommerceCatalog.keepsake(for: product.id).map { review.state($0) },
-                    actions: review.actions, availability: review.usesAppStore ? .appStore : .direct,
+                    actions: review.actions, availability: .appStore,
                     onClose: { NSApp.keyWindow?.close() })
                     .id(product.id)
             }

@@ -4,9 +4,24 @@ import AppKit
 final class AppCoordinator {
     let model: AppModel
 
+    lazy var typingActivity = makeTypingActivity()
+
+    private func makeTypingActivity() -> TypingActivityController {
+        TypingActivityController(
+            now: { ProcessInfo.processInfo.systemUptime },
+            automaticallySchedule: true,
+            publish: { [weak self] roomID, event in
+                try await self?.backend?.broadcastTyping(roomID: roomID, event: event)
+            },
+            localTyping: { [weak self] roomID, active in
+                guard let self, let userID = model.currentUserID else { return }
+                model.updateTyping(roomID: roomID, userID: userID, active: active)
+            }
+        )
+    }
+
     let preferencesStore: PreferencesStore
     private let legacyMigrator: LegacySettingsMigrator
-    private let updateController: any AppUpdateChecking
     let releaseChannel: AppReleaseChannel
     var backend: SideyBackend?
     private let runtimeConfiguration: RuntimeConfiguration?
@@ -24,7 +39,13 @@ final class AppCoordinator {
         onRegionChanged: { [weak self] in self?.persistPreferences() },
         onTreeMovementToggle: { [weak self] in self?.toggleTreeMovement() }
     )
-    private lazy var historyWindow = makeHistoryWindow()
+    private var historyWindowStorage: HistoryWindowController?
+    private var historyWindow: HistoryWindowController {
+        if let historyWindowStorage { return historyWindowStorage }
+        let historyWindow = makeHistoryWindow()
+        historyWindowStorage = historyWindow
+        return historyWindow
+    }
     lazy var settingsWindow = SettingsWindowController(
         model: model,
         actions: SettingsActions(
@@ -36,8 +57,6 @@ final class AppCoordinator {
             },
             onQuietModeChanged: { [weak self] enabled in self?.setQuietMode(enabled) },
             onLaunchAtLoginChanged: { [weak self] enabled in self?.setLaunchAtLogin(enabled) },
-            onCheckForUpdates: { [weak self] in self?.updateController.checkForUpdates() },
-            canCheckForUpdates: { [weak self] in self?.updateController.canCheckForUpdates ?? false },
             onPurchase: { [weak self] productID in self?.purchase(productID: productID) },
             onRefreshCommerceState: { [weak self] productID in
                 self?.refreshCommerceState(productID: productID)
@@ -84,17 +103,29 @@ final class AppCoordinator {
     )
     private lazy var statusItemController = StatusItemController(
         onToggleOverlay: { [weak self] in self?.toggleOverlay() },
-        onFocusMessage: { [weak self] in self?.focusMessageField() },
+        onFocusMessage: { [weak self] in self?.toggleMessageComposer() },
         onSelectRoom: { [weak self] roomID in self?.selectRoom(roomID) },
         onToggleQuietMode: { [weak self] in self?.setQuietMode(!(self?.model.preferences.quietModeEnabled ?? false)) },
         onOpenHistory: { [weak self] in self?.showHistory() },
         onOpenStore: { [weak self] in self?.showStore() },
         onToggleLaunchAtLogin: { [weak self] in self?.setLaunchAtLogin(!(self?.model.launchAtLogin ?? false)) },
         onOpenGroupSettings: { [weak self] in self?.showGroupSettings() },
-        onCheckForUpdates: { [weak self] in self?.updateController.checkForUpdates() },
-        canCheckForUpdates: { [weak self] in self?.updateController.canCheckForUpdates ?? false },
         onOpenSettings: { [weak self] in self?.showSettings() },
         onQuit: { NSApplication.shared.terminate(nil) }
+    )
+    private lazy var globalShortcuts = GlobalShortcutController(
+        onAction: { [weak self] action in
+            guard let self else { return }
+            switch action {
+            case .toggleQuietMode: self.setQuietMode(!self.model.preferences.quietModeEnabled)
+            case .toggleComposer: self.toggleMessageComposer()
+            case .openHistory: self.showHistory()
+            }
+        },
+        onStatusChanged: { [weak self] statuses in
+            self?.model.globalShortcutStatuses = statuses
+            self?.refreshStatusItem()
+        }
     )
     let commerceSession = CommerceSession()
     let roomSession = RoomSessionLifetime()
@@ -102,6 +133,7 @@ final class AppCoordinator {
     private var landingTask: Task<Void, Never>?
     private var landingDidComplete = false
     private var didCompleteFirstRunTransition = false
+    private var settingsWindowPresented = false
     var backendBootstrapState: BackendBootstrapState = .pending
     var backendConnectionStatus: BackendConnectionStatus?
     private lazy var activityMonitor = SystemActivityMonitor { [weak self] state in
@@ -110,7 +142,6 @@ final class AppCoordinator {
     private let mainThreadProbe = MainThreadPerformanceProbe()
 
     init(
-        updateController: any AppUpdateChecking,
         preferencesStore: PreferencesStore = .live,
         legacyMigrator: LegacySettingsMigrator = .live,
         keychainAccessSession: KeychainAccessSession = .shared,
@@ -118,7 +149,6 @@ final class AppCoordinator {
         arguments: [String] = ProcessInfo.processInfo.arguments,
         onLandingFirstFrame: @escaping () -> Void = {}
     ) {
-        self.updateController = updateController
         self.releaseChannel = releaseChannel
         self.launchAtLoginController = LaunchAtLoginController(mode: releaseChannel.loginItemMode)
         self.preferencesStore = preferencesStore
@@ -189,6 +219,7 @@ final class AppCoordinator {
 
         mainThreadProbe.start()
         statusItemController.install()
+        globalShortcuts.install()
         overlayWindows.restore(preference: model.preferences.overlayRegion)
         model.launchAtLogin = launchAtLoginController.isEnabled
         model.preferences.launchAtLogin = model.launchAtLogin
@@ -207,7 +238,7 @@ final class AppCoordinator {
             showSettings()
         case .loginItem:
             refreshStatusItem()
-            NSApplication.shared.setActivationPolicy(.accessory)
+            applyActivationPolicyForCurrentLifecycle()
         }
         activityMonitor.start()
         startBackend()
@@ -222,17 +253,29 @@ final class AppCoordinator {
         showSettings()
     }
 
-    func shutdown() {
+    private var shutdownTask: Task<Void, Never>?
+
+    @discardableResult
+    func shutdown() -> Task<Void, Never>? {
+        if let shutdownTask { return shutdownTask }
+        globalShortcuts.uninstall()
         cancelTreeMovementRequests()
         model.treeMovement.reset()
         landingTask?.cancel()
+        stopAllTyping()
         roomSession.cancel()
         commerceSession.cancel(model: model)
         activityMonitor.stop()
         mainThreadProbe.stop()
-        if let backend { Task { await backend.shutdown() } }
+        let typingActivity = typingActivity
+        let backend = backend
+        shutdownTask = Task {
+            await typingActivity.shutdown()
+            await backend?.shutdown()
+        }
         keychainAccessSession.setAccessDeniedHandler(nil)
         persistPreferences()
+        return shutdownTask
     }
 
     private func showLanding() {
@@ -278,7 +321,7 @@ final class AppCoordinator {
         case .overlay:
             didCompleteFirstRunTransition = true
             landingWindow.close()
-            NSApplication.shared.setActivationPolicy(.accessory)
+            applyActivationPolicyForCurrentLifecycle()
             applyRequestedOverlayVisibility()
         case .recovery:
             didCompleteFirstRunTransition = true
@@ -288,7 +331,8 @@ final class AppCoordinator {
     }
 
     func showSettings() {
-        NSApplication.shared.setActivationPolicy(.regular)
+        settingsWindowPresented = true
+        applyActivationPolicyForCurrentLifecycle()
         settingsWindow.show()
         NSApplication.shared.activate(ignoringOtherApps: true)
     }
@@ -304,52 +348,31 @@ final class AppCoordinator {
     }
 
     func handleOpenURL(_ url: URL) -> Bool {
-#if APP_STORE
         return false
-#else
-        guard releaseChannel.storeAvailability == .direct,
-              SideyAuthCallback.matches(url),
-              let backend
-        else { return false }
-        showStore()
-        commerceSession.authenticationTask?.cancel()
-        let previousTreeTask = cancelTreeMovementRequests()
-        let targetProductID = commerceSession.googleConnectionProductID
-        commerceSession.authenticationTask = Task { [weak self] in
-            guard let self else { return }
-            defer {
-                commerceSession.googleConnectionProductID = nil
-                commerceSession.authenticationTask = nil
-            }
-            do {
-                await previousTreeTask?.value
-                try await backend.handleAuthCallback(url)
-                refreshCommerceState()
-                model.presentSuccess("Google 계정을 연결했습니다.")
-                model.errorMessage = nil
-            } catch {
-                if let targetProductID {
-                    model.setCommercePurchaseState(
-                        .error("Google 계정 연결을 확인하지 못했습니다."),
-                        productID: targetProductID
-                    )
-                }
-                model.errorMessage = "Google 계정 연결 실패: \(error.localizedDescription)"
-            }
-        }
-        return true
-#endif
     }
 
     private func settingsDidClose() {
-        NSApplication.shared.setActivationPolicy(.accessory)
+        settingsWindowPresented = false
+        applyActivationPolicyForCurrentLifecycle()
+    }
+
+    func applyActivationPolicyForCurrentLifecycle() {
+        let policy: NSApplication.ActivationPolicy = DockVisibilityPolicy.shouldShowDockIcon(
+            firstRunPresentationActive: launchReason == .firstRun && !didCompleteFirstRunTransition,
+            settingsWindowPresented: settingsWindowPresented
+        ) ? .regular : .accessory
+        NSApplication.shared.setActivationPolicy(policy)
     }
 
     private func toggleOverlay() {
         setOverlayVisible(!model.overlayVisible)
     }
 
-    private func focusMessageField() {
+    func toggleMessageComposer() {
+        if overlayWindows.composerVisible {
+            overlayWindows.dismissComposer()
+            return
+        }
         if !model.overlayVisible { setOverlayVisible(true) }
         overlayWindows.focusMessageField()
     }
@@ -467,7 +490,8 @@ final class AppCoordinator {
             activeRoomID: model.activeRoom?.id,
             unreadCounts: model.unreadCounts,
             quietModeEnabled: model.preferences.quietModeEnabled,
-            launchAtLogin: model.launchAtLogin
+            launchAtLogin: model.launchAtLogin,
+            globalShortcutStatuses: model.globalShortcutStatuses
         )
     }
 
@@ -487,15 +511,25 @@ final class AppCoordinator {
                     before: cursor,
                     pageSize: pageSize
                 )
-            }
+            },
+            onSend: { [weak self] in self?.sendMessage($0, source: .history) },
+            onTypingChanged: { [weak self] in self?.typingChanged($0, source: .history) }
         )
     }
 
     private func showHistory() {
         markActiveRoomRead()
-        NSApplication.shared.setActivationPolicy(.regular)
+        applyActivationPolicyForCurrentLifecycle()
         historyWindow.show()
         NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+
+    func removeHistoryMessage(id: UUID, roomID: UUID) {
+        historyWindowStorage?.historyStore.remove(messageID: id, roomID: roomID)
+    }
+
+    func reloadHistory(roomID: UUID) {
+        historyWindowStorage?.historyStore.reload(roomID: roomID)
     }
 
 }

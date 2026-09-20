@@ -107,6 +107,7 @@ final class PixelWorldWindowController {
     private let model: AppModel
     private var hostingView: NSHostingView<PixelWorldView>?
     private var composerVisible = false
+    private var composerFrame: CGRect?
     private var characterPulse: CharacterPulseEvent?
     private var characterThrow: CharacterThrowEvent?
     private var localActivityFrame: CGRect = .zero
@@ -157,6 +158,12 @@ final class PixelWorldWindowController {
         hostingView?.rootView = makeRootView()
     }
 
+    func setComposerFrame(_ frame: CGRect) {
+        guard composerFrame != frame else { return }
+        composerFrame = frame
+        hostingView?.rootView = makeRootView()
+    }
+
     func playCharacterPulse(_ event: CharacterPulseEvent) {
         guard event.roomID == model.activeRoom?.id, let hostingView else { return }
         characterPulse = event
@@ -192,6 +199,7 @@ final class PixelWorldWindowController {
             model: model,
             activityFrame: localActivityFrame,
             composerVisible: composerVisible,
+            composerFrame: composerFrame,
             characterPulse: characterPulse,
             characterThrow: characterThrow,
             onCharacterFramesChanged: onCharacterFramesChanged
@@ -219,8 +227,11 @@ final class OverlayInteractionWindowController: NSObject, NSWindowDelegate {
     static let focusLossDismissDelay: Duration = .milliseconds(250)
     private let panel: NSPanel
     private let onDismissRequested: () -> Void
+    private let onTypingEnded: () -> Void
     private let focusLossScheduler: any ComposerFocusLossScheduling
     private let isApplicationActive: @MainActor () -> Bool
+    private let onFrameChanged: (CGRect, Bool) -> Void
+    private var settingFrame = false
     private var focusRequestID = 0
     private var isProgrammaticallyHiding = false
     private(set) var hasPendingFocusLossDismiss = false
@@ -231,12 +242,15 @@ final class OverlayInteractionWindowController: NSObject, NSWindowDelegate {
         onInputActivity: @escaping () -> Void,
         onTypingChanged: @escaping (Bool) -> Void,
         onCancel: @escaping () -> Void,
+        onFrameChanged: @escaping (CGRect, Bool) -> Void = { _, _ in },
         focusLossScheduler: (any ComposerFocusLossScheduling)? = nil,
         isApplicationActive: @escaping @MainActor () -> Bool = { NSApplication.shared.isActive }
     ) {
         onDismissRequested = onCancel
+        onTypingEnded = { onTypingChanged(false) }
         self.focusLossScheduler = focusLossScheduler ?? TaskComposerFocusLossScheduler()
         self.isApplicationActive = isApplicationActive
+        self.onFrameChanged = onFrameChanged
         panel = InteractiveOverlayPanel(
             contentRect: CGRect(origin: .zero, size: Self.panelSize),
             styleMask: [.borderless],
@@ -250,6 +264,8 @@ final class OverlayInteractionWindowController: NSObject, NSWindowDelegate {
             name: NSApplication.didResignActiveNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(self, selector: #selector(dragEnded(_:)),
+            name: .sideyComposerDragEnded, object: panel)
         panel.identifier = OverlayWindowIdentifier.composer
         panel.delegate = self
         panel.backgroundColor = .clear
@@ -283,8 +299,26 @@ final class OverlayInteractionWindowController: NSObject, NSWindowDelegate {
     }
 
     func setScreenFrame(_ visibleFrame: CGRect) {
-        panel.setFrame(OverlayComposerLayout.frame(in: visibleFrame), display: panel.isVisible)
+        setFrame(OverlayComposerLayout.frame(in: visibleFrame))
     }
+
+    func setFrame(_ frame: CGRect) {
+        settingFrame = true
+        panel.setFrame(frame, display: panel.isVisible)
+        settingFrame = false
+        onFrameChanged(panel.frame, false)
+    }
+
+    func windowDidMove(_ notification: Notification) {
+        guard !settingFrame else { return }
+        onFrameChanged(panel.frame, false)
+    }
+
+    @objc private func dragEnded(_ notification: Notification) {
+        onFrameChanged(panel.frame, true)
+    }
+
+    var frame: CGRect { panel.frame }
 
     func setVisible(_ visible: Bool) {
         if visible {
@@ -301,6 +335,7 @@ final class OverlayInteractionWindowController: NSObject, NSWindowDelegate {
 
     func windowDidResignKey(_ notification: Notification) {
         guard !isProgrammaticallyHiding, panel.isVisible else { return }
+        onTypingEnded()
         scheduleFocusLossDismissCheck()
     }
 
@@ -480,68 +515,6 @@ final class CharacterHotspotWindowController {
     var isVisible: Bool { panel.isVisible }
     var ignoresMouseEvents: Bool { panel.ignoresMouseEvents }
     var size: CGSize { panel.frame.size }
-}
-
-@MainActor
-final class HistoryWindowController: NSWindowController, NSWindowDelegate {
-    static let contentSize = CGSize(width: 560, height: 420)
-    private let model: AppModel
-    private(set) var historyStore: MessageHistoryStore
-
-    convenience init(model: AppModel) {
-        self.init(
-            model: model,
-            loadPage: { _, _, _ in
-                MessageHistoryPage(messages: [], nextCursor: nil)
-            }
-        )
-    }
-
-    init(
-        model: AppModel,
-        loadPage: @escaping MessageHistoryPageLoader
-    ) {
-        self.model = model
-        let historyStore = MessageHistoryStore(loadPage: loadPage)
-        self.historyStore = historyStore
-        let window = NSWindow(
-            contentRect: CGRect(origin: .zero, size: Self.contentSize),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
-            backing: .buffered,
-            defer: false
-        )
-        window.title = "\(AppPresentation.displayName) 최근 기록"
-        window.level = .normal
-        window.collectionBehavior = [.managed]
-        window.isReleasedWhenClosed = false
-        window.minSize = CGSize(width: 440, height: 300)
-        window.center()
-        window.contentView = NSHostingView(
-            rootView: OverlayHistoryView(
-                model: model,
-                history: historyStore,
-                onClose: { [weak window] in
-                    historyStore.deactivate()
-                    window?.orderOut(nil)
-                }
-            )
-        )
-        super.init(window: window)
-        window.delegate = self
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    func show() {
-        historyStore.activate(roomID: model.realtimeActiveRoomID)
-        window?.makeKeyAndOrderFront(nil)
-    }
-
-    func windowWillClose(_ notification: Notification) {
-        historyStore.deactivate()
-    }
 }
 
 private extension NSView {

@@ -2,6 +2,11 @@ import CoreGraphics
 import Foundation
 import Observation
 
+enum MessageInputSource {
+    case overlay
+    case history
+}
+
 @MainActor
 @Observable
 final class AppModel {
@@ -40,6 +45,9 @@ final class AppModel {
         didSet { if oldValue != currentUserID { treeMovement.reset() } }
     }
     var errorMessage: String?
+    var historySendError: String?
+    var globalShortcutStatuses: [GlobalShortcutAction: GlobalShortcutStatus] = [:]
+    private(set) var typingInputSource: MessageInputSource?
     private var successFeedback = SuccessFeedbackState()
     var successMessage: String? { successFeedback.message }
     var successMessageGeneration: Int { successFeedback.generation }
@@ -75,7 +83,29 @@ final class AppModel {
         preferences.overlayVisible = visibility.isVisible
     }
 
+    var canSubmitDraft: Bool {
+        groupOperation == .idle && !isWorking && activeRoom != nil
+            && MessageValidator.isValid(MessageValidator.normalized(draft))
+    }
+
+    /// Only the input that last received an edit may end that typing session.
+    /// A delayed focus-loss callback from the other window cannot cancel it.
+    @discardableResult
+    func updateTypingInput(active: Bool, source: MessageInputSource) -> Bool {
+        if active {
+            guard groupOperation == .idle else { return false }
+            typingInputSource = source
+            return true
+        }
+        guard typingInputSource == source else { return false }
+        typingInputSource = nil
+        return true
+    }
+
+    func resetTypingInput() { typingInputSource = nil }
+
     func acceptDraft() -> String? {
+        guard canSubmitDraft else { return nil }
         let normalized = MessageValidator.normalized(draft)
         guard MessageValidator.isValid(normalized) else { return nil }
         draft = ""
@@ -424,10 +454,11 @@ final class AppModel {
     var pixelWorldMembers: [PixelWorldMember] {
         OverlayMemberProjection.members(room: activeRoom, currentUserID: currentUserID,
                                         localPresence: effectiveLocalPresence,
-                                        showsOffline: preferences.showOfflineMembers, state: realtime)
+                                        showsOffline: preferences.showOfflineMembers, state: realtime,
+                                        quietModeEnabled: preferences.quietModeEnabled)
     }
 
-    var activeBubbles: [ActiveBubble] { bubbleLedger.bubbles }
+    var activeBubbles: [ActiveBubble] { preferences.quietModeEnabled ? [] : bubbleLedger.bubbles }
 
     var totalUnreadCount: Int { messages.totalUnreadCount }
     var activeRoomUnreadCount: Int { activeRoom.map { messages.unreadCount(in: $0.id) } ?? 0 }

@@ -8,18 +8,8 @@ struct OverlayComposerView: View {
     let onCancel: () -> Void
 
     var body: some View {
-        HStack(spacing: 10) {
-            Button(action: onCancel) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 13, weight: .bold))
-                    .frame(width: 28, height: 34)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .accessibilityLabel("메시지 입력 닫기")
-            .accessibilityIdentifier("sidey.composer-close")
-
+        HStack(spacing: 8) {
+            ComposerDragHandle().frame(width: 14, height: 34)
             ZStack(alignment: .leading) {
                 if model.draft.isEmpty {
                     Text("메시지를 입력해 주세요").foregroundStyle(.tertiary)
@@ -28,20 +18,19 @@ struct OverlayComposerView: View {
                     text: $model.draft,
                     onInputActivity: onInputActivity,
                     onSubmit: send,
-                    onCancel: onCancel
+                    onCancel: onCancel,
+                    onTextEdited: onTypingChanged,
+                    onFocusLost: { onTypingChanged(false) }
                 )
             }
             .frame(maxWidth: .infinity, minHeight: 34, maxHeight: 40)
-            .onChange(of: model.draft) { _, value in
-                onTypingChanged(!MessageValidator.normalized(value).isEmpty)
-            }
 
             Button(action: send) {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.title2)
             }
             .buttonStyle(.plain)
-            .disabled(!MessageValidator.isValid(MessageValidator.normalized(model.draft)))
+            .disabled(!model.canSubmitDraft)
             .accessibilityLabel("메시지 전송")
         }
         .font(.system(size: 16, weight: .medium))

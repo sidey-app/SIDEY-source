@@ -1,5 +1,5 @@
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class PresenceAndRealtimeTests: XCTestCase {
@@ -889,29 +889,6 @@ final class PresenceAndRealtimeTests: XCTestCase {
         XCTAssertEqual(model.rooms[0].members[0].presence, .reconnecting)
         model.setActiveRoomRealtimeConnected(true)
         XCTAssertEqual(model.rooms[0].members[0].presence, .offline)
-    }
-
-    func testTypingLeaseStartsOnceAndDoesNotRestartForEveryKeystroke() {
-        let roomID = UUID()
-        var lease = TypingLease()
-
-        XCTAssertEqual(lease.update(active: true, roomID: roomID), [.start(roomID)])
-        XCTAssertEqual(lease.update(active: true, roomID: roomID), [])
-        XCTAssertEqual(lease.update(active: true, roomID: roomID), [])
-        XCTAssertEqual(lease.update(active: false, roomID: roomID), [.stop(roomID)])
-        XCTAssertEqual(lease.update(active: false, roomID: roomID), [])
-    }
-
-    func testTypingLeaseStopsPreviousRoomBeforeStartingAnother() {
-        let previousRoomID = UUID()
-        let nextRoomID = UUID()
-        var lease = TypingLease()
-
-        XCTAssertEqual(lease.update(active: true, roomID: previousRoomID), [.start(previousRoomID)])
-        XCTAssertEqual(
-            lease.update(active: true, roomID: nextRoomID),
-            [.stop(previousRoomID), .start(nextRoomID)]
-        )
     }
 
     func testCharacterPulseCooldownAllowsOneEventPerMemberEverySecond() {

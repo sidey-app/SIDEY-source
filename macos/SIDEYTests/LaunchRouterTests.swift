@@ -1,5 +1,5 @@
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 final class LaunchRouterTests: XCTestCase {
     func testFirstRunWinsEvenWhenStartedByStaleLoginItem() {
@@ -18,6 +18,12 @@ final class LaunchRouterTests: XCTestCase {
             LaunchRouter.reason(hasShownNativeLanding: true, arguments: [LaunchRouter.loginItemArgument]),
             .loginItem
         )
+    }
+
+    func testDockIconIsVisibleOnlyForFirstRunOrSettingsPresentation() {
+        XCTAssertFalse(DockVisibilityPolicy.shouldShowDockIcon())
+        XCTAssertTrue(DockVisibilityPolicy.shouldShowDockIcon(firstRunPresentationActive: true))
+        XCTAssertTrue(DockVisibilityPolicy.shouldShowDockIcon(settingsWindowPresented: true))
     }
 
     func testManualReopenDoesNotOpenSettingsWhileComposerIsVisible() {

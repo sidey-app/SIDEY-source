@@ -1,6 +1,6 @@
 import Synchronization
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class BackendEventLifecycleTests: XCTestCase {
@@ -88,7 +88,7 @@ final class BackendEventLifecycleTests: XCTestCase {
         preferencesStore: PreferencesStore = PreferencesStore(load: { .defaults }, save: { _ in })
     ) -> AppCoordinator {
         AppCoordinator(
-            updateController: NoUpdateController(),
+
             preferencesStore: preferencesStore,
             legacyMigrator: .none,
             keychainAccessSession: KeychainAccessSession(),

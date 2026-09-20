@@ -214,6 +214,7 @@ final class PixelWorldScene: SKScene {
     private var edge: OverlayEdge = .bottom
     private var activityFrame: CGRect?
     private var composerVisible = false
+    private var composerFrame: CGRect?
     private var lifecycleObservers: [(NotificationCenter, NSObjectProtocol)] = []
     private var suspendedReasons: Set<String> = []
     private var lastUpdateTime: TimeInterval?
@@ -305,6 +306,7 @@ final class PixelWorldScene: SKScene {
         activityFrame: CGRect? = nil,
         installationSeed: UInt64,
         composerVisible: Bool = false,
+        composerFrame: CGRect? = nil,
         characterPulse: CharacterPulseEvent? = nil,
         characterThrow: CharacterThrowEvent? = nil,
         onCurrentUserFrameChanged: ((CGRect?) -> Void)? = nil,
@@ -320,6 +322,7 @@ final class PixelWorldScene: SKScene {
         let activityFrameChanged = self.activityFrame != activityFrame
         self.activityFrame = activityFrame
         self.composerVisible = composerVisible
+        self.composerFrame = composerFrame
         if roomChanged {
             stationaryTreeIDs.removeAll()
             resetStunState()
@@ -629,7 +632,8 @@ final class PixelWorldScene: SKScene {
         PixelWorldAvoidanceLayout.composerRects(
             activityFrame: effectiveActivityFrame,
             edge: edge,
-            composerVisible: composerVisible
+            composerVisible: composerVisible,
+            composerFrame: composerFrame
         )
     }
 

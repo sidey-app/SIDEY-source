@@ -1,10 +1,18 @@
 import AppKit
 import SpriteKit
 import XCTest
-@testable import SIDEY
+@testable import SIDEYAppStore
 
 @MainActor
 final class WindowPolicyTests: XCTestCase {
+    private func waitForWindowState(_ ready: @escaping @MainActor () -> Bool) async {
+        let condition = expectation(
+            for: NSPredicate { _, _ in MainActor.assumeIsolated { ready() } },
+            evaluatedWith: nil
+        )
+        await fulfillment(of: [condition], timeout: 2)
+    }
+
     func testRightClickSingleWaitsForDoubleClickWindow() async {
         let single = expectation(description: "single right click")
         var doubles = 0
@@ -268,6 +276,58 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(onboardingSize.height, 640)
     }
 
+    func testSettingsWindowMovesToTheActiveSpaceWhenPresented() {
+        let settings = SettingsWindowController(model: AppModel(preferences: .defaults))
+
+        XCTAssertTrue(settings.window?.collectionBehavior.contains(.moveToActiveSpace) ?? false)
+        XCTAssertFalse(settings.window?.collectionBehavior.contains(.canJoinAllSpaces) ?? true)
+    }
+
+    func testSettingsCloseFinishesBeforeLifecycleCallback() async {
+        let closed = expectation(description: "settings close lifecycle")
+        var callbackRan = false
+        let settings = SettingsWindowController(
+            model: AppModel(preferences: .defaults),
+            onClose: {
+                callbackRan = true
+                closed.fulfill()
+            }
+        )
+        settings.show()
+
+        settings.window?.close()
+
+        XCTAssertFalse(callbackRan)
+        XCTAssertFalse(settings.window?.isVisible ?? true)
+        await fulfillment(of: [closed], timeout: 1)
+        XCTAssertTrue(callbackRan)
+    }
+
+    func testReopenedSettingsIgnoresStaleCloseLifecycleCallback() async {
+        var closeCallbacks = 0
+        let settings = SettingsWindowController(
+            model: AppModel(preferences: .defaults),
+            onClose: { closeCallbacks += 1 }
+        )
+        settings.show()
+
+        settings.window?.close()
+        settings.show()
+
+        let queueDrained = expectation(description: "main queue drained")
+        DispatchQueue.main.async { queueDrained.fulfill() }
+        await fulfillment(of: [queueDrained], timeout: 1)
+        XCTAssertEqual(closeCallbacks, 0)
+        XCTAssertTrue(settings.window?.isVisible ?? false)
+
+        settings.window?.close()
+        let cleanupDrained = expectation(description: "settings cleanup drained")
+        DispatchQueue.main.async { cleanupDrained.fulfill() }
+        await fulfillment(of: [cleanupDrained], timeout: 1)
+        XCTAssertEqual(closeCallbacks, 1)
+        XCTAssertFalse(settings.window?.isVisible ?? true)
+    }
+
     func testWindowLevelsClickPolicyAndFixedComposerSize() {
         let model = AppModel(preferences: .defaults)
         let userID = UUID()
@@ -332,7 +392,7 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertFalse(controller.isVisible)
     }
 
-    func testCharacterHotspotDoubleClickKeepsComposerOpenAndRequestsPulse() {
+    func testCharacterHotspotDoubleClickPreservesComposerVisibilityAndRequestsPulse() {
         let model = AppModel(preferences: .defaults)
         let roomID = UUID()
         model.rooms = [Room(
@@ -351,7 +411,28 @@ final class WindowPolicyTests: XCTestCase {
         group.handleCharacterClick(clickCount: 2)
 
         XCTAssertEqual(pulseRequests, 1)
+        XCTAssertFalse(group.composerVisible)
+        group.presentComposer()
+        group.handleCharacterClick(clickCount: 1)
+        group.handleCharacterClick(clickCount: 2)
+        XCTAssertEqual(pulseRequests, 2)
         XCTAssertTrue(group.composerVisible)
+        group.setVisible(false)
+    }
+
+    func testExplicitComposerDismissCancelsPendingCharacterClick() async throws {
+        let model = AppModel(preferences: .defaults)
+        let roomID = UUID()
+        model.rooms = [Room(id: roomID, name: "테스트", ownerID: UUID(), members: [], inviteCodeHint: "TEST")]
+        model.preferences.activeRoomID = roomID
+        let group = OverlayWindowGroup(model: model)
+        group.setVisible(true)
+        group.handleCharacterClick(clickCount: 1)
+        group.dismissComposer()
+        // Wait beyond the system click classification window, not an arbitrary UI delay.
+        try await Task.sleep(for: .seconds(NSEvent.doubleClickInterval + 0.1))
+        XCTAssertFalse(group.composerVisible)
+        group.setVisible(false)
     }
 
     func testCharacterClickFocusesMessageFieldAfterMouseEventCompletes() async {
@@ -366,7 +447,7 @@ final class WindowPolicyTests: XCTestCase {
         controller.setVisible(true)
 
         controller.focusMessageField()
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
 
         XCTAssertTrue(controller.isVisible)
         XCTAssertTrue(controller.isKeyWindow)
@@ -378,12 +459,13 @@ final class WindowPolicyTests: XCTestCase {
     func testComposerRequestsDismissWhenAnotherWindowBecomesKey() async {
         let model = AppModel(preferences: .defaults)
         var dismissRequests = 0
+        var typingStops = 0
         let scheduler = TestComposerFocusLossScheduler()
         let controller = OverlayInteractionWindowController(
             model: model,
             onSend: { _ in },
             onInputActivity: {},
-            onTypingChanged: { _ in },
+            onTypingChanged: { if !$0 { typingStops += 1 } },
             onCancel: { dismissRequests += 1 },
             focusLossScheduler: scheduler,
             isApplicationActive: { false }
@@ -401,14 +483,15 @@ final class WindowPolicyTests: XCTestCase {
 
         controller.setVisible(true)
         controller.focusMessageField()
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
         XCTAssertTrue(controller.isKeyWindow)
 
         otherWindow.makeKeyAndOrderFront(nil)
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { otherWindow.isKeyWindow }
 
         XCTAssertEqual(dismissRequests, 0)
         XCTAssertEqual(scheduler.latestDelay, .milliseconds(250))
+        XCTAssertGreaterThan(typingStops, 0, "Typing ends as soon as the key window changes")
         XCTAssertTrue(controller.hasPendingFocusLossDismiss)
         scheduler.fireLatest()
         XCTAssertEqual(dismissRequests, 1)
@@ -440,11 +523,11 @@ final class WindowPolicyTests: XCTestCase {
 
         controller.setVisible(true)
         controller.focusMessageField()
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
         let textView = try XCTUnwrap(controller.messageTextView)
 
         otherWindow.makeKeyAndOrderFront(nil)
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { otherWindow.isKeyWindow }
         XCTAssertTrue(controller.hasPendingFocusLossDismiss)
 
         // Selecting from the character palette can take arbitrarily longer than
@@ -455,7 +538,7 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertEqual(scheduler.scheduleCount, 1)
 
         textView.insertText("👨‍👩‍👧‍👦", replacementRange: textView.selectedRange())
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
         scheduler.fireLatest()
 
         XCTAssertEqual(model.draft, "👨‍👩‍👧‍👦")
@@ -493,9 +576,9 @@ final class WindowPolicyTests: XCTestCase {
 
         controller.setVisible(true)
         controller.focusMessageField()
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { controller.isKeyWindow && controller.messageFieldIsFirstResponder }
         otherWindow.makeKeyAndOrderFront(nil)
-        for _ in 0..<3 { await Task.yield() }
+        await waitForWindowState { otherWindow.isKeyWindow }
 
         scheduler.fireLatest()
         XCTAssertEqual(dismissRequests, 0)
@@ -538,7 +621,7 @@ final class WindowPolicyTests: XCTestCase {
         group.dismissComposer()
 
         XCTAssertEqual(model.draft, "보존할 초안")
-        XCTAssertEqual(typingChanges, [true, false])
+        XCTAssertEqual(typingChanges, [false], "Restoring a draft is not a text edit")
     }
 
     func testComposerDismissesFiveSecondsAfterTheLastSubmittedMessage() {
@@ -685,29 +768,12 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertNil(menu.item(withTitle: "오버레이 잠금 해제"))
         XCTAssertNil(menu.item(withTitle: "오버레이 위치 초기화"))
         XCTAssertNotNil(menu.item(withTitle: "그룹 설정…"))
-        XCTAssertNotNil(menu.item(withTitle: "업데이트 확인…"))
+        XCTAssertNil(menu.item(withTitle: "업데이트 확인…"))
         XCTAssertEqual(menu.item(withTitle: "조용히 모드")?.state, .on)
         XCTAssertEqual(menu.item(withTitle: "로그인 시 자동 실행")?.state, .on)
         let groups = try XCTUnwrap(menu.item(withTitle: "활성 그룹")?.submenu)
         XCTAssertEqual(groups.item(withTitle: "작업방")?.state, .on)
         XCTAssertNotNil(groups.item(withTitle: "친구방 (3)"))
-    }
-
-    func testStatusMenuDisablesUpdateCheckWhileUpdaterIsBusy() {
-        var canCheckForUpdates = false
-        let controller = StatusItemController(
-            onToggleOverlay: {},
-            canCheckForUpdates: { canCheckForUpdates },
-            onOpenSettings: {},
-            onQuit: {}
-        )
-
-        let menu = controller.makeMenu()
-        XCTAssertEqual(menu.item(withTitle: "업데이트 확인…")?.isEnabled, false)
-
-        canCheckForUpdates = true
-        controller.menuWillOpen(menu)
-        XCTAssertEqual(menu.item(withTitle: "업데이트 확인…")?.isEnabled, true)
     }
 
     func testStatusItemUsesTemplateHamsterAssetsForReadAndUnreadStates() throws {

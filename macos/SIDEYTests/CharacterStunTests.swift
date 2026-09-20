@@ -1,11 +1,7 @@
 import AppKit
 import SpriteKit
 import XCTest
-#if APP_STORE
 @testable import SIDEYAppStore
-#else
-@testable import SIDEY
-#endif
 
 @MainActor
 final class CharacterStunTests: XCTestCase {
@@ -254,10 +250,10 @@ final class CharacterStunTests: XCTestCase {
     }
 
     func testLocalCoordinatorBlocksBeforeCooldownAndLeavesChatDraftIntact() {
-        let coordinator = AppCoordinator(updateController: NoUpdateController(),
+        let coordinator = AppCoordinator(
             preferencesStore: PreferencesStore(load: { .defaults }, save: { _ in }),
             legacyMigrator: .none, keychainAccessSession: KeychainAccessSession(),
-            releaseChannel: .development, arguments: [])
+            releaseChannel: .staging, arguments: [])
         let user = UUID(), friend = UUID(), room = UUID()
         coordinator.model.apply(snapshot: BackendSnapshot(
             profile: Profile(id: user, nickname: "나", characterID: "pixel_hamster"),

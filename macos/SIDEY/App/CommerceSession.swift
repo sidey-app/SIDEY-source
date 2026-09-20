@@ -7,8 +7,6 @@ final class CommerceSession {
     var productTasks: [String: Task<Void, Never>] = [:]
     var equipmentTasks: [CommerceProductKind: Task<Void, Never>] = [:]
     var characterTask: Task<Void, Never>?
-    var authenticationTask: Task<Void, Never>?
-    var googleConnectionProductID: String?
 
     func cancel(model: AppModel) {
         productTasks.values.forEach { $0.cancel() }
@@ -19,9 +17,6 @@ final class CommerceSession {
         characterTask?.cancel()
         characterTask = nil
         model.endCharacterEquipmentRequest()
-        authenticationTask?.cancel()
-        authenticationTask = nil
-        googleConnectionProductID = nil
         purchaseController.stopObserving()
     }
 }
