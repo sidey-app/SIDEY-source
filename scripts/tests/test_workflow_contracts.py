@@ -47,6 +47,7 @@ class WorkflowContractTests(unittest.TestCase):
         website = self.read('website-deployment.yml')
         self.assertIn('name: Build and test website', website)
         self.assertIn('name: Deploy to GitHub Pages', website)
+        self.assertIn('Publish tested website to public gh-pages branch', website)
 
         release = self.read('windows-release.yml')
         self.assertIn('name: Build release candidate', release)
@@ -130,6 +131,12 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertNotIn(old_script, validation)
         self.assertIn('name: Upload tested website build', workflow)
         self.assertIn('name: Download tested website build', workflow)
+        self.assertIn('actions/create-github-app-token@v2', workflow)
+        self.assertIn('scripts/publication/validate_public_tree.py', workflow)
+        self.assertIn('scripts/publication/compliance-source-assets.json', workflow)
+        self.assertIn('$expectedAssetNames = @($installerName) + $complianceAssetNames', workflow)
+        self.assertIn('repository: ${{ env.PUBLIC_REPOSITORY }}', workflow)
+        self.assertNotIn('actions/deploy-pages', workflow)
 
     def test_public_checkout_excludes_backend_sources(self):
         private_paths = (
@@ -185,6 +192,7 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertNotIn('website/AGENTS.md', workflow)
         self.assertIn("- 'website/src/**'", workflow)
         self.assertIn("- 'website/public/**'", workflow)
+        self.assertIn("- 'scripts/publication/**'", workflow)
         self.assertNotIn("- 'scripts/validate_pixel_assets.py'", workflow)
 
 

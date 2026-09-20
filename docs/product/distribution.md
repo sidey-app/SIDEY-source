@@ -2,6 +2,11 @@
 
 ## 공개 상태의 source of truth
 
+현재 제품 source와 배포 설정의 원본은 비공개 `sidey-app/SIDEY-source` 저장소다.
+공개 `sidey-app/SIDEY` 저장소는 기존 website와 Windows update URL을 유지하는
+배포 surface이며 현재 application source를 제공하지 않는다. 다만 계속 배포하는 과거
+AGPL binary의 정확한 Corresponding Source archive와 license notice는 release별로 유지한다.
+
 macOS의 App Store target version/build는 [`release/macos.json`](../../release/macos.json)과
 [`macos/SIDEY.xcodeproj/project.pbxproj`](../../macos/SIDEY.xcodeproj/project.pbxproj)가
 일치해야 한다. 이 metadata는 빌드 계약이며 App Store 심사·게시 완료를 뜻하지 않는다.
@@ -50,13 +55,16 @@ runtime의 수동 삭제를 해결책으로 안내하지 않으며, 특정 error
 Installer의 compiled helper가 payload transaction과 오류 정규화를 담당하며 사용자 PC에서
 PowerShell script, `ExecutionPolicy Bypass` 또는 `taskkill.exe`를 호출하지 않는다. 새 공개
 artifact, update metadata와 release note는 Windows release manifest와 같은 version을
-사용한다.
+사용한다. 공개 저장소에는 검증된 installer, 사용자용 release metadata와 해당 binary에
+필요한 historical license material만 게시한다.
 
 ## 공개 웹과 release note
 
 공식 website는 macOS 설치를 App Store로 연결한다. Windows는 공개 release artifact를
-확인하고 실제 hash에서 download metadata를 생성한다. `docs/releases/`는 사용자에게 보이는 각 platform release 결과를 기록하지만
-현재 version의 source는 아니다. Store upload, public release, website deployment와
-backend deployment는 서로 별도 작업이며 각각 명시적인 승인과 evidence가 필요하다.
+확인하고 실제 hash에서 download metadata를 생성한다. Private source에서 생성·검증한
+정적 website 결과, 공개 정책, release metadata와 binary만 공개 `SIDEY`에 게시한다.
+`docs/releases/`는 사용자에게 보이는 각 platform release 결과를 기록하지만 현재
+version의 source는 아니다. Store upload, public release, website deployment와 backend
+deployment는 서로 별도 작업이며 각각 명시적인 승인과 evidence가 필요하다.
 
 반복 가능한 준비·검증·게시 순서는 [release operation](../operations/release.md)을 따른다.

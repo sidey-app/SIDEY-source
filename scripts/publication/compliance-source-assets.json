@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "assets": [
+    {
+      "tag": "windows-v2.0.0",
+      "source_commit": "92088b671cebd073623701d15442b1ba3c8638e8",
+      "license_introduction_commit": "43c489ff2da69745c8bc7122795019f77ade6239",
+      "name": "SIDEY-windows-v2.0.0-corresponding-source.tar",
+      "archive_prefix": "SIDEY-windows-v2.0.0-source/",
+      "size": 51988480,
+      "digest": "sha256:c96d1c6cfdb506cc90874a6ccd7d8a6304396f57d13a3ba0896ed158729e695f"
+    }
+  ]
+}

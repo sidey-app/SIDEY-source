@@ -1,6 +1,7 @@
 # 코드 공개 라이선스와 에셋 기여 경계
 
-Status: Accepted
+Status: Superseded
+Superseded by: [비공개 source와 공개 배포 저장소 분리](202609202255-private-source-public-distribution.md)
 Decided: 2026-09-17 18:25 KST
 
 ## Context

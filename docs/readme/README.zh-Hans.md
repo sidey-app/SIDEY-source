@@ -20,7 +20,7 @@
   <span> · </span>
   <a href="https://github.com/sidey-app/SIDEY/releases">发行说明</a>
   <span> · </span>
-  <a href="https://github.com/sidey-app/SIDEY/issues">问题反馈与建议</a>
+  <a href="https://github.com/sidey-app/SIDEY/issues">错误报告</a>
 </p>
 
 <p align="center">
@@ -92,32 +92,21 @@ SIDEY 是一款适用于 macOS 和 Windows 的桌面聊天应用，让你通过�
 
 </details>
 
-## 问题反馈与建议
+## 错误报告
 
-如果你发现了问题，或有想要的功能，欢迎到 [GitHub Issues](https://github.com/sidey-app/SIDEY/issues) 告诉我们。
+如果你发现了错误，请在 [GitHub Issues](https://github.com/sidey-app/SIDEY/issues) 中提供复现步骤以及 SIDEY 和操作系统版本。公开仓库仅用于分发和错误报告，不接受功能建议或外部 Pull Request。
 
-## 参与贡献
-
-欢迎提交错误修复、功能改进、文档改进和翻译。我们不接受角色或素材贡献。
-
-开始前，请先阅读[贡献指南](../../CONTRIBUTING.md)，了解讨论、分支、提交、验证和 Pull Request 流程。
-
-- 提出新功能前，请先在 [Issue](https://github.com/sidey-app/SIDEY/issues) 中一起讨论它的用途和具体行为。
-- 修改代码或文档时，请使用[通用 PR 模板](../../.github/PULL_REQUEST_TEMPLATE/general.md)，说明修改原因和验证情况。
+请勿在日志或截图中包含访问令牌、邀请码、消息内容或个人信息。详情请参阅[错误报告指南](../../CONTRIBUTING.md)。
 
 ## 特别感谢
 
 感谢所有参与 SIDEY 开发和角色制作的朋友。
 
-<a href="https://github.com/sidey-app/SIDEY/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=sidey-app/SIDEY" alt="SIDEY 贡献者" />
-</a>
-
 也感谢每一位帮忙反馈问题、润色文字、分享使用体验的朋友。
 
 ## 许可证
 
-除非另有说明，SIDEY 源代码采用 [GNU AGPL 仅限第 3.0 版（AGPL-3.0-only）](../../LICENSE)。适用范围请参阅[许可说明](../../LICENSING.md)。
+当前 SIDEY 源代码是非公开专有软件。许可证变更前公开版本已授予的 AGPLv3 权利不会被撤销。当前代码与历史公开版本的界限请参阅[许可说明](../../LICENSING.md)。
 
 品牌、素材和第三方内容仍分别适用其现有条款。有关素材的复制、修改、再分发和商业使用条件，请参阅 [SIDEY Paid Asset License 1.0](../../assets/PAID_ASSET_LICENSE.md)。
 

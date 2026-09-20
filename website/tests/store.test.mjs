@@ -495,3 +495,32 @@ test("generated checkout pages use external executable scripts under strict CSP"
     }
   }
 });
+
+test("legacy policy HTML routes redirect to locale-neutral policy gateways", () => {
+  for (const path of ["privacy", "terms"]) {
+    const html = read(`${path}.html`);
+    assert.match(html, /name="robots" content="noindex"/);
+    assert.match(html, new RegExp(`rel="canonical" href="https://sidey-app\\.github\\.io/SIDEY/${path}/"`));
+    assert.ok(html.includes(`url=/SIDEY/${path}/`));
+    assert.match(html, /destination\.search=window\.location\.search/);
+    assert.match(html, /destination\.hash=window\.location\.hash/);
+  }
+});
+
+test("localized terms preserve historical AGPL grants without presenting current source as open", () => {
+  const expectations = {
+    ko: ["현재 SIDEY 소스코드는 비공개 독점 소프트웨어", "이미 부여된", "철회"],
+    en: ["Current SIDEY source code is private proprietary software", "rights already granted", "withdraw"],
+    ja: ["現在のSIDEYソースコードは非公開のプロプライエタリソフトウェア", "すでに付与された", "撤回"],
+  };
+  for (const [locale, phrases] of Object.entries(expectations)) {
+    const html = read(`${locale}/terms/index.html`);
+    for (const phrase of phrases) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
+    assert.ok(html.includes("AGPL-3.0-only"), `${locale}: historical license identifier`);
+  }
+});
+
+test("public build excludes the former contribution asset previewer", () => {
+  assert.equal(existsSync(new URL("../dist/contribute/asset-previewer/index.html", import.meta.url)), false);
+  assert.doesNotMatch(read("sitemap.xml"), /contribute\/asset-previewer/);
+});

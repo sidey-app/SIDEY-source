@@ -20,7 +20,7 @@
   <span> · </span>
   <a href="https://github.com/sidey-app/SIDEY/releases">릴리스 노트</a>
   <span> · </span>
-  <a href="https://github.com/sidey-app/SIDEY/issues">문제 신고 및 제안</a>
+  <a href="https://github.com/sidey-app/SIDEY/issues">버그 신고</a>
 </p>
 
 <p align="center">
@@ -92,32 +92,21 @@ SIDEY는 macOS·Windows 데스크톱 메신저예요. 화면 가장자리의 2D 
 
 </details>
 
-## 문제 신고 및 제안
+## 버그 신고
 
-오류를 발견했거나 제안하고 싶은 기능이 있다면 [GitHub Issues](https://github.com/sidey-app/SIDEY/issues)에 남겨 주세요.
+오류를 발견했다면 [GitHub Issues](https://github.com/sidey-app/SIDEY/issues)에 재현 방법과 SIDEY·운영체제 버전을 남겨 주세요. 공개 저장소는 배포와 버그 신고 용도이며, 기능 제안과 외부 Pull Request는 받지 않아요.
 
-## 기여하기
-
-버그 수정, 기능 개선, 문서 개선, 번역 기여를 환영해요. 캐릭터와 에셋 기여는 받지 않아요.
-
-작업을 시작하기 전에 [기여 가이드](CONTRIBUTING.md)에서 논의, 브랜치, 커밋, 검증, PR 절차를 확인해 주세요.
-
-- 새 기능을 제안할 때는 먼저 [이슈](https://github.com/sidey-app/SIDEY/issues)에서 사용 목적과 동작을 함께 논의해 주세요.
-- 코드와 문서 변경은 [일반 PR 양식](.github/PULL_REQUEST_TEMPLATE/general.md)에 따라 변경 이유와 확인한 내용을 적어 주세요.
+로그·스크린샷에는 접근 토큰, 초대 코드, 메시지 내용과 개인정보를 포함하지 마세요. 자세한 신고 범위는 [버그 신고 안내](CONTRIBUTING.md)를 확인해 주세요.
 
 ## 감사한 분들
 
 SIDEY의 개발과 캐릭터 제작에 참여해 주신 분들께 감사드려요.
 
-<a href="https://github.com/sidey-app/SIDEY/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=sidey-app/SIDEY" alt="SIDEY 기여자" />
-</a>
-
 오류를 알려 주시고 문구를 다듬고 사용 경험을 나눠 주시는 모든 분들께도 감사드려요.
 
 ## 라이선스
 
-별도 표시가 없는 SIDEY 소스코드는 [GNU AGPL v3.0 전용(AGPL-3.0-only)](LICENSE)으로 제공해요. 적용 범위는 [라이선스 안내](LICENSING.md)를 확인해 주세요.
+현재 SIDEY 소스코드는 비공개 독점 소프트웨어예요. 라이선스 전환 전에 공개된 revision에 부여된 AGPLv3 이용 권한은 철회되지 않아요. 현재 코드와 과거 공개 revision의 경계는 [라이선스 안내](LICENSING.md)를 확인해 주세요.
 
 브랜드·에셋·서드파티 자료에는 각각의 기존 조건이 별도로 적용돼요. 에셋의 복제·수정·재배포·상업 이용 조건은 [SIDEY Paid Asset License 1.0](assets/PAID_ASSET_LICENSE.md)을 확인해 주세요.
 
