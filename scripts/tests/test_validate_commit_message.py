@@ -137,22 +137,6 @@ class CommitMessageValidatorTests(unittest.TestCase):
             validator.validate_subject("Publish Sparkle appcast for v1.2.3")
         )
 
-    def test_macos_appcast_uses_a_valid_sidey_commit_and_pr_subject(self):
-        script = (ROOT / "scripts/macos/release_macos.sh").read_text(encoding="utf-8")
-        subject = "build(Shared): macOS v1.2.3 Sparkle appcast 갱신"
-
-        self.assertEqual(validator.validate_subject(subject), [])
-        self.assertIn(
-            'SIDEY_APPCAST_SUBJECT="build(Shared): macOS $SIDEY_TAG Sparkle appcast 갱신"',
-            script,
-        )
-        self.assertIn('commit -m "$SIDEY_APPCAST_SUBJECT"', script)
-        self.assertIn('--title "$SIDEY_APPCAST_SUBJECT"', script)
-
-    def test_external_homebrew_release_subject_is_not_sidey_compliant(self):
-        # The release script commits this in the separate Homebrew tap repository,
-        # outside this repository validator's enforcement boundary.
-        self.assertTrue(validator.validate_subject("Update SIDEY to 1.2.3"))
 
 
 if __name__ == "__main__":

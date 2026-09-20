@@ -120,13 +120,15 @@ async function createCheckoutHarness({ fetchResponse, requestPayment } = {}) {
 
 for (const locale of ["ko", "en", "ja"]) {
   for (const category of Object.keys(included)) {
-    test(`${locale}/${category}: complete catalog, exact direct prices, assets, separate keepsakes`, () => {
+    test(`${locale}/${category}: complete catalog, exact reference prices, assets, separate keepsakes`, () => {
       const html = read(`${locale}/store/${category}/index.html`);
       const cards = [...html.matchAll(/<button class="store-product-card"[^>]*>[\s\S]*?<\/button>/g)].map(([card]) => card);
       const paid = catalog.filter((entry) => entry.kind === category.slice(0, -1));
       assert.equal(cards.length, paid.length + included[category]);
       assert.match(html, /store-price-basis/);
-      assert.match(html, /App Store/);
+      assert.match(html, /reference prices|참고 가격|参考価格/);
+      assert.doesNotMatch(html, /Windows direct-purchase|Windows 직접 결제|Windows版の直接決済/);
+      assert.doesNotMatch(html, /direct macOS edition|macOS 직배포판|macOS直接配布版/);
       for (const entry of paid) {
         const card = cards.find((candidate) => candidate.includes(`data-product-id="${entry.id}"`));
         assert.ok(card, entry.id);
@@ -434,7 +436,6 @@ test("checkout redirects only after successful server completion", async () => {
   assert.deepEqual(harness.assigned, ["https://sidey-app.github.io/SIDEY/checkout-result/?result=success"]);
   assert.equal(harness.elements["#checkout-pay"].disabled, true);
 });
-
 test("checkout ignores injected API origins and sends tokens only to SIDEY production", async () => {
   const { runInNewContext } = await import("node:vm");
   for (const name of ["checkout", "checkout-result"]) {

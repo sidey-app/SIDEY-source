@@ -2,7 +2,7 @@
 
 Read this reference before writing or revising a canonical macOS or Windows release note.
 
-## Default body
+## Default GitHub Release body
 
 Write a short final-user summary, then the exact `## 변경사항` heading, attributed bullets and the comparison URL:
 
@@ -27,11 +27,15 @@ The opening summary describes the important outcome at a higher level than the b
 - End a direct-commit bullet with `( 7자리커밋, @작성자 )` as described in the evidence reference.
 - Use the same PR or commit reference on multiple bullets when distinct outcomes genuinely require separate bullets.
 
-The comparison line is the last nonblank line and uses the exact platform tags:
+For Windows and historical Direct macOS GitHub Release bodies, the comparison line is the last nonblank line and uses the exact platform tags:
 
 ```markdown
 **전체 변경 내역**: https://github.com/sidey-app/SIDEY/compare/이전-태그...대상-태그
 ```
+
+## App Store Connect notes
+
+An App Store note is a separate artifact. Require the exact submitted build, prior published App Store build, App Store Connect evidence and requested localization before drafting it. Do not add a GitHub comparison link or write it over `docs/releases/v<version>.md`; those files preserve historical Direct GitHub Release bodies.
 
 ## User-requested preamble or sections
 

@@ -20,28 +20,21 @@ class PrepareReleaseMetadataTests(unittest.TestCase):
             test_root = Path(temporary)
             release_dir = test_root / "release"
             release_dir.mkdir()
-            macos_manifest_path = ROOT / "release" / "macos.json"
             windows_manifest_path = ROOT / "release" / "windows.json"
-            macos_manifest = json.loads(macos_manifest_path.read_text(encoding="utf-8"))
             windows_manifest = json.loads(windows_manifest_path.read_text(encoding="utf-8"))
-            macos_dmg = release_dir / f"SIDEY-macOS-arm64-v{macos_manifest['version']}.dmg"
             windows_installer = release_dir / (
                 f"SIDEY-Windows-x64-v{windows_manifest['version']}-Setup.exe"
             )
-            shutil.copyfile(macos_manifest_path, macos_dmg)
             shutil.copyfile(windows_manifest_path, windows_installer)
             output_dir = test_root / "site"
 
             prepare(
                 ROOT / "website" / "dist",
                 output_dir,
-                macos_manifest_path,
-                macos_dmg,
                 windows_manifest_path,
                 windows_installer,
             )
 
-            macos_hash = hashlib.sha256(macos_dmg.read_bytes()).hexdigest()
             windows_hash = hashlib.sha256(windows_installer.read_bytes()).hexdigest()
             published = json.loads(
                 (output_dir / "windows-latest.json").read_text(encoding="utf-8")
@@ -53,10 +46,10 @@ class PrepareReleaseMetadataTests(unittest.TestCase):
             )
             for locale in ("ko", "en", "ja"):
                 html = (output_dir / locale / "index.html").read_text(encoding="utf-8")
-                self.assertIn(
-                    f'<code id="macos-download-sha256" data-release-platform="macos">{macos_hash}</code>',
-                    html,
-                )
+                self.assertNotIn("macos-download-sha256", html)
+                self.assertNotIn(".dmg", html)
+                self.assertNotIn("brew-command", html)
+                self.assertIn('href="https://apps.apple.com/kr/app/sidey/id6808528060?mt=12"', html)
                 self.assertIn(
                     f'<code id="windows-download-sha256" data-release-platform="windows">{windows_hash}</code>',
                     html,

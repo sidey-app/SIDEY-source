@@ -30,12 +30,14 @@ ID 또는 metadata 불일치는 오류다.
 
 - Mac App Store판은 StoreKit의 비소모성 상품과 Apple이 반환한 localized price를
   사용한다. Apple에서 상품을 받지 못하면 다른 채널의 가격을 대신 표시하지 않는다.
-- macOS 직접 배포판의 production purchase availability는 build가 결정하며 remote response만으로
-  열리지 않는다. 이미 가진 상품의 장착은 판매 잠금과 별개다.
+- macOS 직접 배포판의 신규 개발·배포는 종료한다. 기존 구매 원본과 지급 권리는
+  보존하며, App Store 전환을 이유로 기존 entitlement를 회수하지 않는다.
 - Windows는 고정된 운영 backend에서 production checkout을 지원한다. 개발 전용 staging
   구매 흐름은 별도의 build 지원과 명시적인 opt-in이 모두 필요하다. 판매 가능 여부는
   서버 상태와 상품별 구매 조건으로 확인하며, 상점이 활성화되면 일괄적인 구매 준비 중
-  안내 대신 소유 여부와 실제 구매·처리 상태를 표시한다.
+  안내 대신 소유 여부와 실제 구매·처리 상태를 표시한다. 주문과 구매 권한은 Google이
+  연결된 SIDEY 사용자 UUID에 저장한다. Google 이메일을 소유권 키로 사용하지 않으며
+  기존 익명 UUID에 Google을 연결해도 구매 ledger는 유지된다.
 - 공개 웹은 catalog를 소개하지만 entitlement를 직접 발급하지 않는다.
   결제·결제 결과 페이지는 고정된 SIDEY 운영 결제 API만 호출하며 URL로 전달된
   API 주소는 사용하지 않는다. 실제 구매 가능 여부와 결제 승인은 서버가 확인한다.

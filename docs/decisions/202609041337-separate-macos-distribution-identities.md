@@ -1,6 +1,7 @@
 # macOS distribution identity 분리
 
-Status: Accepted
+Status: Superseded
+Superseded by: [macOS App Store 단일화](20260918-macos-app-store-only.md)
 Decided: 2026-09-04 13:37 KST
 Evidence: [commit 222428b](https://github.com/sidey-app/SIDEY/commit/222428b92579712e7d9e242c1dbc81200f8efcb3)
 

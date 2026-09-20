@@ -14,17 +14,19 @@ Establish the target platform and commit, the intended artifact or distribution,
 the request is advisory or asks to apply metadata changes. Record any user-selected version
 class, but do not accept one below the evidence-based minimum.
 
-Start with `release/macos.json` or `release/windows.json`, then confirm whether its matching tag
-(`v<version>` or `windows-v<version>`) is already a published regular release. If the manifest is
-intentionally staged ahead of publication, identify the previous published platform release as
-the comparison baseline and label the manifest state as pending. If the baseline, target,
-artifact impact, or tag provenance cannot be established, return `BLOCKED` with the missing
-evidence.
+Start with `release/macos.json` or `release/windows.json`. For macOS, obtain App Store
+Connect publication/build evidence and the exact source provenance of the last shipped
+App Store artifact; the manifest describes the target build, not publication status. Do not
+use an archived Developer ID tag as proof of an App Store release. For Windows, confirm the
+matching `windows-v<version>` tag is a published regular release. If a target is intentionally
+staged ahead of publication, identify the previous shipped platform artifact as the comparison
+baseline. If baseline, target, artifact impact or provenance cannot be established, return
+`BLOCKED` with the missing evidence.
 
 ## Audit
 
-1. Inspect commits, changed paths, and relevant hunks from the platform's public tag through
-   the target commit. Commit titles alone are insufficient.
+1. Inspect commits, changed paths and relevant hunks from the platform's verified shipped
+   commit through the target commit. Commit titles alone are insufficient.
 2. Decide whether the distributed platform artifact or a packaging input it consumes changes.
    A shared change counts only for a platform that consumes it. Return `NONE` for web-, server-,
    documentation-, or contributor-only changes that do not alter an app artifact.
@@ -37,15 +39,15 @@ evidence.
      that requires user intervention.
 4. Propose the exact next version for the selected class. Reject malformed, reused, decreasing,
    skipped-within-class, or under-classified versions.
-5. For macOS, keep equivalent Direct and App Store artifacts on the same marketing version.
-   Before proposing a distributable build, determine the greatest build already consumed by
-   either channel and add one. Repository metadata cannot prove external upload history: label
-   the build `PROVISIONAL` and block upload readiness when that history is unavailable.
-6. Read `scripts/skills/verify_release_consistency.py` for the current mirrors, then run the mode that
-   matches the state being audited. Windows publication uses the strict platform check. macOS
-   pre-publication intentionally permits an older signed appcast; the appcast becomes strict
-   after its verified post-release update. Candidate allowances validate only their named staged
-   states and do not waive other inconsistencies.
+5. macOS supports only the App Store target. Before proposing a distributable build, determine
+   the greatest build already consumed by App Store Connect and add one. Repository metadata
+   cannot prove external upload history: label the build `PROVISIONAL` and block upload
+   readiness when that history is unavailable. Do not restart or lower existing version/build
+   values when retiring a distribution channel.
+6. Read `scripts/skills/verify_release_consistency.py` for the current mirrors and run the mode
+   matching the audited platform. macOS validates the App Store target build contract, not
+   review or publication status. Windows publication uses the strict platform check.
+   Candidate allowances validate only their named staged states.
 
 When the user asks to apply the decision, change only the metadata in scope and rerun the
 affected deterministic checks. An audit does not by itself authorize edits.
@@ -61,7 +63,7 @@ Comparison: exact range, artifact affected YES/NO, consumed shared changes
 Impact: PATCH, MINOR, and MAJOR evidence
 Decision: required bump, proposed version, proposed build
 Build history: VERIFIED / PROVISIONAL / BLOCKED
-Consistency: source, manifest, updater or appcast, release note, public metadata, tag uniqueness
+Consistency: source, manifest, Windows updater or App Store target, release note, public metadata, tag uniqueness
 Verdict: READY / ACTION REQUIRED / BLOCKED
 Missing or conflicting evidence
 ```

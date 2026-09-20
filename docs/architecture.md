@@ -6,9 +6,9 @@
 
 ## 시스템 구성
 
-- macOS 클라이언트는 SwiftUI·AppKit·SpriteKit으로 만든 네이티브 앱이다. Developer
-  ID 직접 배포판과 Mac App Store판은 핵심 제품 코드를 공유하지만 인증, Keychain,
-  결제, 업데이트, signing 및 entitlement 경계를 분리한다.
+- macOS 클라이언트는 SwiftUI·AppKit·SpriteKit으로 만든 Mac App Store 네이티브 앱이다.
+  Sign in with Apple, 전용 Keychain, sandbox와 StoreKit 경계를 유지한다. 직접 배포판의
+  개발·지원은 종료하며 과거 계정·구매 원본을 자동 병합하거나 삭제하지 않는다.
 - Windows 클라이언트는 C#/.NET·WinUI 3·Win32로 만든 네이티브 앱이다. 일반 UI와
   투명 overlay surface를 분리하고, Core·Presentation·Infrastructure·Overlay·Platform
   계층의 의존 방향은 [Windows 아키텍처 문서](../windows/docs/architecture.md)가 설명한다.
@@ -53,11 +53,14 @@ backend가 상품 변경을 필요로 하면 검토된 공개 commit의 snapshot
 
 ## 배포 산출물
 
-공개 release의 정확한 버전은 [`release/macos.json`](../release/macos.json)과
-[`release/windows.json`](../release/windows.json)이 소유한다. 네이티브 project 설정,
-업데이트 feed와 웹 metadata는 검증되는 mirror다. Mac App Store 후보의 version/build는
-[`macos/SIDEY.xcodeproj/project.pbxproj`](../macos/SIDEY.xcodeproj/project.pbxproj),
-Windows build metadata는 해당 project file이 소유한다.
+Mac App Store target version/build는 [`release/macos.json`](../release/macos.json)과
+[`macos/SIDEY.xcodeproj/project.pbxproj`](../macos/SIDEY.xcodeproj/project.pbxproj)가
+일치해야 한다. 이 계약은 App Store 게시 완료를 증명하지 않으며, 웹 다운로드는
+App Store 제품 페이지로 연결한다.
+
+Windows 공개 version은 [`release/windows.json`](../release/windows.json)이 소유한다.
+네이티브 project 설정, Windows update manifest와 웹 download metadata는 검증되는
+mirror다. 과거 macOS 직접 배포 release와 feed는 기록으로 보존하고 새로 갱신하지 않는다.
 
 ## 권위 순서
 

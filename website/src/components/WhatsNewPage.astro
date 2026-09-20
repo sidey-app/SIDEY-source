@@ -1,6 +1,7 @@
 ---
 import InfoLayout from "../layouts/InfoLayout.astro";
 import PageTabs from "./PageTabs.astro";
+import { appStoreURL } from "../data/releases";
 import { getTranslations, type Locale } from "../i18n/landing";
 import { getGitHubReleases, type ReleasePlatform } from "../data/github-releases";
 
@@ -20,7 +21,7 @@ const tabs = [
   { href: `${base}${localePrefix}whats-new/windows/`, label: copy.tabs.windows, active: platform === "windows" },
 ];
 const resolvedCanonicalPath = canonicalPath ?? `${localePrefix}whats-new/${platform}/`;
-const platformReleases = await getGitHubReleases(platform);
+const platformReleases = platform === "windows" ? await getGitHubReleases(platform) : [];
 const dateLocales: Record<Locale, string> = { ko: "ko-KR", en: "en-US", ja: "ja-JP" };
 const dateFormatter = new Intl.DateTimeFormat(dateLocales[locale], {
   year: "numeric",
@@ -37,6 +38,7 @@ const initialReleaseCount = 3;
     <PageTabs label={copy.tabs.label} items={tabs} />
   </section>
   <section class="section update-list" aria-label={`${platformLabel} ${copy.title}`}>
+    {platform === "macos" && <p><a class="release-link" href={appStoreURL}>{copy.appStoreHistory}<span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span></a></p>}
     {platformReleases.map((release, index) => (
       <details class:list={["update-card", { "is-expanded": index === 0 }]} open={index === 0} data-release-item hidden={index >= initialReleaseCount}>
         <summary>

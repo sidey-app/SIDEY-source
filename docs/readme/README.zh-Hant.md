@@ -70,26 +70,6 @@ SIDEY 是一款適用於 macOS 和 Windows 的桌面聊天應用程式，讓你�
   <p>由於需要經過 Apple 審核，更新可能會晚一些推出。</p>
 </details>
 
-<details>
-  <summary><strong>從 GitHub 下載 .dmg 檔案</strong></summary>
-  <br/>
-
-  前往 [SIDEY GitHub Releases](https://github.com/sidey-app/SIDEY/releases) 頁面，向下捲動至 **Assets**，下載適合你裝置的安裝檔並安裝。
-
-</details>
-
-<details>
-  <summary><strong>透過 Homebrew 安裝</strong></summary>
-  <br/>
-
-  你也可以透過 [Homebrew](https://brew.sh/) 下載 SIDEY：
-
-  ```sh
-  brew install --cask sidey-app/tap/sidey
-  ```
-
-</details>
-
 ### Windows
 
 **系統需求：** Windows 10 1809 或以上版本 · x64。

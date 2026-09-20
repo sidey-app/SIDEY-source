@@ -46,9 +46,9 @@ const ui = {
     },
     download: {
       title: "내 컴퓨터에도 SIDEY를.", description: "macOS와 Windows에서 쓸 수 있어요. 내 컴퓨터에 맞는 버전을 골라 설치하면 돼요.",
-      macButton: "macOS 다운로드", windowsButton: "Windows 다운로드", releaseNotes: "릴리스 정보",
-      macSystem: "macOS 26 이상 · Apple Silicon(arm64)", windowsSystem: "Windows 11 25H2 이상 · x64", brewTitle: "Homebrew로 설치",
-      copyLabel: "Homebrew 설치 명령 복사", copySuccess: "Homebrew 설치 명령을 복사했습니다.", copyFailure: "복사하지 못했습니다. 명령을 직접 선택해 주세요.",
+      macButton: "Mac App Store", windowsButton: "Windows 다운로드", releaseNotes: "릴리스 정보",
+      macSystem: "macOS 26 이상 · Apple Silicon(arm64)", windowsSystem: "Windows 11 25H2 이상 · x64",
+      copyFailure: "복사하지 못했습니다. 해시를 직접 선택해 주세요.",
       hashCopy: "SHA-256 해시 복사", hashCopied: "SHA-256 해시를 복사했습니다.",
     },
     faq: {
@@ -64,6 +64,7 @@ const ui = {
       ],
     },
     whatsNew: {
+      appStoreHistory: "macOS 업데이트 내용은 Mac App Store에서 확인하세요.",
       title: "새로운 기능", intro: "SIDEY의 최신 업데이트를 살펴보세요. 새로워진 기능을 놓치지 않도록 한곳에 모았어요.",
       tabs: { label: "운영체제별 새로운 기능", macos: "macOS", windows: "Windows" },
       viewRelease: "GitHub Release에서 전체 내용 보기", openDetails: "변경 내용 펼치기", closeDetails: "변경 내용 접기", loadedMore: "지난 업데이트를 더 불러왔습니다.",
@@ -113,9 +114,9 @@ const ui = {
     },
     download: {
       title: "Bring SIDEY to your desktop.", description: "SIDEY is available for macOS and Windows. Pick the version that matches your computer and install it.",
-      macButton: "Download for macOS", windowsButton: "Download for Windows", releaseNotes: "Release notes",
-      macSystem: "macOS 26 or later · Apple Silicon (arm64)", windowsSystem: "Windows 11 25H2 or later · x64", brewTitle: "Install with Homebrew",
-      copyLabel: "Copy Homebrew install command", copySuccess: "Homebrew install command copied.", copyFailure: "Could not copy. Please select the command manually.",
+      macButton: "Mac App Store", windowsButton: "Download for Windows", releaseNotes: "Release notes",
+      macSystem: "macOS 26 or later · Apple Silicon (arm64)", windowsSystem: "Windows 11 25H2 or later · x64",
+      copyFailure: "Could not copy. Please select the hash manually.",
       hashCopy: "Copy SHA-256 hash", hashCopied: "SHA-256 hash copied.",
     },
     faq: {
@@ -131,6 +132,7 @@ const ui = {
       ],
     },
     whatsNew: {
+      appStoreHistory: "View macOS version history on the Mac App Store.",
       title: "What's New", intro: "See the latest changes to SIDEY, grouped by macOS and Windows.",
       tabs: { label: "What's new by operating system", macos: "macOS", windows: "Windows" },
       viewRelease: "View the full GitHub Release", openDetails: "Show changes", closeDetails: "Hide changes", loadedMore: "More previous updates loaded.",
@@ -182,9 +184,9 @@ const ui = {
     download: {
       title: "あなたのデスクトップにもSIDEYを。", description: "macOSとWindowsに対応しています。お使いのパソコンに合うバージョンを選んでインストールしてください。",
       titleParts: ["あなたの", "デスクトップにも", "SIDEYを。"],
-      macButton: "macOS版をダウンロード", windowsButton: "Windows版をダウンロード", releaseNotes: "リリースノート",
-      macSystem: "macOS 26以降 · Appleシリコン（arm64）", windowsSystem: "Windows 11 25H2以降 · x64", brewTitle: "Homebrewでインストール",
-      copyLabel: "Homebrewのインストールコマンドをコピー", copySuccess: "Homebrewのインストールコマンドをコピーしました。", copyFailure: "コピーできませんでした。コマンドを選択してコピーしてください。",
+      macButton: "Mac App Store", windowsButton: "Windows版をダウンロード", releaseNotes: "リリースノート",
+      macSystem: "macOS 26以降 · Appleシリコン（arm64）", windowsSystem: "Windows 11 25H2以降 · x64",
+      copyFailure: "コピーできませんでした。ハッシュを選択してコピーしてください。",
       hashCopy: "SHA-256ハッシュをコピー", hashCopied: "SHA-256ハッシュをコピーしました。",
     },
     faq: {
@@ -200,6 +202,7 @@ const ui = {
       ],
     },
     whatsNew: {
+      appStoreHistory: "macOSの更新内容はMac App Storeで確認できます。",
       title: "新機能", intro: "SIDEYの最新アップデートをチェック。新しくなった機能を見逃さないよう、ひとつにまとめました。",
       tabs: { label: "OS別の新機能", macos: "macOS", windows: "Windows" },
       viewRelease: "GitHub Releaseですべて見る", openDetails: "変更内容を表示", closeDetails: "変更内容を閉じる", loadedMore: "過去のアップデートをさらに読み込みました。",

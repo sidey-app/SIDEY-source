@@ -70,26 +70,6 @@ SIDEY — мессенджер для macOS и Windows, в котором вы �
   <p>Обновления могут выходить позже, поскольку проходят проверку Apple.</p>
 </details>
 
-<details>
-  <summary><strong>Скачать файл .dmg с GitHub</strong></summary>
-  <br/>
-
-  Откройте страницу [выпусков SIDEY на GitHub](https://github.com/sidey-app/SIDEY/releases), прокрутите до раздела **Assets** и скачайте установочный файл, подходящий для вашей системы.
-
-</details>
-
-<details>
-  <summary><strong>Установить через Homebrew</strong></summary>
-  <br/>
-
-  SIDEY можно скачать через [Homebrew](https://brew.sh/):
-
-  ```sh
-  brew install --cask sidey-app/tap/sidey
-  ```
-
-</details>
-
 ### Windows
 
 **Системные требования:** Windows 10 1809 или новее · x64.

@@ -7,7 +7,8 @@ presence, typing과 짧은 메시지를 보여 주는 초대 전용 desktop ambi
 
 ## 현재 제품 경계
 
-- macOS와 Windows 네이티브 클라이언트를 제공한다. 정확한 공개 버전과 지원 환경은
+- macOS는 Mac App Store판만 지원하고 Windows 네이티브 클라이언트를 유지한다.
+  배포 채널과 지원 환경은
   [배포 문서](distribution.md)가 가리키는 machine-readable source에서 확인한다.
 - 한 번에 한 private group의 친구를 overlay에 표시한다. 계정과 그룹 계약은
   [identity-and-groups.md](identity-and-groups.md)를 따른다.
@@ -32,6 +33,33 @@ presence, typing과 짧은 메시지를 보여 주는 초대 전용 desktop ambi
 파일 내용, microphone audio 또는 camera video를 수집하지 않는다. Typing 상태는 SIDEY
 입력창에서만 발생한다. E2EE는 설계·구현·검증되지 않았으므로 제공한다고 표현하지
 않는다.
+
+## macOS 조작
+
+최초 온보딩 중이거나 설정 창이 열려 있는 동안에는 Dock에 일반 app으로 표시한다. 그
+밖에는 로그인 항목을 통한 자동 실행과 사용자의 수동 실행 모두 메뉴바 accessory app으로
+동작한다. 설정 창을 닫으면 accessory app으로 복귀하고, 최근 기록 창만 열려 있을 때는
+Dock icon을 표시하지 않는다. 메뉴바 메뉴에서 설정, 최근 기록과 종료에 접근한다.
+
+설정 창은 어느 Space에서 열든 현재 활성 Space로 옮겨 표시하며, 이전에 설정 창이 있던
+Space로 사용자를 전환하지 않는다.
+
+캐릭터를 한 번 클릭하면 시스템 double-click 판정 시간이 지난 뒤 입력창을 토글한다.
+두 번 클릭하면 대기 중인 단일 클릭을 취소하고 기존 리액션만 실행하며, 이미 열린
+입력창도 변경하지 않는다.
+
+입력창에는 명시적인 X 닫기 버튼이 없다. 입력창 바깥 클릭, Escape 또는 전역 입력창
+토글로 닫는다.
+
+전역 단축키는 `Ctrl+Option+Command+M`으로 조용히 모드,
+`Ctrl+Option+Command+I`로 입력창 토글, `Ctrl+Option+Command+R`로 최근 기록 열기를
+실행한다. 메뉴바 메뉴와 설정에 단축키를 표시한다.
+키를 누른 채 유지해도 반복 실행하지 않으며, 등록 충돌은 해당 항목에 안내한다.
+
+입력창 왼쪽의 전용 손잡이로 창 크기를 유지한 채 다른 모니터까지 옮길 수 있다.
+모니터 식별자와 화면 내 상대 위치를 로컬에 저장하고 캐릭터 모니터 설정과 독립적으로
+복원한다. 저장한 모니터가 사라지거나 해상도가 바뀌면 현재 화면 안으로 위치를 보정한다.
+캐릭터의 입력창 회피 영역은 실제 입력창 위치를 따른다.
 
 ## 문서 경계
 

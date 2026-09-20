@@ -8,8 +8,8 @@ Read this reference only when the review includes macOS-owned changes. Apply `ma
 - Check NotificationCenter, workspace, display, network-path and application observers for symmetric teardown and duplicate registration across reinitialization.
 - Follow AppKit window and panel lifetime, activation, focus, click-through and interaction-mode transitions. Check monitor, scale and visible-frame changes and partial window-controller construction.
 - Inspect SpriteKit update loops for per-frame allocation, node or action leaks, stale coordinate spaces, nondeterministic frame selection and work that continues while hidden or locked.
-- Preserve Keychain denial and caching behavior, StoreKit transaction and entitlement ownership, Supabase session boundaries, Sparkle verification, and the differences between Direct and App Store products.
-- Review signing, entitlements, package resolution, resource membership, login-item behavior, appcast or archive inputs, and Release-only configuration when the diff touches distribution.
+- Preserve Keychain denial and caching behavior, StoreKit transaction and entitlement ownership, Supabase session boundaries and the App Store sandbox identity. Retired Direct credentials and customer records must not be silently migrated or deleted.
+- Review signing, entitlements, package resolution, resource membership, login-item behavior, App Store archive inputs, and Release-only configuration when the diff touches distribution.
 
 ## Validation
 

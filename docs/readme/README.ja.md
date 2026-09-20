@@ -70,26 +70,6 @@ SIDEYは、画面の端にいる2Dピクセル動物を通じて友だちと会�
   <p>Appleの審査があるため、アップデートの公開が遅れる場合があります。</p>
 </details>
 
-<details>
-  <summary><strong>GitHubから.dmgをダウンロード</strong></summary>
-  <br/>
-
-  [SIDEYのGitHubリリース](https://github.com/sidey-app/SIDEY/releases)ページを開き、下へスクロールして**Assets**からお使いの環境に合ったインストールファイルをダウンロードすると、インストールできます。
-
-</details>
-
-<details>
-  <summary><strong>Homebrewでインストール</strong></summary>
-  <br/>
-
-  [Homebrew](https://brew.sh/)でSIDEYをダウンロードできます:
-
-  ```sh
-  brew install --cask sidey-app/tap/sidey
-  ```
-
-</details>
-
 ### Windows
 
 **動作環境:** Windows 10 1809以降 · x64。

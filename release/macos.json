@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "platform": "macos",
-  "channel": "production",
+  "channel": "appstore",
   "version": "1.2.1",
-  "build": 29
+  "build": 31
 }

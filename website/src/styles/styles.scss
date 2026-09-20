@@ -470,16 +470,6 @@ main { overflow: hidden; }
   .copy-button:hover { color: var(--ink); background: rgba(74, 74, 92, .08); }
   .material-symbols-rounded { font-size: 1rem; }
 }
-.install-box {
-  margin-top: 1.75rem; padding-top: 1.5rem; border-top: .0625rem solid var(--line);
-
-  > strong { display: block; margin-bottom: .625rem; font-size: .8rem; }
-}
-.code-row {
-  display: flex; align-items: center; gap: .625rem; padding: .625rem .625rem .625rem .875rem; border-radius: .625rem; color: #f5f5f4; background: #26272d;
-
-  code { flex: 1 1 auto; min-width: 0; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: clamp(.69rem, 1.2vw, .82rem); white-space: nowrap; scrollbar-width: thin; }
-}
 .copy-button {
   display: inline-grid; flex: 0 0 auto; width: 2.125rem; min-height: 2.125rem; padding: 0; place-items: center; border: 0; border-radius: .4375rem; color: #fff; background: #3b3c44; cursor: pointer;
 

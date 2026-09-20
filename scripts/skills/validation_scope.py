@@ -62,11 +62,6 @@ def validation_platform_for(path):
     if (
         path.startswith(('macos/', 'scripts/macos/'))
         or re.fullmatch(
-            r'scripts/(?:export_macos|install_macos_dev|'
-            r'package_macos_release|release_macos)\.sh',
-            path,
-        )
-        or re.fullmatch(
             r'\.github/workflows/'
             r'(?:macos-build-and-tests|validate-macos)\.yml',
             path,
