@@ -4,6 +4,23 @@ import XCTest
 
 @MainActor
 final class BackendEventLifecycleTests: XCTestCase {
+    func testStartBackendRetriesAfterPreviousTransportInitializationFailure() {
+        let coordinator = makeCoordinator()
+        defer { coordinator.shutdown() }
+        XCTAssertNil(coordinator.configurationError)
+        coordinator.backend = nil
+        coordinator.realtimeTransportInitializationError =
+            FirebaseV2ProductionFactoryError.appVersionUnavailable
+        coordinator.model.errorMessage = nil
+
+        coordinator.startBackend()
+
+        XCTAssertNil(
+            coordinator.model.errorMessage,
+            "A stale transport diagnostic must not short-circuit a fresh startup attempt"
+        )
+    }
+
     func testRepeatedStartKeepsStreamAliveAndDeliversEachEventOnce() async throws {
         let savedNicknames = Mutex<[String]>([])
         let coordinator = makeCoordinator(preferencesStore: PreferencesStore(
@@ -99,7 +116,9 @@ final class BackendEventLifecycleTests: XCTestCase {
 
     private func waitUntil(_ condition: () -> Bool) async throws {
         let clock = ContinuousClock()
-        let deadline = clock.now.advanced(by: .seconds(2))
+        // A clean App Store test host can spend a few seconds warming AppKit
+        // and linked SDKs before the main-actor consumer gets its first turn.
+        let deadline = clock.now.advanced(by: .seconds(5))
         while !condition() {
             guard clock.now < deadline else {
                 XCTFail("Backend event receiver did not reach the expected state")

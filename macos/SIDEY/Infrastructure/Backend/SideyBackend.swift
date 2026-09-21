@@ -10,6 +10,7 @@ actor SideyBackend {
     private let legacyRefreshAccount: String
     private let inviteAccountPrefix: String
     private let eventContinuation: AsyncStream<BackendEvent>.Continuation
+    private var eventSubscribers: [UUID: AsyncStream<BackendEvent>.Continuation] = [:]
     private let networkPathMonitor: any NetworkPathMonitoring
     private let recoveryLogger = Logger(
         subsystem: "app.sidey.desktop",
@@ -79,6 +80,18 @@ actor SideyBackend {
         return try await loadSnapshot()
     }
 
+    func subscribeEvents() -> AsyncStream<BackendEvent> {
+        let subscriberID = UUID()
+        let pair = AsyncStream<BackendEvent>.makeStream(
+            bufferingPolicy: .bufferingNewest(256)
+        )
+        eventSubscribers[subscriberID] = pair.continuation
+        pair.continuation.onTermination = { [weak self] _ in
+            Task { await self?.removeEventSubscriber(subscriberID) }
+        }
+        return pair.stream
+    }
+
     func signInWithApple(identityToken: String, nonce: String) async throws {
         _ = try await client.auth.signInWithIdToken(
             credentials: OpenIDConnectCredentials(
@@ -91,6 +104,31 @@ actor SideyBackend {
 
     func currentAccessToken() async throws -> String {
         try await client.auth.session.accessToken
+    }
+
+    func currentFirebaseV2BootstrapSession() async throws -> FirebaseV2SupabaseSession {
+        let session = try await client.auth.session
+        return try FirebaseV2SupabaseSessionDecoder.decode(
+            accessToken: session.accessToken,
+            expectedAccountID: session.user.id
+        )
+    }
+
+    func registerRealtimeCapabilityV2(
+        platform: String,
+        appVersion: String,
+        protocolVersion: Int,
+        contractHash: String
+    ) async throws -> RealtimeRolloutPolicyResponse {
+        try await client.rpc(
+            "register_realtime_capability_v2",
+            params: RealtimeCapabilityRegistrationParameters(
+                platform: platform,
+                appVersion: appVersion,
+                protocolVersion: protocolVersion,
+                contractHash: contractHash
+            )
+        ).execute().value
     }
 
     func signOut() async throws {
@@ -189,6 +227,10 @@ actor SideyBackend {
         for task in typingExpiryTasks.values { task.cancel() }
         typingExpiryTasks.removeAll()
         await presencePublicationQueue.cancel()
+        for continuation in eventSubscribers.values {
+            continuation.finish()
+        }
+        eventSubscribers.removeAll()
         eventContinuation.finish()
     }
 
@@ -323,7 +365,41 @@ actor SideyBackend {
         return value.domain
     }
 
+    /// Candidate Firebase v2 grant RPC. This is deliberately separate from the
+    /// released legacy RPC so the rollout gate can select exactly one mutation
+    /// shape without changing old-client behavior.
+    func setEquippedCosmeticV2(
+        kind: CommerceProductKind,
+        catalogItemID: String?
+    ) async throws -> FirebaseV2EquippedCosmeticGrant {
+        guard kind != .character else { throw SideyBackendError.malformedResponse }
+        let rows: [FirebaseV2EquipCosmeticGrantRow] = try await client.rpc(
+            "set_equipped_cosmetic_v2",
+            params: SetEquippedCosmeticParameters(
+                productKind: kind,
+                catalogItemID: catalogItemID
+            )
+        ).execute().value
+        guard let row = rows.first else { throw SideyBackendError.malformedResponse }
+        return FirebaseV2EquippedCosmeticGrant(
+            profile: row.profile.domain,
+            accessRevision: row.accessRevision
+        )
+    }
 
+    func firebaseV2StoreWireItems() async throws -> [FirebaseV2StoreWireItem] {
+        try await client.rpc("get_store_state_v2").execute().value
+    }
+
+    func currentFirebaseAccessRevision() async throws -> RealtimeRevision {
+        let value: String = try await client.rpc(
+            "current_firebase_access_revision"
+        ).execute().value
+        guard let revision = RealtimeRevision(rawValue: value) else {
+            throw SideyBackendError.malformedResponse
+        }
+        return revision
+    }
 
     @discardableResult
     func upsertProfile(nickname: String, characterID: String = "pixel_hamster") async throws -> Profile {
@@ -358,6 +434,31 @@ actor SideyBackend {
         )
     }
 
+    func createRoomV2(name: String) async throws -> FirebaseV2CreatedRoomGrant {
+        guard RoomNameValidator.isValid(name) else { throw SideyBackendError.invalidRoomName }
+        let normalized = RoomNameValidator.normalized(name)
+        let rows: [FirebaseV2CreateRoomGrantRow] = try await client.rpc(
+            "create_room_v2",
+            params: CreateRoomParameters(name: normalized)
+        ).execute().value
+        guard let row = rows.first else { throw SideyBackendError.malformedResponse }
+        let storedInKeychain: Bool
+        do {
+            try keychain.writeString(row.inviteCode, account: inviteAccount(roomID: row.roomID))
+            storedInKeychain = true
+        } catch {
+            storedInKeychain = false
+        }
+        return FirebaseV2CreatedRoomGrant(
+            room: CreatedRoom(
+                roomID: row.roomID,
+                inviteCode: row.inviteCode,
+                storedInKeychain: storedInKeychain
+            ),
+            accessRevision: row.accessRevision
+        )
+    }
+
     func joinRoom(inviteCode: String) async throws -> JoinedRoom {
         let normalized = inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         guard !normalized.isEmpty else { throw SideyBackendError.invalidInviteCode }
@@ -378,6 +479,34 @@ actor SideyBackend {
             storedInKeychain = false
         }
         return JoinedRoom(roomID: roomID, storedInKeychain: storedInKeychain)
+    }
+
+    func joinRoomV2(inviteCode: String) async throws -> FirebaseV2JoinedRoomGrant {
+        let normalized = inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        guard !normalized.isEmpty else { throw SideyBackendError.invalidInviteCode }
+        let rows: [FirebaseV2JoinRoomGrantRow] = try await client.rpc(
+            "join_room_v2",
+            params: JoinRoomParameters(inviteCode: normalized)
+        ).execute().value
+        guard let row = rows.first else { throw SideyBackendError.malformedResponse }
+        if let code = row.errorCode, !code.isEmpty { throw SideyBackendError.business(code: code) }
+        let grant: FirebaseV2JoinRoomGrant
+        do {
+            grant = try row.validatedGrant()
+        } catch {
+            throw SideyBackendError.malformedResponse
+        }
+        let storedInKeychain: Bool
+        do {
+            try keychain.writeString(normalized, account: inviteAccount(roomID: grant.roomID))
+            storedInKeychain = true
+        } catch {
+            storedInKeychain = false
+        }
+        return FirebaseV2JoinedRoomGrant(
+            room: JoinedRoom(roomID: grant.roomID, storedInKeychain: storedInKeychain),
+            accessRevision: grant.accessRevision
+        )
     }
 
     func rotateInviteCode(roomID: UUID) async throws -> CreatedRoom {
@@ -1390,20 +1519,62 @@ actor SideyBackend {
     }
 
     private func emit(_ event: BackendEvent) {
+        var terminatedSubscribers: [UUID] = []
+        var subscriberDroppedEvent = false
+        for (id, continuation) in eventSubscribers {
+            switch continuation.yield(event) {
+            case .enqueued:
+                break
+            case .dropped:
+                subscriberDroppedEvent = true
+            case .terminated:
+                terminatedSubscribers.append(id)
+            @unknown default:
+                subscriberDroppedEvent = true
+            }
+        }
+        for id in terminatedSubscribers {
+            eventSubscribers.removeValue(forKey: id)
+        }
+        if subscriberDroppedEvent {
+            scheduleStructuralSnapshot()
+        }
         switch eventContinuation.yield(event) {
         case .enqueued:
             break
         case .dropped:
             scheduleStructuralSnapshot()
         case .terminated:
-            isShuttingDown = true
+            // A transport switch intentionally retires the original consumer
+            // before attaching a fresh subscriber. Backend lifetime is owned
+            // by `shutdown()`; terminating this compatibility stream must not
+            // stop RPC, Presence, or subscriber fanout.
+            break
         @unknown default:
             scheduleStructuralSnapshot()
         }
     }
 
+    private func removeEventSubscriber(_ id: UUID) {
+        eventSubscribers.removeValue(forKey: id)
+    }
+
     private func inviteAccount(roomID: UUID) -> String {
         inviteAccountPrefix + roomID.uuidString.lowercased()
+    }
+}
+
+private struct RealtimeCapabilityRegistrationParameters: Encodable, Sendable {
+    let platform: String
+    let appVersion: String
+    let protocolVersion: Int
+    let contractHash: String
+
+    private enum CodingKeys: String, CodingKey {
+        case platform = "p_platform"
+        case appVersion = "p_app_version"
+        case protocolVersion = "p_protocol_version"
+        case contractHash = "p_contract_hash"
     }
 }
 
