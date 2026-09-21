@@ -969,16 +969,10 @@ def finish(root, args):
             'finish '
             'after validation passes'
         )
-    run(
-        root,
-        'gh',
-        'pr',
-        'checks',
-        number,
-        '--repo',
-        repository,
-        '--required',
-    )
+    # SIDEY-source is a private repository on GitHub Free, so it deliberately
+    # has no branch-protection "required checks" for `gh pr checks --required`
+    # to discover. The scope-aware `Required checks` job above is the canonical
+    # integration gate and has already proved both existence and success.
     checked_head = task['checked']['head']
     checked_base = task['checked']['base']
     details = json.loads(
