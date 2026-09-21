@@ -753,6 +753,16 @@ class WorkflowTests(unittest.TestCase):
             with self.subTest(check=check):
                 self.assertTrue(w.is_required_validation(check))
 
+    def test_non_gate_checks_cannot_replace_required_validation(self):
+        checks = (
+            {'name': 'Repository checks', 'workflow': 'SIDEY CI'},
+            {'name': 'macOS build and tests', 'workflow': 'SIDEY CI'},
+            {'name': 'Required checks', 'workflow': 'Other workflow'},
+        )
+        for check in checks:
+            with self.subTest(check=check):
+                self.assertFalse(w.is_required_validation(check))
+
     def test_policy_and_contributor_changes_are_repository_only(self):
         self.assertEqual(
             w.required_scopes([
