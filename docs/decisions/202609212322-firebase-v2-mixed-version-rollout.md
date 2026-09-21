@@ -25,8 +25,12 @@ Presence와 Broadcast를 사용하므로 새 client가 일시 event를 곧바로
 - 혼합 버전 동안 presence와 typing·pulse·projectile은 Supabase 단일 plane에 유지한다.
   기존 client와 v2-capable client는 이 plane을 통해 양방향 호환된다.
 - 인증된 server selector가 protocol과 frozen client contract를 확인한 session만 v2를
-  선택한다. 명시적인 OFF는 bounded refresh 안에 legacy로 전환할 수 있지만, selector,
-  bootstrap 또는 권한 실패는 legacy downgrade의 근거가 되지 않는다.
+  선택한다. Bootstrap은 selector 결정을 다시 검증하고 최대 5분의 rollout lease를
+  Firebase custom token, RTDB read와 callable write 권한에 함께 묶는다. Client는 만료 전에
+  selector 재등록, bootstrap, Firebase Auth와 listener 세대 교체를 완료한다.
+- 명시적인 OFF는 bounded refresh 안에 Firebase 자원을 먼저 retire한 뒤 legacy로 전환할
+  수 있다. Selector, bootstrap, lease 갱신 또는 권한 실패는 legacy downgrade의 근거가
+  되지 않으며, 갱신하지 못한 lease는 server와 client에서 fail-closed로 끝난다.
 - Client rollout 시작을 T0로 기록한 뒤 최소 7일을 관찰한다. 기간 경과만으로 기본 경로를
   바꾸거나 legacy schema, RPC, trigger 또는 Broadcast를 삭제하지 않는다. Adoption,
   오류·backlog·비용과 old/new smoke를 확인하고 별도 승인한 뒤 후속 변경으로 다룬다.
@@ -36,7 +40,10 @@ Presence와 Broadcast를 사용하므로 새 client가 일시 event를 곧바로
 두 실시간 구현을 일정 기간 함께 유지해야 하므로 client router, server outbox와 운영
 관측 비용이 늘어난다. 대신 구버전 사용자는 업데이트 없이 계속 대화할 수 있고, 새 chat의
 영구 저장은 전송 계층 장애와 분리된다. Rollout 중 문제는 server selector로 v2-capable
-session만 legacy로 되돌릴 수 있으며 권한 실패를 downgrade로 숨기지 않는다.
+session만 legacy로 되돌릴 수 있으며 권한 실패를 downgrade로 숨기지 않는다. 짧은 lease로
+bootstrap 우회와 이미 열린 listener의 장기 잔존을 막는 대신, v2 client는 sleep/wake와
+일시적 정책 조회 실패에서도 lease 만료 전에 갱신하거나 정확히 연결 해제 상태로 전환해야
+한다.
 
 Windows가 v2-capable transport를 구현하기 전까지는 legacy Supabase 경로를 사용한다.
 이 결정은 Windows 구현을 자동 승인하거나 T0를 시작하지 않는다.
