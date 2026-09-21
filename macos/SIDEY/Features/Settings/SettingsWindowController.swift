@@ -20,7 +20,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
             defer: false
         )
         super.init(window: window)
-        window.title = "\(AppPresentation.displayName) 설정"
+        window.title = L10n.text("settings.window.title")
         window.titlebarAppearsTransparent = false
         window.titlebarSeparatorStyle = .automatic
         window.isReleasedWhenClosed = false

@@ -92,7 +92,7 @@ extension AppCoordinator {
             } catch is CancellationError {
                 return
             } catch {
-                model.errorMessage = "장착 상태를 바꾸지 못했습니다: \(error.localizedDescription)"
+                model.errorMessage = L10n.text("store.error.equipment_update_failed")
             }
         }
     }
@@ -104,12 +104,14 @@ extension AppCoordinator {
               let messagingTransport,
               let productState = model.commerceProduct(id: productID),
               commerceSession.productTasks[productID] == nil,
-              productState.purchaseState != .owned
+              productState.purchaseState != .owned,
+              !releaseChannel.storeAvailability.usesAppStore || productState.storefrontProductAvailable
         else { return }
 
         guard productState.purchaseState.canStartPurchase else { return }
 
         let product = productState.product
+        let productDisplayName = productState.displayName
         model.setCommerceWorking(true, productID: productID)
         model.setCommercePurchaseState(.openingCheckout, productID: productID)
         model.errorMessage = nil
@@ -152,30 +154,37 @@ extension AppCoordinator {
                                 }
                                 model.apply(profile: profile)
                                 persistPreferences()
-                                model.presentSuccess("\(product.displayName) 구매 및 장착이 완료되었습니다.")
+                                model.presentSuccess(L10n.format(
+                                    "store.purchase_and_equip.success", productDisplayName
+                                ))
                             } catch is CancellationError {
                                 return
                             } catch {
-                                model.presentSuccess("\(product.displayName) 구매가 완료되었습니다.")
-                                model.errorMessage = "구매는 반영됐지만 자동 장착하지 못했습니다: \(error.localizedDescription)"
+                                model.presentSuccess(L10n.format(
+                                    "store.purchase.success", productDisplayName
+                                ))
+                                model.errorMessage = L10n.text("store.error.auto_equip_failed")
                             }
                         } else {
-                            model.presentSuccess("\(product.displayName) 구매가 완료되었습니다.")
+                            model.presentSuccess(L10n.format(
+                                "store.purchase.success", productDisplayName
+                            ))
                         }
                     } else {
                         model.setCommercePurchaseState(.available, productID: productID)
                     }
                     return
                 }
-                throw SideyBackendError.remote("App Store 배포 구성이 올바르지 않습니다.")
+                throw AppStorePurchaseError.verifierNotConfigured
             } catch is CancellationError {
                 return
             } catch {
                 model.setCommercePurchaseState(
-                    .error("결제 상태를 확인하지 못했습니다."),
+                    .error(L10n.text("store.error.purchase_status_failed")),
                     productID: productID
                 )
-                model.errorMessage = "\(product.displayName) 구매 처리 실패: \(error.localizedDescription)"
+                model.errorMessage = (error as? AppStorePurchaseError)?.localizedDescription
+                    ?? L10n.format("store.error.purchase_failed", productDisplayName)
             }
         }
     }
@@ -201,7 +210,7 @@ extension AppCoordinator {
                 startBackend()
             } catch {
                 model.authenticationRequired = true
-                model.errorMessage = "Apple 로그인 실패: \(error.localizedDescription)"
+                model.errorMessage = L10n.text("auth.apple_sign_in.failed")
             }
         }
     }
@@ -221,9 +230,10 @@ extension AppCoordinator {
                 let snapshot = try await backend.loadSnapshot()
                 applyBackendSnapshot(snapshot, currentUserID: userID)
                 refreshCommerceState()
-                model.presentSuccess("App Store 구매 내역을 복원했습니다.")
+                model.presentSuccess(L10n.text("store.restore.success"))
             } catch {
-                model.errorMessage = "구매 복원 실패: \(error.localizedDescription)"
+                model.errorMessage = (error as? AppStorePurchaseError)?.localizedDescription
+                    ?? L10n.text("store.restore.failed")
             }
         }
     }
@@ -253,7 +263,7 @@ extension AppCoordinator {
                 preferencesStore.save(.defaults)
                 NSApplication.shared.terminate(nil)
             } catch {
-                model.errorMessage = "계정 탈퇴 실패: \(error.localizedDescription)"
+                model.errorMessage = L10n.text("account.delete.failed")
             }
         }
     }
@@ -261,10 +271,10 @@ extension AppCoordinator {
     func refreshAppStorePrices() async {
         model.beginCommercePriceLoading()
         do {
-            model.setCommerceLocalizedPrices(try await commerceSession.purchaseController.loadProducts())
+            model.setCommerceStorefrontMetadata(try await commerceSession.purchaseController.loadProducts())
         } catch {
             model.failCommercePriceLoading()
-            model.errorMessage = "App Store 상품 정보를 불러오지 못했습니다: \(error.localizedDescription)"
+            model.errorMessage = L10n.text("store.error.products_load_failed")
         }
     }
 
@@ -275,13 +285,13 @@ extension AppCoordinator {
                 accessToken: try await backend.currentAccessToken()
             )
         } catch {
-            model.errorMessage = "App Store 구매 내역을 반영하지 못했습니다: \(error.localizedDescription)"
+            model.errorMessage = L10n.text("store.error.entitlements_reconcile_failed")
         }
         commerceSession.purchaseController.startObserving(
             accessToken: { try await backend.currentAccessToken() },
             didChange: { [weak self] in self?.refreshCommerceState() },
-            didFail: { [weak self] message in
-                self?.model.errorMessage = "App Store 거래 반영 실패: \(message)"
+            didFail: { [weak self] in
+                self?.model.errorMessage = L10n.text("store.error.transaction_update_failed")
             }
         )
     }

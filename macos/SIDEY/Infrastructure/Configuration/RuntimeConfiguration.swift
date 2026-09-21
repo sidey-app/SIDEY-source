@@ -116,15 +116,15 @@ enum RuntimeConfigurationError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .incompleteEnvironment:
-            "SIDEY_SUPABASE_URL과 SIDEY_SUPABASE_PUBLISHABLE_KEY를 모두 설정해야 합니다."
+            L10n.text("configuration.error.incomplete_environment")
         case .secretKeyNotAllowed:
-            "클라이언트에 Supabase secret/service-role 키를 사용할 수 없습니다."
+            L10n.text("configuration.error.secret_key_not_allowed")
         case .missingDevelopmentConfiguration:
-            "Sidey-dev에는 SIDEY-staging URL과 publishable key가 필요합니다."
+            L10n.text("configuration.error.missing_development_configuration")
         case .productionBackendNotAllowedInDevelopment:
-            "Sidey-dev는 production Supabase 프로젝트에 연결할 수 없습니다."
+            L10n.text("configuration.error.production_backend_in_development")
         case .invalidRealtimeTransport:
-            "SIDEY 실시간 프로토콜 설정이 지원되지 않는 값입니다."
+            L10n.text("configuration.error.unsupported_realtime_protocol")
         }
     }
 }

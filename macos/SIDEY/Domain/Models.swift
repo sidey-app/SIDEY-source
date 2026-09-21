@@ -61,11 +61,15 @@ enum GroupOperation: Equatable, Sendable {
     }
 
     var createButtonTitle: String {
-        self == .creating ? "만드는 중…" : "그룹 만들기"
+        self == .creating
+            ? L10n.text("group.create.in_progress")
+            : L10n.text("group.create.action")
     }
 
     var joinButtonTitle: String {
-        self == .joining ? "참여 중…" : "코드로 참여"
+        self == .joining
+            ? L10n.text("group.join.in_progress")
+            : L10n.text("group.join.action")
     }
 }
 
@@ -112,10 +116,10 @@ enum SettingsPage: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .profile: "내 프로필"
-        case .groups: "그룹"
-        case .store: "꾸미기·상점"
-        case .app: "앱 설정"
+        case .profile: L10n.text("settings.page.profile")
+        case .groups: L10n.text("settings.page.groups")
+        case .store: L10n.text("settings.page.store")
+        case .app: L10n.text("settings.page.app")
         }
     }
 
@@ -606,11 +610,11 @@ enum RoomLeaveConfirmation: Equatable, Sendable {
     var message: String {
         switch self {
         case .member:
-            "그룹과 기존 메시지에 더 이상 접근할 수 없습니다."
+            L10n.text("group.leave.confirmation.member")
         case .ownerWithRemainingMembers:
-            "가장 먼저 참여한 남은 멤버에게 방장이 이전되며, 그룹과 기존 메시지에 더 이상 접근할 수 없습니다."
+            L10n.text("group.leave.confirmation.owner_transfer")
         case .lastOwner:
-            "마지막 멤버이므로 그룹과 모든 메시지가 영구 삭제되며 복구할 수 없습니다."
+            L10n.text("group.leave.confirmation.last_member")
         }
     }
 }
@@ -644,9 +648,9 @@ enum StoreSortOrder: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .catalog: "기본순"
-        case .priceAscending: "가격 낮은순"
-        case .priceDescending: "가격 높은순"
+        case .catalog: L10n.text("store.sort.catalog")
+        case .priceAscending: L10n.text("store.sort.price_ascending")
+        case .priceDescending: L10n.text("store.sort.price_descending")
         }
     }
 }
@@ -696,11 +700,16 @@ enum CosmeticEquipmentFeedback {
         kind: CommerceProductKind,
         product: CommerceProduct?
     ) -> String {
-        if let product { return "\(product.displayName) 장착했습니다." }
+        if let product {
+            return L10n.format("commerce.equipment.success.named", product.displayName)
+        }
         switch kind {
-        case .bubble: return "기본 말풍선을 장착했습니다."
-        case .throwable: return "기본 말랑공을 장착했습니다."
-        case .character: return "기본 캐릭터를 장착했습니다."
+        case .bubble:
+            return L10n.text("commerce.equipment.success.default_bubble")
+        case .throwable:
+            return L10n.text("commerce.equipment.success.default_throwable")
+        case .character:
+            return L10n.text("commerce.equipment.success.default_character")
         }
     }
 }

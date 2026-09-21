@@ -12,7 +12,7 @@ final class StoreReviewDebugWindow: NSWindowController {
         let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 620, height: 800),
             styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
         super.init(window: window)
-        window.title = "Sidey-dev · 상점 검토 · 실제 결제 없음"
+        window.title = L10n.text("store.review.window.title")
         window.isReleasedWhenClosed = false
         window.appearance = NSAppearance(named: .aqua)
         window.contentView = NSHostingView(rootView: StoreReviewDebugView(review: review) { [weak window] size in
@@ -33,7 +33,7 @@ final class StoreReviewDebugWindow: NSWindowController {
                         try capture(to: directory.appendingPathComponent(product.appStoreProductID + ".png"))
                     }
                     review.selectedID = CommerceProduct.pig.id
-                } catch { window.title = "상점 검토 · 캡처 실패: \(error.localizedDescription)" }
+                } catch { window.title = L10n.text("store.review.capture_failed") }
             }
         }
     }
@@ -76,13 +76,22 @@ private final class StoreReviewSelection: ObservableObject {
     func state(_ product: CommerceProduct) -> CommerceProductState {
         let owns = ownership == 3 || (ownership == 1 && product.kind == .character)
             || (ownership == 2 && product.isKeepsake)
-        let price = CommerceCatalog.definition(id: product.id)?.appStorePrice ?? product.amountKRW
+        let displayPrice = product.formattedPrice
+        let metadata = StorefrontProductMetadata(
+            logicalProductID: product.id,
+            appStoreProductID: product.appStoreProductID,
+            displayName: product.displayName,
+            description: product.description,
+            displayPrice: displayPrice
+        )
         return CommerceProductState(product: product, purchaseState: owns ? .owned : .available,
-            isWorking: false, localizedPrice: "\(price.formatted())원")
+            isWorking: false, localizedPrice: displayPrice, storefrontMetadata: metadata)
     }
     var actions: SettingsActions {
         var actions = SettingsActions.empty
-        actions.onPurchase = { [weak self] _ in self?.notice = "검토용 화면에서는 실제 결제를 진행하지 않아요." }
+        actions.onPurchase = { [weak self] _ in
+            self?.notice = L10n.text("store.review.purchase_disabled")
+        }
         actions.onCharacterImpact = { [weak self] id, time in self?.audio.play(objectID: id, at: time) }
         actions.onStopCharacterSounds = { [weak self] in self?.audio.stopAll() }
         return actions
@@ -95,12 +104,14 @@ private struct StoreReviewDebugView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Picker("상품", selection: $review.selectedID) {
+                Picker(L10n.text("store.review.product"), selection: $review.selectedID) {
                     ForEach(CommerceCatalog.products, id: \.id) { Text($0.displayName).tag($0.id) }
                 }.frame(width: 270)
-                Picker("보유", selection: $review.ownership) {
-                    Text("미보유").tag(0); Text("캐릭터만").tag(1)
-                    Text("물건만").tag(2); Text("둘 다").tag(3)
+                Picker(L10n.text("store.review.ownership"), selection: $review.ownership) {
+                    Text(L10n.text("store.review.ownership.none")).tag(0)
+                    Text(L10n.text("store.review.ownership.character")).tag(1)
+                    Text(L10n.text("store.review.ownership.keepsake")).tag(2)
+                    Text(L10n.text("store.review.ownership.all")).tag(3)
                 }.frame(width: 150)
             }.padding(12)
             if !review.notice.isEmpty { Text(review.notice).font(.caption) }

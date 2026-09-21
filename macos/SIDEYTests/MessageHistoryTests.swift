@@ -166,7 +166,7 @@ final class MessageHistoryTests: XCTestCase {
             currentUserID: nil
         )
 
-        XCTAssertEqual(participant.nickname, "알 수 없는 친구")
+        XCTAssertEqual(participant.nickname, L10n.text("profile.nickname.unknown_friend"))
         XCTAssertEqual(participant.characterID, PixelCharacterCatalog.pixelHamsterID)
         XCTAssertFalse(participant.isCurrentUser)
     }

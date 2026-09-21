@@ -21,15 +21,15 @@ struct ProfileSettingsView: View {
 
     var body: some View {
         SettingsSection(
-            title: "내 프로필",
-            subtitle: "친구들에게 보이는 이름과 캐릭터를 설정할 수 있습니다.",
+            title: "profile.title",
+            subtitle: "profile.subtitle",
             systemImage: "person.crop.circle"
         ) {
             SettingsControlRow(
-                title: "닉네임",
-                description: "친구들의 픽셀 월드와 메시지에 표시되는 이름 · 2~8자"
+                title: "profile.nickname.title",
+                description: "profile.nickname.description"
             ) {
-                TextField("2~8자", text: $model.nickname)
+                TextField("profile.nickname.placeholder", text: $model.nickname)
                     .textFieldStyle(.roundedBorder)
                     .frame(maxWidth: .infinity)
                     .onChange(of: model.nickname) { _, value in
@@ -39,9 +39,9 @@ struct ProfileSettingsView: View {
             }
             Divider()
             VStack(alignment: .leading, spacing: 6) {
-                Text("캐릭터")
+                Text("profile.character.title")
                     .font(.headline)
-                Text("친구 화면에서 나를 나타낼 픽셀 동물을 선택할 수 있습니다.")
+                Text("profile.character.description")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -53,13 +53,13 @@ struct ProfileSettingsView: View {
                 isDisabled: model.pendingCharacterID != nil || model.groupMutationsDisabled,
                 onSelect: actions.onSetCharacter
             )
-            Text("캐릭터와 닉네임은 그룹 안에서 중복해서 선택할 수 있습니다.")
+            Text("profile.duplicates_allowed")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             if model.hasNicknameChanges {
                 HStack {
                     Spacer()
-                    Button("닉네임 변경하기") {
+                    Button("profile.nickname.save") {
                         PendingTextInputCommitter.commitThen(actions.onSaveProfile)
                     }
                         .buttonStyle(.glassProminent)
@@ -90,7 +90,7 @@ struct ProfileSettingsView: View {
         }
 
         if !model.preferences.onboardingComplete {
-            Label("프로필을 저장한 뒤 그룹을 만들거나 초대 코드로 참여해 주세요.", systemImage: "sparkles")
+            Label("profile.onboarding.next_hint", systemImage: "sparkles")
                 .foregroundStyle(.secondary)
                 .padding(.top, 18)
         }
@@ -117,7 +117,7 @@ struct ProfileCosmeticEquipmentSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 5) {
-                Text(kind.title)
+                Text(kind.localizedTitle)
                     .font(.headline)
                 Text(description)
                     .font(.subheadline)
@@ -147,15 +147,15 @@ struct ProfileCosmeticEquipmentSection: View {
                 }
             }
             .accessibilityElement(children: .contain)
-            .accessibilityLabel("\(kind.title) 선택")
+            .accessibilityLabel(Text(kind.selectionAccessibilityLabel))
         }
     }
 
-    private var description: String {
+    private var description: LocalizedStringResource {
         switch kind {
-        case .bubble: "보유한 말풍선을 고르면 모든 그룹에 바로 적용됩니다."
-        case .throwable: "보유한 투척물을 고르면 모든 그룹에 바로 적용됩니다."
-        case .character: ""
+        case .bubble: "profile.cosmetics.bubble.description"
+        case .throwable: "profile.cosmetics.throwable.description"
+        case .character: "profile.cosmetics.character.description"
         }
     }
 }
@@ -175,7 +175,7 @@ struct ProfileCosmeticTile: View {
             VStack(spacing: 7) {
                 preview
                     .frame(height: 58)
-                Text(label)
+                label
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(2)
@@ -196,9 +196,9 @@ struct ProfileCosmeticTile: View {
         .focused($isFocused)
         .disabled(isDisabled)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(label)
-        .accessibilityValue(accessibilityValue)
-        .accessibilityHint(isSelected ? "현재 사용 중" : "선택하면 모든 그룹에 바로 적용됩니다")
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(Text(accessibilityValue))
+        .accessibilityHint(Text(accessibilityHint))
     }
 
     @ViewBuilder private var preview: some View {
@@ -220,19 +220,61 @@ struct ProfileCosmeticTile: View {
         }
     }
 
-    private var label: String {
-        if let product { return product.displayName }
-        return kind == .bubble ? "기본 말풍선" : "기본 말랑공"
+    @ViewBuilder private var label: some View {
+        if let product {
+            Text(verbatim: product.displayName)
+        } else {
+            Text(defaultLabel)
+        }
     }
 
-    private var accessibilityValue: String {
-        if isPending { return "적용 중" }
-        return isSelected ? "선택됨" : "선택 안 됨"
+    private var accessibilityLabel: Text {
+        if let product {
+            return Text(verbatim: product.displayName)
+        }
+        return Text(defaultLabel)
+    }
+
+    private var defaultLabel: LocalizedStringResource {
+        kind == .bubble
+            ? "profile.cosmetics.default_bubble"
+            : "profile.cosmetics.default_throwable"
+    }
+
+    private var accessibilityValue: LocalizedStringResource {
+        if isPending { return "profile.cosmetics.state.applying" }
+        return isSelected
+            ? "profile.selection.state.selected"
+            : "profile.selection.state.not_selected"
+    }
+
+    private var accessibilityHint: LocalizedStringResource {
+        isSelected
+            ? "profile.cosmetics.hint.current"
+            : "profile.cosmetics.hint.select"
     }
 
     func requestSelection() {
         guard !isDisabled, !isSelected else { return }
         onSelect(kind, product?.catalogItemID)
+    }
+}
+
+private extension CommerceProductKind {
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .character: "commerce.kind.character"
+        case .bubble: "commerce.kind.bubble"
+        case .throwable: "commerce.kind.throwable"
+        }
+    }
+
+    var selectionAccessibilityLabel: LocalizedStringResource {
+        switch self {
+        case .character: "profile.cosmetics.character.selection.accessibility"
+        case .bubble: "profile.cosmetics.bubble.selection.accessibility"
+        case .throwable: "profile.cosmetics.throwable.selection.accessibility"
+        }
     }
 }
 

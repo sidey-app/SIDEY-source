@@ -238,8 +238,9 @@ final class KeychainAccessSession: @unchecked Sendable {
 }
 
 struct KeychainStore: Sendable {
-    static let defaultOperationReason =
-        "로그인 상태와 그룹 초대 코드를 안전하게 불러옵니다."
+    static var defaultOperationReason: String {
+        L10n.text("keychain.operation_reason")
+    }
 
     let service: String
     let operationReason: String
@@ -325,7 +326,8 @@ struct KeychainStoreError: LocalizedError, Equatable {
     let status: OSStatus
 
     var errorDescription: String? {
-        SecCopyErrorMessageString(status, nil) as String? ?? "Keychain 오류 \(status)"
+        SecCopyErrorMessageString(status, nil) as String?
+            ?? L10n.format("keychain.error.status", Int64(status))
     }
 }
 

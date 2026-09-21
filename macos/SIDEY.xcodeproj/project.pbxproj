@@ -159,11 +159,13 @@
 				};
 			};
 			buildConfigurationList = 100000000000000000000036 /* Build configuration list for PBXProject "SIDEY" */;
-			developmentRegion = ko;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				ko,
 				en,
+				ko,
+				ja,
+				"zh-Hant",
 				Base,
 			);
 			mainGroup = 100000000000000000000009;

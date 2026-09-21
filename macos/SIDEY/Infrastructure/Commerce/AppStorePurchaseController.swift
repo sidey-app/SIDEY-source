@@ -15,7 +15,7 @@ final class AppStorePurchaseController {
 
     deinit { updatesTask?.cancel() }
 
-    func loadProducts() async throws -> [String: String] {
+    func loadProducts() async throws -> [String: StorefrontProductMetadata] {
         let products = try await Product.products(for: CommerceCatalog.products.map(\.appStoreProductID))
         let missingIDs = Set(CommerceCatalog.products.map(\.appStoreProductID))
             .subtracting(products.map(\.id)).sorted().joined(separator: ",")
@@ -23,7 +23,15 @@ final class AppStorePurchaseController {
         productsByID = Dictionary(uniqueKeysWithValues: products.compactMap { product in
             CommerceCatalog.product(appStoreID: product.id).map { ($0.id, product) }
         })
-        return Dictionary(uniqueKeysWithValues: productsByID.map { ($0.key, $0.value.displayPrice) })
+        return Dictionary(uniqueKeysWithValues: productsByID.map { logicalID, product in
+            (logicalID, StorefrontProductMetadata(
+                logicalProductID: logicalID,
+                appStoreProductID: product.id,
+                displayName: product.displayName,
+                description: product.description,
+                displayPrice: product.displayPrice
+            ))
+        })
     }
 
     func purchase(productID: String, userID: UUID, accessToken: String) async throws -> Bool {
@@ -59,7 +67,7 @@ final class AppStorePurchaseController {
     func startObserving(
         accessToken: @escaping @Sendable () async throws -> String,
         didChange: @escaping @MainActor () -> Void,
-        didFail: @escaping @MainActor (String) -> Void
+        didFail: @escaping @MainActor () -> Void
     ) {
         updatesTask?.cancel()
         updatesTask = Task { @MainActor [weak self] in
@@ -73,7 +81,8 @@ final class AppStorePurchaseController {
                     )
                     didChange()
                 } catch {
-                    didFail(error.localizedDescription)
+                    logger.error("StoreKit transaction update failed: \(error.localizedDescription, privacy: .private)")
+                    didFail()
                 }
             }
         }
@@ -162,12 +171,12 @@ enum AppStorePurchaseError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .productUnavailable: "App Store에서 이 상품을 찾지 못했습니다."
-        case .pending: "구매 승인이 대기 중입니다. 승인 후 자동으로 반영됩니다."
-        case .unknownResult: "알 수 없는 App Store 구매 결과입니다."
-        case .unverifiedTransaction: "Apple이 검증하지 못한 거래라 반영하지 않았습니다."
-        case .verifierNotConfigured: "App Store 거래 검증 서버가 설정되지 않았습니다."
-        case .serverRejected: "서버가 App Store 거래를 승인하지 않았습니다."
+        case .productUnavailable: L10n.text("store.error.product_unavailable")
+        case .pending: L10n.text("store.error.purchase_pending")
+        case .unknownResult: L10n.text("store.error.unknown_result")
+        case .unverifiedTransaction: L10n.text("store.error.unverified_transaction")
+        case .verifierNotConfigured: L10n.text("store.error.verifier_not_configured")
+        case .serverRejected: L10n.text("store.error.server_rejected")
         }
     }
 }

@@ -300,7 +300,7 @@ actor SideyBackend {
                 let peer = profileByID[membership.userID]
                 return RoomMember(
                     userID: membership.userID,
-                    nickname: peer?.nickname ?? "친구",
+                    nickname: peer?.nickname ?? L10n.text("profile.nickname.unknown"),
                     characterID: PixelCharacterCatalog.canonicalID(for: peer?.characterID ?? "pixel_hamster"),
                     presence: .offline,
                     equippedBubbleStyleID: peer?.equippedBubbleStyleID,
@@ -597,7 +597,7 @@ actor SideyBackend {
 
     func sendMessage(roomID: UUID, body: String, id: UUID = UUID()) async throws -> ChatMessage {
         let normalized = MessageValidator.normalized(body)
-        guard MessageValidator.isValid(normalized) else { throw SideyBackendError.remote("메시지는 200자·3줄 이하로 입력해 주세요.") }
+        guard MessageValidator.isValid(normalized) else { throw SideyBackendError.invalidMessage }
         let parameters = SendMessageParameters(id: id, roomID: roomID, body: normalized)
         do {
             let value: DatabaseMessage = try await client.rpc(
@@ -833,7 +833,7 @@ actor SideyBackend {
 
     private func addChannel(roomID: UUID, epoch: Int, generation: Int) async throws {
         guard let userID = client.auth.currentUser?.id else {
-            throw SideyBackendError.remote("인증 세션이 없습니다.")
+            throw SideyBackendError.authenticationRequired
         }
         try ensureCurrentRealtimeGeneration(generation)
 
@@ -1390,9 +1390,10 @@ actor SideyBackend {
                 emit(.message(verified))
             } catch {
                 guard isCurrentChannel(roomID: roomID, generation: generation) else { return }
-                emit(.technicalError(
-                    "메시지 수신 실패: \(error.localizedDescription)"
-                ))
+                recoveryLogger.error(
+                    "Message receive failed: \(String(reflecting: error), privacy: .private)"
+                )
+                emit(.technicalError(L10n.text("backend.error.message_receive_failed")))
             }
         case "structure_changed":
             guard let entity = change.entity,
@@ -1448,7 +1449,10 @@ actor SideyBackend {
                 _ = try await reconcileCurrentState(emitEvents: true)
             }
         } catch {
-            emit(.technicalError("그룹 상태 재동기화 실패: \(error.localizedDescription)"))
+            recoveryLogger.error(
+                "Room state resynchronization failed: \(String(reflecting: error), privacy: .private)"
+            )
+            emit(.technicalError(L10n.text("backend.error.room_resync_failed")))
             structuralSnapshotAttempt += 1
             scheduleStructuralSnapshot()
             if !recoveryReconciled {

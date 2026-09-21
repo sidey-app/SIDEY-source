@@ -101,7 +101,10 @@ final class StoreCatalogCompatibilityTests: XCTestCase {
         }
         model.failStoreCatalogLoading(productIDs: CommerceCatalog.products.map(\.id))
         XCTAssertEqual(model.commerceProduct(id: CommerceProduct.otter.id)?.purchaseState, .owned)
-        XCTAssertEqual(model.commerceProduct(id: CommerceProduct.pig.id)?.purchaseState, .error("상점 상태를 불러오지 못했습니다."))
+        XCTAssertEqual(
+            model.commerceProduct(id: CommerceProduct.pig.id)?.purchaseState,
+            .error(L10n.text("commerce.error.catalog_unavailable"))
+        )
         model.applyStoreCatalog(try StoreCatalogResponse.validatedStates(rows), usesAppStore: true)
         XCTAssertEqual(model.commerceProduct(id: CommerceProduct.pig.id)?.purchaseState, .available)
         XCTAssertEqual(model.commerceProduct(id: "character_shiba")?.purchaseState, .unavailable)
@@ -116,13 +119,29 @@ final class StoreCatalogCompatibilityTests: XCTestCase {
     func testAppStoreAvailabilityAndApplePriceAreIndependent() throws {
         let shiba = try product("character_shiba")
         let model = AppModel(preferences: .defaults)
-        model.setCommerceLocalizedPrices([shiba.id: "₩1,100"])
+        model.setCommerceStorefrontMetadata([shiba.id: metadata(for: shiba)])
         model.applyStoreCatalog([], usesAppStore: true)
         XCTAssertEqual(model.commerceProduct(id: shiba.id)?.purchaseState, .unavailable)
         XCTAssertFalse(try XCTUnwrap(model.commerceProduct(id: shiba.id)).purchaseState.canStartPurchase)
         model.applyStoreCatalog(try StoreCatalogResponse.validatedStates([row(shiba, overrides: ["google_connected": false])]), usesAppStore: true)
         XCTAssertEqual(model.commerceProduct(id: shiba.id)?.purchaseState, .available)
         XCTAssertEqual(model.commerceProduct(id: shiba.id)?.localizedPrice, "₩1,100")
+    }
+
+    func testBackendCannotReplaceBundledLocalizedProductCopy() throws {
+        let product = try product("character_shiba")
+        let row = try row(product, overrides: [
+            "display_name": "서버가 보낸 이름",
+            "product_description": "서버가 보낸 설명",
+            "amount_krw": 999_999,
+        ])
+
+        let state = try XCTUnwrap(StoreCatalogResponse.validatedStates([row]).first)
+
+        XCTAssertEqual(state.product, product)
+        XCTAssertNotEqual(state.product.displayName, row.displayName)
+        XCTAssertNotEqual(state.product.description, row.productDescription)
+        XCTAssertNotEqual(state.product.amountKRW, row.amountKRW)
     }
 
     func testPurchaseEntryRejectsUnavailableAndOtherNonPurchasableStates() {
@@ -132,11 +151,21 @@ final class StoreCatalogCompatibilityTests: XCTestCase {
         }
         XCTAssertTrue(CommercePurchaseState.available.canStartPurchase)
         XCTAssertTrue(CommercePurchaseState.refunded.canStartPurchase)
-        XCTAssertEqual(CommercePurchaseState.unavailable.label, "현재 구매 불가")
+        XCTAssertEqual(CommercePurchaseState.unavailable.label, L10n.text("store.purchase.unavailable"))
     }
 
     private func product(_ id: String) throws -> CommerceProduct {
         try XCTUnwrap(CommerceCatalog.product(id: id))
+    }
+
+    private func metadata(for product: CommerceProduct) -> StorefrontProductMetadata {
+        StorefrontProductMetadata(
+            logicalProductID: product.id,
+            appStoreProductID: product.appStoreProductID,
+            displayName: product.displayName,
+            description: product.description,
+            displayPrice: "₩1,100"
+        )
     }
 
     private func ownedModel(character: CommerceProduct, bubble: CommerceProduct? = nil, throwable: CommerceProduct? = nil) -> AppModel {

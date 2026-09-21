@@ -7,22 +7,22 @@ final class KeychainStoreTests: XCTestCase {
     func testDefaultOperationReasonExplainsWhySIDEYUsesKeychain() {
         XCTAssertEqual(
             KeychainStore.defaultOperationReason,
-            "로그인 상태와 그룹 초대 코드를 안전하게 불러옵니다."
+            L10n.text("keychain.operation_reason")
         )
     }
 
     func testTransitionNoticeUsesApprovedCopy() {
         XCTAssertEqual(
             KeychainTransitionNotice.message,
-            "SIDEY는 로그인 상태와 그룹 초대 코드를 안전하게 보관하고 불러오기 위해 macOS 키체인을 사용합니다."
+            L10n.text("keychain.transition.message")
         )
         XCTAssertEqual(
             KeychainTransitionNotice.migrationExplanation,
-            "이전 버전에서 저장한 정보를 처음 불러올 때 Mac 로그인 암호를 요청할 수 있습니다. 다음부터 묻지 않도록 하려면 이어서 표시되는 macOS 창에서 ‘항상 허용’을 선택해 주세요. ‘허용’을 선택하면 저장된 정보에 따라 창이 몇 차례 더 나타나거나 다음 실행 때 다시 표시될 수 있습니다."
+            L10n.text("keychain.transition.migration_explanation")
         )
         XCTAssertEqual(
             KeychainTransitionNotice.privacyExplanation,
-            "SIDEY는 입력한 암호를 확인하거나 저장하지 않습니다."
+            L10n.text("keychain.transition.privacy_explanation")
         )
     }
 

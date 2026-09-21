@@ -59,7 +59,10 @@ final class GlobalShortcutTests: XCTestCase {
 
         XCTAssertEqual(actions, [.toggleOverlay])
         XCTAssertEqual(statuses[.toggleQuietMode], .unavailable(OSStatus(eventHotKeyExistsErr)))
-        XCTAssertTrue(statuses[.toggleQuietMode]?.notice?.contains("다른 앱") == true)
+        XCTAssertEqual(
+            statuses[.toggleQuietMode]?.notice,
+            L10n.text("shortcut.error.used_by_other_app")
+        )
         XCTAssertEqual(statuses[.toggleComposer], .registered)
         XCTAssertEqual(statuses[.openHistory], .registered)
         XCTAssertEqual(statuses[.toggleOverlay], .registered)
@@ -80,7 +83,9 @@ final class GlobalShortcutTests: XCTestCase {
         XCTAssertTrue(registrar.registered.isEmpty)
         XCTAssertEqual(statuses.count, GlobalShortcutAction.allCases.count)
         XCTAssertTrue(statuses.values.allSatisfy { $0 == .unavailable(OSStatus(eventInternalErr)) })
-        XCTAssertTrue(statuses.values.allSatisfy { $0.notice?.contains("등록하지 못했습니다") == true })
+        XCTAssertTrue(statuses.values.allSatisfy {
+            $0.notice == L10n.text("shortcut.error.registration_failed")
+        })
         controller.uninstall()
     }
 
@@ -221,20 +226,22 @@ final class GlobalShortcutTests: XCTestCase {
         )
         let menu = controller.makeMenu()
         for (title, action) in [
-            ("오버레이 숨기기", GlobalShortcutAction.toggleOverlay),
-            ("메시지 작성…", .toggleComposer),
-            ("조용히 모드", .toggleQuietMode),
-            ("최근 기록…", .openHistory)
+            (L10n.text("status.menu.overlay.hide"), GlobalShortcutAction.toggleOverlay),
+            (L10n.text("status.menu.compose"), .toggleComposer),
+            (L10n.text("status.menu.quiet_mode"), .toggleQuietMode),
+            (L10n.text("status.menu.history"), .openHistory)
         ] {
             let item = try XCTUnwrap(menu.item(withTitle: title))
             XCTAssertEqual(item.keyEquivalent, "")
             XCTAssertTrue(item.attributedTitle?.string.contains(configuration[action].displayShortcut) == true)
         }
-        let quiet = try XCTUnwrap(menu.item(withTitle: "조용히 모드"))
-        XCTAssertTrue(quiet.attributedTitle?.string.contains("단축키 사용 불가") == true)
-        XCTAssertTrue(quiet.toolTip?.contains("다른 앱") == true)
-        let composer = try XCTUnwrap(menu.item(withTitle: "메시지 작성…"))
-        XCTAssertEqual(composer.toolTip, "Shift + Command + C")
+        let quiet = try XCTUnwrap(menu.item(withTitle: L10n.text("status.menu.quiet_mode")))
+        XCTAssertTrue(quiet.attributedTitle?.string.contains(
+            L10n.text("shortcut.status.unavailable")
+        ) == true)
+        XCTAssertEqual(quiet.toolTip, L10n.text("shortcut.error.used_by_other_app"))
+        let composer = try XCTUnwrap(menu.item(withTitle: L10n.text("status.menu.compose")))
+        XCTAssertEqual(composer.toolTip, configuration[.toggleComposer].descriptiveShortcut)
     }
 }
 

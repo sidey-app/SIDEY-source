@@ -7,7 +7,7 @@ final class RoomManagementTests: XCTestCase {
         XCTAssertEqual(ProductLimits.messageRetentionDays, 3)
         XCTAssertEqual(
             SideyBackendError.memberLimitReached.localizedDescription,
-            "이 그룹은 이미 12명으로 가득 찼습니다."
+            L10n.format("backend.error.member_limit_reached", Int64(12))
         )
     }
 
@@ -101,11 +101,17 @@ final class RoomManagementTests: XCTestCase {
             room: soloRoom,
             currentUserID: ownerID
         ), .lastOwner)
-        XCTAssertTrue(RoomLeaveConfirmation.ownerWithRemainingMembers.message.contains("방장이 이전"))
-        XCTAssertTrue(RoomLeaveConfirmation.lastOwner.message.contains("영구 삭제"))
+        XCTAssertEqual(
+            RoomLeaveConfirmation.ownerWithRemainingMembers.message,
+            L10n.text("group.leave.confirmation.owner_transfer")
+        )
+        XCTAssertEqual(
+            RoomLeaveConfirmation.lastOwner.message,
+            L10n.text("group.leave.confirmation.last_member")
+        )
     }
 
-    func testBackendBusinessErrorsUseUserFacingKoreanMessages() {
+    func testBackendBusinessErrorsUseLocalizedMessages() {
         let cases: [(String, SideyBackendError)] = [
             ("owner_required", .ownerRequired),
             ("member_not_found", .memberNotFound),
@@ -124,6 +130,14 @@ final class RoomManagementTests: XCTestCase {
             XCTAssertEqual(normalized, expected)
             XCTAssertFalse(normalized.localizedDescription.contains(code))
         }
+    }
+
+    func testUnknownRemoteErrorDoesNotExposeDiagnosticTextToUI() {
+        let remote = SideyBackendError.remote(diagnostic: "private upstream detail")
+
+        XCTAssertEqual(remote.localizedDescription, L10n.text("backend.error.generic"))
+        XCTAssertEqual(remote.diagnosticDescription, "private upstream detail")
+        XCTAssertFalse(remote.localizedDescription.contains("private upstream detail"))
     }
 
     @MainActor

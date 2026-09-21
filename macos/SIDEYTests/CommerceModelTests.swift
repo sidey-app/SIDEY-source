@@ -176,11 +176,14 @@ final class CommerceModelTests: XCTestCase {
     func testCosmeticEquipmentSuccessCopyUsesCompletedEquipmentWording() {
         XCTAssertEqual(
             CosmeticEquipmentFeedback.successMessage(kind: .bubble, product: nil),
-            "기본 말풍선을 장착했습니다."
+            L10n.text("commerce.equipment.success.default_bubble")
         )
         XCTAssertEqual(
             CosmeticEquipmentFeedback.successMessage(kind: .bubble, product: .bunnyPinkBubble),
-            "핑크 토끼 말풍선 장착했습니다."
+            L10n.format(
+                "commerce.equipment.success.named",
+                CommerceProduct.bunnyPinkBubble.displayName
+            )
         )
     }
 
@@ -356,37 +359,138 @@ final class CommerceModelTests: XCTestCase {
 
     func testMissingApplePriceNeverDisplaysServerDirectPrice() {
         let state = CommerceProductState(product: .snowflake, purchaseState: .available, isWorking: false)
-        XCTAssertEqual(state.priceLabel(for: .appStore), "가격 확인 필요")
+        XCTAssertEqual(state.priceLabel(for: .appStore), L10n.text("store.price.required"))
         XCTAssertNotEqual(state.priceLabel(for: .appStore), state.product.formattedPrice)
+        XCTAssertFalse(state.storefrontProductAvailable)
     }
 
     func testPartialApplePriceResponseFinishesLoadingAndRetryRecoversMissingProduct() throws {
         let model = AppModel(preferences: .defaults, commerceProducts: [.snowflake, .baseball])
         model.setCommercePurchaseState(.owned, productID: CommerceProduct.baseball.id)
         model.beginCommercePriceLoading()
-        XCTAssertEqual(model.commerceProduct(id: CommerceProduct.snowflake.id)?.priceLabel(for: .appStore), "가격 확인 중")
-        model.setCommerceLocalizedPrices([CommerceProduct.baseball.id: "₩1,100"])
+        XCTAssertEqual(
+            model.commerceProduct(id: CommerceProduct.snowflake.id)?.priceLabel(for: .appStore),
+            L10n.text("store.price.loading.short")
+        )
+        model.setCommerceStorefrontMetadata([
+            CommerceProduct.baseball.id: storefrontMetadata(
+                product: .baseball,
+                displayName: "Baseball",
+                description: "A StoreKit baseball",
+                price: "$0.99"
+            )
+        ])
         let unavailable = try XCTUnwrap(model.commerceProduct(id: CommerceProduct.snowflake.id))
         XCTAssertEqual(unavailable.priceLoadState, .unavailable)
-        XCTAssertEqual(unavailable.priceLabel(for: .appStore), "가격 확인 불가")
+        XCTAssertEqual(unavailable.priceLabel(for: .appStore), L10n.text("store.price.unavailable.short"))
+        XCTAssertEqual(unavailable.displayName, CommerceProduct.snowflake.displayName)
+        XCTAssertFalse(unavailable.storefrontProductAvailable)
         XCTAssertEqual(model.commerceProduct(id: CommerceProduct.baseball.id)?.purchaseState, .owned)
+        XCTAssertEqual(model.commerceProduct(id: CommerceProduct.baseball.id)?.displayName, "Baseball")
 
         model.beginCommercePriceLoading()
-        model.setCommerceLocalizedPrices([CommerceProduct.baseball.id: "₩1,100", CommerceProduct.snowflake.id: "₩1,100"])
+        model.setCommerceStorefrontMetadata([
+            CommerceProduct.baseball.id: storefrontMetadata(
+                product: .baseball,
+                displayName: "Baseball",
+                description: "A StoreKit baseball",
+                price: "$0.99"
+            ),
+            CommerceProduct.snowflake.id: storefrontMetadata(
+                product: .snowflake,
+                displayName: "Snowflake",
+                description: "A StoreKit snowflake",
+                price: "$0.99"
+            ),
+        ])
         let recovered = try XCTUnwrap(model.commerceProduct(id: CommerceProduct.snowflake.id))
         XCTAssertEqual(recovered.priceLoadState, .available)
-        XCTAssertEqual(recovered.priceLabel(for: .appStore), "₩1,100")
+        XCTAssertEqual(recovered.priceLabel(for: .appStore), "$0.99")
+        XCTAssertEqual(recovered.displayName, "Snowflake")
+        XCTAssertEqual(recovered.displayDescription, "A StoreKit snowflake")
+        XCTAssertTrue(recovered.storefrontProductAvailable)
         XCTAssertEqual(model.commerceProduct(id: CommerceProduct.baseball.id)?.purchaseState, .owned)
     }
 
     func testFailedApplePriceRequestStopsLoadingWithoutInventingPrice() throws {
         let model = AppModel(preferences: .defaults, commerceProducts: [.snowflake])
+        model.setCommerceStorefrontMetadata([
+            CommerceProduct.snowflake.id: storefrontMetadata(
+                product: .snowflake,
+                displayName: "Snowflake",
+                description: "StoreKit localized description",
+                price: "$0.99"
+            )
+        ])
         model.beginCommercePriceLoading()
+        XCTAssertEqual(
+            model.commerceProduct(id: CommerceProduct.snowflake.id)?.priceLabel(for: .appStore),
+            L10n.text("store.price.loading.short")
+        )
         model.failCommercePriceLoading()
         let failed = try XCTUnwrap(model.commerceProduct(id: CommerceProduct.snowflake.id))
         XCTAssertEqual(failed.priceLoadState, .failed)
         XCTAssertNil(failed.localizedPrice)
-        XCTAssertEqual(failed.priceLabel(for: .appStore), "가격 확인 불가")
+        XCTAssertNil(failed.storefrontMetadata)
+        XCTAssertEqual(failed.displayName, CommerceProduct.snowflake.displayName)
+        XCTAssertEqual(failed.priceLabel(for: .appStore), L10n.text("store.price.unavailable.short"))
+        XCTAssertFalse(failed.storefrontProductAvailable)
+    }
+
+    func testStorefrontCopyOverridesBundleCopyWithoutMutatingCatalogProduct() {
+        let product = CommerceProduct.snowflake
+        let metadata = storefrontMetadata(
+            product: product,
+            displayName: "Snowflake",
+            description: "StoreKit localized description",
+            price: "$0.99"
+        )
+        let model = AppModel(preferences: .defaults, commerceProducts: [product])
+
+        model.setCommerceStorefrontMetadata([product.id: metadata])
+
+        let state = model.commerceProduct(id: product.id)
+        XCTAssertEqual(state?.displayName, metadata.displayName)
+        XCTAssertEqual(state?.displayDescription, metadata.description)
+        XCTAssertEqual(state?.formattedPrice, metadata.displayPrice)
+        XCTAssertEqual(state?.product, product)
+    }
+
+    func testRefundedProductStillRequiresStorefrontLookupBeforeRepurchase() throws {
+        let product = CommerceProduct.snowflake
+        let model = AppModel(preferences: .defaults, commerceProducts: [product])
+        model.setCommercePurchaseState(.refunded, productID: product.id)
+
+        XCTAssertTrue(try XCTUnwrap(model.commerceProduct(id: product.id)).purchaseState.canStartPurchase)
+        XCTAssertFalse(try XCTUnwrap(model.commerceProduct(id: product.id)).storefrontProductAvailable)
+
+        model.setCommerceStorefrontMetadata([
+            product.id: storefrontMetadata(
+                product: product,
+                displayName: "Snowflake",
+                description: "StoreKit localized description",
+                price: "$0.99"
+            )
+        ])
+        XCTAssertTrue(try XCTUnwrap(model.commerceProduct(id: product.id)).storefrontProductAvailable)
+    }
+
+    func testCommerceLocaleResolutionUsesTraditionalChineseRegionsAndEnglishFallback() {
+        XCTAssertEqual(CommerceLocalizationCatalog.resolvedLocale(preferredLocalizations: ["zh-HK"]), "zh-Hant")
+        XCTAssertEqual(CommerceLocalizationCatalog.resolvedLocale(preferredLocalizations: ["zh-MO"]), "zh-Hant")
+        XCTAssertEqual(CommerceLocalizationCatalog.resolvedLocale(preferredLocalizations: ["fr-FR"]), "en")
+    }
+
+    func testCurrentAndRestoreOnlyAppStoreIDsMapToTheSameLogicalProduct() {
+        XCTAssertEqual(
+            CommerceCatalog.product(appStoreID: "character_monkey_solo_4")?.id,
+            CommerceProduct.monkey.id
+        )
+        XCTAssertEqual(
+            CommerceCatalog.product(appStoreID: "character_monkey_solo")?.id,
+            CommerceProduct.monkey.id
+        )
+        XCTAssertNil(CommerceCatalog.product(appStoreID: "unknown_product"))
     }
 
     func testStoreReactionPreviewFitsInsideItsCardWithoutUsingWorldScale() {
@@ -587,6 +691,21 @@ final class CommerceModelTests: XCTestCase {
             amountKRW: 1_200,
             currency: "KRW",
             taxInclusive: true
+        )
+    }
+
+    private func storefrontMetadata(
+        product: CommerceProduct,
+        displayName: String,
+        description: String,
+        price: String
+    ) -> StorefrontProductMetadata {
+        StorefrontProductMetadata(
+            logicalProductID: product.id,
+            appStoreProductID: product.appStoreProductID,
+            displayName: displayName,
+            description: description,
+            displayPrice: price
         )
     }
 }

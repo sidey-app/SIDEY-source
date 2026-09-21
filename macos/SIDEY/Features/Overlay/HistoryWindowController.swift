@@ -30,7 +30,7 @@ final class HistoryWindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "\(AppPresentation.displayName) 최근 기록"
+        window.title = L10n.format("history.window.title", AppPresentation.displayName)
         window.level = .normal
         window.collectionBehavior = [.managed]
         window.isReleasedWhenClosed = false

@@ -45,34 +45,34 @@ struct StoreView: View {
         VStack(alignment: .leading, spacing: 18) {
             header
             HStack(spacing: 12) {
-                Picker("상품 종류", selection: $selectedKind) {
+                Picker(L10n.text("store.filter.kind"), selection: $selectedKind) {
                     ForEach(CommerceProductKind.allCases, id: \.self) { kind in
                         Text(kind.title).tag(kind)
                     }
                 }
                 .pickerStyle(.segmented)
-                .accessibilityLabel("상점 상품 종류")
+                .accessibilityLabel(L10n.text("store.filter.kind.accessibility"))
 
                 Menu {
-                    Picker("정렬", selection: $sortOrder) {
+                    Picker(L10n.text("store.sort.label"), selection: $sortOrder) {
                         ForEach(StoreSortOrder.allCases) { order in
                             Text(order.title).tag(order)
                         }
                     }
                     Divider()
-                    Toggle("보유 중 숨기기", isOn: $hidesOwned)
+                    Toggle(L10n.text("store.filter.hide_owned"), isOn: $hidesOwned)
                 } label: {
-                    Label("정렬 및 필터", systemImage: "line.3.horizontal.decrease.circle")
+                    Label(L10n.text("store.filter.menu"), systemImage: "line.3.horizontal.decrease.circle")
                 }
                 .menuStyle(.button)
-                .accessibilityLabel("정렬 및 필터")
+                .accessibilityLabel(L10n.text("store.filter.menu"))
             }
 
             if visibleProducts.isEmpty {
                 ContentUnavailableView(
-                    "조건에 맞는 상품 없음",
+                    L10n.text("store.empty.title"),
                     systemImage: "sparkles",
-                    description: Text("상품 종류나 보유 필터를 바꿔 보세요.")
+                    description: Text(L10n.text("store.empty.description"))
                 )
                 .frame(maxWidth: .infinity, minHeight: 220)
             } else {
@@ -128,8 +128,8 @@ struct StoreView: View {
                 .frame(width: 24, height: 24)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 5) {
-                Text("꾸미기·상점").font(.title2.bold())
-                Text("캐릭터와 말풍선, 투척물을 골라보세요.")
+                Text(L10n.text("store.title")).font(.title2.bold())
+                Text(L10n.text("store.subtitle"))
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
@@ -141,16 +141,16 @@ struct StoreView: View {
             Label(footerHeadline, systemImage: "lock.shield").font(.callout)
             if availability.allowsCommerceActions {
                 Text(availability.usesAppStore
-                     ? "구매는 Apple이 처리하며 서버 검증 뒤 계정에 사용권이 반영됩니다."
-                     : "표시 가격은 부가세 포함이며 서버 확인 뒤 디지털 꾸미기 사용권이 즉시 시작됩니다.")
+                     ? L10n.text("store.footer.app_store.entitlement")
+                     : L10n.text("store.footer.direct.entitlement"))
                     .font(.caption)
                 Text(availability.usesAppStore
-                     ? "환불과 결제 문의는 Apple의 App Store 정책과 절차를 따릅니다."
-                     : "제공 시작 뒤 단순 변심 환불은 불가하며, 미제공·계약 불일치·중복·무단 결제 등 법정 사유는 전액 환불합니다.")
+                     ? L10n.text("store.footer.app_store.refund")
+                     : L10n.text("store.footer.direct.refund"))
                     .font(.caption)
             }
             if availability.usesAppStore {
-                Button("구매 복원", action: actions.onRestorePurchases)
+                Button(L10n.text("store.restore.action"), action: actions.onRestorePurchases)
                     .buttonStyle(.link)
                     .disabled(model.accountOperationInProgress)
             }
@@ -163,8 +163,8 @@ struct StoreView: View {
 
     private var footerHeadline: String {
         switch availability {
-        case .comingSoon: "현재 상점은 준비 중입니다. 보유 상품은 계속 사용할 수 있습니다."
-        case .appStore: "가격과 결제는 App Store에서 표시하고 처리합니다."
+        case .comingSoon: L10n.text("store.footer.coming_soon")
+        case .appStore: L10n.text("store.footer.app_store.headline")
         }
     }
 }
@@ -193,9 +193,9 @@ struct StoreProductCard: View {
     var body: some View {
         Button(action: onSelect) {
             VStack(spacing: 8) {
-                StoreProductPreview(product: productState.product, pointSize: 82)
+                StoreProductPreview(product: productState.displayProduct, pointSize: 82)
                     .frame(height: StoreCardLayout.previewHeight)
-                Text(productState.product.displayName)
+                Text(productState.displayName)
                     .font(.caption.weight(.semibold))
                     .lineLimit(1)
                     .frame(maxWidth: .infinity)
@@ -224,21 +224,21 @@ struct StoreProductCard: View {
         .onHover { isHovered = $0 }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
-        .accessibilityHint("상세 보기")
+        .accessibilityHint(L10n.text("store.product.detail.hint"))
     }
 
     @ViewBuilder private var status: some View {
         if productState.isWorking {
-            ProgressView().controlSize(.small).accessibilityLabel("처리 중")
+            ProgressView().controlSize(.small).accessibilityLabel(L10n.text("store.processing"))
         } else {
             Text(statusLabel)
         }
     }
 
     private var statusLabel: String {
-        if productState.isEquipped { return "사용 중" }
-        if productState.purchaseState == .owned { return "보유 중" }
-        if case .error = productState.purchaseState { return "오류" }
+        if productState.isEquipped { return L10n.text("store.product.equipped") }
+        if productState.purchaseState == .owned { return L10n.text("store.purchase.owned") }
+        if case .error = productState.purchaseState { return L10n.text("store.purchase.error") }
         if productState.purchaseState == .unavailable { return productState.purchaseState.label }
         return productState.priceLabel(for: availability)
     }
@@ -251,7 +251,7 @@ struct StoreProductCard: View {
     }
 
     private var accessibilityLabel: String {
-        "\(productState.product.displayName), \(statusLabel)"
+        L10n.format("store.product.status.accessibility", productState.displayName, statusLabel)
     }
 
     private var cardBackground: Color {
@@ -285,9 +285,9 @@ struct StoreLockedProductCard: View {
     var body: some View {
         Button(action: onSelect) {
             VStack(spacing: 8) {
-                StoreProductPreview(product: productState.product, pointSize: 82)
+                StoreProductPreview(product: productState.displayProduct, pointSize: 82)
                     .frame(height: StoreCardLayout.previewHeight)
-                Text(productState.product.displayName)
+                Text(productState.displayName)
                     .font(.caption.weight(.semibold))
                     .lineLimit(1)
                 Text(productState.formattedPrice).font(.caption2)
@@ -302,7 +302,7 @@ struct StoreLockedProductCard: View {
             .overlay {
                 VStack(spacing: 7) {
                     Image(systemName: "lock.fill")
-                    Text("추후 오픈 예정")
+                    Text(L10n.text("store.coming_soon.badge"))
                         .font(.caption2.weight(.semibold))
                 }
                 .foregroundStyle(.white)
@@ -316,8 +316,10 @@ struct StoreLockedProductCard: View {
         .buttonStyle(.plain)
         .focused($isFocused)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(productState.product.displayName), 추후 오픈 예정")
-        .accessibilityHint("상세 미리보기")
+        .accessibilityLabel(L10n.format(
+            "store.coming_soon.product.accessibility", productState.displayName
+        ))
+        .accessibilityHint(L10n.text("store.product.preview.hint"))
     }
 
     func requestPreview() {

@@ -12,7 +12,7 @@ struct OverlayComposerView: View {
             ComposerDragHandle().frame(width: 14, height: 34)
             ZStack(alignment: .leading) {
                 if model.draft.isEmpty {
-                    Text("메시지를 입력해 주세요").foregroundStyle(.tertiary)
+                    Text(L10n.text("message.composer.placeholder")).foregroundStyle(.tertiary)
                 }
                 NativeMessageField(
                     text: $model.draft,
@@ -31,7 +31,7 @@ struct OverlayComposerView: View {
             }
             .buttonStyle(.plain)
             .disabled(!model.canSubmitDraft)
-            .accessibilityLabel("메시지 전송")
+            .accessibilityLabel(L10n.text("message.send.accessibility"))
         }
         .font(.system(size: 16, weight: .medium))
         .padding(.horizontal, 14)

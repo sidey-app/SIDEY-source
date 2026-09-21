@@ -25,9 +25,9 @@ struct StorePreviewStage: View {
                 .fill(Color.primary.opacity(0.035))
             StorePreviewPlatform()
             StorePreviewSceneView(scenario: scenario, isPlaying: !reduceMotion, onCharacterImpact: onCharacterImpact, onStopCharacterSounds: onStopCharacterSounds)
-                .accessibilityLabel("\(product.displayName) 미리보기")
+                .accessibilityLabel(L10n.format("store.preview.accessibility", product.displayName))
                 .accessibilityHint(reduceMotion
-                                   ? "동작 줄이기가 켜져 정지된 장면을 표시합니다."
+                                   ? L10n.text("store.preview.reduce_motion_hint")
                                    : previewAccessibilityHint)
         }
         .frame(width: StorePreviewStageLayout.size.width, height: StorePreviewStageLayout.size.height)
@@ -40,10 +40,11 @@ struct StorePreviewStage: View {
 
     private var previewAccessibilityHint: String {
         if product.kind == .character {
-            let objectName = CommerceCatalog.keepsake(for: product.id)?.displayName ?? "기본 말랑공"
-            return "상대 캐릭터를 클릭해 \(objectName) 던지기를 체험할 수 있습니다. 캐릭터를 두 번 클릭하면 확대 반응을 볼 수 있습니다."
+            let objectName = CommerceCatalog.keepsake(for: product.id)?.displayName
+                ?? L10n.text("store.preview.default_throwable")
+            return L10n.format("store.preview.character_interaction_hint", objectName)
         }
-        return "캐릭터를 두 번 클릭하면 확대 반응을 볼 수 있습니다."
+        return L10n.text("store.preview.double_click_hint")
     }
 }
 

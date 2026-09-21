@@ -2,8 +2,29 @@ import SwiftUI
 import AuthenticationServices
 
 enum AppSettingsLegalLinks {
-    static let privacyPolicy = URL(string: "https://sidey-app.github.io/SIDEY/privacy/")!
-    static let termsOfService = URL(string: "https://sidey-app.github.io/SIDEY/terms/")!
+    static var localizedPrivacyPolicy: URL {
+        localizedURL(page: "privacy")
+    }
+
+    static var localizedTermsOfService: URL {
+        localizedURL(page: "terms")
+    }
+
+    static func localizedURL(
+        page: String,
+        preferredLocalization: String = Bundle.main.preferredLocalizations.first ?? "en"
+    ) -> URL {
+        let localePath = switch preferredLocalization.lowercased() {
+        case let value where value.hasPrefix("ko"): "ko/"
+        case let value where value.hasPrefix("ja"): "ja/"
+        case let value where value.hasPrefix("zh-hant")
+            || value.hasPrefix("zh-tw")
+            || value.hasPrefix("zh-hk")
+            || value.hasPrefix("zh-mo"): "zh-hant/"
+        default: "en/"
+        }
+        return URL(string: "https://sidey-app.github.io/SIDEY/\(localePath)\(page)/")!
+    }
 }
 
 struct AppSettingsView: View {
@@ -26,19 +47,19 @@ struct AppSettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 34) {
             #if DEBUG
-            Text("\(SideyBuildStamp.target) · \(SideyBuildStamp.commit.prefix(8))\(SideyBuildStamp.dirty ? " · 미커밋 변경" : "")")
+            Text(verbatim: debugBuildStamp)
                 .font(.caption.monospaced())
                 .foregroundStyle(.secondary)
                 .textSelection(.enabled)
             #endif
             SettingsSection(
-                title: "일반",
-                subtitle: "SIDEY의 기본 표시와 실행 방식을 설정할 수 있습니다.",
+                title: "settings.general.title",
+                subtitle: "settings.general.subtitle",
                 systemImage: "gearshape"
             ) {
                 SettingsToggleRow(
-                    title: "픽셀 월드 표시",
-                    description: "선택한 화면 가장자리에 친구들의 픽셀 월드를 표시합니다.",
+                    title: "settings.general.overlay_visible.title",
+                    description: "settings.general.overlay_visible.description",
                     isOn: Binding(
                         get: { model.overlayVisible },
                         set: { actions.onOverlayVisibilityChanged($0) }
@@ -46,8 +67,8 @@ struct AppSettingsView: View {
                 )
                 Divider()
                 SettingsToggleRow(
-                    title: "로그인 시 자동 실행",
-                    description: "Mac에 로그인하면 SIDEY를 자동으로 시작합니다.",
+                    title: "settings.general.launch_at_login.title",
+                    description: "settings.general.launch_at_login.description",
                     isOn: Binding(
                         get: { model.launchAtLogin },
                         set: { actions.onLaunchAtLoginChanged($0) }
@@ -56,13 +77,13 @@ struct AppSettingsView: View {
             }
 
             SettingsSection(
-                title: "표시",
-                subtitle: "친구 상태와 메시지가 화면에 나타나는 방식을 조절할 수 있습니다.",
+                title: "settings.display.title",
+                subtitle: "settings.display.subtitle",
                 systemImage: "eye"
             ) {
                 SettingsToggleRow(
-                    title: "조용히 모드",
-                    description: "메시지 본문과 타이핑 점을 숨기고 연결 상태와 미확인 수는 유지합니다.",
+                    title: "settings.display.quiet_mode.title",
+                    description: "settings.display.quiet_mode.description",
                     isOn: Binding(
                         get: { model.preferences.quietModeEnabled },
                         set: { actions.onQuietModeChanged($0) }
@@ -70,8 +91,8 @@ struct AppSettingsView: View {
                 )
                 Divider()
                 SettingsToggleRow(
-                    title: "오프라인 멤버 표시",
-                    description: "접속하지 않은 친구도 잠든 캐릭터와 빨간 상태 점으로 표시합니다.",
+                    title: "settings.display.offline_members.title",
+                    description: "settings.display.offline_members.description",
                     isOn: Binding(
                         get: { model.preferences.showOfflineMembers },
                         set: { actions.onShowOfflineMembersChanged($0) }
@@ -79,8 +100,8 @@ struct AppSettingsView: View {
                 )
                 Divider()
                 SettingsToggleRow(
-                    title: "더블 우클릭 후 던지기",
-                    description: "끄면 친구 캐릭터를 바로 클릭할 수 있고, 켜면 내 캐릭터를 더블 우클릭한 뒤 10초 동안만 클릭할 수 있습니다.",
+                    title: "settings.display.throw_guard.title",
+                    description: "settings.display.throw_guard.description",
                     isOn: Binding(
                         get: { model.preferences.requiresRightClickToThrow },
                         set: { actions.onRequiresRightClickToThrowChanged($0) }
@@ -89,14 +110,14 @@ struct AppSettingsView: View {
             }
 
             SettingsSection(
-                title: "전역 단축키",
-                subtitle: "수정 키를 하나 이상 선택하고 영문 또는 숫자 키를 지정합니다. 변경은 바로 적용됩니다.",
+                title: "settings.shortcuts.title",
+                subtitle: "settings.shortcuts.subtitle",
                 systemImage: "keyboard"
             ) {
                 ForEach(GlobalShortcutAction.allCases) { shortcut in
                     SettingsControlRow(
-                        title: shortcut.title,
-                        description: model.globalShortcutStatuses[shortcut]?.notice
+                        title: shortcut.localizedTitle,
+                        verbatimDescription: model.globalShortcutStatuses[shortcut]?.notice
                             ?? model.preferences.globalShortcuts[shortcut].descriptiveShortcut
                     ) {
                         GlobalShortcutEditor(
@@ -108,27 +129,31 @@ struct AppSettingsView: View {
                 }
             }
 
-            SettingsSection(title: "소리", subtitle: "캐릭터 효과음 재생을 설정합니다.", systemImage: "speaker.wave.2") {
+            SettingsSection(
+                title: "settings.sound.title",
+                subtitle: "settings.sound.subtitle",
+                systemImage: "speaker.wave.2"
+            ) {
                 SettingsToggleRow(
-                    title: "캐릭터 효과음",
-                    description: "현재 그룹에서 캐릭터가 맞을 때 효과음을 재생합니다.",
+                    title: "settings.sound.character_effects.title",
+                    description: "settings.sound.character_effects.description",
                     isOn: Binding(get: { model.preferences.characterSoundEffectsEnabled },
                                   set: { actions.onCharacterSoundEffectsChanged($0) })
                 )
             }
 
             SettingsSection(
-                title: "월드 배치",
-                subtitle: "픽셀 캐릭터를 표시할 화면과 위치를 선택할 수 있습니다.",
+                title: "settings.placement.title",
+                subtitle: "settings.placement.subtitle",
                 systemImage: "rectangle.inset.filled"
             ) {
                 SettingsControlRow(
-                    title: "가장자리",
-                    description: "캐릭터가 걸어 다닐 화면 방향을 선택합니다."
+                    title: "settings.placement.edge.title",
+                    description: "settings.placement.edge.description"
                 ) {
-                    Picker("가장자리", selection: regionEdgeBinding) {
+                    Picker("settings.placement.edge.picker", selection: regionEdgeBinding) {
                         ForEach(OverlayEdge.allCases) { edge in
-                            Text(edge.title).tag(edge)
+                            Text(edge.localizedTitle).tag(edge)
                         }
                     }
                     .labelsHidden()
@@ -136,12 +161,12 @@ struct AppSettingsView: View {
                 }
                 Divider()
                 SettingsControlRow(
-                    title: "영역 길이",
-                    description: "선택한 가장자리에서 월드가 차지할 범위를 선택합니다."
+                    title: "settings.placement.span.title",
+                    description: "settings.placement.span.description"
                 ) {
-                    Picker("길이", selection: regionSpanBinding) {
+                    Picker("settings.placement.span.picker", selection: regionSpanBinding) {
                         ForEach(OverlaySpan.allCases) { span in
-                            Text(span.title).tag(span)
+                            Text(span.localizedTitle).tag(span)
                         }
                     }
                     .labelsHidden()
@@ -149,12 +174,12 @@ struct AppSettingsView: View {
                 }
                 Divider()
                 SettingsControlRow(
-                    title: "모니터",
-                    description: "픽셀 월드를 표시할 화면을 선택합니다. 입력창은 왼쪽 손잡이로 따로 이동할 수 있습니다."
+                    title: "settings.placement.monitor.title",
+                    description: "settings.placement.monitor.description"
                 ) {
-                    Picker("모니터", selection: regionScreenBinding) {
+                    Picker("settings.placement.monitor.picker", selection: regionScreenBinding) {
                         ForEach(model.availableScreens) { screen in
-                            Text(screen.name).tag(Optional(screen.id))
+                            Text(verbatim: screen.name).tag(Optional(screen.id))
                         }
                     }
                     .labelsHidden()
@@ -171,33 +196,33 @@ struct AppSettingsView: View {
 
     private var accountSection: some View {
         SettingsSection(
-            title: "계정 및 개인정보",
-            subtitle: "계정 데이터와 App Store 구매 연결을 관리합니다.",
+            title: "settings.account.title",
+            subtitle: "settings.account.subtitle",
             systemImage: "person.crop.circle"
         ) {
             HStack(spacing: 18) {
                 Link(
-                    "개인정보 처리방침",
-                    destination: AppSettingsLegalLinks.privacyPolicy
+                    "settings.account.privacy_policy",
+                    destination: AppSettingsLegalLinks.localizedPrivacyPolicy
                 )
                 Link(
-                    "이용약관",
-                    destination: AppSettingsLegalLinks.termsOfService
+                    "settings.account.terms",
+                    destination: AppSettingsLegalLinks.localizedTermsOfService
                 )
                 Spacer()
-                Button("구매 복원", action: actions.onRestorePurchases)
+                Button("settings.account.restore_purchases", action: actions.onRestorePurchases)
                     .disabled(model.accountOperationInProgress)
             }
             Divider()
             VStack(alignment: .leading, spacing: 12) {
-                Text("계정 탈퇴")
+                Text("settings.account.delete.title")
                     .font(.body.weight(.semibold))
-                Text("프로필, 메시지, 그룹 멤버십을 삭제합니다. 구매 기록은 회계·부정 사용 방지에 필요한 범위에서 계정과 분리해 보관될 수 있습니다.")
+                Text("settings.account.delete.description")
                     .font(.callout)
                     .foregroundStyle(.secondary)
 
                 if showsDeletionControls {
-                    TextField("확인을 위해 ‘탈퇴’ 입력", text: $deletionPhrase)
+                    TextField("settings.account.delete.placeholder", text: $deletionPhrase)
                         .textFieldStyle(.roundedBorder)
                         .frame(maxWidth: 280)
                     SignInWithAppleButton(.continue) { request in
@@ -213,12 +238,12 @@ struct AppSettingsView: View {
                     }
                     .signInWithAppleButtonStyle(.black)
                     .frame(width: 280, height: 40)
-                    .disabled(deletionPhrase != "탈퇴" || model.accountOperationInProgress)
-                    Text("‘탈퇴’를 입력한 뒤 Apple로 다시 인증하면 즉시 삭제됩니다.")
+                    .disabled(deletionPhrase != deletionConfirmationPhrase || model.accountOperationInProgress)
+                    Text("settings.account.delete.authentication_notice")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
-                    Button("계정 탈퇴…", role: .destructive) {
+                    Button("settings.account.delete.reveal", role: .destructive) {
                         showsDeletionControls = true
                     }
                 }
@@ -265,6 +290,17 @@ struct AppSettingsView: View {
             }
         )
     }
+
+    private var deletionConfirmationPhrase: String {
+        L10n.text("settings.account.delete.confirmation_phrase")
+    }
+
+    private var debugBuildStamp: String {
+        let dirtySuffix = SideyBuildStamp.dirty
+            ? " · \(L10n.text("debug.build.dirty"))"
+            : ""
+        return "\(SideyBuildStamp.target) · \(SideyBuildStamp.commit.prefix(8))\(dirtySuffix)"
+    }
 }
 
 private struct GlobalShortcutEditor: View {
@@ -277,10 +313,10 @@ private struct GlobalShortcutEditor: View {
                 Toggle(modifier.symbol, isOn: modifierBinding(modifier))
                     .toggleStyle(.button)
                     .controlSize(.small)
-                    .help(modifier.title)
-                    .accessibilityLabel(modifier.title)
+                    .help(Text(modifier.localizedTitle))
+                    .accessibilityLabel(Text(modifier.localizedTitle))
             }
-            Picker("키", selection: keyBinding) {
+            Picker("settings.shortcuts.key.picker", selection: keyBinding) {
                 ForEach(GlobalShortcutKey.allCases) { key in
                     Text(key.rawValue).tag(key)
                 }
@@ -295,8 +331,8 @@ private struct GlobalShortcutEditor: View {
             }
             .buttonStyle(.borderless)
             .disabled(binding == defaultBinding)
-            .help("기본 단축키로 복원")
-            .accessibilityLabel("기본 단축키로 복원")
+            .help("settings.shortcuts.restore_default.help")
+            .accessibilityLabel("settings.shortcuts.restore_default.accessibility")
         }
         .font(.body.monospaced())
     }
@@ -321,5 +357,48 @@ private struct GlobalShortcutEditor: View {
                 binding = updated
             }
         )
+    }
+}
+
+private extension GlobalShortcutAction {
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .toggleQuietMode: "settings.shortcuts.quiet_mode"
+        case .toggleComposer: "settings.shortcuts.composer"
+        case .openHistory: "settings.shortcuts.history"
+        case .toggleOverlay: "settings.shortcuts.overlay"
+        }
+    }
+}
+
+private extension GlobalShortcutModifier {
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .control: "settings.shortcuts.modifier.control"
+        case .option: "settings.shortcuts.modifier.option"
+        case .shift: "settings.shortcuts.modifier.shift"
+        case .command: "settings.shortcuts.modifier.command"
+        }
+    }
+}
+
+private extension OverlayEdge {
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .bottom: "settings.placement.edge.bottom"
+        case .left: "settings.placement.edge.left"
+        case .right: "settings.placement.edge.right"
+        case .top: "settings.placement.edge.top"
+        }
+    }
+}
+
+private extension OverlaySpan {
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .third: "settings.placement.span.third"
+        case .half: "settings.placement.span.half"
+        case .full: "settings.placement.span.full"
+        }
     }
 }

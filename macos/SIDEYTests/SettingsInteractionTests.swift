@@ -7,13 +7,40 @@ import XCTest
 final class SettingsInteractionTests: XCTestCase {
     func testLegalLinksUseCanonicalPublicWebsiteRoutes() {
         XCTAssertEqual(
-            AppSettingsLegalLinks.privacyPolicy.absoluteString,
-            "https://sidey-app.github.io/SIDEY/privacy/"
+            AppSettingsLegalLinks.localizedURL(
+                page: "privacy",
+                preferredLocalization: "ko"
+            ).absoluteString,
+            "https://sidey-app.github.io/SIDEY/ko/privacy/"
         )
         XCTAssertEqual(
-            AppSettingsLegalLinks.termsOfService.absoluteString,
-            "https://sidey-app.github.io/SIDEY/terms/"
+            AppSettingsLegalLinks.localizedURL(
+                page: "terms",
+                preferredLocalization: "ko"
+            ).absoluteString,
+            "https://sidey-app.github.io/SIDEY/ko/terms/"
         )
+    }
+
+    func testLegalLinksFollowTheSupportedAppLocalizationAndFallbackToEnglish() {
+        let expectations = [
+            ("ko", "https://sidey-app.github.io/SIDEY/ko/privacy/"),
+            ("en-GB", "https://sidey-app.github.io/SIDEY/en/privacy/"),
+            ("ja", "https://sidey-app.github.io/SIDEY/ja/privacy/"),
+            ("zh-Hant", "https://sidey-app.github.io/SIDEY/zh-hant/privacy/"),
+            ("zh-Hans", "https://sidey-app.github.io/SIDEY/en/privacy/"),
+            ("fr", "https://sidey-app.github.io/SIDEY/en/privacy/")
+        ]
+
+        for (localization, expectedURL) in expectations {
+            XCTAssertEqual(
+                AppSettingsLegalLinks.localizedURL(
+                    page: "privacy",
+                    preferredLocalization: localization
+                ).absoluteString,
+                expectedURL
+            )
+        }
     }
 
     func testInviteCopySuccessIsVisibleForThreeSeconds() throws {
@@ -104,8 +131,8 @@ final class SettingsInteractionTests: XCTestCase {
     func testGroupOperationUsesSpecificProgressLabelsAndMutationPolicy() {
         let roomID = UUID()
 
-        XCTAssertEqual(GroupOperation.creating.createButtonTitle, "만드는 중…")
-        XCTAssertEqual(GroupOperation.joining.joinButtonTitle, "참여 중…")
+        XCTAssertEqual(GroupOperation.creating.createButtonTitle, L10n.text("group.create.in_progress"))
+        XCTAssertEqual(GroupOperation.joining.joinButtonTitle, L10n.text("group.join.in_progress"))
         XCTAssertTrue(GroupOperation.switching(roomID).isSwitching(to: roomID))
         XCTAssertTrue(GroupOperation.switching(roomID).allowsRoomSelection)
         XCTAssertTrue(GroupOperation.switching(roomID).blocksMutations)

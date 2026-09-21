@@ -24,7 +24,16 @@ enum StoreCatalogResponse {
             else {
                 throw ValidationError.mismatchedProduct(row.productID)
             }
-            return row.domain
+            // The backend owns sale and entitlement state, not localized product copy.
+            // Always retain the bundled product definition so remote Korean or stale
+            // descriptions cannot replace the user's locale.
+            return CommerceState(
+                product: registered,
+                googleConnected: row.googleConnected,
+                entitlementStatus: row.entitlementStatus,
+                latestOrderStatus: row.latestOrderStatus,
+                isEquipped: row.isEquipped
+            )
         }
         return states.sorted { $0.product.sortOrder < $1.product.sortOrder }
     }

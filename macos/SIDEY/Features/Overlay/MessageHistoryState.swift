@@ -106,7 +106,9 @@ final class MessageHistoryStore {
                 guard let self,
                       self.isCurrent(roomID: roomID, generation: requestGeneration)
                 else { return }
-                self.olderState = .failed(error.localizedDescription)
+                self.olderState = .failed(
+                    SideyBackendError.normalized(error).localizedDescription
+                )
                 self.requestTask = nil
             }
         }
@@ -173,7 +175,9 @@ final class MessageHistoryStore {
                 guard let self,
                       self.isCurrent(roomID: roomID, generation: requestGeneration)
                 else { return }
-                self.initialState = .failed(error.localizedDescription)
+                self.initialState = .failed(
+                    SideyBackendError.normalized(error).localizedDescription
+                )
                 self.olderState = .idle
                 self.requestTask = nil
             }
@@ -288,7 +292,7 @@ enum MessageHistoryParticipantResolver {
     ) -> MessageHistoryParticipant {
         guard let member = room?.members.first(where: { $0.userID == senderID }) else {
             return MessageHistoryParticipant(
-                nickname: "알 수 없는 친구",
+                nickname: L10n.text("profile.nickname.unknown_friend"),
                 characterID: PixelCharacterCatalog.pixelHamsterID,
                 isCurrentUser: senderID == currentUserID
             )

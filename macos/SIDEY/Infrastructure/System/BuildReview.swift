@@ -61,9 +61,9 @@ final class BuildReview {
         } catch {
             NSLog("SIDEY build review: launch ticket rejected: %@", String(describing: error))
             let alert = NSAlert()
-            alert.messageText = "현재 소스로 빌드한 앱인지 확인할 수 없습니다."
-            alert.informativeText = "scripts/macos/open_current.sh로 다시 열거나 Xcode에서 빌드 후 실행해 주세요."
-            alert.addButton(withTitle: "종료")
+            alert.messageText = L10n.text("build_review.error.unverified_source")
+            alert.informativeText = L10n.text("build_review.error.relaunch_instructions")
+            alert.addButton(withTitle: L10n.text("common.quit"))
             alert.runModal()
             return false
         }

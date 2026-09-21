@@ -4,7 +4,7 @@ enum CommerceCatalog {
     static let starlightUpalupaProductID = "character_starlight_upalupa"
     static let starlightUpalupaCharacterID = "pixel_starlight_upalupa"
     static let starlightUpalupaEntitlementKey = "character:pixel_starlight_upalupa"
-    static let starlightUpalupaDescription = "진주빛 몸과 별빛 아가미를 가진 우파루파예요. 온라인일 때 별이 은은하게 따라다니고, 더블클릭하면 별무리가 두 겹으로 팡 터져요."
+    static var starlightUpalupaDescription: String { CommerceProduct.starlightUpalupa.description }
 
     static let guineaPigProductID = "character_guinea_pig"
     static let guineaPigEntitlementKey = "character:pixel_guinea_pig"
@@ -13,13 +13,27 @@ enum CommerceCatalog {
     static let chinchillaProductID = "character_chinchilla"
     static let chinchillaEntitlementKey = "character:pixel_chinchilla"
 
-    static let products: [CommerceProduct] = definitions.map { $0.product }.sorted { $0.sortOrder < $1.sortOrder }
+    static let products: [CommerceProduct] = {
+        let localizations = CommerceLocalizationCatalog.load()
+        guard localizations.count == definitions.count else {
+            preconditionFailure("Bundled commerce localization product count differs")
+        }
+        return definitions.map { definition in
+            guard let localization = localizations[definition.id] else {
+                preconditionFailure("Bundled commerce localization is missing: \(definition.id)")
+            }
+            return definition.product(localization: localization)
+        }.sorted { $0.sortOrder < $1.sortOrder }
+    }()
     static var characterProducts: [CommerceProduct] { products.filter { $0.kind == .character } }
     static var cosmeticProducts: [CommerceProduct] { products.filter { $0.kind != .character } }
 
     static func product(id: String) -> CommerceProduct? { products.first { $0.id == id } }
     static func product(appStoreID: String) -> CommerceProduct? {
-        definitions.first { $0.appStoreProductID == appStoreID || $0.legacyAppStoreProductIDs.contains(appStoreID) }?.product
+        guard let definition = definitions.first(where: {
+            $0.appStoreProductID == appStoreID || $0.legacyAppStoreProductIDs.contains(appStoreID)
+        }) else { return nil }
+        return product(id: definition.id)
     }
     static func keepsake(for characterProductID: String) -> CommerceProduct? {
         products.first { $0.relatedCharacterProductID == characterProductID }
@@ -45,9 +59,9 @@ enum CommerceProductKind: String, Codable, CaseIterable, Sendable {
 
     var title: String {
         switch self {
-        case .character: "캐릭터"
-        case .bubble: "말풍선"
-        case .throwable: "투척물"
+        case .character: L10n.text("store.kind.character")
+        case .bubble: L10n.text("store.kind.bubble")
+        case .throwable: L10n.text("store.kind.throwable")
         }
     }
 }
@@ -119,14 +133,13 @@ struct CommerceProduct: Equatable, Sendable {
     var appStoreProductID: String { CommerceCatalog.definition(id: id)?.appStoreProductID ?? id }
     var isKeepsake: Bool { relatedCharacterProductID != nil }
 
-    /// Character stories ship with the app so older server metadata cannot replace them.
+    /// Product copy ships with the app and is never sourced from the backend.
     var storeDescription: String {
-        guard kind == .character else { return description }
-        return CommerceCatalog.definition(id: id)?.description ?? description
+        CommerceCatalog.product(id: id)?.description ?? description
     }
 
     var formattedPrice: String {
-        amountKRW.formatted(.number.grouping(.automatic)) + "원"
+        amountKRW.formatted(.currency(code: currency).precision(.fractionLength(0)))
     }
 
     /// A newly completed cosmetic purchase should be immediately visible to
@@ -142,11 +155,20 @@ enum StorePriceLoadState: Equatable, Sendable {
     case notRequested, loading, available, unavailable, failed
 }
 
+struct StorefrontProductMetadata: Equatable, Sendable {
+    let logicalProductID: String
+    let appStoreProductID: String
+    let displayName: String
+    let description: String
+    let displayPrice: String
+}
+
 struct CommerceProductState: Equatable, Identifiable, Sendable {
     var product: CommerceProduct
     var purchaseState: CommercePurchaseState
     var isWorking: Bool
     var localizedPrice: String?
+    var storefrontMetadata: StorefrontProductMetadata?
     var priceLoadState: StorePriceLoadState = .notRequested
     var isEquipped: Bool
 
@@ -155,25 +177,47 @@ struct CommerceProductState: Equatable, Identifiable, Sendable {
         purchaseState: CommercePurchaseState,
         isWorking: Bool,
         localizedPrice: String? = nil,
+        storefrontMetadata: StorefrontProductMetadata? = nil,
         isEquipped: Bool = false
     ) {
         self.product = product
         self.purchaseState = purchaseState
         self.isWorking = isWorking
         self.localizedPrice = localizedPrice
+        self.storefrontMetadata = storefrontMetadata
         self.isEquipped = isEquipped
     }
 
     var id: String { product.id }
+    var displayName: String { storefrontMetadata?.displayName ?? product.displayName }
+    var displayDescription: String { storefrontMetadata?.description ?? product.description }
+    var displayProduct: CommerceProduct {
+        CommerceProduct(
+            id: product.id,
+            displayName: displayName,
+            description: displayDescription,
+            kind: product.kind,
+            catalogItemID: product.catalogItemID,
+            characterID: product.characterID,
+            entitlementKey: product.entitlementKey,
+            sortOrder: product.sortOrder,
+            amountKRW: product.amountKRW,
+            currency: product.currency,
+            taxInclusive: product.taxInclusive
+        )
+    }
+    var storefrontProductAvailable: Bool {
+        storefrontMetadata != nil && priceLoadState == .available
+    }
     var formattedPrice: String { localizedPrice ?? product.formattedPrice }
 
     func priceLabel(for availability: StoreAvailability) -> String {
         guard availability.usesAppStore else { return formattedPrice }
-        if let localizedPrice { return localizedPrice }
         switch priceLoadState {
-        case .loading: return "가격 확인 중"
-        case .notRequested: return "가격 확인 필요"
-        case .available, .unavailable, .failed: return "가격 확인 불가"
+        case .loading: return L10n.text("store.price.loading.short")
+        case .notRequested: return L10n.text("store.price.required")
+        case .available: return localizedPrice ?? L10n.text("store.price.unavailable.short")
+        case .unavailable, .failed: return L10n.text("store.price.unavailable.short")
         }
     }
 }
@@ -191,13 +235,13 @@ enum CommercePurchaseState: Equatable, Sendable {
 
     var label: String {
         switch self {
-        case .available: "구매 가능"
-        case .openingCheckout: "결제창 여는 중"
-        case .confirming: "확인 중"
-        case .owned: "보유 중"
-        case .error: "오류"
-        case .unavailable: "현재 구매 불가"
-        case .refunded: "환불됨"
+        case .available: L10n.text("store.purchase.available")
+        case .openingCheckout: L10n.text("store.purchase.opening_checkout")
+        case .confirming: L10n.text("store.purchase.confirming")
+        case .owned: L10n.text("store.purchase.owned")
+        case .error: L10n.text("store.purchase.error")
+        case .unavailable: L10n.text("store.purchase.unavailable")
+        case .refunded: L10n.text("store.purchase.refunded")
         }
     }
 }
@@ -240,7 +284,7 @@ enum StoreAvailability: Equatable {
 
     var unavailableDetailMessage: String? {
         self == .comingSoon
-            ? "상점은 준비 중입니다. 빠른 시일 내에 만나요."
+            ? L10n.text("store.coming_soon.detail")
             : nil
     }
 }

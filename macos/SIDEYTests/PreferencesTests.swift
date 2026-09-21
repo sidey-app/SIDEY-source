@@ -80,6 +80,21 @@ final class PreferencesTests: XCTestCase {
         XCTAssertEqual(AppPreferences.defaults.schemaVersion, AppPreferences.currentSchemaVersion)
         XCTAssertTrue(AppPreferences.defaults.keychainTransitionComplete)
         XCTAssertFalse(AppPreferences.defaults.requiresRightClickToThrow)
+        XCTAssertEqual(AppPreferences.defaults.nickname, "")
+    }
+
+    func testPreferencesWithoutNicknameUseEmptyDraftInsteadOfKoreanDefault() throws {
+        let json = #"{"schemaVersion":11,"onboardingComplete":false}"#
+        let value = try JSONDecoder().decode(AppPreferences.self, from: Data(json.utf8))
+
+        XCTAssertEqual(value.nickname, "")
+    }
+
+    func testExistingKoreanNicknameIsPreservedVerbatim() throws {
+        let json = #"{"schemaVersion":11,"nickname":"나"}"#
+        let value = try JSONDecoder().decode(AppPreferences.self, from: Data(json.utf8))
+
+        XCTAssertEqual(value.nickname, "나")
     }
 
     func testVersionSevenMigratesThrowInteractionToDefaultOffWithoutRepeatingKeychainNotice() throws {

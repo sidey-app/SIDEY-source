@@ -11,10 +11,10 @@ enum GlobalShortcutAction: UInt32, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .toggleQuietMode: "조용히 모드"
-        case .toggleComposer: "입력창 열기 / 닫기"
-        case .openHistory: "최근 기록 열기"
-        case .toggleOverlay: "오버레이 보이기 / 숨기기"
+        case .toggleQuietMode: L10n.text("shortcut.action.quiet_mode")
+        case .toggleComposer: L10n.text("shortcut.action.composer")
+        case .openHistory: L10n.text("shortcut.action.history")
+        case .toggleOverlay: L10n.text("shortcut.action.overlay")
         }
     }
 
@@ -56,10 +56,10 @@ enum GlobalShortcutModifier: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .control: "Control"
-        case .option: "Option"
-        case .shift: "Shift"
-        case .command: "Command"
+        case .control: L10n.text("shortcut.modifier.control")
+        case .option: L10n.text("shortcut.modifier.option")
+        case .shift: L10n.text("shortcut.modifier.shift")
+        case .command: L10n.text("shortcut.modifier.command")
         }
     }
 }
@@ -296,25 +296,25 @@ enum GlobalShortcutStatus: Equatable {
         case .registered:
             nil
         case .unavailable(let code) where code == eventHotKeyExistsErr:
-            "다른 앱에서 사용 중입니다. 다른 단축키로 변경하거나 충돌하는 앱 설정을 확인해 주세요."
+            L10n.text("shortcut.error.used_by_other_app")
         case .unavailable:
-            "단축키를 등록하지 못했습니다. 다른 단축키로 변경해 주세요."
+            L10n.text("shortcut.error.registration_failed")
         case .changeRejected(.invalid):
-            "수정 키를 하나 이상 선택해야 합니다. 기존 단축키를 유지합니다."
+            L10n.text("shortcut.error.modifier_required")
         case .changeRejected(.duplicate(let action)):
-            "‘\(action.title)’에서 이미 사용 중입니다. 기존 단축키를 유지합니다."
+            L10n.format("shortcut.error.duplicate", action.title)
         case .changeRejected(.unavailable(let code)) where code == eventHotKeyExistsErr:
-            "다른 앱에서 사용 중인 조합입니다. 기존 단축키를 유지합니다."
+            L10n.text("shortcut.error.new_binding_used_by_other_app")
         case .changeRejected(.unavailable):
-            "새 단축키를 등록하지 못해 기존 단축키를 유지합니다."
+            L10n.text("shortcut.error.new_binding_registration_failed")
         }
     }
 
     var menuAnnotation: String? {
         switch self {
         case .registered: nil
-        case .unavailable: "단축키 사용 불가"
-        case .changeRejected: "변경 실패"
+        case .unavailable: L10n.text("shortcut.status.unavailable")
+        case .changeRejected: L10n.text("shortcut.status.change_failed")
         }
     }
 }

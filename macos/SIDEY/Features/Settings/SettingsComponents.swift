@@ -6,7 +6,7 @@ struct ConnectionBadge: View {
     var body: some View {
         HStack(spacing: 8) {
             Circle().fill(color).frame(width: 8, height: 8)
-            Text(state.label).font(.caption.weight(.medium))
+            Text(localizedLabel).font(.caption.weight(.medium))
             Spacer()
         }
         .padding(.horizontal, 12)
@@ -23,6 +23,15 @@ struct ConnectionBadge: View {
         case .failed: .red
         }
     }
+
+    private var localizedLabel: LocalizedStringResource {
+        switch state {
+        case .idle: "connection.state.idle"
+        case .connecting: "connection.state.connecting"
+        case .online: "connection.state.online"
+        case .failed: "connection.state.failed"
+        }
+    }
 }
 
 struct ErrorBanner: View {
@@ -32,9 +41,11 @@ struct ErrorBanner: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-            Text(message).lineLimit(3)
+            Text(verbatim: message).lineLimit(3)
             Spacer()
-            Button(action: onDismiss) { Image(systemName: "xmark") }.buttonStyle(.plain)
+            Button(action: onDismiss) { Image(systemName: "xmark") }
+                .buttonStyle(.plain)
+                .accessibilityLabel("common.dismiss")
         }
         .padding(16)
         .frame(maxWidth: 620)
@@ -50,9 +61,11 @@ struct SuccessBanner: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-            Text(message).lineLimit(2)
+            Text(verbatim: message).lineLimit(2)
             Spacer()
-            Button(action: onDismiss) { Image(systemName: "xmark") }.buttonStyle(.plain)
+            Button(action: onDismiss) { Image(systemName: "xmark") }
+                .buttonStyle(.plain)
+                .accessibilityLabel("common.dismiss")
         }
         .padding(16)
         .frame(maxWidth: 620)
@@ -62,19 +75,31 @@ struct SuccessBanner: View {
 }
 
 struct SettingsSection<Content: View>: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringResource
+    private let subtitle: SettingsRowDescription
     let systemImage: String?
     let content: Content
 
     init(
-        title: String,
-        subtitle: String,
+        title: LocalizedStringResource,
+        subtitle: LocalizedStringResource,
         systemImage: String? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
-        self.subtitle = subtitle
+        self.subtitle = .localized(subtitle)
+        self.systemImage = systemImage
+        self.content = content()
+    }
+
+    init(
+        title: LocalizedStringResource,
+        verbatimSubtitle: String,
+        systemImage: String? = nil,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.subtitle = .verbatim(verbatimSubtitle)
         self.systemImage = systemImage
         self.content = content()
     }
@@ -92,7 +117,7 @@ struct SettingsSection<Content: View>: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(title)
                         .font(.title2.bold())
-                    Text(subtitle)
+                    subtitle.text
                         .font(.body)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -117,15 +142,17 @@ struct SettingsSection<Content: View>: View {
 }
 
 struct SettingsToggleRow: View {
-    let title: String
-    let description: String
+    let title: LocalizedStringResource
+    let description: LocalizedStringResource
     @Binding var isOn: Bool
 
     var body: some View {
         HStack(alignment: .center, spacing: 24) {
-            SettingsRowLabel(title: title, description: description)
+            SettingsRowLabel(title: title, description: .localized(description))
             Spacer(minLength: 16)
-            Toggle(title, isOn: $isOn)
+            Toggle(isOn: $isOn) {
+                Text(title)
+            }
                 .labelsHidden()
                 .toggleStyle(.switch)
                 .controlSize(.large)
@@ -138,17 +165,27 @@ struct SettingsToggleRow: View {
 }
 
 struct SettingsControlRow<Control: View>: View {
-    let title: String
-    let description: String
+    let title: LocalizedStringResource
+    private let description: SettingsRowDescription
     let control: Control
 
     init(
-        title: String,
-        description: String,
+        title: LocalizedStringResource,
+        description: LocalizedStringResource,
         @ViewBuilder control: () -> Control
     ) {
         self.title = title
-        self.description = description
+        self.description = .localized(description)
+        self.control = control()
+    }
+
+    init(
+        title: LocalizedStringResource,
+        verbatimDescription: String,
+        @ViewBuilder control: () -> Control
+    ) {
+        self.title = title
+        self.description = .verbatim(verbatimDescription)
         self.control = control()
     }
 
@@ -163,19 +200,33 @@ struct SettingsControlRow<Control: View>: View {
     }
 }
 
-struct SettingsRowLabel: View {
-    let title: String
-    let description: String
+private struct SettingsRowLabel: View {
+    let title: LocalizedStringResource
+    let description: SettingsRowDescription
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .font(.headline)
-            Text(description)
+            description.text
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private enum SettingsRowDescription {
+    case localized(LocalizedStringResource)
+    case verbatim(String)
+
+    @ViewBuilder var text: some View {
+        switch self {
+        case .localized(let resource):
+            Text(resource)
+        case .verbatim(let value):
+            Text(verbatim: value)
+        }
     }
 }

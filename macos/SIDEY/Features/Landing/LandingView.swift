@@ -31,7 +31,7 @@ struct LandingView: View {
                     Circle()
                         .stroke(.black.opacity(0.08), lineWidth: 1)
                         .frame(width: 96, height: 96)
-                    Text("S")
+                    Text(verbatim: "S")
                         .font(.system(size: 58, weight: .black, design: .rounded))
                         .foregroundStyle(.black.opacity(0.86))
                     ForEach(0..<3) { index in
@@ -46,14 +46,14 @@ struct LandingView: View {
                 .opacity(appeared ? 1 : 0)
                 .animation(.linear(duration: 2.4).repeatForever(autoreverses: false), value: orbit)
 
-                Text("SIDEY")
+                Text(verbatim: "SIDEY")
                     .font(.system(size: 58, weight: .black, design: .rounded))
                     .tracking(5)
                     .foregroundStyle(.black.opacity(0.88))
-                Text("친구들이 화면 곁에 도착했습니다.")
+                Text("landing.tagline")
                     .font(.title3.weight(.medium))
                     .foregroundStyle(.black.opacity(0.58))
-                Text(isRestoringSession ? "기존 세션을 복원하고 있습니다…" : "클릭해서 바로 시작해 주세요.")
+                Text(statusText)
                     .font(.callout)
                     .foregroundStyle(.black.opacity(0.38))
             }
@@ -69,7 +69,15 @@ struct LandingView: View {
             orbit = true
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(isRestoringSession ? "SIDEY 기존 세션 복원 중" : "SIDEY 시작 화면")
+        .accessibilityLabel(Text(accessibilityLabel))
         .accessibilityAddTraits(.isButton)
+    }
+
+    private var statusText: LocalizedStringResource {
+        isRestoringSession ? "landing.status.restoring" : "landing.status.ready"
+    }
+
+    private var accessibilityLabel: LocalizedStringResource {
+        isRestoringSession ? "landing.accessibility.restoring" : "landing.accessibility.ready"
     }
 }

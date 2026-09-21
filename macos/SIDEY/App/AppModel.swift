@@ -318,7 +318,7 @@ final class AppModel {
             guard let state = commerceProduct(id: id) else { continue }
             commerce.setCommercePurchaseState(
                 activeEntitlementKeys.contains(state.product.entitlementKey)
-                    ? .owned : .error("상점 상태를 불러오지 못했습니다."), productID: id
+                    ? .owned : .error(L10n.text("commerce.error.catalog_unavailable")), productID: id
             )
         }
     }
@@ -388,7 +388,9 @@ final class AppModel {
     func setCommercePurchaseState(_ state: CommercePurchaseState, productID: String) { commerce.setCommercePurchaseState(state, productID: productID) }
     func beginCommercePriceLoading() { commerce.beginCommercePriceLoading() }
     func failCommercePriceLoading() { commerce.failCommercePriceLoading() }
-    func setCommerceLocalizedPrices(_ prices: [String: String]) { commerce.setCommerceLocalizedPrices(prices) }
+    func setCommerceStorefrontMetadata(_ metadata: [String: StorefrontProductMetadata]) {
+        commerce.setCommerceStorefrontMetadata(metadata)
+    }
 
     private func enforceSelectableCurrentCharacter() {
         guard !isCharacterSelectable(selectedCharacterID) else { return }

@@ -82,7 +82,7 @@ struct StorePreviewScenario: Equatable, Sendable {
     private static func moka(characterID: String) -> PixelWorldMember {
         PixelWorldMember(
             id: mokaID,
-            nickname: "모카",
+            nickname: L10n.text("store.preview.member.moka"),
             characterID: characterID,
             presence: .online,
             isTyping: false,
@@ -93,7 +93,7 @@ struct StorePreviewScenario: Equatable, Sendable {
     private static func dubu(characterID: String) -> PixelWorldMember {
         PixelWorldMember(
             id: dubuID,
-            nickname: "두부",
+            nickname: L10n.text("store.preview.member.dubu"),
             characterID: characterID,
             presence: .online,
             isTyping: false,
@@ -126,8 +126,8 @@ struct StorePreviewBubbleSequence: Equatable, Sendable {
     static let typingDuration: TimeInterval = 1
     static let messageDuration: TimeInterval = 2
     static let cycleDuration = 2 * (typingDuration + messageDuration)
-    static let leftBody = "저메추좀 해줘"
-    static let rightBody = "곱도리탕 어때?"
+    static var leftBody: String { L10n.text("store.preview.message.left") }
+    static var rightBody: String { L10n.text("store.preview.message.right") }
     private static let leftMessageID = UUID(uuidString: "08A6BBCF-45BD-45D6-A373-3056DE9A5CBA")!
     private static let rightMessageID = UUID(uuidString: "87793D0B-A870-4D96-930D-BE1465A1BB92")!
 
