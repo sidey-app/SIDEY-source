@@ -3,13 +3,14 @@ import DownloadButton from "./DownloadButton.astro";
 import Checksum from "./Checksum.astro";
 import type { Locale } from "../i18n/landing";
 import { getLandingCopy } from "../i18n/landing";
-import { releases } from "../data/releases";
+import { appStoreURLForLocale, releases } from "../data/releases";
 import PhraseText from "./PhraseText.astro";
 
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
 const copy = getLandingCopy(locale).download;
 const titleParts = "titleParts" in copy ? copy.titleParts : null;
+const appStoreURL = appStoreURLForLocale(locale);
 ---
 
 <section class="section download-section" id="download" aria-labelledby="download-title">
@@ -17,7 +18,7 @@ const titleParts = "titleParts" in copy ? copy.titleParts : null;
   <div class="download-grid">
     <article class="download-card">
       <span class="platform-label"><img class="platform-logo platform-logo-macos" src={`${import.meta.env.BASE_URL}assets/platforms/macos-dark.svg`} alt="" width="16" height="16">macOS</span><h3>SIDEY</h3>
-      <div class="download-actions"><DownloadButton label={copy.macButton} platform="macos" id="macos-download-action" href={releases.macos.url} legalNotice locale={locale} /></div>
+      <div class="download-actions"><DownloadButton label={copy.macButton} platform="macos" id="macos-download-action" href={appStoreURL} appStoreLink legalNotice locale={locale} /></div>
       <p class="system-note">{copy.macSystem}</p>
     </article>
     <article class="download-card">

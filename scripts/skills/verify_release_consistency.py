@@ -13,7 +13,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SEMVER = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
-APP_STORE_URL = "https://apps.apple.com/kr/app/sidey/id6808528060"
+APP_STORE_URLS = {
+    "README.md": "https://apps.apple.com/kr/app/sidey/id6808528060",
+    "docs/readme/README.en.md": "https://apps.apple.com/us/app/sidey/id6808528060",
+    "docs/readme/README.ja.md": "https://apps.apple.com/jp/app/sidey/id6808528060",
+    "docs/readme/README.ru.md": "https://apps.apple.com/us/app/sidey/id6808528060",
+    "docs/readme/README.uk.md": "https://apps.apple.com/us/app/sidey/id6808528060",
+    "docs/readme/README.zh-Hans.md": "https://apps.apple.com/us/app/sidey/id6808528060",
+    "docs/readme/README.zh-Hant.md": "https://apps.apple.com/tw/app/sidey/id6808528060",
+}
 RELEASES_URL = "https://github.com/sidey-app/SIDEY/releases"
 README_PATHS = ("README.md",) + tuple(
     f"docs/readme/README.{language}.md"
@@ -48,7 +56,7 @@ def validate_readme_release_links(platform: str) -> None:
     for path in README_PATHS:
         require((ROOT / path).is_file(), f"README translation is missing: {path}")
         display = release_display(platform, path)
-        expected_url = APP_STORE_URL if platform == "macos" else RELEASES_URL
+        expected_url = APP_STORE_URLS[path] if platform == "macos" else RELEASES_URL
         official_link = re.escape(expected_url)
         require(re.search(rf'\]\({official_link}\)|href=[\"\']{official_link}[\"\']',
                           display) is not None,
@@ -131,7 +139,7 @@ def validate_macos() -> dict[str, str]:
     require(project_value_for_bundle_identifier(project, bundle, "CURRENT_PROJECT_VERSION") == build,
             "Mac App Store project build does not match release/macos.json")
     release_data = read("website/src/data/releases.ts")
-    require(APP_STORE_URL in release_data and "url: appStoreURL" in release_data,
+    require("appStoreURLForLocale" in release_data,
             "website macOS installation must use the Mac App Store")
     require(".dmg" not in release_data,
             "website release data must not offer retired macOS installers")

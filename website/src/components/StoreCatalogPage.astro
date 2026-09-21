@@ -3,14 +3,14 @@ import StoreLayout from "../layouts/StoreLayout.astro";
 import PageTabs from "./PageTabs.astro";
 import type { StoreCategory, StoreProduct } from "../data/store";
 import { getStoreCategories } from "../data/store";
-import type { Locale } from "../i18n/landing";
+import { localePathSegment, type Locale } from "../i18n/landing";
 
 interface Props { category: StoreCategory; locale?: Locale; canonicalPath?: string; }
 const { category, locale = "ko", canonicalPath } = Astro.props;
 const content = getStoreCategories(locale)[category];
 const detailProducts = [...content.products, ...content.products.flatMap((product) => product.keepsake ? [product.keepsake] : [])];
 const base = import.meta.env.BASE_URL;
-const localePrefix = `${locale}/`;
+const localePrefix = `${localePathSegment(locale)}/`;
 const storeBase = `${base}${localePrefix}store/`;
 const chromeByLocale: Record<Locale, {
   store: string;
@@ -72,6 +72,21 @@ const chromeByLocale: Record<Locale, {
     previewAction: "プレビュー",
     closePreview: "プレビューを閉じる",
     bubbleMessage: "今日も一緒にいよう！",
+  },
+  "zh-Hant": {
+    store: "SIDEY 商店",
+    keepsake: "珍藏小物", separate: "另售",
+    priceBasis: "顯示價格為韓元參考價。請在你使用的 App 內確認支援的商品與最終價格。",
+    treeHint: "在 macOS App 中，以滑鼠右鍵按一下樹木可讓它停下；再按一次即可繼續走動。",
+    sound: "音效",
+    categories: "商店分類",
+    characters: "角色",
+    throwables: "投擲道具",
+    bubbles: "對話框",
+    preview: "開啟預覽",
+    previewAction: "預覽",
+    closePreview: "關閉預覽",
+    bubbleMessage: "今天也一起待著吧！",
   },
 };
 const chrome = chromeByLocale[locale];

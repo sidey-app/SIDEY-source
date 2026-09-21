@@ -1,5 +1,5 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
+import { localeRoot } from "../i18n/landing";
 
 interface Props {
   path?: string;
@@ -12,14 +12,15 @@ const routeSuffix = normalizedPath ? `${normalizedPath}/` : "";
 const baseUrl = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
-const koreanTarget = `${getRelativeLocaleUrl("ko")}${routeSuffix}`;
-const englishTarget = `${getRelativeLocaleUrl("en")}${routeSuffix}`;
-const japaneseTarget = `${getRelativeLocaleUrl("ja")}${routeSuffix}`;
+const koreanTarget = `${localeRoot("ko")}${routeSuffix}`;
+const englishTarget = `${localeRoot("en")}${routeSuffix}`;
+const japaneseTarget = `${localeRoot("ja")}${routeSuffix}`;
+const traditionalChineseTarget = `${localeRoot("zh-Hant")}${routeSuffix}`;
 const gatewayTarget = `${baseUrl}${routeSuffix}`;
 ---
 
 <!doctype html>
-<html lang="ko">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,8 +29,9 @@ const gatewayTarget = `${baseUrl}${routeSuffix}`;
     <link rel="alternate" hreflang="ko" href={new URL(koreanTarget, Astro.site)}>
     <link rel="alternate" hreflang="en" href={new URL(englishTarget, Astro.site)}>
     <link rel="alternate" hreflang="ja" href={new URL(japaneseTarget, Astro.site)}>
+    <link rel="alternate" hreflang="zh-Hant" href={new URL(traditionalChineseTarget, Astro.site)}>
     <link rel="alternate" hreflang="x-default" href={new URL(gatewayTarget, Astro.site)}>
-    <script is:inline define:vars={{ koreanTarget, englishTarget, japaneseTarget }}>
+    <script is:inline define:vars={{ koreanTarget, englishTarget, japaneseTarget, traditionalChineseTarget }}>
       (() => {
         const preferredLanguage = navigator.languages?.[0] ?? navigator.language ?? "";
         const language = preferredLanguage.toLowerCase();
@@ -37,7 +39,9 @@ const gatewayTarget = `${baseUrl}${routeSuffix}`;
           ? koreanTarget
           : language.startsWith("ja")
             ? japaneseTarget
-            : englishTarget;
+            : language.startsWith("zh-hant") || language.startsWith("zh-tw") || language.startsWith("zh-hk") || language.startsWith("zh-mo")
+              ? traditionalChineseTarget
+              : englishTarget;
         const target = new URL(destination, window.location.origin);
         target.search = window.location.search;
         target.hash = window.location.hash;
@@ -53,6 +57,8 @@ const gatewayTarget = `${baseUrl}${routeSuffix}`;
         <a href={englishTarget} lang="en" hreflang="en">English</a>
         ·
         <a href={japaneseTarget} lang="ja" hreflang="ja">日本語</a>
+        ·
+        <a href={traditionalChineseTarget} lang="zh-Hant" hreflang="zh-Hant">繁體中文</a>
       </p>
     </main>
   </body>
