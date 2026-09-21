@@ -7,10 +7,22 @@ Postgres가 메시지의 source of truth다. 클라이언트는 UUID로 메시�
 실패도 같은 UUID로 확인하고 재시도해 중복 발송을 만들지 않는다. 메시지는 서버
 보관 정책에 따라 생성 후 사흘이 지나면 삭제된다.
 
+서버 rollout selector가 허용한 macOS build는 chat을 Firebase callable로 제출하고
+Firebase RTDB의 최신 live event와 sequence hint를 구독한다. Callable도 Postgres에
+같은 UUID를 먼저 저장하므로 Firebase delivery가 늦거나 다시 전달되어도 영구 메시지는
+한 건이다. Selector가 명시적으로 OFF이면 Supabase transport로 전환한다. Selector,
+bootstrap 또는 권한 확인 실패를 이유로 더 약한 transport로 자동 downgrade하지 않는다.
+Windows와 아직 v2를 선택하지 않은 build는 기존 Supabase 경로를 계속 사용한다.
+
 Presence는 연결·online·away 상태에 사용한다. Broadcast는 SIDEY 입력창의 typing,
 캐릭터 pulse와 projectile 같은 저장하지 않는 event에만 사용한다. DB 변경 알림은
 식별자만 전달하고 client가 RLS를 거쳐 row를 다시 읽는다. 연결이 복구되면 membership,
 presence와 최근 메시지를 다시 맞춘 뒤 online으로 전환한다.
+
+혼합 버전 기간의 presence, typing, pulse와 projectile은 v2-capable client에서도
+Supabase를 통해 송수신한다. 따라서 업데이트 전후 client가 같은 방에서 서로의 상태와
+일시 event를 볼 수 있다. 최소 7일의 관찰 기간이 지나도 adoption과 안전성 확인 및 별도
+승인 없이 legacy 경로를 제거하지 않는다.
 
 ## 작성과 표시
 

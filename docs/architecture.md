@@ -44,6 +44,21 @@ Broadcast는 SIDEY 입력창의 typing과 캐릭터 상호작용 같은 일시 �
 클라이언트는 서버가 확인한 membership, rate limit, entitlement 및 equipped state를
 표현하며 이를 로컬 상태만으로 부여하지 않는다.
 
+Firebase Realtime Database의 `/v2` namespace는 서버가 만든 access snapshot, room
+revision과 최신 메시지 전달 event를 위한 파생 실시간 계층이다. 영구 메시지와 권한의
+원본을 대신하지 않으며 client가 access 또는 chat record를 직접 쓰지 않는다. Firebase
+Functions는 인증된 Supabase session을 Firebase custom token으로 교환하고, chat UUID를
+Postgres transaction에 먼저 저장한 뒤 전달 event를 발행한다. 응답 유실처럼 commit
+여부가 불명확한 전송은 같은 UUID를 조회해 조정하고 자동 재전송하지 않는다.
+
+혼합 버전 기간에는 기존 client가 Supabase Realtime을 그대로 사용한다. v2-capable
+client도 presence와 typing·pulse·projectile 같은 transient event는 Supabase 단일
+plane을 사용하여 구버전과 양방향으로 보이게 한다. 인증된 server rollout selector가
+명시적으로 허용한 session만 Firebase v2를 사용한다. Selector OFF는 bounded refresh
+안에 legacy transport로 전환하지만, bootstrap·권한 확인 실패를 legacy downgrade로
+우회하지 않는다. 7일은 client rollout 뒤의 최소 관찰 기간이며 자동 cutover나 legacy
+schema·RPC·Broadcast 제거 시점이 아니다.
+
 클라이언트와 공개 웹에 필요한 계약만 이 저장소에 둔다. 비공개 schema, secret,
 운영 데이터 또는 backend 배포 절차를 공개 문서에 복제하지 않는다.
 
