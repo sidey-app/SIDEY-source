@@ -10,9 +10,12 @@ Postgres가 메시지의 source of truth다. 클라이언트는 UUID로 메시�
 서버 rollout selector가 허용한 macOS build는 chat을 Firebase callable로 제출하고
 Firebase RTDB의 최신 live event와 sequence hint를 구독한다. Callable도 Postgres에
 같은 UUID를 먼저 저장하므로 Firebase delivery가 늦거나 다시 전달되어도 영구 메시지는
-한 건이다. Selector가 명시적으로 OFF이면 Supabase transport로 전환한다. Selector,
-bootstrap 또는 권한 확인 실패를 이유로 더 약한 transport로 자동 downgrade하지 않는다.
-Windows와 아직 v2를 선택하지 않은 build는 기존 Supabase 경로를 계속 사용한다.
+한 건이다. Bootstrap은 selector가 허용한 현재 login session에 최대 5분의 rollout lease를
+발급하고, client는 만료 전에 selector 재등록과 Firebase token·listener 교체를 마쳐야
+한다. Selector가 명시적으로 OFF이면 Supabase transport로 전환한다. Selector, bootstrap,
+lease 갱신 또는 권한 확인 실패를 이유로 더 약한 transport로 자동 downgrade하지 않으며,
+만료된 Firebase 연결은 전송과 수신을 모두 닫는다. Windows와 아직 v2를 선택하지 않은
+build는 기존 Supabase 경로를 계속 사용한다.
 
 Presence는 연결·online·away 상태에 사용한다. Broadcast는 SIDEY 입력창의 typing,
 캐릭터 pulse와 projectile 같은 저장하지 않는 event에만 사용한다. DB 변경 알림은
