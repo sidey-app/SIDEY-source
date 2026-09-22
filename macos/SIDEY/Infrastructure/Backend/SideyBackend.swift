@@ -2,6 +2,26 @@ import Foundation
 import OSLog
 import Supabase
 
+struct AuthSessionRestorer<Value: Sendable>: Sendable {
+    let loadCurrentSession: @Sendable () async throws -> Value
+    let isSessionMissing: @Sendable (Error) -> Bool
+    let loadFreshRefreshToken: @Sendable () throws -> String?
+    let refreshSession: @Sendable (String) async throws -> Value
+
+    func session() async throws -> Value {
+        do {
+            return try await loadCurrentSession()
+        } catch {
+            guard isSessionMissing(error),
+                  let refreshToken = try loadFreshRefreshToken(),
+                  !refreshToken.isEmpty else {
+                throw error
+            }
+            return try await refreshSession(refreshToken)
+        }
+    }
+}
+
 actor SideyBackend {
     nonisolated let events: AsyncStream<BackendEvent>
 
@@ -103,11 +123,11 @@ actor SideyBackend {
     }
 
     func currentAccessToken() async throws -> String {
-        try await client.auth.session.accessToken
+        try await authenticatedSession().accessToken
     }
 
     func currentFirebaseV2BootstrapSession() async throws -> FirebaseV2SupabaseSession {
-        let session = try await client.auth.session
+        let session = try await authenticatedSession()
         return try FirebaseV2SupabaseSessionDecoder.decode(
             accessToken: session.accessToken,
             expectedAccountID: session.user.id
@@ -120,7 +140,8 @@ actor SideyBackend {
         protocolVersion: Int,
         contractHash: String
     ) async throws -> RealtimeRolloutPolicyResponse {
-        try await client.rpc(
+        _ = try await authenticatedSession()
+        return try await client.rpc(
             "register_realtime_capability_v2",
             params: RealtimeCapabilityRegistrationParameters(
                 platform: platform,
@@ -682,20 +703,42 @@ actor SideyBackend {
 #endif
 
     private func restoreOrCreateSession(requireExistingSession: Bool) async throws -> Session {
-        if client.auth.currentSession != nil {
-            return try await client.auth.session
+        do {
+            return try await authenticatedSession()
+        } catch let error as SideyBackendError where error == .sessionRecoveryFailed {
+            if requireExistingSession {
+                throw error
+            }
+            return try await client.auth.signInAnonymously()
         }
-        if let refreshToken = try keychain.readString(account: legacyRefreshAccount), !refreshToken.isEmpty {
-            do {
-                return try await client.auth.refreshSession(refreshToken: refreshToken)
-            } catch {
+    }
+
+    private func authenticatedSession() async throws -> Session {
+        let client = self.client
+        let keychain = self.keychain
+        let legacyRefreshAccount = self.legacyRefreshAccount
+        let restorer = AuthSessionRestorer(
+            loadCurrentSession: { try await client.auth.session },
+            isSessionMissing: { error in
+                guard let authError = error as? AuthError else { return false }
+                if case .sessionMissing = authError { return true }
+                return false
+            },
+            loadFreshRefreshToken: {
+                try keychain.readFreshString(account: legacyRefreshAccount)
+            },
+            refreshSession: { token in
+                try await client.auth.refreshSession(refreshToken: token)
+            }
+        )
+        do {
+            return try await restorer.session()
+        } catch let authError as AuthError {
+            if case .sessionMissing = authError {
                 throw SideyBackendError.sessionRecoveryFailed
             }
+            throw authError
         }
-        if requireExistingSession {
-            throw SideyBackendError.sessionRecoveryFailed
-        }
-        return try await client.auth.signInAnonymously()
     }
 
     private func configureChannels(rooms: [Room], activeRoomID: UUID?) async throws {
