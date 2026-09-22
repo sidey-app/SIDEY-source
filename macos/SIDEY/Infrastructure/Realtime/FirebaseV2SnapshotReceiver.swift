@@ -282,6 +282,25 @@ protocol FirebaseV2DatabaseValueStreaming: Sendable {
     func values(at path: String) -> AsyncThrowingStream<Data, Error>
 }
 
+enum FirebaseV2DatabaseSnapshotSerializationError: Error, Equatable {
+    case expectedObject
+}
+
+enum FirebaseV2DatabaseSnapshotSerializer {
+    static func data(from value: Any?) throws -> Data {
+        let object: [String: Any]
+        switch value {
+        case nil, is NSNull:
+            object = [:]
+        case let dictionary as [String: Any]:
+            object = dictionary
+        default:
+            throw FirebaseV2DatabaseSnapshotSerializationError.expectedObject
+        }
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+}
+
 /// Converts Firebase callback snapshots to immutable JSON bytes before they
 /// cross a concurrency boundary. Cancelling the stream removes exactly the
 /// observer installed for that stream.
@@ -297,8 +316,9 @@ final class FirebaseV2DatabaseValueStream: @unchecked Sendable, FirebaseV2Databa
             let reference = database.reference(withPath: path)
             let handle = reference.observe(.value) { snapshot in
                 do {
-                    let value = snapshot.value ?? [:]
-                    let data = try JSONSerialization.data(withJSONObject: value)
+                    let data = try FirebaseV2DatabaseSnapshotSerializer.data(
+                        from: snapshot.value
+                    )
                     continuation.yield(data)
                 } catch {
                     continuation.finish(throwing: error)

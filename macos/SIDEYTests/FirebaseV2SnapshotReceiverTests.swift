@@ -2,6 +2,27 @@ import XCTest
 @testable import SIDEY
 
 final class FirebaseV2SnapshotReceiverTests: XCTestCase {
+    func testDatabaseSnapshotSerializerTreatsMissingFirebaseValueAsEmptyObject() throws {
+        for value in [nil, NSNull()] as [Any?] {
+            let data = try FirebaseV2DatabaseSnapshotSerializer.data(from: value)
+            let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            XCTAssertEqual(object?.count, 0)
+        }
+    }
+
+    func testDatabaseSnapshotSerializerRejectsTopLevelScalarsWithoutCallingJSONWriter() {
+        for value in ["invalid", 1, true] as [Any] {
+            XCTAssertThrowsError(
+                try FirebaseV2DatabaseSnapshotSerializer.data(from: value)
+            ) { error in
+                XCTAssertEqual(
+                    error as? FirebaseV2DatabaseSnapshotSerializationError,
+                    .expectedObject
+                )
+            }
+        }
+    }
+
     func testInboxInitialSnapshotIsBaselineAndOnlyIncreasingHintsAct() throws {
         let roomID = UUID(uuidString: "11111111-1111-4111-8111-111111111111")!
         var reconciler = FirebaseV2InboxReconciler()
