@@ -122,12 +122,10 @@ final class FirebaseV2CompositeCredentialEstablisher: @unchecked Sendable,
 
 /// Supabase duties that remain active in Firebase v2 mode.
 ///
-/// A conformer owns authoritative Postgres reconciliation, Presence, and the
-/// authorized transient RPCs. During the mixed-version compatibility window,
-/// those RPCs are the single outbound entry point for typing, pulse, and throw;
-/// Supabase Broadcast remains the single transient send/receive plane. Compact
-/// RTDB transient delivery is ignored and never written by this composite until
-/// a separate capability-gated cutover is implemented.
+/// A conformer owns authoritative Postgres reconciliation and Presence. The
+/// transient methods remain on this boundary only because the same conformer is
+/// reused when the router switches back to the legacy transport; a selected
+/// Firebase v2 transport never calls or forwards those Supabase transient paths.
 protocol FirebaseV2SupabasePlane: Actor {
     nonisolated var events: AsyncStream<BackendEvent> { get }
 
@@ -145,15 +143,6 @@ protocol FirebaseV2SupabasePlane: Actor {
         targetUserID: UUID
     ) async throws
     func shutdown() async
-}
-
-/// Owns transient delivery while old and new app versions can share a room.
-///
-/// Adding a Firebase-only cutover mode must be an explicit source change after
-/// the capability gate and mixed-version exit criteria have passed. Keeping a
-/// single case now prevents an accidental calendar-based cutover.
-enum FirebaseV2TransientDeliveryMode: Equatable, Sendable {
-    case supabaseCompatibility
 }
 
 enum FirebaseV2CompositeTransportError: LocalizedError, Equatable {
@@ -190,8 +179,8 @@ struct FirebaseV2CompositeDiagnostics: Equatable, Sendable {
 
 /// Firebase v2 transport selected only after the authenticated Supabase
 /// rollout RPC confirms this exact protocol and contract hash. The production
-/// router retains the shared Supabase socket for compatibility events and a
-/// remote kill-switch transition.
+/// router retains the shared Supabase socket for Presence, authoritative
+/// reconciliation, and a remote kill-switch transition.
 actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     nonisolated let kind: RealtimeTransportKind = .firebaseV2
     nonisolated let events: AsyncStream<BackendEvent>
@@ -200,9 +189,10 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     private let credentials: any FirebaseV2CompositeCredentialEstablishing
     private let supabasePlane: any FirebaseV2SupabasePlane
     private let databaseValues: any FirebaseV2DatabaseValueStreaming
+    private let databaseWrites: any FirebaseV2DatabaseWriteTransport
     private let chatClient: FirebaseV2ChatClient
     private let throwableCatalogIDByWireCode: [FirebaseV2WireCode: String]
-    private let transientDeliveryMode: FirebaseV2TransientDeliveryMode
+    private let throwableWireCodeByCatalogID: [String: FirebaseV2WireCode]
     private let nowMilliseconds: @Sendable () -> Int64
     private let liveReadinessTimeout: Duration
     private let credentialReplacementGate = RealtimeCredentialOperationGate()
@@ -211,6 +201,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     private var session: FirebaseV2CompositeSession?
     private var currentRooms: [Room] = []
     private var currentReconciliation: BackendReconciliation?
+    private var transientWriter: FirebaseV2TransientWriter?
     private var activeRoomState = RealtimeActiveRoomState()
     private var grantBarrier = RealtimeGrantBarrier()
     private var inboxReconciler = FirebaseV2InboxReconciler()
@@ -238,9 +229,9 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         credentials: any FirebaseV2CompositeCredentialEstablishing,
         supabasePlane: any FirebaseV2SupabasePlane,
         databaseValues: any FirebaseV2DatabaseValueStreaming,
+        databaseWrites: any FirebaseV2DatabaseWriteTransport,
         chatClient: FirebaseV2ChatClient,
         throwableCatalogIDByWireCode: [FirebaseV2WireCode: String],
-        transientDeliveryMode: FirebaseV2TransientDeliveryMode,
         liveReadinessTimeout: Duration = .seconds(10),
         nowMilliseconds: @escaping @Sendable () -> Int64 = {
             Int64(Date().timeIntervalSince1970 * 1_000)
@@ -254,9 +245,12 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         self.credentials = credentials
         self.supabasePlane = supabasePlane
         self.databaseValues = databaseValues
+        self.databaseWrites = databaseWrites
         self.chatClient = chatClient
         self.throwableCatalogIDByWireCode = throwableCatalogIDByWireCode
-        self.transientDeliveryMode = transientDeliveryMode
+        self.throwableWireCodeByCatalogID = Dictionary(
+            uniqueKeysWithValues: throwableCatalogIDByWireCode.map { ($0.value, $0.key) }
+        )
         self.liveReadinessTimeout = liveReadinessTimeout
         self.nowMilliseconds = nowMilliseconds
     }
@@ -315,15 +309,18 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
 
     func publishTyping(roomID: UUID, event: String) async throws {
         try requireReady(roomID: roomID)
-        try await supabasePlane.publishTyping(roomID: roomID, event: event)
+        guard let transientWriter else {
+            throw FirebaseV2CompositeTransportError.liveListenerUnavailable
+        }
+        try await transientWriter.publishTyping(roomID: roomID, event: event)
     }
 
     func publishCharacterPulse(roomID: UUID, eventID: UUID) async throws {
         try requireReady(roomID: roomID)
-        try await supabasePlane.publishCharacterPulse(
-            roomID: roomID,
-            eventID: eventID
-        )
+        guard let transientWriter else {
+            throw FirebaseV2CompositeTransportError.liveListenerUnavailable
+        }
+        try await transientWriter.publishPulse(roomID: roomID)
     }
 
     func publishCharacterThrow(
@@ -332,10 +329,15 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         targetUserID: UUID
     ) async throws {
         try requireReady(roomID: roomID)
-        try await supabasePlane.publishCharacterThrow(
+        guard let transientWriter else {
+            throw FirebaseV2CompositeTransportError.liveListenerUnavailable
+        }
+        let catalogItemID = currentReconciliation?.snapshot.profile?.equippedThrowableID
+            ?? "patch_soft_ball"
+        try await transientWriter.publishThrow(
             roomID: roomID,
-            eventID: eventID,
-            targetUserID: targetUserID
+            targetUserID: targetUserID,
+            catalogItemID: catalogItemID
         )
     }
 
@@ -380,6 +382,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         rolloutLeaseExpiryDeadline = nil
         liveReadinessContinuation = nil
         pendingInitialLiveActions = []
+        transientWriter = nil
         session = nil
         activeRoomState.invalidateAll()
         grantBarrier.revokeSession()
@@ -597,6 +600,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         pendingInitialLiveActions = []
         liveReconciler = FirebaseV2LiveReconciler()
         guard let roomID else {
+            transientWriter = nil
             _ = activeRoomState.commit(operation)
             return
         }
@@ -647,6 +651,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         guard activeRoomState.commit(operation) else {
             throw CancellationError()
         }
+        transientWriter = makeTransientWriter(roomID: roomID, session: session)
         await drainPendingInitialLiveActions(roomID: roomID, generation: generation)
     }
 
@@ -708,12 +713,11 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         guard !isShutDown else { return }
         switch event {
         case .typing, .characterPulse, .characterThrow:
-            switch transientDeliveryMode {
-            case .supabaseCompatibility:
-                // Compatibility mode keeps old and new clients on the same
-                // ordered, server-authorized transient delivery plane.
-                eventContinuation.yield(event)
-            }
+            // Old clients still use Supabase Broadcast, but a session selected
+            // for Firebase v2 consumes exactly one transient plane. A backend
+            // bridge may mirror events for old clients; forwarding that mirror
+            // here would replay the same interaction in the new client.
+            break
         case .snapshot(let snapshot):
             currentRooms = snapshot.rooms
             failClosedIfActiveRoomWasRevoked()
@@ -798,7 +802,6 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     private func handleLiveAction(_ action: FirebaseV2LiveAction, roomID: UUID) -> Bool {
         switch action {
         case .typing(let userID, let active):
-            guard consumesFirebaseTransients else { return false }
             guard userID != session?.identity.accountID else { return false }
             eventContinuation.yield(.typing(
                 roomID: roomID,
@@ -807,7 +810,6 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             ))
             return false
         case .pulse(let userID, _):
-            guard consumesFirebaseTransients else { return false }
             guard userID != session?.identity.accountID else { return false }
             eventContinuation.yield(.characterPulse(CharacterPulseEvent(
                 id: UUID(),
@@ -816,7 +818,6 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             )))
             return false
         case .characterThrow(let actorUserID, let payload):
-            guard consumesFirebaseTransients else { return false }
             guard actorUserID != session?.identity.accountID,
                   actorUserID != payload.targetUserID,
                   let room = currentRooms.first(where: { $0.id == roomID }),
@@ -836,13 +837,6 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             // RTDB chat bodies are delivery hints only. Postgres remains the
             // source of truth and is re-read before emitting a durable message.
             return true
-        }
-    }
-
-    private var consumesFirebaseTransients: Bool {
-        switch transientDeliveryMode {
-        case .supabaseCompatibility:
-            false
         }
     }
 
@@ -1021,10 +1015,10 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         ))
         // A terminal RTDB listener means Firebase can no longer prove that
         // this session still has room access. Close the complete composite
-        // transport so chat and the compatibility Supabase transient plane
-        // cannot continue under a stale grant. Preserve the shared Supabase
-        // backend only so the authenticated remote kill-switch can still
-        // rebuild the legacy adapter.
+        // transport so chat and Firebase transients cannot continue under a
+        // stale grant. Preserve the shared Supabase backend only so the
+        // authenticated remote kill-switch can still rebuild the legacy
+        // adapter.
         await retire(shutdownSupabase: false)
     }
 
@@ -1045,6 +1039,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         typingExpiryTask = nil
         liveReadinessContinuation = nil
         pendingInitialLiveActions = []
+        transientWriter = nil
         liveReconciler = FirebaseV2LiveReconciler()
         activeRoomState.invalidateAll()
     }
@@ -1071,13 +1066,34 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             throw FirebaseV2CompositeTransportError.accessGrantClosed
         }
         if let roomID,
-           activeRoomState.committedRealtimeActiveRoomID != roomID {
+           (activeRoomState.committedRealtimeActiveRoomID != roomID
+               || activeRoomState.desiredActiveRoomID != roomID) {
             throw FirebaseV2CompositeTransportError.roomNotAuthorized
         }
     }
+
+    private func makeTransientWriter(
+        roomID: UUID,
+        session: FirebaseV2CompositeSession
+    ) -> FirebaseV2TransientWriter {
+        var authorizedWireCodes = Set(session.bootstrap.wireItems)
+        if let defaultWireCode = FirebaseV2WireCode(rawValue: "0") {
+            authorizedWireCodes.insert(defaultWireCode)
+        }
+        return FirebaseV2TransientWriter(
+            transport: databaseWrites,
+            context: FirebaseV2TransientContext(
+                identity: session.identity,
+                activeRoomID: roomID,
+                throwableWireCodesByCatalogID: throwableWireCodeByCatalogID,
+                authorizedWireCodes: authorizedWireCodes
+            )
+        )
+    }
 }
 
-// SideyBackend's methods call the existing membership- and epoch-authorized
-// Supabase RPCs. Compatibility mode deliberately keeps transient send and
-// receive on that one Supabase plane until an explicit capability-gated cutover.
+// SideyBackend retains its membership- and epoch-authorized legacy transient
+// RPCs so the router can rebuild the Supabase adapter when the selector turns
+// Firebase v2 off. The Firebase composite itself only uses this conformance for
+// authoritative reconciliation and Presence.
 extension SideyBackend: FirebaseV2SupabasePlane {}

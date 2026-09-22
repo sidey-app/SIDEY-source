@@ -2,7 +2,7 @@ import XCTest
 @testable import SIDEY
 
 final class FirebaseV2CompositeTransportTests: XCTestCase {
-    func testCompatibilityWindowPublishesTransientEventsThroughSupabasePlaneWithoutDirectRTDBWrites() async throws {
+    func testFirebaseSelectionPublishesTransientsOnlyThroughRTDB() async throws {
         let fixture = try Fixture()
 
         let reconciliation = try await fixture.transport.synchronize(
@@ -45,19 +45,26 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
                 FirebaseV2Path.liveRoom(fixture.room.id),
             ]
         )
-        XCTAssertEqual(transientPublications, [
-            .typing(roomID: fixture.room.id, event: "typing_start"),
-            .pulse(roomID: fixture.room.id, eventID: pulseID),
-            .characterThrow(
+        XCTAssertTrue(transientPublications.isEmpty)
+        XCTAssertEqual(directRTDBWrites, [
+            .setServerTimestamp(path: FirebaseV2Path.typing(
                 roomID: fixture.room.id,
-                eventID: throwID,
-                targetUserID: fixture.friendID
+                userID: fixture.ownID,
+                sessionID: fixture.sessionID
+            )),
+            .setServerTimestamp(path: FirebaseV2Path.pulse(
+                roomID: fixture.room.id,
+                userID: fixture.ownID
+            )),
+            .setThrow(
+                path: FirebaseV2Path.characterThrow(
+                    roomID: fixture.room.id,
+                    userID: fixture.ownID
+                ),
+                targetUserID: fixture.friendID,
+                wireCode: fixture.throwWireCode
             ),
         ])
-        XCTAssertTrue(
-            directRTDBWrites.isEmpty,
-            "Compatibility-window transient publishes must not write RTDB directly"
-        )
         guard case .confirmed(let message) = chat else {
             return XCTFail("Firebase callable result must be returned")
         }
@@ -70,7 +77,7 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         XCTAssertTrue(diagnostics.grantOpen)
     }
 
-    func testCompatibilityModeForwardsSupabaseTransientEventsAndPresence() async throws {
+    func testFirebaseSelectionIgnoresSupabaseTransientsButForwardsPresence() async throws {
         let fixture = try Fixture()
         _ = try await fixture.transport.synchronize(
             rooms: [fixture.room],
@@ -102,23 +109,6 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
             state: .online
         ))
 
-        guard case .typing(let typingRoomID, let typingUserID, let active) = await iterator.next()
-        else { return XCTFail("Expected Supabase typing event") }
-        XCTAssertEqual(typingRoomID, fixture.room.id)
-        XCTAssertEqual(typingUserID, fixture.friendID)
-        XCTAssertTrue(active)
-
-        guard case .characterPulse(let pulse) = await iterator.next()
-        else { return XCTFail("Expected Supabase pulse event") }
-        XCTAssertEqual(pulse.roomID, fixture.room.id)
-        XCTAssertEqual(pulse.userID, fixture.friendID)
-
-        guard case .characterThrow(let characterThrow) = await iterator.next()
-        else { return XCTFail("Expected Supabase throw event") }
-        XCTAssertEqual(characterThrow.roomID, fixture.room.id)
-        XCTAssertEqual(characterThrow.actorUserID, fixture.friendID)
-        XCTAssertEqual(characterThrow.targetUserID, fixture.ownID)
-
         guard case .presence(let roomID, let userID, let state) = await iterator.next()
         else { return XCTFail("Presence event must be forwarded") }
         XCTAssertEqual(roomID, fixture.room.id)
@@ -136,7 +126,15 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
             rooms: [fixture.room, secondRoom],
             activeRoomID: fixture.room.id
         )
+        try await fixture.transport.publishCharacterPulse(
+            roomID: fixture.room.id,
+            eventID: UUID()
+        )
         try await fixture.transport.setActiveRoom(secondRoomID)
+        try await fixture.transport.publishCharacterPulse(
+            roomID: secondRoomID,
+            eventID: UUID()
+        )
 
         let diagnostics = await fixture.transport.diagnostics()
         XCTAssertEqual(diagnostics.activeRoomID, secondRoomID)
@@ -149,6 +147,16 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
                 FirebaseV2Path.liveRoom(secondRoomID),
             ]
         )
+        XCTAssertEqual(fixture.values.writeOperations, [
+            .setServerTimestamp(path: FirebaseV2Path.pulse(
+                roomID: fixture.room.id,
+                userID: fixture.ownID
+            )),
+            .setServerTimestamp(path: FirebaseV2Path.pulse(
+                roomID: secondRoomID,
+                userID: fixture.ownID
+            )),
+        ])
         await assertThrowsAsync(
             FirebaseV2CompositeTransportError.roomNotAuthorized
         ) {
@@ -270,7 +278,7 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         }.count, 2)
     }
 
-    func testCompatibilityModeIgnoresFirebaseTransientEventsButReconcilesChatHint() async throws {
+    func testFirebaseSelectionConsumesFirebaseTransientsAndReconcilesChatHint() async throws {
         let fixture = try Fixture()
         _ = try await fixture.transport.synchronize(
             rooms: [fixture.room],
@@ -304,14 +312,68 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         }
         """.utf8), at: livePath)
 
+        guard case .typing(let typingRoomID, let typingUserID, let active) = await iterator.next()
+        else { return XCTFail("Expected Firebase typing event") }
+        XCTAssertEqual(typingRoomID, fixture.room.id)
+        XCTAssertEqual(typingUserID, fixture.friendID)
+        XCTAssertTrue(active)
+
+        guard case .characterPulse(let pulse) = await iterator.next()
+        else { return XCTFail("Expected Firebase pulse event") }
+        XCTAssertEqual(pulse.roomID, fixture.room.id)
+        XCTAssertEqual(pulse.userID, fixture.friendID)
+
+        guard case .characterThrow(let characterThrow) = await iterator.next()
+        else { return XCTFail("Expected Firebase throw event") }
+        XCTAssertEqual(characterThrow.roomID, fixture.room.id)
+        XCTAssertEqual(characterThrow.actorUserID, fixture.friendID)
+        XCTAssertEqual(characterThrow.targetUserID, fixture.ownID)
+        XCTAssertEqual(characterThrow.throwableID, "throwable_leaf")
+
         guard case .reconciliation = await iterator.next()
-        else {
-            return XCTFail(
-                "Firebase transient actions must be ignored before the chat hint reconciliation"
-            )
-        }
+        else { return XCTFail("Chat hint must trigger authoritative reconciliation") }
         let synchronizeCount = await fixture.supabase.synchronizeCount
         XCTAssertEqual(synchronizeCount, 2)
+    }
+
+    func testUnknownFirebaseThrowableWireCodeIsDroppedWithoutBlockingTyping() async throws {
+        let fixture = try Fixture()
+        _ = try await fixture.transport.synchronize(
+            rooms: [fixture.room],
+            activeRoomID: fixture.room.id
+        )
+        var iterator = fixture.transport.events.makeAsyncIterator()
+        let livePath = FirebaseV2Path.liveRoom(fixture.room.id)
+        fixture.values.yield(Data("{}".utf8), at: livePath)
+        fixture.values.yield(Data("""
+        {
+          "t": {
+            "\(fixture.friendID.uuidString.lowercased())": {
+              "11111111-1111-4111-8111-111111111111": 1800000000000
+            }
+          },
+          "x": {
+            "\(fixture.friendID.uuidString.lowercased())": {
+              "k": "999999",
+              "t": 1800000000000,
+              "u": "\(fixture.ownID.uuidString.lowercased())"
+            }
+          }
+        }
+        """.utf8), at: livePath)
+
+        guard case .typing(_, let userID, let active) = await iterator.next()
+        else { return XCTFail("Valid Firebase typing must survive an unknown throw code") }
+        XCTAssertEqual(userID, fixture.friendID)
+        XCTAssertTrue(active)
+
+        await fixture.supabase.emit(.presence(
+            roomID: fixture.room.id,
+            userID: fixture.friendID,
+            state: .online
+        ))
+        guard case .presence = await iterator.next()
+        else { return XCTFail("Unknown wire code must not emit a throw event") }
     }
 
     func testGrantBarrierBlocksWritesUntilRequestedRevisionIsAcknowledged() async throws {
@@ -342,8 +404,8 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
             eventID: UUID()
         )
         let publicationCount = await fixture.supabase.transientPublications.count
-        XCTAssertEqual(publicationCount, 1)
-        XCTAssertTrue(fixture.values.writeOperations.isEmpty)
+        XCTAssertEqual(publicationCount, 0)
+        XCTAssertEqual(fixture.values.writeOperations.count, 1)
     }
 
     func testSynchronizationRetriesOnlyPendingGrantAfterCommittedMutation() async throws {
@@ -393,7 +455,8 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
             ),
         ])
         let publicationCount = await fixture.supabase.transientPublications.count
-        XCTAssertEqual(publicationCount, 1)
+        XCTAssertEqual(publicationCount, 0)
+        XCTAssertEqual(fixture.values.writeOperations.count, 1)
     }
 
     func testShutdownCancelsBothPlanesAndPreventsFurtherOperations() async throws {
@@ -713,9 +776,12 @@ private struct Fixture {
             credentials: credentials,
             supabasePlane: supabase,
             databaseValues: values,
+            databaseWrites: values,
             chatClient: chatClient,
-            throwableCatalogIDByWireCode: [throwWireCode: "throwable_leaf"],
-            transientDeliveryMode: .supabaseCompatibility,
+            throwableCatalogIDByWireCode: [
+                FirebaseV2WireCode(rawValue: "0")!: "patch_soft_ball",
+                throwWireCode: "throwable_leaf",
+            ],
             liveReadinessTimeout: liveReadinessTimeout,
             nowMilliseconds: { 1_800_000_000_000 }
         )

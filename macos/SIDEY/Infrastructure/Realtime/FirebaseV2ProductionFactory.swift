@@ -3,7 +3,7 @@ import Foundation
 enum FirebaseV2ProductionContract {
     // Frozen backend/client fixture SHA-256. The server enables a session only
     // when registration supplies this exact value.
-    static let hash = "3c836b40cfc44437e9d069b84787cd3d8793026ce40de46d82b9ece79127b7e5"
+    static let hash = "0f2845d033df248b1745c6526c8c7100b8d8fa6839b45f28c73b1023053fce2e"
 }
 
 enum FirebaseV2ProductionFactoryError: LocalizedError, Equatable {
@@ -194,13 +194,14 @@ enum FirebaseV2ProductionFactory {
             senderUserID: accountID,
             bubbleCatalogIDByWireCode: bubbles
         )
+        let databaseValues = FirebaseV2DatabaseValueStream(database: runtime.database)
         return FirebaseV2CompositeTransport(
             credentials: credentials,
             supabasePlane: supabasePlane,
-            databaseValues: FirebaseV2DatabaseValueStream(database: runtime.database),
+            databaseValues: databaseValues,
+            databaseWrites: FirebaseV2DatabaseWriteAdapter(database: runtime.database),
             chatClient: chatClient,
-            throwableCatalogIDByWireCode: throwables,
-            transientDeliveryMode: .supabaseCompatibility
+            throwableCatalogIDByWireCode: throwables
         )
     }
 }
