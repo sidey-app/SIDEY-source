@@ -89,6 +89,12 @@ final class KeychainAccessSession: @unchecked Sendable {
         handler?(status)
     }
 
+    func invalidateCachedValue(service: String, account: String) {
+        lock.lock()
+        cache.removeValue(forKey: CacheKey(service: service, account: account))
+        lock.unlock()
+    }
+
     func read(service: String, account: String, query: [String: Any]) throws -> Data? {
         let cacheKey = CacheKey(service: service, account: account)
         lock.lock()
@@ -295,6 +301,11 @@ struct KeychainStore: Sendable {
     func readString(account: String) throws -> String? {
         guard let data = try read(account: account) else { return nil }
         return String(data: data, encoding: .utf8)
+    }
+
+    func readFreshString(account: String) throws -> String? {
+        session.invalidateCachedValue(service: service, account: account)
+        return try readString(account: account)
     }
 
     func writeString(_ value: String, account: String) throws {
