@@ -96,10 +96,10 @@ enum RoomMessagingTransportRouterError: Error, Equatable {
 ///
 /// A Firebase v2 implementation must keep Supabase Presence and authoritative
 /// reconciliation, merge their domain events with Firebase delivery events,
-/// and expose only that single merged stream. During mixed-version rollout,
-/// transient publishing and receiving both use the authorized Supabase plane.
-/// Compact RTDB transient actions are ignored and direct RTDB transient writes
-/// remain disabled until an explicit capability-gated cutover.
+/// and expose only that single merged stream. When Firebase v2 is selected,
+/// typing, pulse, and throw publish and receive only through compact RTDB;
+/// legacy Supabase transient mirrors are ignored. The legacy adapter resumes
+/// Supabase transient ownership only after an explicit selector rollback.
 protocol RoomMessagingTransport: Actor {
     nonisolated var kind: RealtimeTransportKind { get }
     nonisolated var events: AsyncStream<BackendEvent> { get }

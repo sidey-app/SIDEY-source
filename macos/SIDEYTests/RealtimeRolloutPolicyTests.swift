@@ -151,9 +151,9 @@ final class RealtimeRolloutPolicyTests: XCTestCase {
         XCTAssertEqual(
             try FirebaseV2ProductionFactory.appVersion(bundleInfo: [
                 "CFBundleShortVersionString": "1.3.0",
-                "CFBundleVersion": "32",
+                "CFBundleVersion": "33",
             ]),
-            "1.3.0+32"
+            "1.3.0+33"
         )
     }
 

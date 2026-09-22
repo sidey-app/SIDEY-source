@@ -1,23 +1,25 @@
 # macOS Firebase v2 구현 보고서
 
-상태: **production selector/factory 연결 완료 — Xcode 검증 후보**  
-기준일: 2026-09-22
+상태: **Firebase transient client 연결 완료 — Xcode 검증 후보**
+기준일: 2026-09-23
 
 ## 기준과 배포 상태
 
-- source branch: `macos/firebase-v2-client`
+- source branch: `macos/firebase-transients-macos`
 - source integration anchor: 최종 backend contract 고정 후 최신 `main`에 workflow로 동기화 예정
 - Gate 1 deployed fixture SHA-256:
   `4785705721e971ae463a5692bc80cadc7ff49ed0e20aab495dc1b0d6be0619d0`
 - frozen client/backend fixture SHA-256:
-  `3c836b40cfc44437e9d069b84787cd3d8793026ce40de46d82b9ece79127b7e5`
+  `0f2845d033df248b1745c6526c8c7100b8d8fa6839b45f28c73b1023053fce2e`
 - Firebase Gate 1: production Functions/Rules 배포 및 read-back 완료
+- Firebase transient bridge candidate: 구현 완료, production 배포/read-back 전
+- production rollout: backend 전환 작업 동안 fail-closed OFF
 - Supabase production selector: authenticated `register_realtime_capability_v2`
 - macOS feature gate: server cohort/kill-switch 응답과 frozen contract hash로 결정
 - commit/push/merge/sign/notarize/App Store upload/release: 이 보고서 snapshot에서는 수행하지 않음
 
 클라이언트가 요구하는 frozen contract hash는
-`3c836b40cfc44437e9d069b84787cd3d8793026ce40de46d82b9ece79127b7e5`이며, selector 등록 시 protocol 2와 함께
+`0f2845d033df248b1745c6526c8c7100b8d8fa6839b45f28c73b1023053fce2e`이며, selector 등록 시 protocol 2와 함께
 서버에 제출한다. App Store 업로드와 release는 이 소스 변경과 별도 작업이다.
 
 ## M1 현재 동작 inventory
@@ -27,8 +29,8 @@
 | Supabase Auth/session | `SideyBackend.swift`, Keychain-backed Supabase storage | `KeychainStoreTests`, `BackendIntegrationTests` |
 | legacy room realtime | `SideyBackend.swift`의 room channel pair와 recovery generation | `BackendEventLifecycleTests`, `BackendIntegrationTests` |
 | Presence/UI | `SideyBackend.swift`, `PresencePublicationQueue`, `AppModel` | `PresenceAndRealtimeTests` |
-| typing | `TypingActivityController.swift` | `TypingActivityTests` |
-| pulse/throw | `AppCoordinator+Backend.swift`, `SideyBackend.swift` | `PixelWorldTests`, `CharacterStunTests` |
+| typing | `TypingActivityController.swift`, Firebase composite RTDB writer | `TypingActivityTests`, `FirebaseV2CompositeTransportTests` |
+| pulse/throw | `AppCoordinator+Backend.swift`, Firebase composite RTDB writer | `PixelWorldTests`, `CharacterStunTests`, `FirebaseV2CompositeTransportTests` |
 | chat outbox | `AppCoordinator+Backend.swift`, `MessageLedger` | `MessageLedgerTests`, `HistoryInteractionTests` |
 | room switch | `RoomSwitchPipeline`, `AppPreferences` | `RoomManagementTests`, `PresenceAndRealtimeTests` |
 | commerce/equip | `AppCoordinator+Commerce.swift`, `SideyBackend.swift` | `CommerceModelTests`, `StoreCatalogCompatibilityTests` |
@@ -84,22 +86,23 @@ sleep/wake 전용 통합 검증과 Firebase production 계정 smoke는 아직 �
   검증한다.
 
 현재 released `SideyBackend` channel 구조를 새 Presence topic-set으로 바꾸는 live I/O 연결은 하지 않았다.
-호환 기간의 composite는 기존 `SideyBackend` socket과 transient stream을 재사용해야 하며, 별도 legacy
-channel 인스턴스를 하나 더 만들면 같은 이벤트가 중복 수신되므로 금지한다.
+호환 기간의 composite는 기존 `SideyBackend` socket을 Presence와 authoritative reconciliation에 재사용한다.
+같은 socket으로 들어오는 legacy transient mirror는 Firebase v2 선택 중 버리며, 별도 legacy channel
+인스턴스를 만들지 않는다.
 
 ### M6 — typing/pulse/throw
 
 - Firebase Database write adapter와 exact compact path/payload를 구현했다.
-- typing stop은 현재 Supabase session slot 하나만 delete한다.
+- typing stop은 현재 `sideySessionId`에 대응하는 RTDB session slot 하나만 delete한다.
 - active room이 아니면 write하지 않는다.
 - throw는 `catalogItemID -> wireCode` mapping과 bootstrap authorized wire set을 모두 만족해야 한다.
 - transient write는 한 번만 실행하며 모호한 응답을 자동 재시도하지 않는다.
-- 다만 혼합 버전 호환 기간의 composite 송신 경로는 RTDB를 직접 쓰지 않는다. 기존 `SideyBackend`의
-  membership·room epoch 검증 Supabase RPC와 Broadcast를 transient 송수신의 단일 plane으로 사용한다.
-  호환 기간에는 typing·pulse·throw를 RTDB에 쓰거나 이중 fan-out하지 않는다. stale 또는 주입된 RTDB transient
-  action이 보여도 composite는 이를 버린다. Firebase compact listener는 chat/access hint와 이후 authoritative
-  reconciliation을 위해 계속 유지한다. RTDB transient 전환은 별도 capability gate를 통과한 뒤 명시적으로
-  구현해야 한다.
+- Firebase v2 selector가 선택된 동안 typing은 `/t/{uid}/{sideySessionId}`, pulse는 `/c/{uid}`,
+  throw는 `/x/{uid}`에만 발행하고 같은 compact listener에서 수신한다.
+- 같은 세션에서 Supabase transient RPC를 호출하거나 legacy Broadcast mirror를 소비하지 않는다. selector가
+  legacy를 반환하거나 rollback을 완료한 경우에만 기존 Supabase adapter가 transient를 담당한다.
+- 최초 pulse/throw snapshot baseline, per-slot timestamp high-water, 5초 freshness, unknown wire code drop과
+  room/session generation 교체를 적용한다. Presence는 계속 Supabase에 남는다.
 
 ### M7 — chat
 
@@ -131,12 +134,14 @@ Firebase v2 선택 시에만 v2 mutation/grant RPC를 호출하며, selector가 
 
 ## 남은 release 운영
 
-1. backend production migration/Functions/Rules 최종 read-back과 `CLIENT_BACKEND_HANDOFF.md` 보존
+1. 이전 rollout fail-closed 비활성화 뒤 backend production migration/Functions/Rules 배포, 최종 read-back,
+   새 contract hash 활성화와 `CLIENT_BACKEND_HANDOFF.md` 보존
 2. production internal 계정 smoke 및 cleanup residual 0 증거 보존
 3. internal → canary → staged rollout 후 backend가 기록한 T0부터 legacy compatibility를 최소 7일 관찰
 
 `AppCoordinator`는 Supabase boot/auth가 완료된 다음에만 selector와 concrete Firebase runtime을 비동기로 만든다.
-선택이 Firebase인 동안 같은 `SideyBackend` socket을 Presence/Broadcast/authoritative reconciliation에 재사용한다.
+선택이 Firebase인 동안 같은 `SideyBackend` socket을 Presence/authoritative reconciliation에 재사용하고,
+legacy transient Broadcast는 소비하지 않는다.
 remote selector는 lease refresh 시점마다 다시 등록하고 bootstrap, Firebase Auth, listener generation을
 순서대로 교체한다. 개별 session/cohort의 explicit legacy 응답은 Firebase listener/Auth를 폐기한 뒤 새
 legacy event subscription으로 동기화한다. 전역 emergency kill과 `realtime_rollout_disabled`, lease hard
@@ -163,7 +168,8 @@ selector 하나만 가지며, 마지막 enabled 결정 뒤 selector fetch/cache�
 - Presence first sync/self-track/member purge/deadline
 - inbox/live snapshot baseline, revision/sequence gap, transient freshness, orphan typing 6초 TTL
 - exact transient write와 wire-code fail-close
-- 혼합 버전 composite의 transient Supabase RPC 위임, Firebase 직접 write 부재, Supabase transient 수신 및 stale/injected RTDB transient drop
+- Firebase 선택 composite의 RTDB transient 단일 발행·수신, Supabase transient 발행·소비 부재
+- initial snapshot baseline, high-water/freshness, unknown wire drop, room/session rotation과 revoke fail-close
 - callable chat compact DTO, error commit 분류, UUID/body/wire-code 검증, ambiguous 동일 UUID lookup/no-resend
 - v2 grant RPC DTO와 revision barrier
 - create/join/equip·구매 직후 자동 장착의 exact revision 수렴, legacy RPC 유지, grant 실패 시 committed/pending 분리
@@ -175,8 +181,8 @@ selector 하나만 가지며, 마지막 enabled 결정 뒤 selector fetch/cache�
 
 검증 결과는 다음과 같다.
 
-- Firebase v2 focused 7-suite 검증: 실패 0개
-- `scripts/macos/tests/test_native.sh`: SIDEY XCTest 497개 실행, 실패 0개, backend integration 1개
+- Firebase transient/rollout focused 검증: 45개 통과, 실패 0개
+- `scripts/macos/tests/test_native.sh`: SIDEY XCTest 509개 중 508개 통과, 실패 0개, backend integration 1개
   환경 미설정으로 skip
 - 같은 명령의 recording suite: 10개 통과, 실패 0개
 - macOS asset 검증: 57개 일치
