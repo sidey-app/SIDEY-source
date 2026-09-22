@@ -11,6 +11,23 @@ final class RuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.supabaseURL.absoluteString, "https://example.supabase.co")
         XCTAssertEqual(configuration.supabasePublishableKey, "sb_publishable_public")
         XCTAssertFalse(configuration.backendFingerprint.isEmpty)
+        XCTAssertNil(configuration.realtimeTransportPreference)
+    }
+
+    func testDevelopmentReadsExplicitRealtimeTransportPreference() throws {
+        let configuration = try RuntimeConfiguration.resolve(releaseChannel: .staging, environment: [
+            "SIDEY_SUPABASE_URL": "https://example.supabase.co",
+            "SIDEY_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_public",
+            "SIDEY_REALTIME_TRANSPORT": "firebase-v2"
+        ])
+
+        XCTAssertEqual(configuration.realtimeTransportPreference, .firebaseV2)
+
+        XCTAssertThrowsError(try RuntimeConfiguration.resolve(releaseChannel: .staging, environment: [
+            "SIDEY_SUPABASE_URL": "https://example.supabase.co",
+            "SIDEY_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_public",
+            "SIDEY_REALTIME_TRANSPORT": "automatic"
+        ]))
     }
 
     func testRejectsPartialInsecureAndSecretConfiguration() {
@@ -66,12 +83,24 @@ final class RuntimeConfigurationTests: XCTestCase {
             releaseChannel: .appStore,
             environment: [
                 "SIDEY_SUPABASE_URL": "https://attacker.example",
-                "SIDEY_SUPABASE_PUBLISHABLE_KEY": "sb_secret_do-not-ship"
+                "SIDEY_SUPABASE_PUBLISHABLE_KEY": "sb_secret_do-not-ship",
+                "SIDEY_REALTIME_TRANSPORT": "firebase-v2"
             ],
             bundleInfo: [:]
         )
 
         XCTAssertTrue(configuration.isProductionBackend)
+        XCTAssertNil(configuration.realtimeTransportPreference)
+    }
+
+    func testAppStoreIgnoresBundledRealtimeTransportPreference() throws {
+        let configuration = try RuntimeConfiguration.resolve(
+            releaseChannel: .appStore,
+            environment: ["SIDEY_REALTIME_TRANSPORT": "legacy"],
+            bundleInfo: ["SIDEYRealtimeTransport": "firebase-v2"]
+        )
+
+        XCTAssertNil(configuration.realtimeTransportPreference)
     }
 
     func testAppStoreUsesProductionBackend() throws {

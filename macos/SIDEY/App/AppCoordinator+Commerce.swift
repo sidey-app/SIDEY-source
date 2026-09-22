@@ -1,5 +1,14 @@
 import AppKit
 
+enum FirebaseV2CommerceGrantPolicy {
+    static func requiresEntitlement(
+        kind: CommerceProductKind,
+        catalogItemID: String?
+    ) -> Bool {
+        kind == .throwable && catalogItemID != nil
+    }
+}
+
 extension AppCoordinator {
     func refreshCommerceState(productID: String? = nil) {
         guard releaseChannel.storeAvailability.allowsCommerceActions,
@@ -43,6 +52,7 @@ extension AppCoordinator {
         guard releaseChannel.storeAvailability.allowsCosmeticEquipment,
               kind != .character,
               let backend,
+              let messagingTransport,
               catalogItemID == nil || product != nil,
               model.equippedCosmeticID(for: kind) != catalogItemID,
               commerceSession.equipmentTasks[kind] == nil,
@@ -58,12 +68,19 @@ extension AppCoordinator {
                 commerceSession.equipmentTasks[kind] = nil
             }
             do {
-                let profile = try await backend.setEquippedCosmetic(
+                let mutation = try await setEquippedCosmeticForSelectedTransport(
+                    backend: backend,
+                    messagingTransport: messagingTransport,
                     kind: kind,
                     catalogItemID: catalogItemID
                 )
+                let profile = mutation.value
                 guard profile.id == model.currentUserID else {
                     throw SideyBackendError.malformedResponse
+                }
+                if let grantError = mutation.grantError {
+                    model.errorMessage = "장착은 서버에 반영됐지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+                    return
                 }
                 model.apply(profile: profile)
                 model.presentSuccess(CosmeticEquipmentFeedback.successMessage(
@@ -84,6 +101,7 @@ extension AppCoordinator {
     func purchase(productID: String) {
         guard releaseChannel.storeAvailability.allowsCommerceActions,
               let backend,
+              let messagingTransport,
               let productState = model.commerceProduct(id: productID),
               commerceSession.productTasks[productID] == nil,
               productState.purchaseState != .owned
@@ -117,12 +135,20 @@ extension AppCoordinator {
                         model.setCommercePurchaseState(.owned, productID: productID)
                         if let equipment = product.automaticEquipmentAfterFreshPurchase {
                             do {
-                                let profile = try await backend.setEquippedCosmetic(
+                                let mutation = try await setEquippedCosmeticForSelectedTransport(
+                                    backend: backend,
+                                    messagingTransport: messagingTransport,
                                     kind: equipment.kind,
                                     catalogItemID: equipment.catalogItemID
                                 )
+                                let profile = mutation.value
                                 guard profile.id == userID else {
                                     throw SideyBackendError.malformedResponse
+                                }
+                                if let grantError = mutation.grantError {
+                                    model.presentSuccess("\(product.displayName) 구매가 완료되었습니다.")
+                                    model.errorMessage = "자동 장착은 서버에 반영됐지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+                                    return
                                 }
                                 model.apply(profile: profile)
                                 persistPreferences()
@@ -256,6 +282,43 @@ extension AppCoordinator {
             didChange: { [weak self] in self?.refreshCommerceState() },
             didFail: { [weak self] message in
                 self?.model.errorMessage = "App Store 거래 반영 실패: \(message)"
+            }
+        )
+    }
+
+    private func setEquippedCosmeticForSelectedTransport(
+        backend: SideyBackend,
+        messagingTransport: RoomMessagingTransportRouter,
+        kind: CommerceProductKind,
+        catalogItemID: String?
+    ) async throws -> RealtimeGrantAwareMutationResult<Profile> {
+        try await RealtimeGrantAwareMutation.perform(
+            selection: try await messagingTransport.currentSelection(),
+            // Only throwable ownership is embedded in the Firebase v2 wire
+            // authorization grant. Bubble styles remain a server-authorized
+            // chat attribute and must not close the complete realtime plane.
+            requiresEntitlement: FirebaseV2CommerceGrantPolicy.requiresEntitlement(
+                kind: kind,
+                catalogItemID: catalogItemID
+            ),
+            legacy: {
+                try await backend.setEquippedCosmetic(
+                    kind: kind,
+                    catalogItemID: catalogItemID
+                )
+            },
+            firebaseV2: {
+                let grant = try await backend.setEquippedCosmeticV2(
+                    kind: kind,
+                    catalogItemID: catalogItemID
+                )
+                return (grant.profile, grant.accessRevision)
+            },
+            converge: { revision, requiresEntitlement in
+                try await messagingTransport.convergeAccessGrant(
+                    revision: revision,
+                    requiresEntitlement: requiresEntitlement
+                )
             }
         )
     }

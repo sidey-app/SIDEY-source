@@ -5,6 +5,7 @@ struct RuntimeConfiguration: Equatable, Sendable {
     static let productionHost = "whtejsviizgejauasqqt.supabase.co"
     let supabaseURL: URL
     let supabasePublishableKey: String
+    let realtimeTransportPreference: RealtimeTransportKind?
 
     var backendFingerprint: String {
         let digest = SHA256.hash(data: Data(supabaseURL.absoluteString.utf8))
@@ -16,10 +17,25 @@ struct RuntimeConfiguration: Equatable, Sendable {
         environment: [String: String] = ProcessInfo.processInfo.environment,
         bundleInfo: [String: Any] = Bundle.main.infoDictionary ?? [:]
     ) throws -> Self {
+        let bundledRealtimeTransport = bundleInfo["SIDEYRealtimeTransport"] as? String
+        // Production transport ownership is remote and authenticated. Neither
+        // environment variables nor bundle metadata may bypass its cohort or
+        // kill-switch decision.
+        let configuredRealtimeTransport = releaseChannel == .appStore
+            ? nil
+            : environment["SIDEY_REALTIME_TRANSPORT"] ?? bundledRealtimeTransport
+        let realtimeTransportPreference: RealtimeTransportKind?
+        do {
+            realtimeTransportPreference = try RealtimeTransportPreference.resolve(configuredRealtimeTransport)
+        } catch {
+            throw RuntimeConfigurationError.invalidRealtimeTransport
+        }
+
         if releaseChannel == .appStore {
             return Self(
                 supabaseURL: URL(string: "https://\(productionHost)")!,
-                supabasePublishableKey: "sb_publishable_kkASOI4rRTX8Drob21hkCw_VwUex63Y"
+                supabasePublishableKey: "sb_publishable_kkASOI4rRTX8Drob21hkCw_VwUex63Y",
+                realtimeTransportPreference: realtimeTransportPreference
             )
         }
 
@@ -39,7 +55,11 @@ struct RuntimeConfiguration: Equatable, Sendable {
             guard url.host?.lowercased() != Self.productionHost else {
                 throw RuntimeConfigurationError.productionBackendNotAllowedInDevelopment
             }
-            return Self(supabaseURL: url, supabasePublishableKey: key)
+            return Self(
+                supabaseURL: url,
+                supabasePublishableKey: key,
+                realtimeTransportPreference: realtimeTransportPreference
+            )
         }
 
         guard let rawURL = bundledURL, !rawURL.isEmpty,
@@ -50,7 +70,11 @@ struct RuntimeConfiguration: Equatable, Sendable {
         guard url.host?.lowercased() != Self.productionHost else {
             throw RuntimeConfigurationError.productionBackendNotAllowedInDevelopment
         }
-        return Self(supabaseURL: url, supabasePublishableKey: key)
+        return Self(
+            supabaseURL: url,
+            supabasePublishableKey: key,
+            realtimeTransportPreference: realtimeTransportPreference
+        )
     }
 
     var isProductionBackend: Bool {
@@ -87,6 +111,7 @@ enum RuntimeConfigurationError: LocalizedError, Equatable {
     case secretKeyNotAllowed
     case missingDevelopmentConfiguration
     case productionBackendNotAllowedInDevelopment
+    case invalidRealtimeTransport
 
     var errorDescription: String? {
         switch self {
@@ -98,6 +123,8 @@ enum RuntimeConfigurationError: LocalizedError, Equatable {
             "Sidey-dev에는 SIDEY-staging URL과 publishable key가 필요합니다."
         case .productionBackendNotAllowedInDevelopment:
             "Sidey-dev는 production Supabase 프로젝트에 연결할 수 없습니다."
+        case .invalidRealtimeTransport:
+            "SIDEY 실시간 프로토콜 설정이 지원되지 않는 값입니다."
         }
     }
 }
