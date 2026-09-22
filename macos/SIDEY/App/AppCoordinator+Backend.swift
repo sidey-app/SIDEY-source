@@ -472,6 +472,11 @@ extension AppCoordinator {
             rejectMessage(body, source: source, message: SideyBackendError.noActiveRoom.localizedDescription)
             return
         }
+        guard model.activeRoomRealtimeAvailable else {
+            stopAllTyping()
+            rejectMessage(body, source: source, message: "실시간 연결이 끊겨 메시지를 전송할 수 없습니다.")
+            return
+        }
         sendMessage(body, source: source) { roomID, body, messageID in
             await messagingTransport.sendChat(roomID: roomID, body: body, id: messageID)
         }
@@ -770,7 +775,8 @@ extension AppCoordinator {
 
     func characterDoubleClicked() {
         if let id = model.currentUserID, model.characterStunState.isStunned(id) { return }
-        guard let room = model.activeRoom,
+        guard model.activeRoomRealtimeAvailable,
+              let room = model.activeRoom,
               let userID = model.currentUserID,
               room.members.contains(where: { $0.userID == userID }),
               roomSession.pulseCooldown.accept(

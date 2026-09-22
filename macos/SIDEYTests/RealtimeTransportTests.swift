@@ -432,6 +432,39 @@ final class RealtimeTransportTests: XCTestCase {
         XCTAssertNil(coordinator.model.historySendError)
         XCTAssertFalse(coordinator.overlayWindows.composerVisible)
     }
+
+    @MainActor
+    func testDisconnectedProductionSendDoesNotStageOrCallTransport() async throws {
+        let transport = FakeRealtimeTransport(kind: .legacySupabase)
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .legacySupabase, firebaseV2Allowed: true),
+            makeLegacy: { transport }
+        )
+        let roomID = UUID()
+        let userID = UUID()
+        let coordinator = AppCoordinator(
+            preferencesStore: PreferencesStore(load: { .defaults }, save: { _ in }),
+            legacyMigrator: .none,
+            keychainAccessSession: KeychainAccessSession(),
+            releaseChannel: .appStore,
+            arguments: []
+        )
+        coordinator.messagingTransport = router
+        coordinator.model.currentUserID = userID
+        coordinator.model.rooms = [
+            Room(id: roomID, name: "친구", ownerID: userID, members: [], inviteCodeHint: "TEST")
+        ]
+        coordinator.model.preferences.activeRoomID = roomID
+        coordinator.model.connectionState = .connecting
+        coordinator.model.setActiveRoomRealtimeConnected(false)
+
+        coordinator.sendMessage("로컬에만 보이면 안 됨", source: .history)
+
+        let operationCount = await transport.operationCount
+        XCTAssertEqual(operationCount, 0)
+        XCTAssertTrue(coordinator.model.messageOutbox.entries.isEmpty)
+        XCTAssertNotNil(coordinator.model.historySendError)
+    }
 }
 
 private func assertThrowsAsync<E: Error & Equatable>(

@@ -275,6 +275,39 @@ final class CharacterStunTests: XCTestCase {
         XCTAssertFalse(coordinator.model.characterStunState.isStunned(user))
     }
 
+    func testDisconnectedCoordinatorDoesNotPlayOrConsumeLocalPulse() {
+        let coordinator = AppCoordinator(
+            preferencesStore: PreferencesStore(load: { .defaults }, save: { _ in }),
+            legacyMigrator: .none, keychainAccessSession: KeychainAccessSession(),
+            releaseChannel: .staging, arguments: [])
+        let user = UUID(), room = UUID()
+        coordinator.model.apply(snapshot: BackendSnapshot(
+            profile: Profile(id: user, nickname: "나", characterID: "pixel_hamster"),
+            rooms: [Room(id: room, name: "검증", ownerID: user, members: [
+                RoomMember(
+                    userID: user,
+                    nickname: "나",
+                    characterID: "pixel_hamster",
+                    presence: .online
+                )
+            ], inviteCodeHint: "AB••••", inviteVersion: 1)]), currentUserID: user)
+        coordinator.model.preferences.activeRoomID = room
+        coordinator.model.connectionState = .connecting
+        coordinator.model.setActiveRoomRealtimeConnected(false)
+        let now = ProcessInfo.processInfo.systemUptime
+
+        coordinator.characterDoubleClicked()
+
+        XCTAssertTrue(
+            coordinator.roomSession.pulseCooldown.accept(
+                roomID: room,
+                userID: user,
+                uptime: now
+            ),
+            "A disconnected double-click must not consume the pulse cooldown"
+        )
+    }
+
     func testReducedMotionFreezesOrbitAndNativeSceneRendersApprovedAssets() throws {
         let effect = PixelCharacterStunEffect()
         effect.update(elapsed: 0, reduceMotion: true)

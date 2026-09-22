@@ -185,10 +185,6 @@ final class OverlayWindowGroup {
         },
         onDoubleRightClick: { [weak self] in self?.activateThrowTargeting() }
     )
-    private lazy var characterClicks = CharacterRightClickCoordinator(
-        onSingle: { [weak self] in self?.toggleComposer() },
-        onDouble: { [weak self] in self?.onCharacterDoubleClick() }
-    )
     private var targetHotspotWindows: [UUID: CharacterHotspotWindowController] = [:]
     private var screenObserver: ScreenObserverToken?
     private(set) var activityFrame: CGRect = .zero
@@ -199,6 +195,7 @@ final class OverlayWindowGroup {
     private(set) var composerVisible = false
     private var currentUserLocalFrame: CGRect?
     private var characterLocalFrames: [UUID: CGRect] = [:]
+    private var composerVisibilityBeforeCharacterClick: Bool?
     private var throwTargetingTask: Task<Void, Never>?
     private var throwTargetingActive = false
     private let composerAutoDismissDelay: Duration
@@ -245,7 +242,7 @@ final class OverlayWindowGroup {
 
     func setVisible(_ visible: Bool) {
         if !visible {
-            characterClicks.cancel()
+            composerVisibilityBeforeCharacterClick = nil
             model.characterImpactAudio.stopAll()
         }
         overlayVisible = visible
@@ -267,7 +264,7 @@ final class OverlayWindowGroup {
     }
 
     func presentComposer() {
-        characterClicks.cancel()
+        composerVisibilityBeforeCharacterClick = nil
         guard overlayVisible, model.activeRoom != nil else { return }
         cancelComposerAutoDismiss()
         composerVisible = true
@@ -285,7 +282,27 @@ final class OverlayWindowGroup {
     }
 
     func handleCharacterClick(clickCount: Int) {
-        characterClicks.handle(clickCount: clickCount)
+        switch clickCount {
+        case 1:
+            let previousVisibility = composerVisible
+            toggleComposer()
+            composerVisibilityBeforeCharacterClick = composerVisible == previousVisibility
+                ? nil
+                : previousVisibility
+        case 2:
+            let previousVisibility = composerVisibilityBeforeCharacterClick
+            composerVisibilityBeforeCharacterClick = nil
+            if let previousVisibility, composerVisible != previousVisibility {
+                if previousVisibility {
+                    presentComposer()
+                } else {
+                    dismissComposer()
+                }
+            }
+            onCharacterDoubleClick()
+        default:
+            composerVisibilityBeforeCharacterClick = nil
+        }
     }
 
     func playCharacterPulse(_ event: CharacterPulseEvent) {
@@ -418,7 +435,7 @@ final class OverlayWindowGroup {
     }
 
     private func dismissComposer(sendTypingStop: Bool) {
-        characterClicks.cancel()
+        composerVisibilityBeforeCharacterClick = nil
         cancelComposerAutoDismiss()
         guard composerVisible || interactionWindow.isVisible else { return }
         composerVisible = false
@@ -442,7 +459,6 @@ final class OverlayWindowGroup {
         currentUserLocalFrame = model.currentUserID.flatMap { frames[$0] }
         let localFrame = currentUserLocalFrame
         guard localFrame != nil else {
-            characterClicks.cancel()
             hotspotWindow.setFrame(nil)
             dismissComposer()
             resetThrowTargeting()
