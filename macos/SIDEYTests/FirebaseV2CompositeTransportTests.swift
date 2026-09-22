@@ -425,9 +425,18 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
             rooms: [fixture.room],
             activeRoomID: fixture.room.id
         )
+        var events = fixture.transport.events.makeAsyncIterator()
 
         await fixture.credentials.emitInvalidation()
 
+        guard case .connection(let status) = await events.next() else {
+            return XCTFail("Identity invalidation must publish disconnected state")
+        }
+        XCTAssertFalse(status.isReady)
+        XCTAssertFalse(status.activeRoomTransportConnected)
+        guard case .technicalError = await events.next() else {
+            return XCTFail("Disconnected state must precede the user-facing error")
+        }
         try await eventually {
             await fixture.transport.diagnostics().shutDown
         }

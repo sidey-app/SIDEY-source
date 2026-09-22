@@ -1,6 +1,52 @@
 import FirebaseAuth
 import Foundation
 
+@MainActor
+protocol FirebaseV2AuthSession: AnyObject {
+    func signIn(customToken: String) async throws -> String
+    func tokenClaims(expectedUID: String) async throws -> [String: Any]?
+    func signOut() throws
+    func addIDTokenDidChangeListener(
+        _ listener: @escaping @MainActor (String?) -> Void
+    ) -> NSObjectProtocol
+    func removeIDTokenDidChangeListener(_ handle: NSObjectProtocol)
+}
+
+@MainActor
+private final class FirebaseV2SDKAuthSession: FirebaseV2AuthSession {
+    private let auth: Auth
+
+    init(auth: Auth) {
+        self.auth = auth
+    }
+
+    func signIn(customToken: String) async throws -> String {
+        try await auth.signIn(withCustomToken: customToken).user.uid
+    }
+
+    func tokenClaims(expectedUID: String) async throws -> [String: Any]? {
+        guard let user = auth.currentUser, user.uid == expectedUID else { return nil }
+        return try await user.getIDTokenResult().claims
+    }
+
+    func signOut() throws {
+        try auth.signOut()
+    }
+
+    func addIDTokenDidChangeListener(
+        _ listener: @escaping @MainActor (String?) -> Void
+    ) -> NSObjectProtocol {
+        auth.addIDTokenDidChangeListener { _, user in
+            let uid = user?.uid
+            Task { @MainActor in listener(uid) }
+        }
+    }
+
+    func removeIDTokenDidChangeListener(_ handle: NSObjectProtocol) {
+        auth.removeIDTokenDidChangeListener(handle)
+    }
+}
+
 enum FirebaseV2AuthError: LocalizedError, Equatable, Sendable {
     case signedOutDuringCredentialLifetime
     case tokenRefreshValidationFailed
@@ -99,11 +145,17 @@ final class FirebaseV2AuthCredentialOwnership {
 /// refresh-token rotation; SIDEY never copies those credentials into Keychain.
 @MainActor
 final class FirebaseV2AuthAdapter {
-    private let auth: Auth
+    private struct MonitoringExpectation {
+        let identity: RealtimeCredentialIdentity
+        let rolloutLeaseExpiresAt: Int64
+    }
+
+    private let authSession: any FirebaseV2AuthSession
     private let onIdentityInvalidated: @MainActor @Sendable (Error) -> Void
     private let nowMilliseconds: @MainActor @Sendable () -> Int64
     private let credentialOwnership = FirebaseV2AuthCredentialOwnership()
     private var identityListenerHandle: NSObjectProtocol?
+    private var identityListenerGeneration: UInt64 = 0
     private var identityValidationGeneration: UInt64 = 0
 
     init(
@@ -113,7 +165,19 @@ final class FirebaseV2AuthAdapter {
             Int64(Date().timeIntervalSince1970 * 1_000)
         }
     ) {
-        self.auth = auth
+        self.authSession = FirebaseV2SDKAuthSession(auth: auth)
+        self.onIdentityInvalidated = onIdentityInvalidated
+        self.nowMilliseconds = nowMilliseconds
+    }
+
+    init(
+        authSession: any FirebaseV2AuthSession,
+        onIdentityInvalidated: @escaping @MainActor @Sendable (Error) -> Void = { _ in },
+        nowMilliseconds: @escaping @MainActor @Sendable () -> Int64 = {
+            Int64(Date().timeIntervalSince1970 * 1_000)
+        }
+    ) {
+        self.authSession = authSession
         self.onIdentityInvalidated = onIdentityInvalidated
         self.nowMilliseconds = nowMilliseconds
     }
@@ -125,13 +189,22 @@ final class FirebaseV2AuthAdapter {
         expectedRolloutLeaseExpiresAt: Int64,
         attemptID: UUID
     ) async throws -> RealtimeCredentialIdentity {
-        let result = try await auth.signIn(withCustomToken: customToken.value)
-        credentialOwnership.installed(by: attemptID)
+        // A custom-token refresh synchronously publishes an ID-token change.
+        // Detach the previous lease observer before installing the new token,
+        // otherwise it compares the new lease against the old expiry and
+        // falsely shuts down a healthy session.
+        let suspendedMonitoring = suspendIdentityMonitoring()
+        var installedCredential = false
         do {
-            let tokenResult = try await result.user.getIDTokenResult()
+            let firebaseUID = try await authSession.signIn(customToken: customToken.value)
+            credentialOwnership.installed(by: attemptID)
+            installedCredential = true
+            guard let claims = try await authSession.tokenClaims(expectedUID: firebaseUID) else {
+                throw FirebaseV2AuthError.tokenRefreshValidationFailed
+            }
             let identity = try FirebaseV2IdentityClaimValidator.validate(
-                firebaseUID: result.user.uid,
-                claims: tokenResult.claims,
+                firebaseUID: firebaseUID,
+                claims: claims,
                 expected: expectedIdentity,
                 expectedRolloutLeaseExpiresAt: expectedRolloutLeaseExpiresAt,
                 nowMilliseconds: nowMilliseconds()
@@ -142,6 +215,13 @@ final class FirebaseV2AuthAdapter {
             )
             return identity
         } catch {
+            if !installedCredential, let suspendedMonitoring {
+                startIdentityMonitoring(
+                    expectedIdentity: suspendedMonitoring.identity,
+                    expectedRolloutLeaseExpiresAt:
+                        suspendedMonitoring.rolloutLeaseExpiresAt
+                )
+            }
             // A failed claim check must not leave a credential from the wrong
             // account/session installed in the named Firebase app.
             if signOut(ifOwnedBy: attemptID) {
@@ -154,7 +234,7 @@ final class FirebaseV2AuthAdapter {
     func signOut() throws {
         credentialOwnership.clear()
         stopIdentityMonitoring()
-        try auth.signOut()
+        try authSession.signOut()
     }
 
     /// A stale bootstrap may clean up only the Firebase credential that it
@@ -165,7 +245,7 @@ final class FirebaseV2AuthAdapter {
     func signOut(ifOwnedBy attemptID: UUID) -> Bool {
         guard credentialOwnership.releaseIfOwned(by: attemptID) else { return false }
         stopIdentityMonitoring()
-        try? auth.signOut()
+        try? authSession.signOut()
         return true
     }
 
@@ -177,15 +257,18 @@ final class FirebaseV2AuthAdapter {
         expectedRolloutLeaseExpiresAt: Int64
     ) {
         stopIdentityMonitoring()
-        identityListenerHandle = auth.addIDTokenDidChangeListener { [weak self] _, user in
-            let firebaseUID = user?.uid
-            Task { @MainActor [weak self] in
-                self?.validateIdentityChange(
-                    firebaseUID: firebaseUID,
-                    expectedIdentity: expectedIdentity,
-                    expectedRolloutLeaseExpiresAt: expectedRolloutLeaseExpiresAt
-                )
-            }
+        let listenerGeneration = identityListenerGeneration
+        monitoringExpectation = MonitoringExpectation(
+            identity: expectedIdentity,
+            rolloutLeaseExpiresAt: expectedRolloutLeaseExpiresAt
+        )
+        identityListenerHandle = authSession.addIDTokenDidChangeListener { [weak self] uid in
+            guard let self, listenerGeneration == self.identityListenerGeneration else { return }
+            self.validateIdentityChange(
+                firebaseUID: uid,
+                expectedIdentity: expectedIdentity,
+                expectedRolloutLeaseExpiresAt: expectedRolloutLeaseExpiresAt
+            )
         }
     }
 
@@ -196,18 +279,19 @@ final class FirebaseV2AuthAdapter {
     ) {
         identityValidationGeneration &+= 1
         let generation = identityValidationGeneration
-        guard let firebaseUID, let user = auth.currentUser else {
+        guard let firebaseUID else {
             invalidateIdentity(with: FirebaseV2AuthError.signedOutDuringCredentialLifetime)
             return
         }
         let validationNowMilliseconds = nowMilliseconds()
-        user.getIDTokenResult { [weak self] tokenResult, _ in
+        Task { @MainActor [weak self] in
+            guard let self else { return }
             let validation: Result<RealtimeCredentialIdentity, FirebaseV2AuthError>
-            if let tokenResult {
+            if let claims = try? await authSession.tokenClaims(expectedUID: firebaseUID) {
                 do {
                     validation = .success(try FirebaseV2IdentityClaimValidator.validate(
                         firebaseUID: firebaseUID,
-                        claims: tokenResult.claims,
+                        claims: claims,
                         expected: expectedIdentity,
                         expectedRolloutLeaseExpiresAt: expectedRolloutLeaseExpiresAt,
                         nowMilliseconds: validationNowMilliseconds
@@ -220,11 +304,9 @@ final class FirebaseV2AuthAdapter {
             } else {
                 validation = .failure(.tokenRefreshValidationFailed)
             }
-            Task { @MainActor [weak self] in
-                guard let self, generation == identityValidationGeneration else { return }
-                if case .failure(let error) = validation {
-                    invalidateIdentity(with: error)
-                }
+            guard generation == identityValidationGeneration else { return }
+            if case .failure(let error) = validation {
+                invalidateIdentity(with: error)
             }
         }
     }
@@ -232,14 +314,24 @@ final class FirebaseV2AuthAdapter {
     private func invalidateIdentity(with error: Error) {
         credentialOwnership.clear()
         stopIdentityMonitoring()
-        try? auth.signOut()
+        try? authSession.signOut()
         onIdentityInvalidated(error)
     }
 
+    private var monitoringExpectation: MonitoringExpectation?
+
+    private func suspendIdentityMonitoring() -> MonitoringExpectation? {
+        let expectation = monitoringExpectation
+        stopIdentityMonitoring()
+        return expectation
+    }
+
     private func stopIdentityMonitoring() {
+        identityListenerGeneration &+= 1
         identityValidationGeneration &+= 1
+        monitoringExpectation = nil
         if let identityListenerHandle {
-            auth.removeIDTokenDidChangeListener(identityListenerHandle)
+            authSession.removeIDTokenDidChangeListener(identityListenerHandle)
             self.identityListenerHandle = nil
         }
     }

@@ -524,6 +524,11 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
 
     private func credentialWasInvalidated() async {
         guard !isShutDown else { return }
+        eventContinuation.yield(.connection(BackendConnectionStatus(
+            transportConnected: false,
+            recoveryReconciled: false,
+            activeRoomTransportConnected: false
+        )))
         eventContinuation.yield(.technicalError(
             "Firebase 인증 세션이 현재 SIDEY 로그인과 일치하지 않습니다."
         ))
