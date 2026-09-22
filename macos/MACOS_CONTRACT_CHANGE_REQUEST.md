@@ -1,7 +1,7 @@
 # macOS Firebase v2 contract change request
 
-상태: **client contract 반영 완료 / production read-back 문서화 대기**  
-기준일: 2026-09-21
+상태: **client contract 및 production read-back 반영 완료**
+기준일: 2026-09-22
 
 ## 해결된 항목
 
@@ -20,9 +20,9 @@
 - create/join/equip v2 RPC와 post-commit revision RPC
 
 위 항목과 rollout selector를 포함한 frozen fixture SHA-256은
-`0657fc8eb05617e3fbeb2b69a5fcbe7cdf9d703a75b62fc6b30fe70bb992ad91`다.
+`3c836b40cfc44437e9d069b84787cd3d8793026ce40de46d82b9ece79127b7e5`다.
 
-## 남은 합의/증거
+## production 합의/증거
 
 ### 1. 최종 client handoff
 
@@ -36,13 +36,13 @@ Supabase production M0 적용과 remote read-back 뒤 다음을 포함한 `CLIEN
 - production Presence/RLS/RPC signature read-back
 - T0 미시작 또는 정확한 T0 시각
 
-현재 backend의 `CLIENT_BACKEND_HANDOFF_PRE_M0.md`는 구현 참고용이며 production 연결 승인이 아니다.
+backend의 최종 `CLIENT_BACKEND_HANDOFF.md`와 production read-back을 연결 승인 근거로 사용한다.
 
 ### 2. remote rollout/kill switch — 해결
 
 - authenticated RPC: `register_realtime_capability_v2(p_platform, p_app_version, p_protocol_version, p_contract_hash)`
 - exact response: `enabled`, `protocolVersion`, `transport`, `contractHash`, `killSwitch`, `cacheTtlSeconds`, `failureMode`
-- contract hash: `0657fc8eb05617e3fbeb2b69a5fcbe7cdf9d703a75b62fc6b30fe70bb992ad91`
+- contract hash: `3c836b40cfc44437e9d069b84787cd3d8793026ce40de46d82b9ece79127b7e5`
 - App Store app version은 marketing/build를 합친 `1.3.0+32` 형식
 - explicit disabled/kill-switch만 legacy 허용; prior enabled에서 fetch/cache 실패는 fail-closed
 - 최대 300초 rollout lease, 30초 refresh lead와 실행 중 sync-before-commit legacy 전환

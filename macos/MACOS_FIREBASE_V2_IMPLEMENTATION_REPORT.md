@@ -1,7 +1,7 @@
 # macOS Firebase v2 구현 보고서
 
 상태: **production selector/factory 연결 완료 — Xcode 검증 후보**  
-기준일: 2026-09-21
+기준일: 2026-09-22
 
 ## 기준과 배포 상태
 
@@ -10,14 +10,14 @@
 - Gate 1 deployed fixture SHA-256:
   `4785705721e971ae463a5692bc80cadc7ff49ed0e20aab495dc1b0d6be0619d0`
 - frozen client/backend fixture SHA-256:
-  `0657fc8eb05617e3fbeb2b69a5fcbe7cdf9d703a75b62fc6b30fe70bb992ad91`
+  `3c836b40cfc44437e9d069b84787cd3d8793026ce40de46d82b9ece79127b7e5`
 - Firebase Gate 1: production Functions/Rules 배포 및 read-back 완료
 - Supabase production selector: authenticated `register_realtime_capability_v2`
 - macOS feature gate: server cohort/kill-switch 응답과 frozen contract hash로 결정
 - commit/push/merge/sign/notarize/App Store upload/release: 이 보고서 snapshot에서는 수행하지 않음
 
 클라이언트가 요구하는 frozen contract hash는
-`0657fc8eb05617e3fbeb2b69a5fcbe7cdf9d703a75b62fc6b30fe70bb992ad91`이며, selector 등록 시 protocol 2와 함께
+`3c836b40cfc44437e9d069b84787cd3d8793026ce40de46d82b9ece79127b7e5`이며, selector 등록 시 protocol 2와 함께
 서버에 제출한다. App Store 업로드와 release는 이 소스 변경과 별도 작업이다.
 
 ## M1 현재 동작 inventory
@@ -132,7 +132,7 @@ Firebase v2 선택 시에만 v2 mutation/grant RPC를 호출하며, selector가 
 ## 남은 release 운영
 
 1. backend production migration/Functions/Rules 최종 read-back과 `CLIENT_BACKEND_HANDOFF.md` 보존
-2. production-shaped internal 계정 smoke와 logout/kick/refund/revoke/cleanup read-back
+2. production internal 계정 smoke 및 cleanup residual 0 증거 보존
 3. internal → canary → staged rollout 후 backend가 기록한 T0부터 legacy compatibility를 최소 7일 관찰
 
 `AppCoordinator`는 Supabase boot/auth가 완료된 다음에만 selector와 concrete Firebase runtime을 비동기로 만든다.
@@ -182,7 +182,7 @@ selector 하나만 가지며, 마지막 enabled 결정 뒤 selector fetch/cache�
 - macOS asset 검증: 57개 일치
 - macOS Python 검증: 7개 통과
 
-최종 backend fixture hash pin과 최신 `main` 동기화 뒤 같은 canonical suite와 workflow check를 다시
+최종 backend fixture hash를 반영했다. 최신 `main` 동기화 뒤 같은 canonical suite와 workflow check를 다시
 실행해야 한다. 위 결과는 lease renewal 구현까지 포함한 현재 client snapshot의 검증 기록이다.
 
 ## rollback과 release

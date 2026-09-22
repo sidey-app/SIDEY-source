@@ -3,7 +3,7 @@ import Foundation
 enum FirebaseV2ProductionContract {
     // Frozen backend/client fixture SHA-256. The server enables a session only
     // when registration supplies this exact value.
-    static let hash = "0657fc8eb05617e3fbeb2b69a5fcbe7cdf9d703a75b62fc6b30fe70bb992ad91"
+    static let hash = "3c836b40cfc44437e9d069b84787cd3d8793026ce40de46d82b9ece79127b7e5"
 }
 
 enum FirebaseV2ProductionFactoryError: LocalizedError, Equatable {
