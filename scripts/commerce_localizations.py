@@ -14,19 +14,43 @@ import json
 from pathlib import Path
 import sys
 
+from catalog_source import load_source, supported_catalog
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = "assets/v1/commerce-catalog.json"
 LOCALIZATIONS = "assets/v1/commerce-localizations.json"
 
-SCHEMA = 1
+SCHEMA = 2
+CONSUMER_SCHEMA = 1
 LOCALES = ("ko", "en", "ja", "zh-Hant")
+WINDOWS_ONLY_LOCALES = ("zh-Hans", "uk", "ru")
 FIELDS = (
     "display_name",
     "iap_description",
     "marketing_description",
 )
-CONSUMERS = ("macos", "web", "storekit", "app-store")
+CONSUMERS = ("macos", "web", "storekit", "app-store", "windows")
+
+WINDOWS_LOCALES = {
+    "ko": "ko-KR",
+    "en": "en-US",
+    "ja": "ja-JP",
+    "zh-Hans": "zh-CN",
+    "zh-Hant": "zh-TW",
+    "uk": "uk-UA",
+    "ru": "ru-RU",
+}
+WINDOWS_CHARACTER_NAME_KEYS = {
+    "character_starlight_upalupa": "characters.starlightUpalupa",
+    "character_guinea_pig": "characters.guineaPig",
+    "character_monkey": "characters.monkey",
+    "character_chinchilla": "characters.chinchilla",
+    "character_otter": "characters.otter",
+    "character_pig": "characters.pig",
+    "character_tree": "characters.tree",
+}
+WINDOWS_FIELDS = ("display_name", "marketing_description")
 
 STOREKIT_LOCALES = {
     "ko": "ko_KR",
@@ -65,15 +89,52 @@ IAP_NAME_SUFFIXES = {
 def read_json(path: Path):
     """Read a UTF-8 JSON document."""
 
-    return json.loads(path.read_text(encoding="utf-8"))
+    def reject_duplicates(pairs):
+        output = {}
+        for key, value in pairs:
+            if key in output:
+                raise ValueError(f"{path}: duplicate JSON key: {key}")
+            output[key] = value
+        return output
+
+    return json.loads(
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=reject_duplicates,
+    )
 
 
-def validate_source(catalog, source):
+def windows_catalog():
+    """Return the exact reviewed catalog subset supported by Windows."""
+
+    catalog, manifest, _ = load_source(ROOT, "windows")
+    return supported_catalog(catalog, manifest, "windows")
+
+
+def validate_translation(translation, fields, product_id, locale):
+    """Validate one product translation without platform assumptions."""
+
+    if not isinstance(translation, dict) or list(translation) != list(fields):
+        raise ValueError(
+            f"Fields or field order differ: {product_id} ({locale})"
+        )
+    for field, value in translation.items():
+        if (
+            not isinstance(value, str)
+            or not value
+            or value != value.strip()
+            or "\n" in value
+            or "\r" in value
+        ):
+            raise ValueError(f"Invalid {field}: {product_id} ({locale})")
+
+
+def validate_source(catalog, source, platform_catalog=None):
     """Validate completeness, ordering and legacy Korean compatibility."""
 
     if not isinstance(source, dict) or set(source) != {
         "schema",
         "locales",
+        "windows_locales",
         "products",
     }:
         raise ValueError("Localization source has unknown or missing keys")
@@ -81,6 +142,11 @@ def validate_source(catalog, source):
         raise ValueError(f"Unsupported localization schema: {source['schema']}")
     if source["locales"] != list(LOCALES):
         raise ValueError("Localization locales or locale order differ")
+    if source["windows_locales"] != list(WINDOWS_ONLY_LOCALES):
+        raise ValueError("Windows-only localization locales or order differ")
+
+    platform_catalog = platform_catalog or windows_catalog()
+    windows_ids = {entry["id"] for entry in platform_catalog}
 
     catalog_ids = [entry["id"] for entry in catalog]
     products = source["products"]
@@ -93,10 +159,13 @@ def validate_source(catalog, source):
         raise ValueError("Localization products or product order differ")
 
     for entry, product in zip(catalog, products):
-        if not isinstance(product, dict) or set(product) != {
+        expected_keys = {
             "id",
             "localizations",
-        }:
+        }
+        if entry["id"] in windows_ids:
+            expected_keys.add("windows_localizations")
+        if not isinstance(product, dict) or set(product) != expected_keys:
             raise ValueError(
                 f"Localization product has unknown or missing keys: {entry['id']}"
             )
@@ -108,24 +177,7 @@ def validate_source(catalog, source):
             raise ValueError(f"Locales differ: {entry['id']}")
 
         for locale, translation in translations.items():
-            if (
-                not isinstance(translation, dict)
-                or list(translation) != list(FIELDS)
-            ):
-                raise ValueError(
-                    f"Fields or field order differ: {entry['id']} ({locale})"
-                )
-            for field, value in translation.items():
-                if (
-                    not isinstance(value, str)
-                    or not value
-                    or value != value.strip()
-                    or "\n" in value
-                    or "\r" in value
-                ):
-                    raise ValueError(
-                        f"Invalid {field}: {entry['id']} ({locale})"
-                    )
+            validate_translation(translation, FIELDS, entry["id"], locale)
             if len(translation["display_name"]) > 30:
                 raise ValueError(
                     f"Display name exceeds 30 characters: "
@@ -147,6 +199,21 @@ def validate_source(catalog, source):
             raise ValueError(
                 f"Korean catalog description differs: {entry['id']}"
             )
+
+        if entry["id"] in windows_ids:
+            windows_translations = product["windows_localizations"]
+            if (
+                not isinstance(windows_translations, dict)
+                or list(windows_translations) != list(WINDOWS_ONLY_LOCALES)
+            ):
+                raise ValueError(f"Windows locales differ: {entry['id']}")
+            for locale, translation in windows_translations.items():
+                validate_translation(
+                    translation,
+                    WINDOWS_FIELDS,
+                    entry["id"],
+                    locale,
+                )
 
     return source
 
@@ -176,7 +243,7 @@ def macos_payload(catalog, source):
 
     localized = products_by_id(source)
     return {
-        "schema": SCHEMA,
+        "schema": CONSUMER_SCHEMA,
         "locales": list(LOCALES),
         "products": [
             {
@@ -194,7 +261,7 @@ def web_payload(catalog, source):
 
     localized = products_by_id(source)
     return {
-        "schema": SCHEMA,
+        "schema": CONSUMER_SCHEMA,
         "locales": {
             locale: {
                 entry["id"]: {
@@ -240,7 +307,53 @@ def iap_payload(catalog, source, locale_codes):
                 ],
             }
         )
-    return {"schema": SCHEMA, "products": products}
+    return {"schema": CONSUMER_SCHEMA, "products": products}
+
+
+def windows_name_key(product_id):
+    """Return the existing Windows resource key for one product name."""
+
+    return WINDOWS_CHARACTER_NAME_KEYS.get(
+        product_id,
+        f"store.product.{product_id}",
+    )
+
+
+def windows_overlays(catalog, source, platform_catalog=None):
+    """Build flat commerce-owned Windows resources by canonical locale."""
+
+    platform_catalog = platform_catalog or windows_catalog()
+    validate_source(catalog, source, platform_catalog)
+    localized = products_by_id(source)
+    output = {locale: {} for locale in WINDOWS_LOCALES}
+    for entry in platform_catalog:
+        product = localized[entry["id"]]
+        for locale in WINDOWS_LOCALES:
+            translations = (
+                product["localizations"][locale]
+                if locale in LOCALES
+                else product["windows_localizations"][locale]
+            )
+            output[locale][windows_name_key(entry["id"])] = translations[
+                "display_name"
+            ]
+            output[locale][
+                f"store.productDescriptions.{entry['id']}"
+            ] = translations["marketing_description"]
+    return output
+
+
+def windows_payload(catalog, source):
+    """Build the canonical flat overlay consumed by the UI generator."""
+
+    overlays = windows_overlays(catalog, source)
+    return {
+        "schema": CONSUMER_SCHEMA,
+        "locales": {
+            WINDOWS_LOCALES[locale]: values
+            for locale, values in overlays.items()
+        },
+    }
 
 
 def generated(catalog, source, consumer):
@@ -255,6 +368,8 @@ def generated(catalog, source, consumer):
         payload = iap_payload(catalog, source, STOREKIT_LOCALES)
     elif consumer == "app-store":
         payload = iap_payload(catalog, source, APP_STORE_LOCALES)
+    elif consumer == "windows":
+        payload = windows_payload(catalog, source)
     else:
         raise ValueError(f"Unknown localization consumer: {consumer}")
     return (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode()

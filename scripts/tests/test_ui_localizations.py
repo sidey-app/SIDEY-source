@@ -47,11 +47,22 @@ class UILocalizationTests(unittest.TestCase):
             self.assertEqual(len(flatten(json.loads(rendered))), 533)
 
     def test_windows_migration_preserves_every_existing_value(self):
+        overlays = tool.commerce_windows_overlays()
+        output_to_canonical = {
+            output: canonical
+            for canonical, output in tool.CONSUMERS["windows"]["locales"].items()
+        }
         for filename, rendered in tool.render_windows(self.source).items():
-            checked_in = tool.read_json(
+            checked_in = flatten(tool.read_json(
                 tool.ROOT / tool.CONSUMERS["windows"]["output"] / filename
-            )
-            self.assertEqual(json.loads(rendered), checked_in, filename)
+            ))
+            generated = flatten(json.loads(rendered))
+            canonical = output_to_canonical[filename.removesuffix(".json")]
+            commerce_values = overlays[canonical]
+            self.assertEqual(set(generated), set(checked_in), filename)
+            for key, value in generated.items():
+                expected = commerce_values.get(key, checked_in[key])
+                self.assertEqual(value, expected, f"{filename}: {key}")
 
     def test_shared_messages_are_identical_for_both_consumers(self):
         self.assertEqual(len(self.source["shared"]), 8)

@@ -147,8 +147,8 @@ def validate_manifest(manifest: Any) -> dict[str, Any]:
 
 
 def _products_list(document: Any) -> list[dict[str, Any]]:
-    if not isinstance(document, dict) or document.get("schema") != 1:
-        raise ValidationError("Commerce localization schema must be 1")
+    if not isinstance(document, dict) or document.get("schema") not in {1, 2}:
+        raise ValidationError("Commerce localization schema must be 1 or 2")
     if document.get("locales") != list(COMMERCE_LOCALES):
         raise ValidationError("Commerce localization locale order differs")
     products = document.get("products")

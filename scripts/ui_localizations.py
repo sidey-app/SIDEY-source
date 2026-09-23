@@ -10,6 +10,8 @@ import re
 import sys
 from typing import Any
 
+import commerce_localizations as commerce
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path("assets/v1/ui-localizations.json")
@@ -207,6 +209,15 @@ def validate_source(source: Any) -> None:
         raise LocalizationError("Localization sections must be objects")
     if set(sections["shared"]) & (set(sections["macos"]) | set(sections["windows"])):
         raise LocalizationError("Shared output keys must not be duplicated by platform sections")
+    commerce_keys = set(next(iter(commerce_windows_overlays().values())))
+    duplicated_commerce = commerce_keys & (
+        set(sections["shared"]) | set(sections["windows"])
+    )
+    if duplicated_commerce:
+        raise LocalizationError(
+            f"Windows commerce keys must be owned by the commerce source: "
+            f"{sorted(duplicated_commerce)}"
+        )
     for key, entry in sections["shared"].items():
         if SEMANTIC_KEY.fullmatch(key) is None:
             raise LocalizationError(f"Invalid shared output key: {key}")
@@ -262,15 +273,27 @@ def assign_nested(root: dict[str, Any], dotted_key: str, value: str) -> None:
     current[parts[-1]] = value
 
 
-def render_windows(source: dict[str, Any]) -> dict[str, bytes]:
+def commerce_windows_overlays() -> dict[str, dict[str, str]]:
+    catalog = commerce.read_json(commerce.ROOT / commerce.CATALOG)
+    source = commerce.read_json(commerce.ROOT / commerce.LOCALIZATIONS)
+    return commerce.windows_overlays(catalog, source)
+
+
+def render_windows(
+    source: dict[str, Any],
+    commerce_overlays: dict[str, dict[str, str]] | None = None,
+) -> dict[str, bytes]:
     rendered: dict[str, bytes] = {}
     locale_map = CONSUMERS["windows"]["locales"]
+    commerce_overlays = commerce_overlays or commerce_windows_overlays()
     for canonical_locale, output_locale in locale_map.items():
         catalog: dict[str, Any] = {}
         for key, entry in source["shared"].items():
             assign_nested(catalog, key, entry["localizations"][canonical_locale])
         for key, entry in source["windows"].items():
             assign_nested(catalog, key, entry["localizations"][canonical_locale])
+        for key, value in commerce_overlays[canonical_locale].items():
+            assign_nested(catalog, key, value)
         rendered[f"{output_locale}.json"] = json_bytes(catalog)
     return rendered
 

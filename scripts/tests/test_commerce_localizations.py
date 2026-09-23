@@ -19,6 +19,7 @@ class CommerceLocalizationTests(unittest.TestCase):
         self.source = localization_tool.read_json(
             localization_tool.ROOT / localization_tool.LOCALIZATIONS
         )
+        self.windows_catalog = localization_tool.windows_catalog()
 
     def test_canonical_source_is_complete_and_matches_korean_catalog(self):
         localization_tool.validate_source(self.catalog, self.source)
@@ -26,6 +27,11 @@ class CommerceLocalizationTests(unittest.TestCase):
         self.assertEqual(len(self.catalog), 33)
         self.assertEqual(len(self.source["products"]), 33)
         self.assertEqual(self.source["locales"], list(localization_tool.LOCALES))
+        self.assertEqual(
+            self.source["windows_locales"],
+            list(localization_tool.WINDOWS_ONLY_LOCALES),
+        )
+        windows_ids = {entry["id"] for entry in self.windows_catalog}
         for catalog_entry, localized in zip(
             self.catalog,
             self.source["products"],
@@ -45,6 +51,13 @@ class CommerceLocalizationTests(unittest.TestCase):
                 korean["marketing_description"],
                 catalog_entry["description"],
             )
+            if catalog_entry["id"] in windows_ids:
+                self.assertEqual(
+                    list(localized["windows_localizations"]),
+                    list(localization_tool.WINDOWS_ONLY_LOCALES),
+                )
+            else:
+                self.assertNotIn("windows_localizations", localized)
 
     def test_missing_stale_empty_and_overlong_values_are_rejected(self):
         mutations = []
@@ -82,6 +95,22 @@ class CommerceLocalizationTests(unittest.TestCase):
             "marketing_description"
         ] = "이전 설명"
         mutations.append(stale_korean)
+
+        missing_windows_locale = copy.deepcopy(self.source)
+        del missing_windows_locale["products"][0]["windows_localizations"]["uk"]
+        mutations.append(missing_windows_locale)
+
+        windows_data_on_unsupported_product = copy.deepcopy(self.source)
+        unsupported = next(
+            product
+            for product in windows_data_on_unsupported_product["products"]
+            if product["id"]
+            not in {entry["id"] for entry in self.windows_catalog}
+        )
+        unsupported["windows_localizations"] = copy.deepcopy(
+            self.source["products"][0]["windows_localizations"]
+        )
+        mutations.append(windows_data_on_unsupported_product)
 
         for source in mutations:
             with self.subTest(source=source), self.assertRaises(ValueError):
@@ -139,6 +168,31 @@ class CommerceLocalizationTests(unittest.TestCase):
                 for item in product["localizations"]:
                     self.assertTrue(2 <= len(item["display_name"]) <= 30)
                     self.assertTrue(0 < len(item["description"]) <= 45)
+
+        windows = payloads["windows"]
+        self.assertEqual(
+            list(windows["locales"]),
+            list(localization_tool.WINDOWS_LOCALES.values()),
+        )
+        for values in windows["locales"].values():
+            self.assertEqual(len(values), 48)
+
+    def test_windows_overlay_uses_only_supported_products(self):
+        overlays = localization_tool.windows_overlays(
+            self.catalog,
+            self.source,
+            self.windows_catalog,
+        )
+        supported_ids = {entry["id"] for entry in self.windows_catalog}
+        unsupported_ids = {entry["id"] for entry in self.catalog} - supported_ids
+        self.assertEqual(len(supported_ids), 24)
+        for locale, values in overlays.items():
+            self.assertEqual(len(values), 48, locale)
+            for product_id in unsupported_ids:
+                self.assertNotIn(
+                    f"store.productDescriptions.{product_id}",
+                    values,
+                )
 
     def test_short_iap_names_use_kind_suffix_without_changing_source(self):
         korean_name = next(
