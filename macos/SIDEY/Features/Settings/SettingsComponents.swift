@@ -13,7 +13,7 @@ struct ConnectionBadge: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 9)
         .clipShape(Capsule())
-        .glassEffect(in: Capsule())
+        .sideyGlassSurface(in: Capsule())
         .overlay {
             if state == .connecting {
                 ConnectionProgressBorder(reduceMotion: reduceMotion)
@@ -101,7 +101,7 @@ struct ErrorBanner: View {
         .padding(16)
         .frame(maxWidth: 620)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .glassEffect(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .sideyGlassSurface(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -121,7 +121,7 @@ struct SuccessBanner: View {
         .padding(16)
         .frame(maxWidth: 620)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .glassEffect(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .sideyGlassSurface(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

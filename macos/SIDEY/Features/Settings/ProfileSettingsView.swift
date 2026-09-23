@@ -62,7 +62,7 @@ struct ProfileSettingsView: View {
                     Button("profile.nickname.save") {
                         PendingTextInputCommitter.commitThen(actions.onSaveProfile)
                     }
-                        .buttonStyle(.glassProminent)
+                        .sideyProminentButtonStyle()
                         .disabled(model.groupMutationsDisabled || !validNickname)
                 }
             }
