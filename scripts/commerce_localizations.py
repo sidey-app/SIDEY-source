@@ -15,7 +15,10 @@ from pathlib import Path
 import re
 import sys
 
-from catalog_source import load_source, supported_catalog
+try:
+    from catalog_source import load_source, supported_catalog
+except ModuleNotFoundError:  # Support `python -m scripts...` package imports.
+    from .catalog_source import load_source, supported_catalog
 
 
 ROOT = Path(__file__).resolve().parents[1]

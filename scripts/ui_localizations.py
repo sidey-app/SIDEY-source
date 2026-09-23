@@ -10,7 +10,10 @@ import re
 import sys
 from typing import Any
 
-import commerce_localizations as commerce
+try:
+    import commerce_localizations as commerce
+except ModuleNotFoundError:  # Support `python -m scripts...` package imports.
+    from . import commerce_localizations as commerce
 
 
 ROOT = Path(__file__).resolve().parents[1]
