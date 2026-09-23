@@ -52,6 +52,16 @@ enum OverlayEdge: String, Codable, CaseIterable, Identifiable, Sendable {
     var readableContentCounterRotation: CGFloat {
         self == .top ? -presentationRotation : 0
     }
+
+    /// Side-edge characters stay rotated toward the display edge, while
+    /// speech bubbles remain aligned with the display so their complete
+    /// presentation (body, decoration, and text) stays readable.
+    var bubbleCounterRotation: CGFloat {
+        switch self {
+        case .left, .right: -presentationRotation
+        case .bottom, .top: 0
+        }
+    }
 }
 
 enum OverlaySpan: String, Codable, CaseIterable, Identifiable, Sendable {
@@ -278,4 +288,3 @@ struct CharacterPulseCooldown: Equatable, Sendable {
         return true
     }
 }
-

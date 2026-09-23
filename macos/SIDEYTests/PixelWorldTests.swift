@@ -595,7 +595,10 @@ final class PixelWorldTests: XCTestCase {
                         isTyping: false,
                         tangentPosition: tangent,
                         tangentLength: geometry.tangentLength,
-                        edge: edge
+                        edge: edge,
+                        maximumContentWidth: edge.isHorizontal
+                            ? nil
+                            : max(24, bounds.width - EdgeTrackGeometry.footInset - 56)
                     )
                     let worldFrame = geometry.worldFrame(for: layout.totalFrame, at: tangent)
                     XCTAssertTrue(
@@ -622,13 +625,15 @@ final class PixelWorldTests: XCTestCase {
                 senderID: senderID,
                 messageID: UUID(),
                 body: String(repeating: "가", count: 200),
-                expiresAt: Date(timeIntervalSince1970: 10)
+                expiresAt: Date(timeIntervalSince1970: 10),
+                bubbleStyleID: "bubble_bunny_pink"
             ),
             ActiveBubble(
                 senderID: senderID,
                 messageID: UUID(),
                 body: String(repeating: "나", count: 200),
-                expiresAt: Date(timeIntervalSince1970: 11)
+                expiresAt: Date(timeIntervalSince1970: 11),
+                bubbleStyleID: "bubble_starry_cat"
             )
         ]
 
@@ -642,16 +647,27 @@ final class PixelWorldTests: XCTestCase {
                     bubbles: bubbles,
                     tangentPosition: tangent,
                     tangentLength: geometry.tangentLength,
-                    edge: edge
+                    edge: edge,
+                    inwardNormalLength: edge.isHorizontal
+                        ? bounds.height - EdgeTrackGeometry.footInset
+                        : bounds.width - EdgeTrackGeometry.footInset
                 )
 
                 XCTAssertEqual(entries.map(\.bubble.body), bubbles.map(\.body))
                 XCTAssertEqual(entries.map(\.includesTail), [false, true])
-                XCTAssertEqual(
-                    entries[0].layout.bodyFrame.minY - entries[1].layout.bodyFrame.maxY,
-                    PixelBubbleStackLayout.bodySpacing,
-                    accuracy: 0.001
-                )
+                if edge.isHorizontal {
+                    XCTAssertEqual(
+                        entries[0].layout.bodyFrame.minY - entries[1].layout.bodyFrame.maxY,
+                        PixelBubbleStackLayout.bodySpacing,
+                        accuracy: 0.001
+                    )
+                } else {
+                    XCTAssertEqual(
+                        entries[0].layout.totalFrame.minY - entries[1].layout.totalFrame.maxY,
+                        PixelBubbleStackLayout.bodySpacing,
+                        accuracy: 0.001
+                    )
+                }
                 for entry in entries {
                     let worldFrame = geometry.worldFrame(for: entry.layout.totalFrame, at: tangent)
                     XCTAssertTrue(
@@ -716,6 +732,81 @@ final class PixelWorldTests: XCTestCase {
                 edge: .bottom
             )
         )
+    }
+
+    func testSideEdgeBubbleLayoutUsesUprightBodyFrameAndTailTargetsCharacter() {
+        let renderBounds = CGRect(x: 0, y: 0, width: 360, height: 720)
+
+        for edge in [OverlayEdge.left, .right] {
+            let activityBounds = CGRect(
+                x: edge == .left ? 0 : 120,
+                y: 0,
+                width: 240,
+                height: 720
+            )
+            let geometry = EdgeTrackGeometry(bounds: activityBounds, edge: edge)
+
+            for tangent in [geometry.trackRange.lowerBound, geometry.trackRange.upperBound] {
+                let layout = PixelBubbleLayout.make(
+                    text: String(repeating: "upright 긴 메시지 ", count: 16),
+                    isTyping: false,
+                    tangentPosition: tangent,
+                    tangentLength: geometry.tangentLength,
+                    edge: edge,
+                    leadingDecorationOverflow: PixelBubbleStyle.decorationLeadingOverflow,
+                    maximumContentWidth: 220
+                )
+                let worldBodyFrame = geometry.worldFrame(for: layout.bodyFrame, at: tangent)
+                let worldTotalFrame = geometry.worldFrame(for: layout.totalFrame, at: tangent)
+
+                XCTAssertEqual(edge.presentationRotation + layout.nodeRotation, 0, accuracy: 0.001)
+                XCTAssertEqual(worldBodyFrame.width, layout.size.width, accuracy: 0.001)
+                XCTAssertEqual(worldBodyFrame.height, layout.size.height, accuracy: 0.001)
+                XCTAssertEqual(layout.tailTipInPresentation.x, 0, accuracy: 0.001)
+                XCTAssertEqual(layout.tailTipInPresentation.y, 44, accuracy: 0.001)
+                XCTAssertEqual(layout.tailAttachment, edge == .left ? .left : .right)
+                XCTAssertTrue(
+                    renderBounds.insetBy(dx: -0.5, dy: -0.5).contains(worldTotalFrame),
+                    "\(edge) \(tangent): \(worldTotalFrame)"
+                )
+
+                let tangentRange = layout.bodyTangentRange(at: tangent, edge: edge)
+                XCTAssertEqual(tangentRange.lowerBound, worldBodyFrame.minY, accuracy: 0.001)
+                XCTAssertEqual(tangentRange.upperBound, worldBodyFrame.maxY, accuracy: 0.001)
+            }
+        }
+    }
+
+    func testDecoratedSideTypingBubbleUsesItsUprightVisualFrameForBoundaryClamp() throws {
+        let member = PixelWorldMember(
+            id: UUID(),
+            nickname: "typing",
+            characterID: "pixel_hamster",
+            presence: .typing,
+            isTyping: true,
+            isCurrentUser: false,
+            equippedBubbleStyleID: "bubble_bunny_pink"
+        )
+        let sceneBounds = CGRect(x: 0, y: 0, width: 100, height: 720)
+
+        for edge in [OverlayEdge.left, .right] {
+            let scene = PixelWorldScene(size: sceneBounds.size)
+            scene.apply(
+                roomID: UUID(),
+                members: [member],
+                bubbles: [],
+                edge: edge,
+                installationSeed: 1
+            )
+            let tangent = try XCTUnwrap(scene.agentStates.first?.trackPosition)
+            let localFrame = try XCTUnwrap(scene.renderedBubbleTotalFrames(for: member.id).first)
+            let worldFrame = scene.trackGeometry.worldFrame(for: localFrame, at: tangent)
+
+            XCTAssertTrue(
+                sceneBounds.insetBy(dx: -0.5, dy: -0.5).contains(worldFrame),
+                "\(edge): \(worldFrame)"
+            )
+        }
     }
 
     func testSceneKeepsTwoBubblesForAllTwelveMembers() {
@@ -1005,7 +1096,7 @@ final class PixelWorldTests: XCTestCase {
         XCTAssertEqual(PixelCharacterThrowStyle.maximumActiveProjectiles, 32)
     }
 
-    func testTopEdgeKeepsNicknameAndBubbleTextUpright() throws {
+    func testSideEdgesKeepCompleteMessageAndTypingBubblesUpright() throws {
         let member = makeMember()
         let bubble = ActiveBubble(
             senderID: member.id,
@@ -1023,16 +1114,27 @@ final class PixelWorldTests: XCTestCase {
                 edge: edge,
                 installationSeed: 1
             )
-            let expectedRotation = edge.presentationRotation + edge.readableContentCounterRotation
+            let expectedNicknameRotation = edge.presentationRotation
+                + edge.readableContentCounterRotation
+            let expectedBubbleRotation: CGFloat = switch edge {
+            case .left, .right: 0
+            case .bottom, .top: edge.presentationRotation
+            }
             XCTAssertEqual(
                 try XCTUnwrap(scene.renderedNicknameWorldRotation(for: member.id)),
-                expectedRotation,
+                expectedNicknameRotation,
                 accuracy: 0.001,
                 "\(edge)"
             )
             XCTAssertEqual(
                 try XCTUnwrap(scene.renderedBubbleTextWorldRotations(for: member.id).first),
-                expectedRotation,
+                0,
+                accuracy: 0.001,
+                "\(edge)"
+            )
+            XCTAssertEqual(
+                try XCTUnwrap(scene.renderedBubbleWorldRotations(for: member.id).first),
+                expectedBubbleRotation,
                 accuracy: 0.001,
                 "\(edge)"
             )
@@ -1046,18 +1148,31 @@ final class PixelWorldTests: XCTestCase {
             isTyping: true,
             isCurrentUser: false
         )
-        scene.apply(
-            roomID: UUID(),
-            members: [typingMember],
-            bubbles: [],
-            edge: .top,
-            installationSeed: 1
-        )
-        XCTAssertEqual(
-            try XCTUnwrap(scene.renderedBubbleTextWorldRotations(for: member.id).first),
-            0,
-            accuracy: 0.001
-        )
+        for edge in OverlayEdge.allCases {
+            scene.apply(
+                roomID: UUID(),
+                members: [typingMember],
+                bubbles: [],
+                edge: edge,
+                installationSeed: 1
+            )
+            XCTAssertEqual(
+                try XCTUnwrap(scene.renderedBubbleTextWorldRotations(for: member.id).first),
+                0,
+                accuracy: 0.001,
+                "\(edge)"
+            )
+            let expectedBubbleRotation: CGFloat = switch edge {
+            case .left, .right: 0
+            case .bottom, .top: edge.presentationRotation
+            }
+            XCTAssertEqual(
+                try XCTUnwrap(scene.renderedBubbleWorldRotations(for: member.id).first),
+                expectedBubbleRotation,
+                accuracy: 0.001,
+                "\(edge)"
+            )
+        }
     }
 
     func testCharacterFramesCallbackReportsEveryMemberAs52Points() {
