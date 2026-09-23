@@ -10,13 +10,14 @@ sys.path.insert(0, str(Path(__file__).parents[1] / 'skills'))
 import verify_release_consistency as v
 
 
-VALID_README = f"""# SIDEY
+ROOT_APP_STORE_URL = v.APP_STORE_URLS["README.md"]
+VALID_README_TEMPLATE = """# SIDEY
 
 ## Installation
 
 ### macOS
 
-[Download SIDEY]({v.APP_STORE_URL})
+[Download SIDEY]({app_store_url})
 
 #### App Store
 
@@ -24,10 +25,14 @@ Install from the Mac App Store.
 
 ### Windows
 
-<a href="{v.RELEASES_URL}">Download SIDEY</a>
+<a href="{releases_url}">Download SIDEY</a>
 
 ## Contribute
 """
+VALID_README = VALID_README_TEMPLATE.format(
+    app_store_url=ROOT_APP_STORE_URL,
+    releases_url=v.RELEASES_URL,
+)
 
 
 class ReleaseDisplayTests(unittest.TestCase):
@@ -38,7 +43,13 @@ class ReleaseDisplayTests(unittest.TestCase):
         for path in v.README_PATHS:
             target = self.root / path
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(VALID_README, encoding="utf-8")
+            target.write_text(
+                VALID_README_TEMPLATE.format(
+                    app_store_url=v.APP_STORE_URLS[path],
+                    releases_url=v.RELEASES_URL,
+                ),
+                encoding="utf-8",
+            )
         root_patch = patch.object(v, "ROOT", self.root)
         root_patch.start()
         self.addCleanup(root_patch.stop)
@@ -66,13 +77,13 @@ class ReleaseDisplayTests(unittest.TestCase):
                         v.validate_readme_release_links(platform)
 
     def test_link_in_other_section_does_not_satisfy_installation_section(self):
-        self.write_readme(VALID_README.replace(f"[Download SIDEY]({v.APP_STORE_URL})", ""))
+        self.write_readme(VALID_README.replace(f"[Download SIDEY]({ROOT_APP_STORE_URL})", ""))
         with self.assertRaisesRegex(v.ConsistencyError, "must link to"):
             v.validate_readme_release_links("macos")
 
     def test_plain_url_without_clickable_link_fails(self):
         self.write_readme(VALID_README.replace(
-            f"[Download SIDEY]({v.APP_STORE_URL})", v.APP_STORE_URL))
+            f"[Download SIDEY]({ROOT_APP_STORE_URL})", ROOT_APP_STORE_URL))
         with self.assertRaisesRegex(v.ConsistencyError, "must link to"):
             v.validate_readme_release_links("macos")
 
@@ -99,10 +110,20 @@ class ReleaseDisplayTests(unittest.TestCase):
     def test_each_translation_is_checked(self):
         for path in v.README_PATHS[1:]:
             with self.subTest(path=path):
-                self.write_readme(VALID_README.replace(v.APP_STORE_URL, "https://example.com"), path)
+                localized = VALID_README_TEMPLATE.format(
+                    app_store_url="https://example.com",
+                    releases_url=v.RELEASES_URL,
+                )
+                self.write_readme(localized, path)
                 with self.assertRaisesRegex(v.ConsistencyError, "must link to"):
                     v.validate_readme_release_links("macos")
-                self.write_readme(VALID_README, path)
+                self.write_readme(
+                    VALID_README_TEMPLATE.format(
+                        app_store_url=v.APP_STORE_URLS[path],
+                        releases_url=v.RELEASES_URL,
+                    ),
+                    path,
+                )
 
     def test_retired_macos_installers_are_rejected_even_with_app_store_link(self):
         for retired in ("[Download](https://example.com/SIDEY.dmg)",

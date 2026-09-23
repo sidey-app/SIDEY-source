@@ -1,6 +1,6 @@
 import { commerceProducts } from "../../public/assets/commerce-products.js";
 import commerceCatalog from "../../../assets/v1/commerce-catalog.json";
-import { paidTranslations } from "./store-translations";
+import commerceLocalizations from "../../../assets/v1/commerce-localizations.json";
 import type { Locale } from "../i18n/landing";
 
 export type StoreCategory = "characters" | "throwables" | "bubbles";
@@ -126,6 +126,37 @@ const ja: StoreCatalog = {
   },
 };
 
+const zhHant: StoreCatalog = {
+  characters: {
+    eyebrow: "角色",
+    title: "帶新朋友來到你的螢幕。",
+    description: "選擇角色，預覽牠在 SIDEY 裡走動的模樣。",
+    products: [
+      { id: "pixel_hamster", name: "小倉鼠", description: "SIDEY 的經典夥伴，有著小耳朵和粉紅臉頰。", price: "隨附", asset: "assets/characters/pixel_hamster.png", mode: "character" },
+      { id: "pixel_cat", name: "小貓", description: "柔和的灰色虎斑，加上一對尖尖的小耳朵。", price: "隨附", asset: "assets/characters/pixel_cat.png", mode: "character" },
+      { id: "pixel_puppy", name: "蓬鬆小狗", description: "焦糖色耳朵和蓬鬆臉蛋的可愛夥伴。", price: "隨附", asset: "assets/characters/pixel_puppy.png", mode: "character" },
+      { id: "pixel_rabbit", name: "小兔子", description: "長耳朵與紫色圍巾，讓這位小朋友格外醒目。", price: "隨附", asset: "assets/characters/pixel_rabbit.png", mode: "character" },
+      { id: "pixel_penguin", name: "小企鵝", description: "深藍色的小企鵝，圍著薄荷色圍巾搖搖擺擺地走。", price: "隨附", asset: "assets/characters/pixel_penguin.png", mode: "character" },
+    ],
+  },
+  throwables: {
+    eyebrow: "投擲道具",
+    title: "從軟球到迷你大砲。",
+    description: "先預覽能丟向好友的小玩意，像是軟球、愛心和迷你大砲。",
+    products: [
+      { id: "patch_soft_ball", name: "拼布軟球", description: "所有基本角色都能輕輕丟向好友的小軟球。", price: "隨附", asset: "assets/previewer/patch_soft_ball.png", sound: "assets/store/impact-patch_soft_ball.wav", mode: "throwable" },
+    ],
+  },
+  bubbles: {
+    eyebrow: "對話框",
+    title: "對話框也能換成你的風格。",
+    description: "變更訊息與輸入中提示的顏色和小裝飾。",
+    products: [
+      { id: "bubble_default", name: "基本對話框", description: "在各種桌面背景上都清楚易讀的 SIDEY 標準對話框。", price: "隨附", mode: "bubble", bubbleTheme: "default" },
+    ],
+  },
+};
+
 export const includedProductIDs = new Set(["pixel_hamster", "pixel_cat", "pixel_puppy", "pixel_rabbit", "pixel_penguin", "patch_soft_ball", "bubble_default"]);
 
 // The same paid catalog drives the app, server, and public store. Never fall back
@@ -138,15 +169,16 @@ function completeCatalog(locale: Locale, catalog: StoreCatalog): StoreCatalog {
     const included = previous.filter((product) => includedProductIDs.has(product.id));
     catalog[category].products = [...included, ...paid.map((entry): StoreProduct => {
       const presentation = commerceProducts[entry.id as keyof typeof commerceProducts];
-      const translated = locale === "ko" ? [entry.name, entry.description] : paidTranslations[locale][entry.id];
+      const localizedProduct = commerceLocalizations.products.find((product) => product.id === entry.id);
+      const translated = localizedProduct?.localizations[locale];
       if (!translated) throw new Error(`Missing ${locale} store translation: ${entry.id}`);
       const renderID = entry.render_asset_id ?? entry.item_id;
       return {
 
         id: entry.item_id,
         commerceID: entry.id,
-        name: translated[0],
-        description: translated[1],
+        name: translated.display_name,
+        description: translated.marketing_description,
         price: locale === "ko" ? `${entry.direct_price.toLocaleString("ko-KR")}원` : `₩${entry.direct_price.toLocaleString("en-US")}`,
         mode: presentation.mode as StoreAssetMode,
         asset: presentation.asset,
@@ -167,7 +199,7 @@ function completeCatalog(locale: Locale, catalog: StoreCatalog): StoreCatalog {
 }
 
 export const storeCategoriesByLocale: Record<Locale, StoreCatalog> = {
-  ko: completeCatalog("ko", ko), en: completeCatalog("en", en), ja: completeCatalog("ja", ja),
+  ko: completeCatalog("ko", ko), en: completeCatalog("en", en), ja: completeCatalog("ja", ja), "zh-Hant": completeCatalog("zh-Hant", zhHant),
 };
 export const storeCategories = storeCategoriesByLocale.ko;
 

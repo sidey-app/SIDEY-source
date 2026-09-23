@@ -4,6 +4,11 @@
 
 현재 상품명, 가격, 내부·판매·복원 ID, 정렬과 asset 연결은
 [`assets/v1/commerce-catalog.json`](../../assets/v1/commerce-catalog.json)이 소유한다.
+상품별 한국어·영어·일본어·번체 중국어 표시명과 App Store 설명, 앱·웹 상세 설명은
+[`assets/v1/commerce-localizations.json`](../../assets/v1/commerce-localizations.json)이
+소유한다. 기존 catalog의 한국어 이름과 설명은 호환용 mirror이며 localization source와
+일치해야 한다. 과거 Apple product ID는 restore mapping으로만 유지하고 신규 판매
+metadata 대상으로 다시 만들지 않는다.
 이 문서는 그 값을 표로 복제하지 않는다. Asset 형식과 플랫폼 지원 범위는
 [`assets/v1/manifest.json`](../../assets/v1/manifest.json)이 소유한다. 공개 웹과
 네이티브 bundle의 catalog는 이 두 source에서 생성되고 일치 여부를 검사한다.
@@ -29,7 +34,11 @@ Entitlement는 account가 상품을 사용할 수 있는 권리이고 equipped s
 ID 또는 metadata 불일치는 오류다.
 
 - Mac App Store판은 StoreKit의 비소모성 상품과 Apple이 반환한 localized price를
-  사용한다. Apple에서 상품을 받지 못하면 다른 채널의 가격을 대신 표시하지 않는다.
+  사용한다. StoreKit이 반환한 상품명·설명·localized price를 논리 상품 ID에 매핑하고,
+  상품명과 설명을 받지 못한 경우에는 bundle localization을 표시할 수 있지만 해당
+  상품의 구매는 막는다. Apple에서 가격을 받지 못하면 다른 채널의 가격을 대신 표시하지
+  않는다. Backend catalog는 권리와 판매 상태만 갱신하며 사용자에게 보이는 현지화 문구를
+  덮어쓰지 않는다.
 - macOS 직접 배포판의 신규 개발·배포는 종료한다. 기존 구매 원본과 지급 권리는
   보존하며, App Store 전환을 이유로 기존 entitlement를 회수하지 않는다.
 - Windows는 고정된 운영 backend에서 production checkout을 지원한다. 개발 전용 staging

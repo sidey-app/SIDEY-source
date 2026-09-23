@@ -30,6 +30,13 @@ Git 이력은 보존한다. App Store 설치가 기존 직접 배포판의 Keych
 
 App Store archive 생성, submission, review와 게시 완료는 별도 단계다.
 
+App Store listing은 한국어를 primary language로 유지하고 영어권 storefront용 영어,
+일본어와 번체 중국어 localization을 함께 관리한다. Binary의 미지원 언어 영어 fallback과
+App Store Connect의 primary language는 별개의 계약이다. Metadata와 IAP localization
+동기화는 기본적으로 read-only diff이며, 명시적인 apply 옵션과 별도 release 승인이 모두
+있을 때만 App Store Connect를 변경한다. Storefront availability는 기존 국가를 제거하지
+않고 release별로 승인된 대상의 누락만 추가한다.
+
 ## Windows
 
 Windows는 native app, launcher, assets, 필요한 installer helper와 .NET·Windows App SDK

@@ -44,12 +44,18 @@ class PrepareReleaseMetadataTests(unittest.TestCase):
                 published,
                 json.loads((output_dir / "windows" / "update.json").read_text(encoding="utf-8")),
             )
-            for locale in ("ko", "en", "ja"):
+            app_store_urls = {
+                "ko": "https://apps.apple.com/kr/app/sidey/id6808528060?mt=12",
+                "en": "https://apps.apple.com/us/app/sidey/id6808528060?mt=12",
+                "ja": "https://apps.apple.com/jp/app/sidey/id6808528060?mt=12",
+                "zh-hant": "https://apps.apple.com/tw/app/sidey/id6808528060?mt=12",
+            }
+            for locale, app_store_url in app_store_urls.items():
                 html = (output_dir / locale / "index.html").read_text(encoding="utf-8")
                 self.assertNotIn("macos-download-sha256", html)
                 self.assertNotIn(".dmg", html)
                 self.assertNotIn("brew-command", html)
-                self.assertIn('href="https://apps.apple.com/kr/app/sidey/id6808528060?mt=12"', html)
+                self.assertIn(f'href="{app_store_url}"', html)
                 self.assertIn(
                     f'<code id="windows-download-sha256" data-release-platform="windows">{windows_hash}</code>',
                     html,

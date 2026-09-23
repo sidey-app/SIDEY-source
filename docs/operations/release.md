@@ -58,6 +58,18 @@ StoreKit 환경을 확인한다. 서명 정보와 App Store Connect 자격 증�
 갱신하지 않는다. 삭제된 Direct release, 자산과 태그를 복원하거나 재게시하지 않는다.
 사용자 계정·메시지·구매 원본은 삭제하지 않는다.
 
+App Store metadata와 IAP localization은 저장소의 App Store Connect 동기화 도구로 먼저
+read-only snapshot과 diff를 만든다. App 이름·부제·설명·keyword·release note·지원 및
+개인정보 URL·screenshot, 활성 IAP의 표시명·설명과 대상 storefront availability를 같은
+candidate 기준으로 검토한다. 원격 변경은 도구의 명시적인 apply 옵션만으로 충분하지
+않으며 release 승인도 별도로 확인해야 한다. 기존 storefront를 제거하는 diff는 적용하지
+않는다. API key는 CI secret 또는 local Keychain에서만 읽고 저장소 파일이나 log에 쓰지
+않는다.
+
+Metadata와 binary를 같은 review에 제출할 때도 upload, submission과 manual release는
+각각 별도 승인 단계다. 승인 후에는 목표 storefront마다 설명·screenshot·지원 link,
+통화와 활성 IAP 조회를 다시 확인한 뒤에만 수동 공개한다.
+
 ### Windows
 
 Private source `main`의 수동

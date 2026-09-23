@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/kr/app/sidey/id6808528060">
+  <a href="https://apps.apple.com/us/app/sidey/id6808528060">
     <img src="../assets/mac-app-store/mac-app-store.en.svg" height="48" alt="Download SIDEY from the Mac App Store">
   </a>
   <span>
@@ -63,7 +63,7 @@ SIDEY is a desktop messenger for macOS and Windows that lets you chat with frien
   <br/>
   <p>You can easily install SIDEY from the Mac App Store:</p>
   <p>
-    <a href="https://apps.apple.com/kr/app/sidey/id6808528060">
+    <a href="https://apps.apple.com/us/app/sidey/id6808528060">
       <img src="../assets/mac-app-store/mac-app-store.en.svg" height="48" alt="Download SIDEY from the Mac App Store">
     </a>
   </p>
