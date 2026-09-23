@@ -81,8 +81,7 @@ def printf_signature(value: str) -> tuple[tuple[int, str], ...]:
         position = int(raw_position) if raw_position else implicit
         if raw_position is None:
             implicit += 1
-        kind = "integer" if match.group("kind") in {"lld", "ld", "d"} else "object"
-        signature.append((position, kind))
+        signature.append((position, match.group("kind")))
         cursor = match.end()
     return tuple(sorted(signature))
 

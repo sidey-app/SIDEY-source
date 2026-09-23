@@ -112,6 +112,12 @@ class CommerceLocalizationTests(unittest.TestCase):
         )
         mutations.append(windows_data_on_unsupported_product)
 
+        untranslated_windows_value = copy.deepcopy(self.source)
+        untranslated_windows_value["products"][0]["windows_localizations"]["ru"][
+            "display_name"
+        ] = "미번역"
+        mutations.append(untranslated_windows_value)
+
         for source in mutations:
             with self.subTest(source=source), self.assertRaises(ValueError):
                 localization_tool.validate_source(self.catalog, source)

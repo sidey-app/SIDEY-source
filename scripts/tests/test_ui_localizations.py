@@ -115,6 +115,19 @@ class UILocalizationTests(unittest.TestCase):
         with self.assertRaisesRegex(tool.LocalizationError, "placeholders differ"):
             tool.validate_source(invalid)
 
+        invalid = copy.deepcopy(self.source)
+        key = "history.retention_notice"
+        for localization in invalid["macos"][key]["localizations"].values():
+            for category in localization["variations"]["plural"].values():
+                unit = category["stringUnit"]
+                unit["value"] = unit["value"].replace("%lld", "%ld")
+        korean_one = invalid["macos"][key]["localizations"]["ko"][
+            "variations"
+        ]["plural"]["one"]["stringUnit"]
+        korean_one["value"] = korean_one["value"].replace("%ld", "%lld")
+        with self.assertRaisesRegex(tool.LocalizationError, "plural placeholders differ"):
+            tool.validate_source(invalid)
+
     def test_plural_shape_and_output_key_collisions_are_rejected(self):
         invalid = copy.deepcopy(self.source)
         plural = invalid["macos"]["history.retention_notice"]["localizations"]["en"]["variations"]["plural"]

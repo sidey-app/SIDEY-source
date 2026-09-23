@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import re
 import sys
 
 from catalog_source import load_source, supported_catalog
@@ -51,6 +52,7 @@ WINDOWS_CHARACTER_NAME_KEYS = {
     "character_tree": "characters.tree",
 }
 WINDOWS_FIELDS = ("display_name", "marketing_description")
+HANGUL = re.compile(r"[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af]")
 
 STOREKIT_LOCALES = {
     "ko": "ko_KR",
@@ -126,6 +128,11 @@ def validate_translation(translation, fields, product_id, locale):
             or "\r" in value
         ):
             raise ValueError(f"Invalid {field}: {product_id} ({locale})")
+        if locale != "ko" and HANGUL.search(value):
+            raise ValueError(
+                f"Untranslated Hangul remains: {product_id} "
+                f"({locale}.{field})"
+            )
 
 
 def validate_source(catalog, source, platform_catalog=None):
