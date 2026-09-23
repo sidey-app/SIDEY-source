@@ -26,7 +26,16 @@ private final class FirebaseV2SDKAuthSession: FirebaseV2AuthSession {
 
     func tokenClaims(expectedUID: String) async throws -> [String: Any]? {
         guard let user = auth.currentUser, user.uid == expectedUID else { return nil }
-        return try await user.getIDTokenResult().claims
+        let claims = try await FirebaseV2TokenClaimsBridge.load { completion in
+            user.getIDTokenResult { result, error in
+                // Firebase guarantees this completion runs asynchronously on the main queue.
+                MainActor.assumeIsolated {
+                    completion(result?.claims, error)
+                }
+            }
+        }
+        guard auth.currentUser === user else { return nil }
+        return claims
     }
 
     func signOut() throws {
@@ -44,6 +53,35 @@ private final class FirebaseV2SDKAuthSession: FirebaseV2AuthSession {
 
     func removeIDTokenDidChangeListener(_ handle: NSObjectProtocol) {
         auth.removeIDTokenDidChangeListener(handle)
+    }
+}
+
+@MainActor
+enum FirebaseV2TokenClaimsBridge {
+    @MainActor
+    private final class ResultHolder {
+        var claims: [String: Any]?
+    }
+
+    static func load(
+        _ request: (@escaping @MainActor ([String: Any]?, Error?) -> Void) -> Void
+    ) async throws -> [String: Any] {
+        let result = ResultHolder()
+        // Only Void crosses the continuation; SDK objects and Any values stay on MainActor.
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            request { claims, error in
+                if let claims {
+                    result.claims = claims
+                    continuation.resume()
+                } else {
+                    continuation.resume(throwing: error ?? FirebaseV2AuthError.tokenRefreshValidationFailed)
+                }
+            }
+        }
+        guard let claims = result.claims else {
+            throw FirebaseV2AuthError.tokenRefreshValidationFailed
+        }
+        return claims
     }
 }
 
