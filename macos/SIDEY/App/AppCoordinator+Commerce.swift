@@ -153,7 +153,7 @@ extension AppCoordinator {
                                 if let grantError = mutation.grantError {
                                     model.presentSuccess(L10n.format(
                                         "store.purchase.success",
-                                        product.displayName
+                                        productDisplayName
                                     ))
                                     model.errorMessage = L10n.format(
                                         "store.error.auto_equip_realtime_grant_pending",

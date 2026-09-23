@@ -96,7 +96,7 @@ extension AppCoordinator {
                     advanceFirstRunTransition()
                     return
                 }
-                let message = SideyBackendError.normalized(error).localizedDescription
+                let message = error.localizedDescription
                 model.connectionState = .failed(message)
                 model.errorMessage = L10n.format("backend.connect.failed_detail", message)
                 backendBootstrapState = .failed
@@ -474,14 +474,14 @@ extension AppCoordinator {
 
     func handleRoomSwitchFailure(_ error: any Error, restoreError: (any Error)?) {
         if let restoreError {
-            let message = SideyBackendError.normalized(restoreError).localizedDescription
+            let message = restoreError.localizedDescription
             model.connectionState = .failed(message)
             model.setActiveRoomRealtimeConnected(false)
             model.errorMessage = L10n.format("backend.realtime_recovery_failed", message)
         } else {
             model.errorMessage = L10n.format(
                 "group.switch.failed",
-                SideyBackendError.normalized(error).localizedDescription
+                error.localizedDescription
             )
         }
         refreshStatusItem()
@@ -667,7 +667,7 @@ extension AppCoordinator {
                 persistPreferences()
             } catch {
                 model.dismissSuccess()
-                let message = SideyBackendError.normalized(error).localizedDescription
+                let message = error.localizedDescription
                 model.errorMessage = serverMutationCommitted
                     ? L10n.format("mutation.post_commit_sync_failed", message)
                     : message
@@ -797,7 +797,7 @@ extension AppCoordinator {
             do { try await messagingTransport.setLocalPresence(state) }
             catch {
                 model.connectionState = .failed(
-                    SideyBackendError.normalized(error).localizedDescription
+                    error.localizedDescription
                 )
             }
         }
