@@ -219,6 +219,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     private var pendingInitialLiveActions: [FirebaseV2LiveAction] = []
     private var inboxListenerGeneration: UInt64 = 0
     private var listenerGeneration: UInt64 = 0
+    private var committedListenerGeneration: UInt64?
     private var roomTransitionGeneration: UInt64 = 0
     private var rolloutLeaseGeneration: UInt64 = 0
     private var isReconcilingHint = false
@@ -580,7 +581,8 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
 
     private func replaceActiveRoom(
         _ roomID: UUID?,
-        session: FirebaseV2CompositeSession
+        session: FirebaseV2CompositeSession,
+        forceListenerRestart: Bool = false
     ) async throws {
         roomTransitionGeneration &+= 1
         let transitionGeneration = roomTransitionGeneration
@@ -589,6 +591,20 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         try requireRunning()
         guard transitionGeneration == roomTransitionGeneration else {
             throw CancellationError()
+        }
+
+        // Authoritative reconciliation can run for chat and room hints while
+        // the active room is unchanged. Keep its healthy RTDB listener alive:
+        // cancelling it on every hint creates a gap for short-lived throws.
+        if !forceListenerRestart,
+           let roomID,
+           activeRoomState.committedRealtimeActiveRoomID == roomID,
+           committedListenerGeneration == listenerGeneration,
+           liveTask != nil,
+           liveReadinessContinuation == nil {
+            guard activeRoomState.commit(operation) else { throw CancellationError() }
+            transientWriter = makeTransientWriter(roomID: roomID, session: session)
+            return
         }
 
         listenerGeneration &+= 1
@@ -653,6 +669,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         guard activeRoomState.commit(operation) else {
             throw CancellationError()
         }
+        committedListenerGeneration = generation
         transientWriter = makeTransientWriter(roomID: roomID, session: session)
         await drainPendingInitialLiveActions(roomID: roomID, generation: generation)
     }
@@ -977,7 +994,11 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             session = recovered
             scheduleRolloutLeaseExpiry(for: recovered)
             restartInboxListener()
-            try await replaceActiveRoom(activeRoomID, session: recovered)
+            try await replaceActiveRoom(
+                activeRoomID,
+                session: recovered,
+                forceListenerRestart: true
+            )
         } catch {
             // Once a new custom-token sign-in succeeds, continuing with the old
             // grant/listeners would mix credential generations. There is no

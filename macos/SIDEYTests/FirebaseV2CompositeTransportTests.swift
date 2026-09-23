@@ -197,7 +197,7 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         XCTAssertEqual(diagnostics.liveListenerCount, 1)
     }
 
-    func testRepeatedSynchronizationWaitsForFreshLiveBaselineWithoutRebootstrapping() async throws {
+    func testRepeatedSynchronizationKeepsLiveListenerAndDeliversLaterThrow() async throws {
         let fixture = try Fixture()
         _ = try await fixture.transport.synchronize(
             rooms: [fixture.room],
@@ -208,6 +208,24 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
             activeRoomID: fixture.room.id
         )
 
+        var iterator = fixture.transport.events.makeAsyncIterator()
+        fixture.values.yield(Data("""
+        {
+          "x": {
+            "\(fixture.friendID.uuidString.lowercased())": {
+              "k": "18",
+              "t": 1800000000000,
+              "u": "\(fixture.ownID.uuidString.lowercased())"
+            }
+          }
+        }
+        """.utf8), at: FirebaseV2Path.liveRoom(fixture.room.id))
+
+        guard case .characterThrow(let characterThrow) = await iterator.next()
+        else { return XCTFail("The retained listener must deliver a later throw") }
+        XCTAssertEqual(characterThrow.actorUserID, fixture.friendID)
+        XCTAssertEqual(characterThrow.targetUserID, fixture.ownID)
+
         let establishCount = await fixture.credentials.establishCount
         XCTAssertEqual(establishCount, 1)
         XCTAssertEqual(fixture.values.paths.filter {
@@ -215,7 +233,7 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         }.count, 1)
         XCTAssertEqual(fixture.values.paths.filter {
             $0 == FirebaseV2Path.liveRoom(fixture.room.id)
-        }.count, 2)
+        }.count, 1)
     }
 
     func testLiveListenerMustDeliverInitialSnapshotBeforeRoomCommit() async throws {

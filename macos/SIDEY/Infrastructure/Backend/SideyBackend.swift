@@ -31,6 +31,7 @@ actor SideyBackend {
     private let inviteAccountPrefix: String
     private let eventContinuation: AsyncStream<BackendEvent>.Continuation
     private var eventSubscribers: [UUID: AsyncStream<BackendEvent>.Continuation] = [:]
+    private var presenceReplay = BackendPresenceReplay()
     private let networkPathMonitor: any NetworkPathMonitoring
     private let recoveryLogger = Logger(
         subsystem: "app.sidey.desktop",
@@ -105,7 +106,17 @@ actor SideyBackend {
         let pair = AsyncStream<BackendEvent>.makeStream(
             bufferingPolicy: .bufferingNewest(256)
         )
+        guard !isShuttingDown else {
+            pair.continuation.finish()
+            return pair.stream
+        }
         eventSubscribers[subscriberID] = pair.continuation
+        // A Firebase-only recovery leaves these Supabase channels alive. A
+        // new adapter will not receive another presence_state from the server.
+        pair.continuation.yield(.connection(currentConnectionStatus()))
+        for event in presenceReplay.events(subscribedRoomIDs: livePresenceRoomIDs()) {
+            pair.continuation.yield(event)
+        }
         pair.continuation.onTermination = { [weak self] _ in
             Task { await self?.removeEventSubscriber(subscriberID) }
         }
@@ -942,7 +953,8 @@ actor SideyBackend {
                     await self?.handleChannelStatus(
                         roomID: roomID,
                         generation: generation,
-                        status: status
+                        status: status,
+                        isPresenceChannel: false
                     )
                 }
             },
@@ -951,7 +963,8 @@ actor SideyBackend {
                     await self?.handleChannelStatus(
                         roomID: roomID,
                         generation: generation,
-                        status: status
+                        status: status,
+                        isPresenceChannel: true
                     )
                 }
             }
@@ -984,6 +997,7 @@ actor SideyBackend {
             return
         }
         connectionTracker.setSubscribed(false, roomID: roomID)
+        presenceReplay.invalidate(roomID: roomID)
         guard let roomChannels = channels.removeValue(forKey: roomID) else { return }
         roomChannels.tasks.forEach { $0.cancel() }
         await client.removeChannel(roomChannels.database)
@@ -1000,9 +1014,15 @@ actor SideyBackend {
     private func handleChannelStatus(
         roomID: UUID,
         generation: Int,
-        status: RealtimeChannelStatus
+        status: RealtimeChannelStatus,
+        isPresenceChannel: Bool
     ) async {
         guard isCurrentChannel(roomID: roomID, generation: generation) else { return }
+        // The database notification channel can resubscribe independently of
+        // the live Presence channel. Only the latter owns this snapshot.
+        if isPresenceChannel, status != .subscribed {
+            presenceReplay.invalidate(roomID: roomID)
+        }
         switch status {
         case .subscribed:
             updateRoomSubscription(roomID: roomID)
@@ -1213,6 +1233,7 @@ actor SideyBackend {
             realtimeRecoveryTask = nil
             realtimeRecoveryAttempt = 0
             recoveryReconciled = true
+            replayPresence(rooms: snapshot.rooms)
             emit(.reconciliation(reconciliation))
             emitConnectionState()
             recoveryLogger.notice(
@@ -1290,6 +1311,7 @@ actor SideyBackend {
     }
 
     private func markAllRoomsUnsubscribed() {
+        presenceReplay.invalidateAll()
         for roomID in connectionTracker.desiredRoomIDs {
             connectionTracker.setSubscribed(false, roomID: roomID)
         }
@@ -1314,6 +1336,9 @@ actor SideyBackend {
             throw SideyBackendError.realtimeUnavailable
         }
         let reconciliation = try await makeReconciliation(snapshot: snapshot)
+        // Replay a complete membership baseline, including offline members,
+        // after a receiver was replaced or a dropped event forced reconciliation.
+        replayPresence(rooms: snapshot.rooms)
         if emitEvents {
             emit(.reconciliation(reconciliation))
         }
@@ -1339,11 +1364,11 @@ actor SideyBackend {
         )
     }
 
-    private func emitConnectionState() {
+    private func currentConnectionStatus() -> BackendConnectionStatus {
         let pathAvailable = networkAvailability.current != .unavailable
         let socketAvailable = connectionTracker.desiredRoomIDs.isEmpty
             || client.realtimeV2.status == .connected
-        let status = RealtimeConnectionStatusPolicy.resolve(
+        return RealtimeConnectionStatusPolicy.resolve(
             pathAvailable: pathAvailable,
             socketAvailable: socketAvailable,
             recoveryTaskRunning: realtimeRecoveryTask != nil,
@@ -1355,9 +1380,32 @@ actor SideyBackend {
                 connectionTracker.isSubscribed(roomID: $0)
             } ?? false
         )
+    }
+
+    private func emitConnectionState() {
+        let status = currentConnectionStatus()
         guard lastEmittedConnectionStatus != status else { return }
         lastEmittedConnectionStatus = status
         emit(.connection(status))
+    }
+
+    private func livePresenceRoomIDs() -> Set<UUID> {
+        guard networkAvailability.current != .unavailable,
+              client.realtimeV2.status == .connected else { return [] }
+        return Set(channels.compactMap { roomID, roomChannels in
+            guard isCurrentChannel(roomID: roomID, generation: roomChannels.generation),
+                  roomChannels.ephemeral.status == .subscribed else { return nil }
+            return roomID
+        })
+    }
+
+    private func replayPresence(rooms: [Room]) {
+        for event in presenceReplay.snapshot(
+            rooms: rooms,
+            subscribedRoomIDs: livePresenceRoomIDs()
+        ) {
+            emit(event)
+        }
     }
 
     private func handleDatabaseBroadcast(
@@ -1476,6 +1524,7 @@ actor SideyBackend {
         }
         let left = Set(action.leaves.keys.compactMap(UUID.init(uuidString:)))
         for update in PresenceChangePlan.updates(joined: joined, left: left) {
+            presenceReplay.record(roomID: roomID, userID: update.userID, state: update.state)
             emit(.presence(
                 roomID: roomID,
                 userID: update.userID,

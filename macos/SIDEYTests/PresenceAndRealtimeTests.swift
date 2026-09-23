@@ -858,6 +858,124 @@ final class PresenceAndRealtimeTests: XCTestCase {
         XCTAssertEqual(model.rooms[0].members[0].presence, .offline)
     }
 
+    func testFirebaseRecoveryRestoresLiveSupabasePresenceWithoutAnotherPeerJoin() {
+        let roomID = UUID()
+        let onlineID = UUID()
+        let awayID = UUID()
+        let room = presenceReplayRoom(id: roomID, userIDs: [onlineID, awayID])
+        let model = AppModel(preferences: .defaults)
+        model.apply(snapshot: BackendSnapshot(profile: nil, rooms: [room]), currentUserID: UUID())
+        var replay = BackendPresenceReplay()
+        for (userID, state) in [(onlineID, PresenceState.online), (awayID, .away)] {
+            replay.record(roomID: roomID, userID: userID, state: state)
+            model.updatePresence(roomID: roomID, userID: userID, state: state)
+        }
+        model.setActiveRoomRealtimeConnected(true)
+
+        // Firebase credentials expire, but the Supabase Presence channel stays live.
+        model.setActiveRoomRealtimeConnected(false)
+        XCTAssertTrue(model.rooms[0].members.allSatisfy { $0.presence == .reconnecting })
+        for event in replay.snapshot(rooms: [room], subscribedRoomIDs: [roomID]) {
+            guard case .presence(let roomID, let userID, let state) = event else {
+                return XCTFail("Presence replay must contain only Presence events")
+            }
+            model.updatePresence(roomID: roomID, userID: userID, state: state)
+        }
+        model.setActiveRoomRealtimeConnected(true)
+
+        XCTAssertEqual(model.rooms[0].members.first { $0.userID == onlineID }?.presence, .online)
+        XCTAssertEqual(model.rooms[0].members.first { $0.userID == awayID }?.presence, .away)
+    }
+
+    func testPresenceReplayInvalidationDropsDisconnectedRoomWithoutDroppingOtherRooms() {
+        let disconnectedRoomID = UUID()
+        let liveRoomID = UUID()
+        let userID = UUID()
+        var replay = BackendPresenceReplay()
+        replay.record(roomID: disconnectedRoomID, userID: userID, state: .online)
+        replay.record(roomID: liveRoomID, userID: userID, state: .away)
+
+        replay.invalidate(roomID: disconnectedRoomID)
+        let events = replay.events(subscribedRoomIDs: [disconnectedRoomID, liveRoomID])
+        XCTAssertEqual(events.count, 1)
+        guard let event = events.first,
+              case .presence(let roomID, let replayedUserID, let state) = event else {
+            return XCTFail("The unaffected room must retain its live Presence")
+        }
+        XCTAssertEqual(roomID, liveRoomID)
+        XCTAssertEqual(replayedUserID, userID)
+        XCTAssertEqual(state, .away)
+
+        let baseline = replay.snapshot(
+            rooms: [presenceReplayRoom(id: disconnectedRoomID, userIDs: [userID])],
+            subscribedRoomIDs: [disconnectedRoomID]
+        )
+        guard let baselineEvent = baseline.first,
+              case .presence(_, _, let disconnectedState) = baselineEvent else {
+            return XCTFail("The rebuilt room must start from an offline baseline")
+        }
+        XCTAssertEqual(disconnectedState, .offline)
+
+        replay.invalidateAll()
+        XCTAssertTrue(replay.events(subscribedRoomIDs: [disconnectedRoomID, liveRoomID]).isEmpty)
+    }
+
+    func testPresenceReplaySnapshotClearsDepartedAndUnobservedPeersAndExcludesRemovedMembers() {
+        let roomID = UUID()
+        let departedID = UUID()
+        let unobservedID = UUID()
+        let removedMemberID = UUID()
+        let room = presenceReplayRoom(id: roomID, userIDs: [departedID, unobservedID])
+        let model = AppModel(preferences: .defaults)
+        model.apply(snapshot: BackendSnapshot(profile: nil, rooms: [room]), currentUserID: UUID())
+        model.updatePresence(roomID: roomID, userID: departedID, state: .online)
+        model.updatePresence(roomID: roomID, userID: unobservedID, state: .away)
+        var replay = BackendPresenceReplay()
+        replay.record(roomID: roomID, userID: departedID, state: .online)
+        replay.record(roomID: roomID, userID: removedMemberID, state: .online)
+        replay.record(roomID: roomID, userID: departedID, state: .offline)
+
+        let events = replay.snapshot(rooms: [room], subscribedRoomIDs: [roomID])
+        XCTAssertEqual(events.count, 2)
+        var replayedUserIDs: Set<UUID> = []
+        for event in events {
+            guard case .presence(let roomID, let userID, let state) = event else {
+                return XCTFail("Presence snapshot must contain only Presence events")
+            }
+            replayedUserIDs.insert(userID)
+            model.updatePresence(roomID: roomID, userID: userID, state: state)
+        }
+        XCTAssertEqual(replayedUserIDs, [departedID, unobservedID])
+        XCTAssertTrue(model.rooms[0].members.allSatisfy { $0.presence == .offline })
+        XCTAssertEqual(replay.events(subscribedRoomIDs: [roomID]).count, 1)
+    }
+
+    func testPresenceReplayNeverReplaysAnUnsubscribedRoom() {
+        let roomID = UUID()
+        let userID = UUID()
+        var replay = BackendPresenceReplay()
+        replay.record(roomID: roomID, userID: userID, state: .online)
+
+        XCTAssertTrue(replay.events(subscribedRoomIDs: []).isEmpty)
+        XCTAssertTrue(replay.snapshot(
+            rooms: [presenceReplayRoom(id: roomID, userIDs: [userID])],
+            subscribedRoomIDs: []
+        ).isEmpty)
+    }
+
+    private func presenceReplayRoom(id: UUID, userIDs: [UUID]) -> Room {
+        Room(
+            id: id,
+            name: "친구들",
+            ownerID: userIDs[0],
+            members: userIDs.map {
+                RoomMember(userID: $0, nickname: "친구", characterID: "minty_pup", presence: .offline)
+            },
+            inviteCodeHint: "AB••••",
+            inviteVersion: 1
+        )
+    }
+
     func testBroadcastTypingLeaseDoesNotRemainStuckAcrossReconnect() {
         let roomID = UUID()
         let friendID = UUID()
