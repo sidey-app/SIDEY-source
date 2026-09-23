@@ -46,7 +46,7 @@ backend의 최종 `CLIENT_BACKEND_HANDOFF.md`와 production read-back을 연결 
 - authenticated RPC: `register_realtime_capability_v2(p_platform, p_app_version, p_protocol_version, p_contract_hash)`
 - exact response: `enabled`, `protocolVersion`, `transport`, `contractHash`, `killSwitch`, `cacheTtlSeconds`, `failureMode`
 - candidate contract hash: `0f2845d033df248b1745c6526c8c7100b8d8fa6839b45f28c73b1023053fce2e`
-- App Store app version은 marketing/build를 합친 `1.3.0+33` 형식
+- App Store app version은 `release/version.json`에서 생성한 marketing/build를 합친 형식
 - explicit disabled/kill-switch만 legacy 허용; prior enabled에서 fetch/cache 실패는 fail-closed
 - 최대 300초 rollout lease, 30초 refresh lead와 실행 중 sync-before-commit legacy 전환
 - server-only Firebase 전역 emergency gate는 남은 lease와 무관하게 RTDB read/callable write를 즉시 차단

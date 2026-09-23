@@ -29,6 +29,7 @@
 		100000000000000000000047 /* SIDEY.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIDEY.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		200000000000000000000003 /* SideyBuildStamp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideyBuildStamp.swift; sourceTree = DERIVED_FILE_DIR; };
 		300000000000000000000004 /* SIDEYTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIDEYTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		400000000000000000000001 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Version.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -70,6 +71,7 @@
 		100000000000000000000009 = {
 			isa = PBXGroup;
 			children = (
+				400000000000000000000001 /* Version.xcconfig */,
 				100000000000000000000005 /* SIDEY */,
 				100000000000000000000006 /* SIDEYTests */,
 				10000000000000000000000A /* Products */,
@@ -308,6 +310,7 @@
 		};
 		10000000000000000000004C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 400000000000000000000001 /* Version.xcconfig */;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -315,7 +318,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 5T933W86GZ;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -327,7 +329,6 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 				);
@@ -345,6 +346,7 @@
 		};
 		10000000000000000000004D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 400000000000000000000001 /* Version.xcconfig */;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -352,7 +354,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 33;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 5T933W86GZ;
 				ENABLE_APP_SANDBOX = YES;
@@ -364,7 +365,6 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 				);
