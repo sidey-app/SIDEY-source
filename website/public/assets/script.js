@@ -65,6 +65,29 @@
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+  const supportedAppStoreRegions = new Set(["GB", "CA", "AU", "SG", "HK", "MO", "TW", "JP", "KR", "US"]);
+  const browserLanguages = navigator.languages?.length ? navigator.languages : [navigator.language];
+  const preferredAppStoreRegion = browserLanguages
+    .flatMap((language) => String(language ?? "").replaceAll("_", "-").split("-").slice(1))
+    .map((part) => part.toUpperCase())
+    .find((part) => supportedAppStoreRegions.has(part));
+
+  if (preferredAppStoreRegion) {
+    const storefront = preferredAppStoreRegion.toLowerCase();
+    const localizedAppStoreURL = (value) => {
+      const url = new URL(value, window.location.href);
+      url.pathname = url.pathname.replace(/^\/(?:[a-z]{2}\/)?app\//i, `/${storefront}/app/`);
+      return url.href;
+    };
+
+    document.querySelectorAll("[data-app-store-link]").forEach((link) => {
+      link.href = localizedAppStoreURL(link.href);
+    });
+    document.querySelectorAll("[data-macos-url]").forEach((link) => {
+      link.dataset.macosUrl = localizedAppStoreURL(link.dataset.macosUrl);
+    });
+  }
+
   document.querySelectorAll(".faq-item").forEach((item) => {
     const summary = item.querySelector("summary");
     const answer = item.querySelector(".faq-answer");

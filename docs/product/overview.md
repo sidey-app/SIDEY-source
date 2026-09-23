@@ -18,6 +18,16 @@ presence, typing과 짧은 메시지를 보여 주는 초대 전용 desktop ambi
   동작은 [characters-and-projectiles.md](characters-and-projectiles.md)를 따른다.
 - 공개 웹사이트는 소개·다운로드·정책·상점 정보를 제공하지만 메시징 client는 아니다.
 
+## 언어와 지역 형식
+
+macOS client는 한국어, 영어, 일본어와 번체 중국어(`zh-Hant`)를 제공하고 별도 앱 내부
+언어 선택기 없이 macOS의 앱 언어 설정을 따른다. 지원하지 않는 언어에서는 영어를
+사용한다. 번체 중국어는 대만식 표현을 기준으로 하되 홍콩과 마카오에서도 이해할 수
+있는 중립 표현을 사용하며 별도 `zh-Hant-HK` catalog는 두지 않는다.
+
+날짜, 시간, 숫자와 StoreKit 가격은 현재 locale의 형식을 사용한다. 닉네임, 그룹명과
+메시지 본문처럼 사용자가 만든 데이터는 번역하거나 기존 저장값을 바꾸지 않는다.
+
 모바일 client, 공개 검색·발견, 열두 명을 넘는 group, 이미지·파일 전송, 음성·영상
 통화, 사용자 업로드 avatar와 AI 동료는 현재 범위가 아니다.
 

@@ -1,10 +1,9 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
-import { getTranslations, type Locale } from "../i18n/landing";
+import { getTranslations, localePathSegment, localeRoot, type Locale } from "../i18n/landing";
 
 interface Props {
   locale?: Locale;
-  current?: "home" | "store" | "whats-new";
+  current?: "home" | "store" | "whats-new" | "support";
   rootPath?: string;
   homeHref?: string;
 }
@@ -15,14 +14,15 @@ const {
   homeHref,
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const localizedHome = homeHref ?? getRelativeLocaleUrl(locale);
+const localizedHome = homeHref ?? localeRoot(locale);
 const labels = getTranslations(locale).navigation;
-const localePrefix = `${locale}/`;
+const localePrefix = `${localePathSegment(locale)}/`;
 const featuresHref = `${localizedHome}#features`;
 const downloadHref = `${localizedHome}#download`;
 const faqHref = `${localizedHome}#faq`;
 const whatsNewHref = `${base}${localePrefix}whats-new/`;
 const storeHref = `${base}${localePrefix}store/`;
+const supportHref = `${base}${localePrefix}support/`;
 ---
 
 <header class="site-header site-header-unified" data-site-header>
@@ -38,6 +38,7 @@ const storeHref = `${base}${localePrefix}store/`;
       <li class="nav-separator" aria-hidden="true"></li>
       <li><a href={whatsNewHref} aria-current={current === "whats-new" ? "page" : undefined}>{labels.whatsNew}</a></li>
       <li><a href={storeHref} aria-current={current === "store" ? "page" : undefined}>{labels.store}</a></li>
+      <li><a href={supportHref} aria-current={current === "support" ? "page" : undefined}>{labels.support}</a></li>
       <li><a class="nav-external" href="https://github.com/sidey-app/SIDEY"><span>GitHub</span><span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span></a></li>
     </ul>
     <div class="nav-controls">

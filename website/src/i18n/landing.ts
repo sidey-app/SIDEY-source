@@ -1,5 +1,17 @@
-export const supportedLocales = ["ko", "en", "ja"] as const;
+export const supportedLocales = ["ko", "en", "ja", "zh-Hant"] as const;
 export type Locale = (typeof supportedLocales)[number];
+
+export function localePathSegment(locale: Locale) {
+  return locale === "zh-Hant" ? "zh-hant" : locale;
+}
+
+export function localeRoot(locale: Locale, base = import.meta.env.BASE_URL) {
+  return `${base}${localePathSegment(locale)}/`;
+}
+
+export function localizeCanonicalPath(path: string, locale: Locale) {
+  return path.replace(/^(ko|en|ja|zh-hant)\//, `${localePathSegment(locale)}/`);
+}
 
 const ui = {
   ko: {
@@ -13,7 +25,7 @@ const ui = {
     skip: "본문으로 건너뛰기",
     navigation: {
       navigation: "주요 메뉴", home: "SIDEY 홈", openMenu: "메뉴 열기", closeMenu: "메뉴 닫기", features: "기능", download: "다운로드",
-      faq: "자주 묻는 질문", whatsNew: "새로운 기능", store: "상점", characters: "캐릭터", throwables: "투척물", bubbles: "말풍선",
+      faq: "자주 묻는 질문", whatsNew: "새로운 기능", store: "상점", support: "지원", characters: "캐릭터", throwables: "투척물", bubbles: "말풍선",
       useLightTheme: "라이트 모드로 전환", useDarkTheme: "다크 모드로 전환",
     },
     hero: {
@@ -21,7 +33,7 @@ const ui = {
       description: "친구들이 조그만 픽셀 캐릭터가 되어 화면 가장자리를 돌아다녀요. 일하다 슬쩍 보고, 생각나면 짧게 한마디 건네 보세요.",
       downloadsLabel: "다운로드 선택", appStoreDownload: "App Store 다운로드", macDownload: "macOS 다운로드", windowsDownload: "Windows 다운로드",
       choosePlatform: "운영체제 선택", platformMenu: "운영체제 직접 선택", menuToggle: "다른 운영체제 선택",
-      windowsStatus: "Windows 11 25H2 이상 · x64", browserTitle: "오늘 할 일 | 메모", browserNote: "오늘 할 일",
+      windowsStatus: "Windows 10 1809(build 17763) 이상 · x64", browserTitle: "오늘 할 일 | 메모", browserNote: "오늘 할 일",
       message: "저녁 7시에 볼까?", typingLabel: "토리 입력 중",
       names: { kong: "콩이 · 나", bori: "보리", mongsil: "몽실", tori: "토리" },
       caption: "모니터 속 브라우저 아래에서 걷거나 졸고 잠든 픽셀 동물 친구들과 짧은 말풍선이 보이는 SIDEY 장면",
@@ -47,7 +59,7 @@ const ui = {
     download: {
       title: "내 컴퓨터에도 SIDEY를.", description: "macOS와 Windows에서 쓸 수 있어요. 내 컴퓨터에 맞는 버전을 골라 설치하면 돼요.",
       macButton: "Mac App Store", windowsButton: "Windows 다운로드", releaseNotes: "릴리스 정보",
-      macSystem: "macOS 26 이상 · Apple Silicon(arm64)", windowsSystem: "Windows 11 25H2 이상 · x64",
+      macSystem: "macOS 26 이상 · Apple Silicon(arm64)", windowsSystem: "Windows 10 1809(build 17763) 이상 · x64",
       copyFailure: "복사하지 못했습니다. 해시를 직접 선택해 주세요.",
       hashCopy: "SHA-256 해시 복사", hashCopied: "SHA-256 해시를 복사했습니다.",
     },
@@ -56,7 +68,7 @@ const ui = {
       intro: "처음 쓰기 전에 궁금할 만한 것만 모았어요.",
       items: [
         ["SIDEY는 어떤 앱인가요?", "가까운 친구들이 작은 픽셀 캐릭터가 되어 화면 가장자리에 머무는 초대 전용 데스크톱 메신저예요. 한 그룹에는 최대 12명까지 함께할 수 있어요."],
-        ["어떤 컴퓨터에서 사용할 수 있나요?", "Apple Silicon을 탑재한 macOS 26 이상과 x64 기반 Windows 11 25H2 이상을 지원해요. Intel Mac은 현재 지원하지 않아요."],
+        ["어떤 컴퓨터에서 사용할 수 있나요?", "Apple Silicon을 탑재한 macOS 26 이상과 x64 기반 Windows 10 1809(build 17763) 이상을 지원해요. Intel Mac은 현재 지원하지 않아요."],
         ["친구는 어떻게 초대하나요?", "비공개 그룹을 만들고 초대 코드를 친구에게 보내면 돼요. 한 그룹에는 최대 12명, 한 사람은 최대 5개 그룹에 참여할 수 있어요."],
         ["SIDEY가 화면이나 키보드 입력을 읽나요?", "아니요. 화면 내용, 사용 중인 앱, 다른 앱에서 누른 키, 마우스 좌표, 파일, 마이크, 카메라는 수집하지 않아요. 입력 중 표시는 SIDEY 입력창에 글을 쓸 때만 전송돼요."],
         ["메시지는 얼마나 보관되나요?", "최근 메시지는 3일 동안 보관하고, 이후에는 영구 삭제해요."],
@@ -67,7 +79,7 @@ const ui = {
       appStoreHistory: "macOS 업데이트 내용은 Mac App Store에서 확인하세요.",
       title: "새로운 기능", intro: "SIDEY의 최신 업데이트를 살펴보세요. 새로워진 기능을 놓치지 않도록 한곳에 모았어요.",
       tabs: { label: "운영체제별 새로운 기능", macos: "macOS", windows: "Windows" },
-      viewRelease: "GitHub Release에서 전체 내용 보기", openDetails: "변경 내용 펼치기", closeDetails: "변경 내용 접기", loadedMore: "지난 업데이트를 더 불러왔습니다.",
+      viewRelease: "GitHub Release에서 전체 내용 보기", koreanOriginalNotice: "전체 릴리스 노트는 한국어 원문으로 제공됩니다.", viewKoreanOriginal: "한국어 원문 보기", openDetails: "변경 내용 펼치기", closeDetails: "변경 내용 접기", loadedMore: "지난 업데이트를 더 불러왔습니다.",
     },
   },
   en: {
@@ -81,7 +93,7 @@ const ui = {
     skip: "Skip to content",
     navigation: {
       navigation: "Main navigation", home: "SIDEY home", openMenu: "Open menu", closeMenu: "Close menu", features: "Features", download: "Download",
-      faq: "FAQ", whatsNew: "What's New", store: "Store", characters: "Characters", throwables: "Throwables", bubbles: "Bubbles",
+      faq: "FAQ", whatsNew: "What's New", store: "Store", support: "Support", characters: "Characters", throwables: "Throwables", bubbles: "Bubbles",
       useLightTheme: "Switch to light mode", useDarkTheme: "Switch to dark mode",
     },
     hero: {
@@ -89,7 +101,7 @@ const ui = {
       description: "Your friends become tiny pixel characters wandering along the edge of your screen. Glance over while you work, and send a quick note when they cross your mind.",
       downloadsLabel: "Download options", appStoreDownload: "Download on App Store", macDownload: "Download for macOS", windowsDownload: "Download for Windows",
       choosePlatform: "Choose your platform", platformMenu: "Choose a platform manually", menuToggle: "Choose another platform",
-      windowsStatus: "Windows 11 25H2 or later · x64", browserTitle: "Today’s tasks | Notes", browserNote: "Today's list",
+      windowsStatus: "Windows 10 1809 (build 17763) or later · x64", browserTitle: "Today’s tasks | Notes", browserNote: "Today's list",
       message: "Meet at seven?", typingLabel: "Rosie is typing",
       names: { kong: "Mochi · ME", bori: "Milo", mongsil: "Luna", tori: "Rosie" },
       caption: "A SIDEY scene with pixel animal friends walking, dozing, and sleeping along the bottom of a browser inside a monitor",
@@ -115,7 +127,7 @@ const ui = {
     download: {
       title: "Bring SIDEY to your desktop.", description: "SIDEY is available for macOS and Windows. Pick the version that matches your computer and install it.",
       macButton: "Mac App Store", windowsButton: "Download for Windows", releaseNotes: "Release notes",
-      macSystem: "macOS 26 or later · Apple Silicon (arm64)", windowsSystem: "Windows 11 25H2 or later · x64",
+      macSystem: "macOS 26 or later · Apple Silicon (arm64)", windowsSystem: "Windows 10 1809 (build 17763) or later · x64",
       copyFailure: "Could not copy. Please select the hash manually.",
       hashCopy: "Copy SHA-256 hash", hashCopied: "SHA-256 hash copied.",
     },
@@ -124,7 +136,7 @@ const ui = {
       intro: "A few things worth knowing before you start.",
       items: [
         ["What is SIDEY?", "SIDEY is an invite-only desktop messenger where your closest friends hang out along the edge of your screen as tiny pixel characters. Each private group can have up to 12 people."],
-        ["Which computers are supported?", "SIDEY runs on Apple silicon Macs with macOS 26 or later, and x64 PCs with Windows 11 25H2 or later. Intel Macs are not currently supported."],
+        ["Which computers are supported?", "SIDEY runs on Apple silicon Macs with macOS 26 or later, and x64 PCs with Windows 10 1809 (build 17763) or later. Intel Macs are not currently supported."],
         ["How do I invite friends?", "Create a private group and send the invite code directly to your friends. A group can have up to 12 members, and each person can join up to five groups."],
         ["Does SIDEY watch what I do on my computer?", "No. SIDEY does not collect your screen, open apps, keystrokes from other apps, pointer location, files, microphone, or camera. Typing status is only sent while you type in SIDEY's own message box."],
         ["How long are messages kept?", "Recent messages are kept for three days, then permanently deleted."],
@@ -135,7 +147,7 @@ const ui = {
       appStoreHistory: "View macOS version history on the Mac App Store.",
       title: "What's New", intro: "See the latest changes to SIDEY, grouped by macOS and Windows.",
       tabs: { label: "What's new by operating system", macos: "macOS", windows: "Windows" },
-      viewRelease: "View the full GitHub Release", openDetails: "Show changes", closeDetails: "Hide changes", loadedMore: "More previous updates loaded.",
+      viewRelease: "View the full GitHub Release", koreanOriginalNotice: "Full release notes are currently available in the original Korean.", viewKoreanOriginal: "View the Korean original", openDetails: "Show changes", closeDetails: "Hide changes", loadedMore: "More previous updates loaded.",
     },
   },
   ja: {
@@ -149,7 +161,7 @@ const ui = {
     skip: "本文へスキップ",
     navigation: {
       navigation: "メインメニュー", home: "SIDEY ホーム", openMenu: "メニューを開く", closeMenu: "メニューを閉じる", features: "機能", download: "ダウンロード",
-      faq: "よくある質問", whatsNew: "新機能", store: "ストア", characters: "キャラクター", throwables: "投げアイテム", bubbles: "吹き出し",
+      faq: "よくある質問", whatsNew: "新機能", store: "ストア", support: "サポート", characters: "キャラクター", throwables: "投げアイテム", bubbles: "吹き出し",
       useLightTheme: "ライトモードに切り替える", useDarkTheme: "ダークモードに切り替える",
     },
     hero: {
@@ -158,7 +170,7 @@ const ui = {
       description: "友だちが小さなピクセルキャラクターになって、画面の端を歩き回ります。作業の合間にちらっと眺めたり、思い立ったときに短いひと言を送ったり。",
       downloadsLabel: "ダウンロードを選択", appStoreDownload: "App Storeでダウンロード", macDownload: "macOS版をダウンロード", windowsDownload: "Windows版をダウンロード",
       choosePlatform: "OSを選択", platformMenu: "OSを選択してください", menuToggle: "別のOSを選ぶ",
-      windowsStatus: "Windows 11 25H2以降 · x64", browserTitle: "今日やること | メモ", browserNote: "今日やること",
+      windowsStatus: "Windows 10 1809（ビルド17763）以降 · x64", browserTitle: "今日やること | メモ", browserNote: "今日やること",
       message: "7時に会う？", typingLabel: "おもちが入力中",
       names: { kong: "むぎ・私", bori: "モカ", mongsil: "きなこ", tori: "おもち" },
       caption: "モニター内のブラウザ下部で、歩いたり、うとうとしたり、眠ったりするピクセルの友だちと短い吹き出しが見えるSIDEYの画面",
@@ -185,7 +197,7 @@ const ui = {
       title: "あなたのデスクトップにもSIDEYを。", description: "macOSとWindowsに対応しています。お使いのパソコンに合うバージョンを選んでインストールしてください。",
       titleParts: ["あなたの", "デスクトップにも", "SIDEYを。"],
       macButton: "Mac App Store", windowsButton: "Windows版をダウンロード", releaseNotes: "リリースノート",
-      macSystem: "macOS 26以降 · Appleシリコン（arm64）", windowsSystem: "Windows 11 25H2以降 · x64",
+      macSystem: "macOS 26以降 · Appleシリコン（arm64）", windowsSystem: "Windows 10 1809（ビルド17763）以降 · x64",
       copyFailure: "コピーできませんでした。ハッシュを選択してコピーしてください。",
       hashCopy: "SHA-256ハッシュをコピー", hashCopied: "SHA-256ハッシュをコピーしました。",
     },
@@ -194,7 +206,7 @@ const ui = {
       intro: "使い始める前に知っておきたいことをまとめました。",
       items: [
         ["SIDEYとは？", "仲のいい友だちが小さなピクセルキャラクターになって画面の端にいる、招待制のデスクトップメッセンジャーです。1つのグループには最大12人まで参加できます。"],
-        ["どのパソコンで使えますか？", "Appleシリコン搭載のmacOS 26以降と、x64版Windows 11 25H2以降に対応しています。Intel Macには現在対応していません。"],
+        ["どのパソコンで使えますか？", "Appleシリコン搭載のmacOS 26以降と、x64版Windows 10 1809（ビルド17763）以降に対応しています。Intel Macには現在対応していません。"],
         ["友だちを招待するには？", "非公開グループを作り、招待コードを友だちに直接送ります。1グループは最大12人、1人につき最大5グループまで参加できます。"],
         ["SIDEYは画面やキーボード入力を読み取りますか？", "いいえ。画面の内容、使用中のアプリ、ほかのアプリでのキー入力、ポインターの位置、ファイル、マイク、カメラは収集しません。入力中の表示は、SIDEYのメッセージ欄に入力している間だけ送信されます。"],
         ["メッセージはいつまで保存されますか？", "直近のメッセージは3日間保存され、その後完全に削除されます。"],
@@ -205,7 +217,75 @@ const ui = {
       appStoreHistory: "macOSの更新内容はMac App Storeで確認できます。",
       title: "新機能", intro: "SIDEYの最新アップデートをチェック。新しくなった機能を見逃さないよう、ひとつにまとめました。",
       tabs: { label: "OS別の新機能", macos: "macOS", windows: "Windows" },
-      viewRelease: "GitHub Releaseですべて見る", openDetails: "変更内容を表示", closeDetails: "変更内容を閉じる", loadedMore: "過去のアップデートをさらに読み込みました。",
+      viewRelease: "GitHub Releaseですべて見る", koreanOriginalNotice: "リリースノート全文は現在、韓国語の原文で提供しています。", viewKoreanOriginal: "韓国語の原文を見る", openDetails: "変更内容を表示", closeDetails: "変更内容を閉じる", loadedMore: "過去のアップデートをさらに読み込みました。",
+    },
+  },
+  "zh-Hant": {
+    meta: {
+      title: "SIDEY — 待在螢幕邊緣的朋友",
+      description: "SIDEY 是桌面通訊軟體，讓親近好友化身為螢幕邊緣的小小像素動物，顯示上線狀態與簡短訊息。",
+      ogTitle: "SIDEY — 小小好友，就在螢幕邊緣。",
+      ogDescription: "透過小小像素動物，看看親近好友的近況與簡短訊息。",
+      ogAlt: "五隻像素動物排列在螢幕邊緣的 SIDEY 社群分享圖片",
+    },
+    skip: "跳到主要內容",
+    navigation: {
+      navigation: "主要導覽", home: "SIDEY 首頁", openMenu: "開啟選單", closeMenu: "關閉選單", features: "功能", download: "下載",
+      faq: "常見問題", whatsNew: "新功能", store: "商店", support: "支援", characters: "角色", throwables: "投擲道具", bubbles: "對話框",
+      useLightTheme: "切換至淺色模式", useDarkTheme: "切換至深色模式",
+    },
+    hero: {
+      title: "朋友就在螢幕邊緣走走停停。",
+      description: "好友會化身成小小像素角色，在螢幕邊緣散步。工作時瞄一眼近況，想起對方時就傳一句簡短訊息。",
+      downloadsLabel: "下載選項", appStoreDownload: "從 App Store 下載", macDownload: "下載 macOS 版", windowsDownload: "下載 Windows 版",
+      choosePlatform: "選擇作業系統", platformMenu: "手動選擇作業系統", menuToggle: "選擇其他作業系統",
+      windowsStatus: "Windows 10 1809（組建 17763）或更新版本 · x64", browserTitle: "今天要做的事｜備忘錄", browserNote: "今天要做的事",
+      message: "晚上七點見？", typingLabel: "麻糬正在輸入",
+      names: { kong: "麥麥 · 我", bori: "摩卡", mongsil: "栗子", tori: "麻糬" },
+      caption: "SIDEY 畫面中，像素動物朋友在瀏覽器視窗下方散步、打瞌睡或睡覺，旁邊顯示簡短對話框",
+    },
+    motion: {
+      title: "一直站著也太無聊了。", description: "好友上線時會散步，離開時會打瞌睡，離線後就睡覺。偶爾也能互相開個小玩笑。", label: "SIDEY 角色狀態與動作示例",
+      presence: { eyebrow: "平常的模樣", title: "散步、打瞌睡、睡覺。", description: "線上、離開或離線，角色會隨好友的狀態改變模樣。", online: "線上", away: "離開", offline: "離線" },
+      throw: { eyebrow: "和朋友玩", title: "有時候，一顆軟球就夠了。", description: "拿鐵丟出軟球，輕輕碰到麻糬。", source: "拿鐵", target: "麻糬" },
+      pulse: { eyebrow: "大聲打招呼", title: "偶爾也要好好打聲招呼。", description: "按兩下栗子，牠就會在螢幕邊緣突然變大。", name: "栗子" },
+      names: { kong: "麥麥", bori: "摩卡", cloud: "栗子" },
+    },
+    showcase: {
+      title: "工作時，也陪在螢幕一角。",
+      introduction: "工作時，SIDEY 會留在螢幕邊緣。瞄一眼就知道好友在不在，想聊時再傳一句話。",
+      label: "SIDEY 在螢幕上的呈現方式", caption: "在 macOS 工作畫面中使用 SIDEY 的示例",
+      alt: "開著備忘錄視窗的 macOS 桌面，SIDEY 像素好友排列在螢幕底部",
+      steps: [
+        ["01", "照常做手邊的事", "即使 SIDEY 顯示在畫面上，也能照常點按並使用後方的 App。"],
+        ["02", "瞄一眼好友近況", "看看角色在散步、打瞌睡還是睡覺，就知道好友現在是否上線。"],
+        ["03", "想聊時說一句", "開啟 SIDEY 傳送簡短訊息，也能互相丟個小道具。"],
+      ],
+    },
+    download: {
+      title: "把 SIDEY 帶到你的桌面。", description: "SIDEY 支援 macOS 與 Windows。選擇適合你電腦的版本並安裝即可。",
+      macButton: "Mac App Store", windowsButton: "下載 Windows 版", releaseNotes: "版本資訊",
+      macSystem: "macOS 26 或更新版本 · Apple 晶片（arm64）", windowsSystem: "Windows 10 1809（組建 17763）或更新版本 · x64",
+      copyFailure: "無法複製，請手動選取雜湊值。",
+      hashCopy: "複製 SHA-256 雜湊值", hashCopied: "已複製 SHA-256 雜湊值。",
+    },
+    faq: {
+      title: "常見問題",
+      intro: "開始使用前，先看看這些常見問題。",
+      items: [
+        ["SIDEY 是什麼？", "SIDEY 是邀請制桌面通訊軟體，讓親近好友化身為螢幕邊緣的小小像素角色。每個私人群組最多可有 12 人。"],
+        ["支援哪些電腦？", "SIDEY 支援配備 Apple 晶片、執行 macOS 26 或更新版本的 Mac，以及執行 Windows 10 1809（組建 17763）或更新版本的 x64 電腦。目前不支援 Intel Mac。"],
+        ["如何邀請朋友？", "建立私人群組後，直接把邀請碼傳給朋友。每個群組最多 12 人，每人最多可加入 5 個群組。"],
+        ["SIDEY 會讀取螢幕或鍵盤輸入嗎？", "不會。SIDEY 不會收集螢幕內容、使用中的 App、在其他 App 按下的按鍵、游標座標、檔案、麥克風或相機資料。只有在 SIDEY 的訊息輸入框打字時，才會傳送輸入中狀態。"],
+        ["訊息會保留多久？", "近期訊息會保留 3 天，之後永久刪除。"],
+        ["所有遊戲或全螢幕 App 上都會顯示嗎？", "不一定。SIDEY 可在一般桌面環境中顯示，但可能無法顯示在安全性畫面、受 DRM 保護的 App、具較高權限的 App，或部分獨佔全螢幕遊戲上。"],
+      ],
+    },
+    whatsNew: {
+      appStoreHistory: "前往 Mac App Store 查看 macOS 版本記錄。",
+      title: "新功能", intro: "查看 SIDEY 在 macOS 與 Windows 上的最新更新。",
+      tabs: { label: "依作業系統查看新功能", macos: "macOS", windows: "Windows" },
+      viewRelease: "在 GitHub Release 查看完整內容", koreanOriginalNotice: "完整版本資訊目前僅提供韓文原文。", viewKoreanOriginal: "查看韓文原文", openDetails: "顯示變更內容", closeDetails: "收合變更內容", loadedMore: "已載入更多舊版更新。",
     },
   },
 } as const;

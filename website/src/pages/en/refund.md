@@ -1,10 +1,10 @@
 ---
 layout: ../../layouts/PolicyMarkdownLayout.astro
 title: Refund Policy · SIDEY
-description: Cancellation and refund terms for SIDEY digital character entitlements.
+description: Cancellation and refund terms for SIDEY digital customization entitlements.
 canonicalPath: en/refund/
 heading: Cancellation and Refund Policy
-introduction: A paid SIDEY character is a digital entitlement delivered to your Account after payment is confirmed.
+introduction: Paid SIDEY customization items are digital entitlements delivered to your Account after payment is confirmed.
 locale: en
 originalPath: ko/refund/
 translationNotice: This page is an English translation of the original Korean document.
@@ -13,7 +13,7 @@ originalLabel: View the original document
 
 ## Change-of-mind refunds after delivery begins
 
-Delivery of a digital character entitlement begins as soon as payment is confirmed. Once delivery has begun, cancellation or refund for a simple change of mind is not available.
+Delivery of a digital customization entitlement begins as soon as payment is confirmed. Once delivery has begun, cancellation or refund for a simple change of mind is not available.
 
 ## When a full refund is available
 
@@ -30,7 +30,7 @@ A full refund will be issued when a legally recognized reason is confirmed, incl
 
 1. For a Mac App Store purchase, request a refund through Apple's Report a Problem process. If payment is offered through PortOne in a direct distribution build, send support only the purchasing Account, payment time, and information needed to locate the order. Do not send a full payment-card number or password.
 2. After Apple or the payment service provider confirms the refund, the entitlement granted by that payment source will be revoked.
-3. If no other valid payment record covers the character and it is currently selected, the profile will return to the default hamster.
+3. If no other valid grant covers the revoked item and it is currently equipped, that category returns to its default item: the default hamster, default speech bubble, or default throwable.
 
 ## Account deletion and refunds
 

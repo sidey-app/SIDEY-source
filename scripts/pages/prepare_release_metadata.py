@@ -11,9 +11,13 @@ import re
 import shutil
 
 
-APP_STORE_URL = "https://apps.apple.com/kr/app/sidey/id6808528060?mt=12"
 DEFAULT_PUBLIC_REPOSITORY = "sidey-app/SIDEY"
-LOCALES = ("ko", "en", "ja")
+APP_STORE_URLS = {
+    "ko": "https://apps.apple.com/kr/app/sidey/id6808528060?mt=12",
+    "en": "https://apps.apple.com/us/app/sidey/id6808528060?mt=12",
+    "ja": "https://apps.apple.com/jp/app/sidey/id6808528060?mt=12",
+    "zh-hant": "https://apps.apple.com/tw/app/sidey/id6808528060?mt=12",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -140,7 +144,7 @@ def prepare(
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(manifest_text, encoding="utf-8", newline="\n")
 
-    for locale in LOCALES:
+    for locale, app_store_url in APP_STORE_URLS.items():
         relative_path = Path(locale) / "index.html"
         path = output_dir / relative_path
         if not path.is_file():
@@ -155,10 +159,10 @@ def prepare(
         require_anchor(
             html,
             "primary-download-action",
-            href=APP_STORE_URL,
-            **{"data-macos-url": APP_STORE_URL, "data-windows-url": windows_url},
+            href=app_store_url,
+            **{"data-macos-url": app_store_url, "data-windows-url": windows_url},
         )
-        require_anchor(html, "macos-download-action", href=APP_STORE_URL)
+        require_anchor(html, "macos-download-action", href=app_store_url)
         require_anchor(html, "windows-download-action", href=windows_url)
         html = replace_checksum(html, "windows", windows_hash)
         path.write_text(html, encoding="utf-8", newline="\n")
