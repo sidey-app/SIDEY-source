@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ConnectionBadge: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let state: BackendConnectionState
 
     var body: some View {
@@ -13,6 +14,13 @@ struct ConnectionBadge: View {
         .padding(.vertical, 9)
         .clipShape(Capsule())
         .glassEffect(in: Capsule())
+        .overlay {
+            if state == .connecting {
+                ConnectionProgressBorder(reduceMotion: reduceMotion)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+        }
     }
 
     private var color: Color {
@@ -31,6 +39,49 @@ struct ConnectionBadge: View {
         case .online: "connection.state.online"
         case .failed: "connection.state.failed"
         }
+    }
+}
+
+struct ConnectionProgressBorder: View {
+    let reduceMotion: Bool
+    @State private var isVisible = false
+
+    var body: some View {
+        Group {
+            if reduceMotion {
+                Capsule().strokeBorder(.orange.opacity(0.65), lineWidth: 1.5)
+            } else {
+                TimelineView(.animation(
+                    minimumInterval: 1.0 / 30,
+                    // Settings uses NSWindow + NSHostingView, not a SwiftUI
+                    // Scene. Its scenePhase is not a window-visibility signal.
+                    paused: !isVisible
+                )) { context in
+                    let phase = context.date.timeIntervalSinceReferenceDate
+                        .truncatingRemainder(dividingBy: 1.6) / 1.6
+                    Capsule()
+                        .strokeBorder(.orange.opacity(0.2), lineWidth: 1.5)
+                        .overlay {
+                            Capsule().strokeBorder(
+                                AngularGradient(
+                                    stops: [
+                                        .init(color: .clear, location: 0),
+                                        .init(color: .clear, location: 0.55),
+                                        .init(color: .orange.opacity(0.3), location: 0.75),
+                                        .init(color: .orange, location: 0.95),
+                                        .init(color: .clear, location: 1)
+                                    ],
+                                    center: .center,
+                                    angle: .degrees(phase * 360)
+                                ),
+                                lineWidth: 1.5
+                            )
+                        }
+                }
+            }
+        }
+        .onAppear { isVisible = true }
+        .onDisappear { isVisible = false }
     }
 }
 
