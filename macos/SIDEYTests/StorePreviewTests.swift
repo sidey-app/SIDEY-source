@@ -10,7 +10,10 @@ final class StorePreviewTests: XCTestCase {
         for product in CommerceCatalog.characterProducts {
             let scenario = StorePreviewScenario.make(product: product)
             let characterID = try XCTUnwrap(product.characterID)
-            XCTAssertEqual(scenario.members.map(\.nickname), ["모카", "두부"])
+            XCTAssertEqual(scenario.members.map(\.nickname), [
+                L10n.text("store.preview.member.moka"),
+                L10n.text("store.preview.member.dubu")
+            ])
             XCTAssertEqual(scenario.members.map(\.characterID), [characterID, "pixel_cat"])
             XCTAssertTrue(scenario.members.allSatisfy { $0.presence == .online })
             XCTAssertTrue(scenario.bubbles.isEmpty)
@@ -60,7 +63,10 @@ final class StorePreviewTests: XCTestCase {
     func testBubbleScenariosAlternateTwoMembersWithTheActualThemeAndDecoration() throws {
         for product in CommerceCatalog.cosmeticProducts where product.kind == .bubble {
             let scenario = StorePreviewScenario.make(product: product)
-            XCTAssertEqual(scenario.members.map(\.nickname), ["모카", "두부"])
+            XCTAssertEqual(scenario.members.map(\.nickname), [
+                L10n.text("store.preview.member.moka"),
+                L10n.text("store.preview.member.dubu")
+            ])
             XCTAssertEqual(scenario.members.map(\.characterID), ["pixel_hamster", "pixel_cat"])
             XCTAssertTrue(scenario.members.allSatisfy { $0.presence == .online })
 
@@ -81,9 +87,9 @@ final class StorePreviewTests: XCTestCase {
             XCTAssertEqual(presentations.map(\.isTyping), [true, false, true, false, true])
             XCTAssertEqual(presentations.map { $0.bubble?.body }, [
                 nil,
-                "저메추좀 해줘",
+                L10n.text("store.preview.message.left"),
                 nil,
-                "곱도리탕 어때?",
+                L10n.text("store.preview.message.right"),
                 nil
             ])
             XCTAssertTrue(
@@ -121,7 +127,10 @@ final class StorePreviewTests: XCTestCase {
     func testThrowableScenariosFixMembersAndAlternateEverySecond() throws {
         for product in CommerceCatalog.cosmeticProducts where product.kind == .throwable {
             let scenario = StorePreviewScenario.make(product: product)
-            XCTAssertEqual(scenario.members.map(\.nickname), ["모카", "두부"])
+            XCTAssertEqual(scenario.members.map(\.nickname), [
+                L10n.text("store.preview.member.moka"),
+                L10n.text("store.preview.member.dubu")
+            ])
             XCTAssertEqual(scenario.members.map(\.characterID), ["pixel_hamster", "pixel_cat"])
             XCTAssertTrue(scenario.members.allSatisfy { $0.presence == .online })
             XCTAssertEqual(scenario.fixedTrackFractions[StorePreviewScenario.mokaID], 0.22)
