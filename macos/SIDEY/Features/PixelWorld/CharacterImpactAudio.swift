@@ -19,15 +19,27 @@ final class CharacterImpactAudio {
                             "throwable_snowflake", "throwable_baseball", "throwable_wakkuball", "throwable_dujjonku",
                             "tennis_ball", "tissue_ball", "fish_cake_skewer", "leaf"]
     var isEnabled = true { didSet { if !isEnabled { stopAll() } } }
-    private var players: [String: [AVAudioPlayer]] = [:]
     private var admission = CharacterImpactAdmission()
     private(set) var resourceErrors: [String] = []
     private(set) var playCount = 0
-    private var observers: [(NotificationCenter, NSObjectProtocol)] = []
-    private var outputListener: AudioObjectPropertyListenerBlock?
-    private var outputAddress = AudioObjectPropertyAddress(
-        mSelector: kAudioHardwarePropertyDefaultOutputDevice,
-        mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+    private final class Resources {
+        var players: [String: [AVAudioPlayer]] = [:]
+        var observers: [(NotificationCenter, NSObjectProtocol)] = []
+        var outputListener: AudioObjectPropertyListenerBlock?
+        var outputAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+    }
+
+    private let resourceLifetime = MainActorResourceLifetime(Resources()) { resources in
+        for (center, token) in resources.observers { center.removeObserver(token) }
+        if let outputListener = resources.outputListener {
+            AudioObjectRemovePropertyListenerBlock(
+                AudioObjectID(kAudioObjectSystemObject), &resources.outputAddress, .main, outputListener)
+        }
+        for player in resources.players.values.flatMap({ $0 }) { player.stop() }
+    }
+    private var resources: Resources { resourceLifetime.resource }
 
     init(bundle: Bundle = .main) {
         for id in Self.objectIDs {
@@ -35,7 +47,7 @@ final class CharacterImpactAudio {
                 guard let url = bundle.url(forResource: "impact-\(id)", withExtension: "wav") else {
                     throw CocoaError(.fileNoSuchFile)
                 }
-                players[id] = try (0..<4).map { _ in
+                resources.players[id] = try (0..<4).map { _ in
                     let player = try AVAudioPlayer(contentsOf: url)
                     player.prepareToPlay()
                     return player
@@ -52,29 +64,23 @@ final class CharacterImpactAudio {
             let token = center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.stopAll() }
             }
-            observers.append((center, token))
+            resources.observers.append((center, token))
         }
         let listener: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
             Task { @MainActor in self?.stopAll() }
         }
-        if AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &outputAddress, .main, listener) == noErr {
-            outputListener = listener
+        if AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &resources.outputAddress, .main, listener) == noErr {
+            resources.outputListener = listener
         }
     }
 
-    isolated deinit {
-        for (center, token) in observers { center.removeObserver(token) }
-        if let outputListener {
-            AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &outputAddress, .main, outputListener)
-        }
-        for player in players.values.flatMap({ $0 }) { player.stop() }
-    }
+    nonisolated deinit {}
 
-    var activeVoiceCount: Int { players.values.flatMap { $0 }.filter(\.isPlaying).count }
+    var activeVoiceCount: Int { resources.players.values.flatMap { $0 }.filter(\.isPlaying).count }
 
     @discardableResult
     func play(objectID: String, at time: TimeInterval) -> Bool {
-        guard !SystemActivityMonitor.currentScreenLocked(), let player = players[objectID]?.first(where: { !$0.isPlaying }),
+        guard !SystemActivityMonitor.currentScreenLocked(), let player = resources.players[objectID]?.first(where: { !$0.isPlaying }),
               admission.accept(at: time, activeVoices: activeVoiceCount, enabled: isEnabled)
         else { return false }
         player.currentTime = 0
@@ -84,7 +90,7 @@ final class CharacterImpactAudio {
     }
 
     func stopAll() {
-        for player in players.values.flatMap({ $0 }) {
+        for player in resources.players.values.flatMap({ $0 }) {
             player.stop()
             player.currentTime = 0
         }
