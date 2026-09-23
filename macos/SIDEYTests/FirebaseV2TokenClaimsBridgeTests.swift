@@ -22,7 +22,10 @@ final class FirebaseV2TokenClaimsBridgeTests: XCTestCase {
     }
 
     func testFailedCallbackPropagatesOriginalError() async {
-        let expected = NSError(domain: "FirebaseTokenClaimsFixture", code: 17)
+        let expected = NSError(
+            domain: "FirebaseTokenClaimsFixture", code: 17,
+            userInfo: [NSLocalizedDescriptionKey: "Fixture token refresh failed"]
+        )
 
         do {
             _ = try await FirebaseV2TokenClaimsBridge.load { completion in
@@ -30,7 +33,10 @@ final class FirebaseV2TokenClaimsBridgeTests: XCTestCase {
             }
             XCTFail("A failed token request must not return claims")
         } catch {
-            XCTAssertTrue(error as NSError === expected)
+            let actual = error as NSError
+            XCTAssertEqual(actual.domain, expected.domain)
+            XCTAssertEqual(actual.code, expected.code)
+            XCTAssertEqual(actual.localizedDescription, expected.localizedDescription)
         }
     }
 
