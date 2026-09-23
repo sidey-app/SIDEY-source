@@ -132,7 +132,7 @@ public sealed class FirebaseRealtimeListenerTests
     }
 
     [Fact]
-    public async Task MalformedInboxDiagnosticIdentifiesFailedStreamWithoutPayload()
+    public async Task MalformedSnapshotIsIgnoredUntilAValidSnapshotArrives()
     {
         var events = new List<BackendEvent>();
         object eventGate = new();
@@ -148,7 +148,48 @@ public sealed class FirebaseRealtimeListenerTests
             _ => CreateClient(
                 Task.Delay(Timeout.InfiniteTimeSpan),
                 RoomEvents(),
-                MalformedInboxEvents()));
+                MalformedThenValidInboxEvents()));
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => listener.IsReady);
+        await WaitUntilAsync(() =>
+        {
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.Diagnostic>().Any(diagnostic =>
+                    diagnostic.Stage == "firebase-listener-snapshot-ignored kind=protocol stream=inbox");
+            }
+        });
+
+        lock (eventGate)
+        {
+            Assert.Contains(events, item => item is BackendEvent.Diagnostic diagnostic
+                && diagnostic.Stage == "firebase-listener-snapshot-ignored kind=protocol stream=inbox");
+            Assert.Contains(events, item => item is BackendEvent.Diagnostic diagnostic
+                && diagnostic.Stage.StartsWith("firebase-listener-ready", StringComparison.Ordinal));
+            Assert.DoesNotContain(events, item => item is BackendEvent.Diagnostic diagnostic
+                && diagnostic.Stage.StartsWith("firebase-listener-connect-failed", StringComparison.Ordinal));
+        }
+    }
+
+    [Fact]
+    public async Task InitialStreamEofDiagnosticIdentifiesStreamWithoutPayload()
+    {
+        var events = new List<BackendEvent>();
+        object eventGate = new();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            backendEvent =>
+            {
+                lock (eventGate)
+                {
+                    events.Add(backendEvent);
+                }
+            },
+            _ => CreateClient(
+                Task.FromResult(0),
+                string.Empty,
+                InboxEvents()));
 
         await listener.StartAsync(s_roomId, CancellationToken.None);
         await WaitUntilAsync(() =>
@@ -156,17 +197,62 @@ public sealed class FirebaseRealtimeListenerTests
             lock (eventGate)
             {
                 return events.OfType<BackendEvent.Diagnostic>().Any(diagnostic =>
-                    diagnostic.Stage == "firebase-listener-connect-failed kind=protocol stream=inbox");
+                    diagnostic.Stage == "firebase-listener-connect-failed kind=eof stream=room phase=initial");
             }
         });
+    }
 
-        lock (eventGate)
+    [Fact]
+    public async Task CredentialProtocolDiagnosticIdentifiesStageWithoutPayload()
+    {
+        var events = new List<BackendEvent>();
+        object eventGate = new();
+        await using var listener = new FirebaseRealtimeListener(
+            new MalformedCredentialProvider(),
+            backendEvent =>
+            {
+                lock (eventGate)
+                {
+                    events.Add(backendEvent);
+                }
+            });
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() =>
         {
-            BackendEvent.Diagnostic failure = Assert.Single(events.OfType<BackendEvent.Diagnostic>());
-            Assert.Equal(
-                "firebase-listener-connect-failed kind=protocol stream=inbox",
-                failure.Stage);
-        }
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.Diagnostic>().Any(diagnostic =>
+                    diagnostic.Stage == "firebase-listener-connect-failed kind=protocol stage=credential");
+            }
+        });
+    }
+
+    [Fact]
+    public async Task StreamRequestDiagnosticIdentifiesStageStatusAndStreamWithoutPayload()
+    {
+        var events = new List<BackendEvent>();
+        object eventGate = new();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            backendEvent =>
+            {
+                lock (eventGate)
+                {
+                    events.Add(backendEvent);
+                }
+            },
+            _ => CreateProtocolFailureClient());
+
+        await listener.StartAsync(activeRoomId: null, CancellationToken.None);
+        await WaitUntilAsync(() =>
+        {
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.Diagnostic>().Any(diagnostic =>
+                    diagnostic.Stage == "firebase-listener-connect-failed kind=protocol stream=inbox stage=request status=400");
+            }
+        });
     }
 
     [Fact]
@@ -235,7 +321,7 @@ public sealed class FirebaseRealtimeListenerTests
             Assert.Contains(events, item => item is BackendEvent.ConnectionChanged
             { Status.IsReady: true });
             Assert.Contains(events, item => item is BackendEvent.Diagnostic diagnostic
-                && diagnostic.Stage == "firebase-listener-disconnected kind=eof");
+                && diagnostic.Stage == "firebase-listener-disconnected kind=eof stream=room phase=active");
         }
     }
 
@@ -389,7 +475,7 @@ public sealed class FirebaseRealtimeListenerTests
             lock (eventGate)
             {
                 return events.OfType<BackendEvent.Diagnostic>().Any(diagnostic =>
-                        diagnostic.Stage == "firebase-listener-connect-failed kind=protocol stream=inbox")
+                        diagnostic.Stage == "firebase-listener-connect-failed kind=eof stream=inbox phase=initial")
                     && events.OfType<BackendEvent.TypingChanged>()
                         .Any(item => item.UserId == peerUserId && !item.Active);
             }
@@ -541,8 +627,7 @@ public sealed class FirebaseRealtimeListenerTests
                 "/v2/n/",
                 StringComparison.Ordinal);
             Stream stream = inbox
-                ? new PrefixThenSuffixStream(
-                    [],
+                ? new PrefixThenSignalStream(
                     Encoding.UTF8.GetBytes(MalformedInboxEvents()),
                     allowInboxFailure)
                 : new PrefixThenWaitStream(Encoding.UTF8.GetBytes(
@@ -583,6 +668,17 @@ public sealed class FirebaseRealtimeListenerTests
             data = false,
         });
         return $"event: put\ndata: {initial}\n\n";
+    }
+
+    private static string MalformedThenValidInboxEvents() =>
+        MalformedInboxEvents() + InboxEvents();
+
+    private static FirebaseRtdbRestClient CreateProtocolFailureClient()
+    {
+        var urls = new FirebaseRtdbUrlBuilder(
+            new Uri("https://sidey.asia-southeast1.firebasedatabase.app"));
+        return FirebaseRtdbRestClient.CreateForTesting(urls, (_, _) =>
+            Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
     }
 
     private static string InboxEvents()
@@ -715,6 +811,17 @@ public sealed class FirebaseRealtimeListenerTests
                 new Uri("https://sidey.asia-southeast1.firebasedatabase.app"),
                 generation: 1));
         }
+
+        public ValueTask ResetAsync(CancellationToken cancellationToken = default) =>
+            ValueTask.CompletedTask;
+    }
+
+    private sealed class MalformedCredentialProvider : IFirebaseRealtimeCredentialProvider
+    {
+        public ValueTask<FirebaseRealtimeCredential> GetCredentialAsync(
+            CancellationToken cancellationToken = default) =>
+            ValueTask.FromException<FirebaseRealtimeCredential>(
+                new InvalidDataException("secret credential payload"));
 
         public ValueTask ResetAsync(CancellationToken cancellationToken = default) =>
             ValueTask.CompletedTask;

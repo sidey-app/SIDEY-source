@@ -196,7 +196,6 @@ public sealed class FirebaseRealtimeProtocolTests
     }
 
     [Theory]
-    [InlineData("{\"z\":{}}")]
     [InlineData("{\"e\":{\"i\":\"7d3bb557-56b2-4409-a0bb-daf9046cc555\",\"s\":\"88557669-c870-4903-b545-e42228922306\",\"b\":\"body\",\"t\":1,\"n\":1,\"k\":\"0\"}}")]
     [InlineData("{\"e\":{\"i\":\"7d3bb557-56b2-4409-a0bb-daf9046cc555\",\"s\":\"88557669-c870-4903-b545-e42228922306\",\"b\":\"body\",\"t\":1,\"n\":9007199254740992}}")]
     public void MalformedRoomShapesFailClosed(string json)
@@ -234,6 +233,41 @@ public sealed class FirebaseRealtimeProtocolTests
     }
 
     [Fact]
+    public void SnapshotDecodersMatchMacExtensionAndInvalidUuidHandling()
+    {
+        FirebaseRealtimeRoomPayload room = ParseRoom(
+            $$"""
+            {
+              "future": true,
+              "c": {
+                "not-a-user": 1800000000000,
+                "{{s_userId:D}}": 1800000000001
+              },
+              "x": {
+                "also-not-a-user": { "u": "{{s_userId:D}}", "k": "0", "t": 1800000000002 },
+                "{{s_userId:D}}": { "u": "{{s_userId:D}}", "k": "0", "t": 1800000000003, "future": true }
+              }
+            }
+            """);
+        Assert.Equal(1_800_000_000_001, room.CharacterPulses[s_userId]);
+        Assert.Equal(1_800_000_000_003, room.CharacterThrows[s_userId].Timestamp);
+
+        FirebaseRealtimeInboxPayload inbox = ParseInbox(
+            $$"""
+            {
+              "future": true,
+              "r": {
+                "not-a-room": { "v": "00000000000000000999" },
+                "{{s_roomId:D}}": { "n": 9, "future": true }
+              }
+            }
+            """);
+        FirebaseRealtimeInboxRoom hint = Assert.Single(inbox.Rooms).Value;
+        Assert.Null(hint.Revision);
+        Assert.Equal(9, hint.ChatSequence);
+    }
+
+    [Fact]
     public void InboxAcceptsProductionPartialHintShapes()
     {
         FirebaseRealtimeInboxPayload accessOnly = ParseInbox(
@@ -260,9 +294,7 @@ public sealed class FirebaseRealtimeProtocolTests
     [Theory]
     [InlineData("{\"a\":42,\"r\":{}}")]
     [InlineData("{\"a\":\"0000000000000000042\",\"r\":{}}")]
-    [InlineData("{\"a\":\"00000000000000000042\",\"r\":{},\"extra\":true}")]
     [InlineData("{\"a\":\"00000000000000000042\",\"r\":{\"73527218-54b9-4a6b-9541-8a19072579f3\":{\"v\":\"00000000000000000123\",\"n\":0}}}")]
-    [InlineData("{\"a\":\"00000000000000000042\",\"r\":{\"73527218-54b9-4a6b-9541-8a19072579f3\":{\"v\":\"00000000000000000123\",\"n\":1,\"x\":1}}}")]
     public void MalformedInboxShapesFailClosed(string json)
     {
         Assert.Throws<InvalidDataException>(() => ParseInbox(json));

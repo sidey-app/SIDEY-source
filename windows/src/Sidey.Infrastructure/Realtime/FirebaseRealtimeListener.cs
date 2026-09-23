@@ -267,8 +267,15 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
         Guid? activeRoomId,
         CancellationToken cancellationToken)
     {
-        FirebaseRealtimeCredential credential =
-            await _credentials.GetCredentialAsync(cancellationToken).ConfigureAwait(false);
+        FirebaseRealtimeCredential credential;
+        try
+        {
+            credential = await _credentials.GetCredentialAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (InvalidDataException exception)
+        {
+            throw new FirebaseRealtimeCredentialProtocolException(exception);
+        }
         FirebaseRtdbRestClient client = _createClient(credential.DatabaseUrl);
         var streamSet = new StreamSet(client, activeRoomId.HasValue ? 2 : 1, cancellationToken);
         BeginLiveGeneration(generation);
@@ -322,13 +329,22 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
 
                 if (firebaseEvent.Kind is FirebaseSseEventKind.Put or FirebaseSseEventKind.Patch)
                 {
-                    snapshot.Apply(firebaseEvent.GetMutation());
-                    ProcessSnapshot(
-                        roomId,
-                        snapshot.Value,
-                        initialMutation,
-                        credential.UserId,
-                        generation);
+                    try
+                    {
+                        snapshot.Apply(firebaseEvent.GetMutation());
+                        ProcessSnapshot(
+                            roomId,
+                            snapshot.Value,
+                            initialMutation,
+                            credential.UserId,
+                            generation);
+                    }
+                    catch (InvalidDataException)
+                    {
+                        _emit(new BackendEvent.Diagnostic(
+                            $"firebase-listener-snapshot-ignored kind=protocol stream={(roomId.HasValue ? "room" : "inbox")}"));
+                        continue;
+                    }
                     if (initialMutation)
                     {
                         initialMutation = false;
@@ -342,10 +358,20 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
                     throw new UnauthorizedAccessException("Firebase realtime permission was revoked.");
                 }
             }
+
+            throw new FirebaseRealtimeStreamEndedException(
+                roomId.HasValue ? "room" : "inbox",
+                initialMutation ? "initial" : "active");
         }
         catch (InvalidDataException exception)
         {
             throw new FirebaseRealtimeStreamProtocolException(
+                roomId.HasValue ? "room" : "inbox",
+                exception);
+        }
+        catch (FirebaseRtdbRequestException exception)
+        {
+            throw new FirebaseRealtimeStreamRequestException(
                 roomId.HasValue ? "room" : "inbox",
                 exception);
         }
@@ -704,6 +730,12 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
 
     private static string FailureDiagnostic(Exception? exception) => exception switch
     {
+        FirebaseRealtimeCredentialProtocolException =>
+            "kind=protocol stage=credential",
+        FirebaseRealtimeStreamEndedException ended =>
+            $"kind=eof stream={ended.StreamKind} phase={ended.Phase}",
+        FirebaseRealtimeStreamRequestException request =>
+            $"kind={request.FailureKind.ToString().ToLowerInvariant()} stream={request.StreamKind} stage=request{StatusDiagnostic(request.StatusCode)}",
         FirebaseRealtimeStreamProtocolException protocol =>
             $"kind=protocol stream={protocol.StreamKind}",
         UnauthorizedAccessException => "kind=access-denied",
@@ -715,6 +747,14 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
         _ => "kind=transport",
     };
 
+    private static string StatusDiagnostic(System.Net.HttpStatusCode? statusCode) =>
+        statusCode is { } value ? $" status={(int)value}" : string.Empty;
+
+    private sealed class FirebaseRealtimeCredentialProtocolException(
+        InvalidDataException innerException) : Exception(
+            "Firebase realtime credential payload is invalid.",
+            innerException);
+
     private sealed class FirebaseRealtimeStreamProtocolException(
         string streamKind,
         InvalidDataException innerException) : Exception(
@@ -722,6 +762,26 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
             innerException)
     {
         public string StreamKind { get; } = streamKind;
+    }
+
+    private sealed class FirebaseRealtimeStreamEndedException(
+        string streamKind,
+        string phase) : Exception(
+        "Firebase realtime stream ended.")
+    {
+        public string StreamKind { get; } = streamKind;
+        public string Phase { get; } = phase;
+    }
+
+    private sealed class FirebaseRealtimeStreamRequestException(
+        string streamKind,
+        FirebaseRtdbRequestException innerException) : Exception(
+            "Firebase realtime stream request failed.",
+            innerException)
+    {
+        public string StreamKind { get; } = streamKind;
+        public FirebaseRtdbFailureKind FailureKind { get; } = innerException.FailureKind;
+        public System.Net.HttpStatusCode? StatusCode { get; } = innerException.StatusCode;
     }
 
     private sealed class StreamSet : IAsyncDisposable
@@ -782,6 +842,9 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
             catch (Exception exception) when (exception is OperationCanceledException
                 or FirebaseRtdbRequestException
                 or UnauthorizedAccessException
+                or FirebaseRealtimeCredentialProtocolException
+                or FirebaseRealtimeStreamEndedException
+                or FirebaseRealtimeStreamRequestException
                 or FirebaseRealtimeStreamProtocolException
                 or InvalidDataException)
             {
