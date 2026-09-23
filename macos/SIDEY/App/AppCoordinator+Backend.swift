@@ -176,7 +176,10 @@ extension AppCoordinator {
                     if activeTransport != .firebaseV2 {
                         model.connectionState = .failed(error.localizedDescription)
                         model.setActiveRoomRealtimeConnected(false)
-                        model.errorMessage = "실시간 kill-switch 전환 실패: \(error.localizedDescription)"
+                        model.errorMessage = L10n.format(
+                            "realtime.kill_switch.transition_failed",
+                            error.localizedDescription
+                        )
                         refreshStatusItem()
                         return
                     }
@@ -334,7 +337,10 @@ extension AppCoordinator {
             }
             self.model.newRoomName = ""
             if let grantError = mutation.grantError {
-                self.model.errorMessage = "그룹은 생성됐지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+                self.model.errorMessage = L10n.format(
+                    "group.create.realtime_grant_pending",
+                    grantError.localizedDescription
+                )
             } else {
                 self.model.preferences.activeRoomID = created.roomID
             }
@@ -377,7 +383,10 @@ extension AppCoordinator {
             }
             self.model.inviteCode = ""
             if let grantError = mutation.grantError {
-                self.model.errorMessage = "그룹에는 참여했지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+                self.model.errorMessage = L10n.format(
+                    "group.join.realtime_grant_pending",
+                    grantError.localizedDescription
+                )
             } else {
                 self.model.preferences.activeRoomID = joined.roomID
             }
@@ -486,7 +495,11 @@ extension AppCoordinator {
         }
         guard model.activeRoomRealtimeAvailable else {
             stopAllTyping()
-            rejectMessage(body, source: source, message: "실시간 연결이 끊겨 메시지를 전송할 수 없습니다.")
+            rejectMessage(
+                body,
+                source: source,
+                message: L10n.text("message.error.realtime_disconnected")
+            )
             return
         }
         sendMessage(body, source: source) { roomID, body, messageID in

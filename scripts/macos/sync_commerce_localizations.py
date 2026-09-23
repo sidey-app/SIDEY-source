@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -15,18 +14,14 @@ CATALOG_PATH = ROOT / "assets/v1/commerce-catalog.json"
 SOURCE_PATH = ROOT / "assets/v1/commerce-localizations.json"
 BUNDLE_PATH = ROOT / "macos/SIDEY/Resources/Commerce/commerce-localizations.json"
 STOREKIT_PATH = ROOT / "macos/SIDEYAppStore.storekit"
-SHARED_EXPORTER_PATH = ROOT / "scripts/commerce_localizations.py"
 
 
 def load_shared_exporter():
-    spec = importlib.util.spec_from_file_location(
-        "sidey_commerce_localizations", SHARED_EXPORTER_PATH
-    )
-    if spec is None or spec.loader is None:
-        raise RuntimeError("Cannot load shared commerce localization exporter")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from scripts import commerce_localizations
+
+    return commerce_localizations
 
 
 def encoded(value: object) -> bytes:

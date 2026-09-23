@@ -84,21 +84,21 @@ enum FirebaseV2ConfigurationError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .missingPlist:
-            "App Store Firebase 설정 파일이 번들에 없습니다."
+            L10n.text("firebase.configuration.error.missing_plist")
         case .invalidPlist:
-            "App Store Firebase 설정 파일을 읽을 수 없습니다."
+            L10n.text("firebase.configuration.error.invalid_plist")
         case .unexpectedProject:
-            "Firebase 설정이 SIDEY production project를 가리키지 않습니다."
+            L10n.text("firebase.configuration.error.unexpected_project")
         case .unexpectedApp:
-            "Firebase 설정이 등록된 App Store app과 일치하지 않습니다."
+            L10n.text("firebase.configuration.error.unexpected_app")
         case .unexpectedBundle:
-            "Firebase 설정과 실행 중인 App Store bundle ID가 일치하지 않습니다."
+            L10n.text("firebase.configuration.error.unexpected_bundle")
         case .unexpectedDatabase:
-            "Firebase 설정이 active SIDEY Realtime Database를 가리키지 않습니다."
+            L10n.text("firebase.configuration.error.unexpected_database")
         case .sdkOptionsUnavailable:
-            "Firebase SDK 설정을 생성할 수 없습니다."
+            L10n.text("firebase.configuration.error.sdk_options_unavailable")
         case .sdkAppUnavailable:
-            "Firebase SDK app을 초기화할 수 없습니다."
+            L10n.text("firebase.configuration.error.sdk_app_unavailable")
         }
     }
 }

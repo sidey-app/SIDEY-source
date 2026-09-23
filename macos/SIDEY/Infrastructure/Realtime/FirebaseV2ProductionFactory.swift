@@ -13,9 +13,9 @@ enum FirebaseV2ProductionFactoryError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .appVersionUnavailable:
-            "앱 버전을 확인할 수 없어 실시간 전환 정책을 등록하지 못했습니다."
+            L10n.text("firebase.production.error.app_version_unavailable")
         case .duplicateWireCode:
-            "Firebase 실시간 상품 코드가 중복되어 안전하게 연결할 수 없습니다."
+            L10n.text("firebase.production.error.duplicate_wire_code")
         }
     }
 }

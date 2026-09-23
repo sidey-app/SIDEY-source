@@ -79,7 +79,10 @@ extension AppCoordinator {
                     throw SideyBackendError.malformedResponse
                 }
                 if let grantError = mutation.grantError {
-                    model.errorMessage = "장착은 서버에 반영됐지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+                    model.errorMessage = L10n.format(
+                        "store.error.equipment_realtime_grant_pending",
+                        grantError.localizedDescription
+                    )
                     return
                 }
                 model.apply(profile: profile)
@@ -148,8 +151,14 @@ extension AppCoordinator {
                                     throw SideyBackendError.malformedResponse
                                 }
                                 if let grantError = mutation.grantError {
-                                    model.presentSuccess("\(product.displayName) 구매가 완료되었습니다.")
-                                    model.errorMessage = "자동 장착은 서버에 반영됐지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+                                    model.presentSuccess(L10n.format(
+                                        "store.purchase.success",
+                                        product.displayName
+                                    ))
+                                    model.errorMessage = L10n.format(
+                                        "store.error.auto_equip_realtime_grant_pending",
+                                        grantError.localizedDescription
+                                    )
                                     return
                                 }
                                 model.apply(profile: profile)

@@ -41,30 +41,30 @@ enum FirebaseV2BootstrapClientError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .missingAccessToken:
-            "Supabase 로그인 세션이 없어 Firebase 실시간 연결을 시작할 수 없습니다."
+            L10n.text("firebase.bootstrap.error.missing_access_token")
         case .invalidHTTPResponse:
-            "Firebase bootstrap 응답을 확인할 수 없습니다."
+            L10n.text("firebase.bootstrap.error.invalid_http_response")
         case .server(let failure):
             switch failure {
             case .invalidArgument:
-                "Firebase bootstrap 요청 형식이 올바르지 않습니다."
+                L10n.text("firebase.bootstrap.error.invalid_argument")
             case .authenticationRequired:
-                "Firebase 실시간 연결을 위해 다시 로그인해야 합니다."
+                L10n.text("firebase.bootstrap.error.authentication_required")
             case .methodNotAllowed:
-                "Firebase bootstrap 요청 방식이 서버 계약과 일치하지 않습니다."
+                L10n.text("firebase.bootstrap.error.method_not_allowed")
             case .grantNotConverged:
-                "Firebase 실시간 권한이 아직 준비되지 않았습니다."
+                L10n.text("firebase.bootstrap.error.grant_not_converged")
             case .rolloutDisabled:
-                "Firebase 실시간 rollout 승인이 만료되었거나 중지되었습니다."
+                L10n.text("firebase.bootstrap.error.rollout_disabled")
             case .rateLimited:
-                "Firebase 실시간 연결 요청이 너무 많습니다. 잠시 뒤 다시 시도해 주세요."
+                L10n.text("firebase.bootstrap.error.rate_limited")
             case .unavailable, .unexpectedStatus:
-                "Firebase 실시간 연결을 준비할 수 없습니다."
+                L10n.text("firebase.bootstrap.error.unavailable")
             }
         case .malformedSuccess:
-            "Firebase bootstrap 성공 응답을 해석할 수 없습니다."
+            L10n.text("firebase.bootstrap.error.malformed_success")
         case .unexpectedContract:
-            "Firebase bootstrap 응답이 이 앱의 실시간 계약과 일치하지 않습니다."
+            L10n.text("firebase.bootstrap.error.unexpected_contract")
         }
     }
 }

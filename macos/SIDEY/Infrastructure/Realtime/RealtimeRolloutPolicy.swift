@@ -126,13 +126,13 @@ enum RealtimeRolloutPolicyError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .malformedResponse:
-            "실시간 전환 정책 응답이 올바르지 않습니다."
+            L10n.text("realtime.rollout.error.malformed_response")
         case .enabledContractMismatch:
-            "서버가 활성화한 Firebase 실시간 계약이 이 앱과 일치하지 않습니다."
+            L10n.text("realtime.rollout.error.contract_mismatch")
         case .enabledPolicyUnavailable:
-            "활성화된 Firebase 실시간 정책과 kill-switch 상태를 확인할 수 없습니다."
+            L10n.text("realtime.rollout.error.enabled_policy_unavailable")
         case .cacheUnavailable:
-            "Firebase 실시간 전환 상태를 안전하게 저장할 수 없습니다."
+            L10n.text("realtime.rollout.error.cache_unavailable")
         }
     }
 }

@@ -61,23 +61,23 @@ enum FirebaseV2AuthError: LocalizedError, Equatable, Sendable {
     var errorDescription: String? {
         switch self {
         case .signedOutDuringCredentialLifetime:
-            "Firebase 인증 세션이 예상보다 일찍 종료되었습니다."
+            L10n.text("backend.error.authentication_required")
         case .tokenRefreshValidationFailed:
-            "Firebase 갱신 인증 정보를 검증할 수 없습니다."
+            L10n.text("firebase.auth.error.token_refresh_validation_failed")
         case .malformedAccountIdentifier:
-            "Firebase 인증 계정 식별자가 올바르지 않습니다."
+            L10n.text("firebase.auth.error.malformed_account_identifier")
         case .accountMismatch:
-            "Firebase 인증 계정이 현재 SIDEY 계정과 일치하지 않습니다."
+            L10n.text("firebase.auth.error.account_mismatch")
         case .invalidSessionClaim:
-            "Firebase 인증 세션 claim을 확인할 수 없습니다."
+            L10n.text("firebase.auth.error.invalid_session_claim")
         case .sessionMismatch:
-            "Firebase 인증 세션이 현재 SIDEY 로그인 세션과 일치하지 않습니다."
+            L10n.text("firebase.auth.error.session_mismatch")
         case .invalidRolloutLeaseClaim:
-            "Firebase rollout lease claim을 확인할 수 없습니다."
+            L10n.text("firebase.auth.error.invalid_rollout_lease_claim")
         case .rolloutLeaseMismatch:
-            "Firebase rollout lease가 bootstrap 응답과 일치하지 않습니다."
+            L10n.text("firebase.auth.error.rollout_lease_mismatch")
         case .rolloutLeaseExpired:
-            "Firebase 실시간 rollout lease가 만료되었습니다."
+            L10n.text("firebase.auth.error.rollout_lease_expired")
         }
     }
 }

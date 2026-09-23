@@ -95,15 +95,25 @@ enum FirebaseV2ChatErrorPolicy {
         }
         switch code {
         case .unauthenticated:
-            return .definitelyRejected(message: "Firebase 채팅 인증이 만료되었습니다.")
+            return .definitelyRejected(
+                message: L10n.text("firebase.chat.error.authentication_expired")
+            )
         case .permissionDenied:
-            return .definitelyRejected(message: "이 방에 메시지를 보낼 권한이 없습니다.")
+            return .definitelyRejected(
+                message: L10n.text("firebase.chat.error.permission_denied")
+            )
         case .resourceExhausted:
-            return .definitelyRejected(message: "메시지를 너무 빠르게 보내고 있습니다.")
+            return .definitelyRejected(
+                message: L10n.text("firebase.chat.error.rate_limited")
+            )
         case .failedPrecondition:
-            return .definitelyRejected(message: "메시지 상태가 서버와 충돌했습니다.")
+            return .definitelyRejected(
+                message: L10n.text("firebase.chat.error.state_conflict")
+            )
         case .invalidArgument:
-            return .definitelyRejected(message: "메시지 형식이 올바르지 않습니다.")
+            return .definitelyRejected(
+                message: L10n.text("firebase.chat.error.invalid_message")
+            )
         case .OK, .cancelled, .unknown, .deadlineExceeded, .notFound,
                 .alreadyExists, .aborted, .outOfRange, .unimplemented,
                 .internal, .unavailable, .dataLoss:
