@@ -468,7 +468,6 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 payload.IdToken,
                 payload.RefreshToken,
                 payload.ExpiresIn,
-                payload.LocalId,
                 key,
                 rolloutLeaseExpiresAt));
     }
@@ -494,13 +493,19 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             cancellationToken).ConfigureAwait(false);
         return ValidateAtStage(
             "firebase-token",
-            () => ValidateTokenGrant(
-                payload.IdToken,
-                payload.RefreshToken,
-                payload.ExpiresIn,
-                payload.UserId,
-                key,
-                rolloutLeaseExpiresAt));
+            () =>
+            {
+                if (!Guid.TryParse(payload.UserId, out Guid userId) || userId != key.UserId)
+                {
+                    throw new InvalidDataException("Firebase refresh response identity was invalid.");
+                }
+                return ValidateTokenGrant(
+                    payload.IdToken,
+                    payload.RefreshToken,
+                    payload.ExpiresIn,
+                    key,
+                    rolloutLeaseExpiresAt);
+            });
     }
 
     private async Task<BoundedHttpResponse> SendAndReadBytesAsync(
@@ -766,7 +771,6 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         string? idToken,
         string? refreshToken,
         string? expiresIn,
-        string? userId,
         SessionKey key,
         long rolloutLeaseExpiresAt)
     {
@@ -774,8 +778,6 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             || idToken.Length > MaximumTokenCharacters
             || string.IsNullOrWhiteSpace(refreshToken)
             || refreshToken.Length > MaximumTokenCharacters
-            || !Guid.TryParse(userId, out Guid parsedUserId)
-            || parsedUserId != key.UserId
             || !int.TryParse(expiresIn, NumberStyles.None, CultureInfo.InvariantCulture, out int seconds)
             || seconds is <= 0 or > 86_400)
         {
@@ -1047,8 +1049,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
     private sealed record CustomTokenExchangeResponse(
         [property: JsonPropertyName("idToken")] string? IdToken,
         [property: JsonPropertyName("refreshToken")] string? RefreshToken,
-        [property: JsonPropertyName("expiresIn")] string? ExpiresIn,
-        [property: JsonPropertyName("localId")] string? LocalId)
+        [property: JsonPropertyName("expiresIn")] string? ExpiresIn)
     {
         public override string ToString() => nameof(CustomTokenExchangeResponse);
     }
