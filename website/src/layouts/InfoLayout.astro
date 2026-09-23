@@ -3,7 +3,7 @@ import SiteFonts from "../components/SiteFonts.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import LandingFooter from "../components/LandingFooter.astro";
 import SiteTheme from "../components/SiteTheme.astro";
-import { supportedLocales, type Locale } from "../i18n/landing";
+import { localizeCanonicalPath, supportedLocales, type Locale } from "../i18n/landing";
 import "../styles/styles.scss";
 
 interface Props { locale: Locale; title: string; description: string; canonicalPath: string; }
@@ -11,10 +11,10 @@ const { locale, title, description, canonicalPath } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const localePaths = supportedLocales.map((code) => ({
   code,
-  path: canonicalPath.replace(/^(ko|en|ja)\//, `${code}/`),
+  path: localizeCanonicalPath(canonicalPath, code),
 }));
-const neutralPath = canonicalPath.replace(/^(ko|en|ja)\//, "");
-const skipLabels: Record<Locale, string> = { ko: "본문으로 건너뛰기", en: "Skip to content", ja: "本文へスキップ" };
+const neutralPath = canonicalPath.replace(/^(ko|en|ja|zh-hant)\//, "");
+const skipLabels: Record<Locale, string> = { ko: "본문으로 건너뛰기", en: "Skip to content", ja: "本文へスキップ", "zh-Hant": "跳到主要內容" };
 ---
 
 <!doctype html>
@@ -36,5 +36,6 @@ const skipLabels: Record<Locale, string> = { ko: "본문으로 건너뛰기", en
     <SiteHeader locale={locale} current="whats-new" />
     <main id="main"><slot /></main>
     <LandingFooter locale={locale} />
+    <script src={`${base}assets/script.js`} defer is:inline></script>
   </body>
 </html>

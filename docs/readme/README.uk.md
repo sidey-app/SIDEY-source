@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/kr/app/sidey/id6808528060">
+  <a href="https://apps.apple.com/us/app/sidey/id6808528060">
     <img src="../assets/mac-app-store/mac-app-store.uk.svg" height="48" alt="Завантажити SIDEY у Mac App Store">
   </a>
   <span>
@@ -63,7 +63,7 @@ SIDEY — месенджер для macOS і Windows, у якому ви спі�
   <br/>
   <p>Застосунок легко встановити з Mac App Store:</p>
   <p>
-    <a href="https://apps.apple.com/kr/app/sidey/id6808528060">
+    <a href="https://apps.apple.com/us/app/sidey/id6808528060">
       <img src="../assets/mac-app-store/mac-app-store.uk.svg" height="48" alt="Завантажити SIDEY у Mac App Store">
     </a>
   </p>

@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "app": {
+    "bundle_id": "app.sidey.desktop.appstore",
+    "platform": "MAC_OS",
+    "primary_locale": "ko"
+  },
+  "release": {
+    "version": "1.3.0",
+    "build": 33
+  },
+  "target_territories": [
+    "KOR",
+    "USA",
+    "CAN",
+    "GBR",
+    "AUS",
+    "SGP",
+    "JPN",
+    "TWN",
+    "HKG",
+    "MAC"
+  ],
+  "screenshot_display_type": "APP_DESKTOP",
+  "app_localizations": {
+    "ko": {
+      "name": "SIDEY",
+      "subtitle": "화면 가장자리의 픽셀 친구",
+      "description": "SIDEY는 최대 12명의 가까운 친구가 비공개 그룹에서 사용하는 데스크톱 오버레이 메신저예요. 친구마다 Mac 화면 위의 픽셀 캐릭터로 나타나서 복잡한 단체 채팅방을 열지 않아도 접속 상태, 입력 중 상태, 짧은 메시지를 가볍게 확인할 수 있어요.\n\n비공개 그룹은 생성과 참여를 합쳐 최대 5개까지 이용할 수 있고, 원하는 캐릭터를 골라 부담 없는 대화를 데스크톱 곁에 둘 수 있어요. 메시지는 3일 동안 보관돼요. 접속 상태와 입력 중 상태는 일시적인 신호이며, 입력 중 표시는 SIDEY 메시지 입력창에서 입력할 때만 전송돼요.\n\n오버레이는 기본적으로 뒤에 있는 앱으로 포인터 입력을 통과시켜요. 메시지 작성, 그룹 관리, 설정 변경, 꾸미기 상품을 둘러볼 때만 상호작용 모드로 전환해요. 구매는 Mac App Store를 사용하며 같은 Apple Account로 복원할 수 있어요.\n\nSIDEY는 화면 내용, 실행 중인 앱 목록, 다른 앱에서 입력한 키, 마우스 좌표, 파일 내용, 마이크 음성, 카메라 영상을 수집하지 않아요.",
+      "keywords": "가까운친구,친구채팅,화면오버레이,픽셀캐릭터,비공개그룹,입력상태",
+      "release_notes": "SIDEY가 Mac의 언어 설정에 따라 한국어, 영어, 일본어, 번체 중국어로 표시돼요. 지원하지 않는 시스템 언어에서는 영어를 사용해요. 로그인, 그룹, 메시지, 상점, 구매 복원, 계정 삭제까지 전체 흐름을 각 언어로 이용할 수 있어요.",
+      "support_url": "https://sidey-app.github.io/SIDEY/ko/support/",
+      "privacy_policy_url": "https://sidey-app.github.io/SIDEY/ko/privacy/",
+      "screenshots": [
+        { "scene": "overlay", "path": "release/app-store-screenshots/ko/01-overlay.png" },
+        { "scene": "groups", "path": "release/app-store-screenshots/ko/02-groups.png" },
+        { "scene": "store", "path": "release/app-store-screenshots/ko/03-store.png" }
+      ]
+    },
+    "en-US": {
+      "name": "SIDEY",
+      "subtitle": "Friends on your desktop",
+      "description": "SIDEY is a desktop overlay messenger for private groups of up to twelve close friends. Each friend appears as a pixel character on your Mac, so you can notice when they are around, typing, or sending a short message without opening a busy group chat.\n\nCreate or join up to five private groups in total, choose a character, and keep lightweight conversations close at hand. Messages are stored for three days. Presence and typing are transient signals, and typing status comes only from the SIDEY message field.\n\nThe overlay normally lets pointer input pass through to the app behind it. Switch to interaction mode when you want to write, manage a group, change settings, or browse optional cosmetics. Purchases use the Mac App Store and can be restored with the same Apple Account.\n\nSIDEY does not collect screen contents, active app lists, keystrokes from other apps, mouse coordinates, files, microphone audio, or camera video.",
+      "keywords": "friends,messenger,overlay,pixel,presence,chat,desktop,private,group,typing",
+      "release_notes": "SIDEY now follows your Mac language in English, Japanese, Traditional Chinese, or Korean, with English as the fallback for other system languages. The complete sign-in, group, messaging, store, restore, and account-deletion flows are localized.",
+      "support_url": "https://sidey-app.github.io/SIDEY/en/support/",
+      "privacy_policy_url": "https://sidey-app.github.io/SIDEY/en/privacy/",
+      "screenshots": [
+        { "scene": "overlay", "path": "release/app-store-screenshots/en/01-overlay.png" },
+        { "scene": "groups", "path": "release/app-store-screenshots/en/02-groups.png" },
+        { "scene": "store", "path": "release/app-store-screenshots/en/03-store.png" }
+      ]
+    },
+    "en-GB": {
+      "name": "SIDEY",
+      "subtitle": "Friends on your desktop",
+      "description": "SIDEY is a desktop overlay messenger for private groups of up to twelve close friends. Each friend appears as a pixel character on your Mac, so you can notice when they are around, typing, or sending a short message without opening a busy group chat.\n\nCreate or join up to five private groups in total, choose a character, and keep lightweight conversations close at hand. Messages are stored for three days. Presence and typing are transient signals, and typing status comes only from the SIDEY message field.\n\nThe overlay normally lets pointer input pass through to the app behind it. Switch to interaction mode when you want to write, manage a group, change settings, or browse optional cosmetics. Purchases use the Mac App Store and can be restored with the same Apple Account.\n\nSIDEY does not collect screen contents, active app lists, keystrokes from other apps, mouse coordinates, files, microphone audio, or camera video.",
+      "keywords": "friends,messenger,overlay,pixel,presence,chat,desktop,private,group,typing",
+      "release_notes": "SIDEY now follows your Mac language in English, Japanese, Traditional Chinese, or Korean, with English as the fallback for other system languages. The complete sign-in, group, messaging, store, restore, and account-deletion flows are localised.",
+      "support_url": "https://sidey-app.github.io/SIDEY/en/support/",
+      "privacy_policy_url": "https://sidey-app.github.io/SIDEY/en/privacy/",
+      "screenshots": [
+        { "scene": "overlay", "path": "release/app-store-screenshots/en/01-overlay.png" },
+        { "scene": "groups", "path": "release/app-store-screenshots/en/02-groups.png" },
+        { "scene": "store", "path": "release/app-store-screenshots/en/03-store.png" }
+      ]
+    },
+    "en-CA": {
+      "name": "SIDEY",
+      "subtitle": "Friends on your desktop",
+      "description": "SIDEY is a desktop overlay messenger for private groups of up to twelve close friends. Each friend appears as a pixel character on your Mac, so you can notice when they are around, typing, or sending a short message without opening a busy group chat.\n\nCreate or join up to five private groups in total, choose a character, and keep lightweight conversations close at hand. Messages are stored for three days. Presence and typing are transient signals, and typing status comes only from the SIDEY message field.\n\nThe overlay normally lets pointer input pass through to the app behind it. Switch to interaction mode when you want to write, manage a group, change settings, or browse optional cosmetics. Purchases use the Mac App Store and can be restored with the same Apple Account.\n\nSIDEY does not collect screen contents, active app lists, keystrokes from other apps, mouse coordinates, files, microphone audio, or camera video.",
+      "keywords": "friends,messenger,overlay,pixel,presence,chat,desktop,private,group,typing",
+      "release_notes": "SIDEY now follows your Mac language in English, Japanese, Traditional Chinese, or Korean, with English as the fallback for other system languages. The complete sign-in, group, messaging, store, restore, and account-deletion flows are localized.",
+      "support_url": "https://sidey-app.github.io/SIDEY/en/support/",
+      "privacy_policy_url": "https://sidey-app.github.io/SIDEY/en/privacy/",
+      "screenshots": [
+        { "scene": "overlay", "path": "release/app-store-screenshots/en/01-overlay.png" },
+        { "scene": "groups", "path": "release/app-store-screenshots/en/02-groups.png" },
+        { "scene": "store", "path": "release/app-store-screenshots/en/03-store.png" }
+      ]
+    },
+    "en-AU": {
+      "name": "SIDEY",
+      "subtitle": "Friends on your desktop",
+      "description": "SIDEY is a desktop overlay messenger for private groups of up to twelve close friends. Each friend appears as a pixel character on your Mac, so you can notice when they are around, typing, or sending a short message without opening a busy group chat.\n\nCreate or join up to five private groups in total, choose a character, and keep lightweight conversations close at hand. Messages are stored for three days. Presence and typing are transient signals, and typing status comes only from the SIDEY message field.\n\nThe overlay normally lets pointer input pass through to the app behind it. Switch to interaction mode when you want to write, manage a group, change settings, or browse optional cosmetics. Purchases use the Mac App Store and can be restored with the same Apple Account.\n\nSIDEY does not collect screen contents, active app lists, keystrokes from other apps, mouse coordinates, files, microphone audio, or camera video.",
+      "keywords": "friends,messenger,overlay,pixel,presence,chat,desktop,private,group,typing",
+      "release_notes": "SIDEY now follows your Mac language in English, Japanese, Traditional Chinese, or Korean, with English as the fallback for other system languages. The complete sign-in, group, messaging, store, restore, and account-deletion flows are localised.",
+      "support_url": "https://sidey-app.github.io/SIDEY/en/support/",
+      "privacy_policy_url": "https://sidey-app.github.io/SIDEY/en/privacy/",
+      "screenshots": [
+        { "scene": "overlay", "path": "release/app-store-screenshots/en/01-overlay.png" },
+        { "scene": "groups", "path": "release/app-store-screenshots/en/02-groups.png" },
+        { "scene": "store", "path": "release/app-store-screenshots/en/03-store.png" }
+      ]
+    },
+    "ja": {
+      "name": "SIDEY",
+      "subtitle": "デスクトップで友だちとつながる",
+      "description": "SIDEYは、親しい友だち最大12人の非公開グループで使うデスクトップオーバーレイメッセンジャーです。友だちがMac上のピクセルキャラクターとして表示されるので、にぎやかなグループチャットを開かなくても、オンライン状態、入力中、短いメッセージをさりげなく確認できます。\n\n非公開グループは、作成・参加を合わせて5個まで利用できます。好きなキャラクターを選び、気軽なやり取りをデスクトップの片隅で楽しめます。メッセージの保存期間は3日間です。プレゼンスと入力中の状態は一時的な信号で、入力中表示はSIDEYのメッセージ欄で入力した場合にのみ送信されます。\n\n通常、オーバーレイは背後のアプリへポインター操作をそのまま通します。メッセージの入力、グループ管理、設定変更、追加のカスタマイズアイテムを見るときだけ操作モードに切り替えます。購入はMac App Storeを利用し、同じApple Accountで復元できます。\n\nSIDEYは、画面の内容、起動中アプリの一覧、他のアプリで入力したキー、マウス座標、ファイル、マイク音声、カメラ映像を収集しません。",
+      "keywords": "友だち,メッセンジャー,ピクセル,チャット,デスクトップ,非公開,グループ",
+      "release_notes": "SIDEYがMacの言語設定に従い、英語、日本語、繁体字中国語、韓国語で表示されるようになりました。未対応のシステム言語では英語を使用します。サインイン、グループ、メッセージ、ストア、購入の復元、アカウント削除までの一連の操作を各言語で利用できます。",
+      "support_url": "https://sidey-app.github.io/SIDEY/ja/support/",
+      "privacy_policy_url": "https://sidey-app.github.io/SIDEY/ja/privacy/",
+      "screenshots": [
+        { "scene": "overlay", "path": "release/app-store-screenshots/ja/01-overlay.png" },
+        { "scene": "groups", "path": "release/app-store-screenshots/ja/02-groups.png" },
+        { "scene": "store", "path": "release/app-store-screenshots/ja/03-store.png" }
+      ]
+    },
+    "zh-Hant": {
+      "name": "SIDEY",
+      "subtitle": "好友就在桌面上",
+      "description": "SIDEY 是為最多 12 位親近好友打造的私人群組桌面通訊軟體。每位好友都會以像素角色出現在 Mac 上，不必打開吵雜的群組聊天室，也能輕鬆看到對方是否在線上、正在輸入，或傳來簡短訊息。\n\n你最多可建立或加入 5 個私人群組、選擇喜歡的角色，讓輕鬆聊天留在桌面一角。訊息會保留 3 天；線上狀態與輸入狀態都是暫時訊號，而且只有在 SIDEY 訊息欄輸入時才會送出輸入狀態。\n\nSIDEY 平時不會擋住後方 App 的指標操作。需要輸入訊息、管理群組、調整設定或瀏覽選購造型時，再切換至互動模式。購買項目透過 Mac App Store 處理，並可使用相同的 Apple Account 回復購買。\n\nSIDEY 不會收集螢幕內容、使用中的應用程式清單、你在其他應用程式輸入的按鍵、滑鼠座標、檔案內容、麥克風音訊或相機影像。",
+      "keywords": "親密好友,即時通訊,桌面好友,像素角色,線上狀態,私人群組,輸入狀態",
+      "release_notes": "SIDEY 現在會依照 Mac 的語言設定顯示英文、日文、繁體中文或韓文；其他尚未支援的系統語言會使用英文。登入、群組、訊息、商店、回復購買及刪除帳號的完整流程均已完成在地化。",
+      "support_url": "https://sidey-app.github.io/SIDEY/zh-hant/support/",
+      "privacy_policy_url": "https://sidey-app.github.io/SIDEY/zh-hant/privacy/",
+      "screenshots": [
+        { "scene": "overlay", "path": "release/app-store-screenshots/zh-Hant/01-overlay.png" },
+        { "scene": "groups", "path": "release/app-store-screenshots/zh-Hant/02-groups.png" },
+        { "scene": "store", "path": "release/app-store-screenshots/zh-Hant/03-store.png" }
+      ]
+    }
+  }
+}

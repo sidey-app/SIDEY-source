@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/kr/app/sidey/id6808528060">
+  <a href="https://apps.apple.com/us/app/sidey/id6808528060">
     <img src="../assets/mac-app-store/mac-app-store.zh-Hans.svg" height="48" alt="在 Mac App Store 下载 SIDEY">
   </a>
   <span>
@@ -63,7 +63,7 @@ SIDEY 是一款适用于 macOS 和 Windows 的桌面聊天应用，让你通过�
   <br/>
   <p>通过 Mac App Store 即可轻松安装：</p>
   <p>
-    <a href="https://apps.apple.com/kr/app/sidey/id6808528060">
+    <a href="https://apps.apple.com/us/app/sidey/id6808528060">
       <img src="../assets/mac-app-store/mac-app-store.zh-Hans.svg" height="48" alt="在 Mac App Store 下载 SIDEY">
     </a>
   </p>
