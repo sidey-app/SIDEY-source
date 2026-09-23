@@ -193,6 +193,8 @@ actor RoomMessagingTransportRouter {
     private let eventContinuation: AsyncStream<BackendEvent>.Continuation
     private var selection: RealtimeTransportSelection
     private var transport: any RoomMessagingTransport
+    private let makeFirebaseV2ForRecovery:
+        (@MainActor @Sendable () async throws -> any RoomMessagingTransport)?
     private let makeLegacyForSwitch: (@Sendable () async throws -> any RoomMessagingTransport)?
     private let shutdownShared: (@Sendable () async -> Void)?
     private let logger = Logger(subsystem: "app.sidey.desktop", category: "RealtimeTransport")
@@ -209,6 +211,8 @@ actor RoomMessagingTransportRouter {
         selection: RealtimeTransportSelection,
         makeLegacy: (@Sendable () throws -> any RoomMessagingTransport)? = nil,
         makeFirebaseV2: (@Sendable () throws -> any RoomMessagingTransport)? = nil,
+        makeFirebaseV2ForRecovery:
+            (@MainActor @Sendable () async throws -> any RoomMessagingTransport)? = nil,
         makeLegacyForSwitch: (@Sendable () async throws -> any RoomMessagingTransport)? = nil,
         shutdownShared: (@Sendable () async -> Void)? = nil
     ) throws {
@@ -232,6 +236,7 @@ actor RoomMessagingTransportRouter {
             )
         }
         self.transport = selectedTransport
+        self.makeFirebaseV2ForRecovery = makeFirebaseV2ForRecovery
         self.makeLegacyForSwitch = makeLegacyForSwitch
         self.shutdownShared = shutdownShared
         let pair = AsyncStream<BackendEvent>.makeStream(
@@ -340,8 +345,65 @@ actor RoomMessagingTransportRouter {
     func refreshRolloutLease() async throws {
         try requireRunning()
         guard selection.active == .firebaseV2 else { return }
+        guard await transport.rolloutLeaseStatus() != nil else {
+            try await recoverFirebaseV2()
+            return
+        }
         try await transport.refreshRolloutLease()
         recordSuccess(operation: "rollout-lease-refresh")
+    }
+
+    /// Rebuilds a Firebase transport after its hard rollout lease closed every
+    /// credential and listener. The router and shared Supabase backend stay
+    /// alive so the app event stream does not need an application restart.
+    private func recoverFirebaseV2() async throws {
+        guard selection.active == .firebaseV2,
+              let makeFirebaseV2ForRecovery else {
+            throw RoomMessagingTransportRouterError.selectedAdapterUnavailable
+        }
+        guard let rooms = synchronizedRooms else {
+            throw RoomMessagingTransportRouterError.transportTopologyUnavailable
+        }
+
+        operationalState = .switching
+        stopEventForwarding()
+        await transport.retireForTransportSwitch()
+
+        let replacement: any RoomMessagingTransport
+        do {
+            replacement = try await makeFirebaseV2ForRecovery()
+        } catch {
+            operationalState = .running
+            throw error
+        }
+        guard replacement.kind == .firebaseV2 else {
+            await replacement.retireForTransportSwitch()
+            operationalState = .running
+            throw RoomMessagingTransportRouterError.selectedAdapterKindMismatch(
+                expected: .firebaseV2,
+                actual: replacement.kind
+            )
+        }
+
+        do {
+            let reconciliation = try await replacement.synchronize(
+                rooms: rooms,
+                activeRoomID: synchronizedActiveRoomID
+            )
+            transport = replacement
+            synchronizedRooms = reconciliation.snapshot.rooms
+            synchronizedActiveRoomID = reconciliation.activeRoomID
+            operationalState = .running
+            startEventForwardingIfNeeded()
+            recordSuccess(operation: "rollout-lease-recovery")
+            eventContinuation.yield(.reconciliation(reconciliation))
+        } catch {
+            // Synchronization can already have published Supabase Presence.
+            // Fail-closing the replacement withdraws it before the next retry.
+            await replacement.failClosedForRolloutLease()
+            operationalState = .running
+            throw error
+        }
     }
 
     func failClosedForRolloutLease() async {

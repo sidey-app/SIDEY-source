@@ -135,6 +135,21 @@ enum FirebaseV2ProductionFactory {
         let router = try RoomMessagingTransportRouter(
             selection: selection,
             makeFirebaseV2: { firebaseTransport },
+            makeFirebaseV2ForRecovery: {
+                let recoveredSession = try await backend.currentFirebaseV2BootstrapSession()
+                let recoveredWireItems = try await backend.firebaseV2StoreWireItems()
+                let recoveredPlane = SideyBackendRealtimeAdapter(
+                    backend: backend,
+                    events: await backend.subscribeEvents()
+                )
+                return try Self.makeFirebaseTransport(
+                    backend: backend,
+                    supabasePlane: recoveredPlane,
+                    accountID: recoveredSession.identity.accountID,
+                    wireItems: recoveredWireItems,
+                    bundle: bundle
+                )
+            },
             makeLegacyForSwitch: {
                 SideyBackendRealtimeAdapter(
                     backend: backend,

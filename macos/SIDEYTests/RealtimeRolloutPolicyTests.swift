@@ -233,6 +233,64 @@ final class RealtimeRolloutPolicyTests: XCTestCase {
         XCTAssertEqual(operations, ["selector"])
     }
 
+    func testObservedLeaseDisappearanceTriggersImmediateRecovery() {
+        XCTAssertEqual(
+            RealtimeRolloutTiming.leaseDelay(
+                nil,
+                observedFirebaseLease: true,
+                fallback: .seconds(300)
+            ),
+            .zero
+        )
+        XCTAssertTrue(RealtimeRolloutTiming.isLeaseDue(
+            nil,
+            observedFirebaseLease: true
+        ))
+    }
+
+    func testLegacyTransportWithoutObservedLeaseUsesPolicySchedule() {
+        XCTAssertEqual(
+            RealtimeRolloutTiming.leaseDelay(
+                nil,
+                observedFirebaseLease: false,
+                fallback: .seconds(42)
+            ),
+            .seconds(42)
+        )
+        XCTAssertFalse(RealtimeRolloutTiming.isLeaseDue(
+            nil,
+            observedFirebaseLease: false
+        ))
+    }
+
+    func testFreshLeaseStatusControlsRenewalDecision() {
+        XCTAssertFalse(RealtimeRolloutTiming.isLeaseDue(
+            RealtimeRolloutLeaseStatus(
+                refreshIn: .seconds(30),
+                expiresIn: .seconds(60)
+            ),
+            observedFirebaseLease: true
+        ))
+        XCTAssertTrue(RealtimeRolloutTiming.isLeaseDue(
+            RealtimeRolloutLeaseStatus(
+                refreshIn: .zero,
+                expiresIn: .seconds(30)
+            ),
+            observedFirebaseLease: true
+        ))
+    }
+
+    func testOperationCancellationDoesNotStopHealthyMonitorTask() {
+        XCTAssertFalse(RealtimeRolloutTiming.shouldStopAfterError(
+            CancellationError(),
+            taskIsCancelled: false
+        ))
+        XCTAssertTrue(RealtimeRolloutTiming.shouldStopAfterError(
+            CancellationError(),
+            taskIsCancelled: true
+        ))
+    }
+
     private func response(
         enabled: Bool,
         transport: String,

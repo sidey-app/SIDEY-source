@@ -482,7 +482,7 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         }
     }
 
-    func testFirebaseIdentityInvalidationTearsDownListenersAndSupabasePlane() async throws {
+    func testFirebaseIdentityInvalidationTearsDownListenersButPreservesSupabaseForRecovery() async throws {
         let fixture = try Fixture()
         _ = try await fixture.transport.synchronize(
             rooms: [fixture.room],
@@ -501,13 +501,20 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
             return XCTFail("Disconnected state must precede the user-facing error")
         }
         try await eventually {
-            await fixture.transport.diagnostics().shutDown
+            let diagnostics = await fixture.transport.diagnostics()
+            let invalidateCount = await fixture.credentials.invalidateCount
+            let activeRoomRequests = await fixture.supabase.activeRoomRequests
+            return diagnostics.shutDown
+                && invalidateCount == 1
+                && activeRoomRequests.last.map { $0 == nil } == true
         }
         let diagnostics = await fixture.transport.diagnostics()
         XCTAssertEqual(diagnostics.inboxListenerCount, 0)
         XCTAssertEqual(diagnostics.liveListenerCount, 0)
         let shutdownCount = await fixture.supabase.shutdownCount
-        XCTAssertEqual(shutdownCount, 1)
+        let activeRoomRequests = await fixture.supabase.activeRoomRequests
+        XCTAssertEqual(shutdownCount, 0)
+        XCTAssertEqual(activeRoomRequests.last!, nil)
     }
 
     func testTerminalFirebaseListenerFailureFailsClosedButPreservesSharedSupabasePlane() async throws {
@@ -527,7 +534,12 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         XCTAssertFalse(status.activeRoomTransportConnected)
 
         try await eventually {
-            await fixture.transport.diagnostics().shutDown
+            let diagnostics = await fixture.transport.diagnostics()
+            let invalidateCount = await fixture.credentials.invalidateCount
+            let activeRoomRequests = await fixture.supabase.activeRoomRequests
+            return diagnostics.shutDown
+                && invalidateCount == 1
+                && activeRoomRequests.last.map { $0 == nil } == true
         }
         let diagnostics = await fixture.transport.diagnostics()
         XCTAssertFalse(diagnostics.grantOpen)
@@ -535,12 +547,14 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         XCTAssertEqual(diagnostics.liveListenerCount, 0)
         let invalidateCount = await fixture.credentials.invalidateCount
         let shutdownCount = await fixture.supabase.shutdownCount
+        let activeRoomRequests = await fixture.supabase.activeRoomRequests
         XCTAssertEqual(invalidateCount, 1)
         XCTAssertEqual(
             shutdownCount,
             0,
             "The router must retain the shared Supabase backend for a remote legacy switch"
         )
+        XCTAssertEqual(activeRoomRequests.last!, nil)
         await assertThrowsAsync(FirebaseV2CompositeTransportError.shutDown) {
             try await fixture.transport.publishCharacterPulse(
                 roomID: fixture.room.id,
@@ -616,8 +630,10 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
 
         let diagnostics = await fixture.transport.diagnostics()
         let shutdownCount = await fixture.supabase.shutdownCount
+        let activeRoomRequests = await fixture.supabase.activeRoomRequests
         XCTAssertTrue(diagnostics.shutDown)
         XCTAssertEqual(shutdownCount, 0)
+        XCTAssertEqual(activeRoomRequests.last!, nil)
     }
 
     func testRolloutLeaseHardDeadlineFailsClosedWithoutShuttingSharedSupabase() async throws {
@@ -634,7 +650,9 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         let diagnostics = await fixture.transport.diagnostics()
         XCTAssertFalse(diagnostics.grantOpen)
         let shutdownCount = await fixture.supabase.shutdownCount
+        let activeRoomRequests = await fixture.supabase.activeRoomRequests
         XCTAssertEqual(shutdownCount, 0)
+        XCTAssertEqual(activeRoomRequests.last!, nil)
         await assertThrowsAsync(FirebaseV2CompositeTransportError.shutDown) {
             try await fixture.transport.publishTyping(
                 roomID: fixture.room.id,
@@ -915,6 +933,7 @@ private actor CompositeSupabasePlaneStub: FirebaseV2SupabasePlane {
     private var activeRoomContinuations: [UUID: CheckedContinuation<Void, Never>] = [:]
     private(set) var synchronizeCount = 0
     private(set) var shutdownCount = 0
+    private(set) var activeRoomRequests: [UUID?] = []
     private(set) var transientPublications: [CompositeTransientPublication] = []
 
     init(reconciliation: BackendReconciliation) {
@@ -937,6 +956,7 @@ private actor CompositeSupabasePlaneStub: FirebaseV2SupabasePlane {
     }
 
     func setActiveRoom(_ roomID: UUID?) async throws {
+        activeRoomRequests.append(roomID)
         guard let roomID, blockedActiveRooms.contains(roomID) else { return }
         await withCheckedContinuation { continuation in
             activeRoomContinuations[roomID] = continuation

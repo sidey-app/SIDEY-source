@@ -212,6 +212,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     private var typingExpiryTask: Task<Void, Never>?
     private var credentialInvalidationTask: Task<Void, Never>?
     private var rolloutLeaseExpiryTask: Task<Void, Never>?
+    private var retirementTask: Task<Void, Never>?
     private var rolloutLeaseRefreshDeadline: ContinuousClock.Instant?
     private var rolloutLeaseExpiryDeadline: ContinuousClock.Instant?
     private var liveReadinessContinuation: AsyncThrowingStream<Void, Error>.Continuation?
@@ -358,7 +359,14 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         await retire(shutdownSupabase: false)
     }
 
-    private func retire(shutdownSupabase: Bool) async {
+    private func retire(
+        shutdownSupabase: Bool,
+        withdrawPresence: Bool = false
+    ) async {
+        if let retirementTask {
+            await retirementTask.value
+            return
+        }
         guard !isShutDown else { return }
         isShutDown = true
         inboxListenerGeneration &+= 1
@@ -386,11 +394,20 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         session = nil
         activeRoomState.invalidateAll()
         grantBarrier.revokeSession()
-        if shutdownSupabase {
-            await supabasePlane.shutdown()
+        let credentials = self.credentials
+        let supabasePlane = self.supabasePlane
+        let eventContinuation = self.eventContinuation
+        let task = Task {
+            if shutdownSupabase {
+                await supabasePlane.shutdown()
+            } else if withdrawPresence {
+                try? await supabasePlane.setActiveRoom(nil)
+            }
+            await credentials.invalidate()
+            eventContinuation.finish()
         }
-        await credentials.invalidate()
-        eventContinuation.finish()
+        retirementTask = task
+        await task.value
     }
 
     func diagnostics() -> FirebaseV2CompositeDiagnostics {
@@ -427,16 +444,9 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     }
 
     func failClosedForRolloutLease() async {
-        guard !isShutDown else { return }
-        eventContinuation.yield(.connection(BackendConnectionStatus(
-            transportConnected: false,
-            recoveryReconciled: false,
-            activeRoomTransportConnected: false
-        )))
-        eventContinuation.yield(.technicalError(
-            L10n.text("firebase.bootstrap.error.rollout_disabled")
-        ))
-        await retire(shutdownSupabase: false)
+        await failClosed(
+            message: L10n.text("firebase.bootstrap.error.rollout_disabled")
+        )
     }
 
     func beginGrant(
@@ -527,15 +537,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
 
     private func credentialWasInvalidated() async {
         guard !isShutDown else { return }
-        eventContinuation.yield(.connection(BackendConnectionStatus(
-            transportConnected: false,
-            recoveryReconciled: false,
-            activeRoomTransportConnected: false
-        )))
-        eventContinuation.yield(.technicalError(
-            L10n.text("firebase.auth.error.login_mismatch")
-        ))
-        await shutdown()
+        await failClosed(message: L10n.text("firebase.auth.error.login_mismatch"))
     }
 
     private func scheduleRolloutLeaseExpiry(for session: FirebaseV2CompositeSession) {
@@ -1005,21 +1007,32 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             )
             liveReadinessContinuation = nil
         }
-        eventContinuation.yield(.connection(BackendConnectionStatus(
-            transportConnected: false,
-            recoveryReconciled: false,
-            activeRoomTransportConnected: false
-        )))
-        eventContinuation.yield(.technicalError(
-            L10n.text("firebase.transport.error.listener_failed")
-        ))
         // A terminal RTDB listener means Firebase can no longer prove that
         // this session still has room access. Close the complete composite
         // transport so chat and Firebase transients cannot continue under a
         // stale grant. Preserve the shared Supabase backend only so the
         // authenticated remote kill-switch can still rebuild the legacy
         // adapter.
-        await retire(shutdownSupabase: false)
+        await failClosed(message: L10n.text("firebase.transport.error.listener_failed"))
+    }
+
+    private func failClosed(message: String) async {
+        guard !isShutDown else { return }
+        eventContinuation.yield(.connection(BackendConnectionStatus(
+            transportConnected: false,
+            recoveryReconciled: false,
+            activeRoomTransportConnected: false
+        )))
+        eventContinuation.yield(.technicalError(message))
+
+        // Close Firebase credentials/listeners before any network wait. The
+        // shared Supabase plane must survive so selector-driven recovery and a
+        // remote legacy switch remain possible.
+        // A Firebase-only failure must not leave this client advertised as
+        // online forever through the still-running Supabase Presence socket.
+        // Local Firebase state has already closed synchronously above;
+        // synchronization restores the committed room after recovery.
+        await retire(shutdownSupabase: false, withdrawPresence: true)
     }
 
     private func failClosedIfActiveRoomWasRevoked() {

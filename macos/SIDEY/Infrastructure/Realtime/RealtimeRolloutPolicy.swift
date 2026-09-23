@@ -94,6 +94,35 @@ struct RealtimeRolloutRenewalResult: Equatable, Sendable {
     let leaseRenewed: Bool
 }
 
+enum RealtimeRolloutTiming {
+    static func leaseDelay(
+        _ lease: RealtimeRolloutLeaseStatus?,
+        observedFirebaseLease: Bool,
+        fallback: Duration
+    ) -> Duration {
+        if let lease { return lease.refreshIn }
+        return observedFirebaseLease ? .zero : fallback
+    }
+
+    static func isLeaseDue(
+        _ lease: RealtimeRolloutLeaseStatus?,
+        observedFirebaseLease: Bool
+    ) -> Bool {
+        guard let lease else { return observedFirebaseLease }
+        return lease.refreshIn <= .milliseconds(1)
+    }
+
+    static func shouldStopAfterError(
+        _ error: any Error,
+        taskIsCancelled: Bool
+    ) -> Bool {
+        // SDK/URLSession operations may independently throw CancellationError
+        // while the owning monitor task is still healthy.
+        if error is CancellationError { return taskIsCancelled }
+        return taskIsCancelled
+    }
+}
+
 enum RealtimeRolloutRenewal {
     /// Re-registers authenticated capability before any bootstrap is allowed.
     /// A legacy/kill-switch decision never mints another Firebase credential.

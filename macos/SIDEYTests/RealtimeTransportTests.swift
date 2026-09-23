@@ -338,6 +338,114 @@ final class RealtimeTransportTests: XCTestCase {
         XCTAssertEqual(retirementCount, 1)
     }
 
+    @MainActor
+    func testMissingFirebaseLeaseRebuildsTransportAndRestoresOperations() async throws {
+        let expired = FakeRealtimeTransport(kind: .firebaseV2)
+        let replacement = FakeRealtimeTransport(kind: .firebaseV2)
+        let roomID = UUID()
+        let rooms = [
+            Room(
+                id: roomID,
+                name: "친구",
+                ownerID: UUID(),
+                members: [],
+                inviteCodeHint: "TEST"
+            ),
+        ]
+        var recoveryCreationCount = 0
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeFirebaseV2: { expired },
+            makeFirebaseV2ForRecovery: {
+                recoveryCreationCount += 1
+                return replacement
+            }
+        )
+        _ = try await router.synchronize(rooms: rooms, activeRoomID: roomID)
+        var events = router.events.makeAsyncIterator()
+
+        try await router.refreshRolloutLease()
+        guard case .reconciliation = await events.next() else {
+            return XCTFail("Recovery must publish its reconciled snapshot")
+        }
+        await replacement.emit(.technicalError("replacement-event"))
+        guard case .technicalError(let forwardedMessage) = await events.next() else {
+            return XCTFail("Replacement events must reach the stable router stream")
+        }
+        try await router.publishCharacterPulse(roomID: roomID, eventID: UUID())
+        let chat = await router.sendChat(roomID: roomID, body: "복구", id: UUID())
+
+        let expiredRetirementCount = await expired.retirementCount
+        let replacementOperationCount = await replacement.operationCount
+        XCTAssertEqual(recoveryCreationCount, 1)
+        XCTAssertEqual(expiredRetirementCount, 1)
+        XCTAssertEqual(replacementOperationCount, 3)
+        XCTAssertEqual(forwardedMessage, "replacement-event")
+        guard case .confirmed = chat else {
+            return XCTFail("Recovered Firebase transport must accept chat")
+        }
+        let diagnostics = await router.diagnostics()
+        XCTAssertEqual(diagnostics.selection.active, .firebaseV2)
+        XCTAssertEqual(diagnostics.lastSuccessfulProtocol, .firebaseV2)
+    }
+
+    @MainActor
+    func testLegacySelectionNeverRebuildsFirebase() async throws {
+        let legacy = FakeRealtimeTransport(kind: .legacySupabase)
+        var recoveryCreationCount = 0
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .legacySupabase, firebaseV2Allowed: false),
+            makeLegacy: { legacy },
+            makeFirebaseV2ForRecovery: {
+                recoveryCreationCount += 1
+                return FakeRealtimeTransport(kind: .firebaseV2)
+            }
+        )
+
+        try await router.refreshRolloutLease()
+
+        let legacyRetirementCount = await legacy.retirementCount
+        XCTAssertEqual(recoveryCreationCount, 0)
+        XCTAssertEqual(legacyRetirementCount, 0)
+    }
+
+    @MainActor
+    func testFailedFirebaseRecoveryCanRetryWithFreshGeneration() async throws {
+        let expired = FakeRealtimeTransport(kind: .firebaseV2)
+        let failing = FakeRealtimeTransport(
+            kind: .firebaseV2,
+            failure: FakeTransportError.permissionDenied
+        )
+        let recovered = FakeRealtimeTransport(kind: .firebaseV2)
+        var recoveryAttempt = 0
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeFirebaseV2: { expired },
+            makeFirebaseV2ForRecovery: {
+                recoveryAttempt += 1
+                return recoveryAttempt == 1 ? failing : recovered
+            }
+        )
+        _ = try await router.synchronize(rooms: [], activeRoomID: nil)
+
+        do {
+            try await router.refreshRolloutLease()
+            XCTFail("The first replacement synchronization must fail")
+        } catch FakeTransportError.permissionDenied {
+            // The router must return to a retryable Firebase state.
+        } catch {
+            XCTFail("Unexpected recovery error: \(error)")
+        }
+        try await router.refreshRolloutLease()
+        try await router.publishTyping(roomID: UUID(), event: "typing_start")
+
+        let recoveredOperationCount = await recovered.operationCount
+        let selection = try await router.currentSelection()
+        XCTAssertEqual(recoveryAttempt, 2)
+        XCTAssertEqual(recoveredOperationCount, 2)
+        XCTAssertEqual(selection.active, .firebaseV2)
+    }
+
     func testKillSwitchSyncFailureBlocksAllTransportOperations() async throws {
         let firebase = FakeRealtimeTransport(kind: .firebaseV2)
         let failingLegacy = FakeRealtimeTransport(
