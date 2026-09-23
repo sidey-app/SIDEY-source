@@ -15,6 +15,151 @@ public sealed class FirebaseRealtimeListenerTests
     private static readonly Guid s_roomId = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc");
 
     [Fact]
+    public async Task CredentialRefreshDeadlineRotatesWithoutDisconnectingHealthyStreams()
+    {
+        var time = new TimerTimeProvider();
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var events = new System.Collections.Concurrent.ConcurrentQueue<BackendEvent>();
+        var credentials = new ScriptedCredentialProvider(async (request, token) =>
+        {
+            if (request > 1)
+            {
+                await release.Task.WaitAsync(token);
+            }
+            return ScheduledCredential(request == 1 ? 10 : 270, request == 1 ? 30 : 300);
+        });
+        await using var listener = new FirebaseRealtimeListener(credentials, events.Enqueue, _ => CreateClient(), time);
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => listener.IsReady && time.ActiveTimers >= 2);
+        events.Clear();
+
+        time.Advance(TimeSpan.FromSeconds(10));
+        await WaitUntilAsync(() => credentials.RequestCount == 2);
+        Assert.True(listener.IsReady);
+        release.SetResult();
+        await WaitUntilAsync(() => events.OfType<BackendEvent.Diagnostic>().Any(item =>
+            item.Stage.StartsWith("firebase-listener-ready", StringComparison.Ordinal)));
+
+        Assert.True(listener.IsReady);
+        Assert.DoesNotContain(events, item => item is BackendEvent.ConnectionChanged { Status.ActiveRoomTransportConnected: false });
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task OldStreamFailureOrLeaseExpiryClearsReadinessDuringBlockedRenewal(bool expireLease)
+    {
+        var time = new TimerTimeProvider();
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var endOldStream = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var credentials = new ScriptedCredentialProvider(async (request, token) =>
+        {
+            if (request > 1)
+            {
+                await release.Task.WaitAsync(token);
+            }
+            return ScheduledCredential(request == 1 ? 10 : 270, request == 1 ? 15 : 300);
+        });
+        int clients = 0;
+        await using var listener = new FirebaseRealtimeListener(
+            credentials,
+            _ => { },
+            _ => CreateClient(Interlocked.Increment(ref clients) == 1 ? endOldStream.Task : Task.Delay(Timeout.InfiniteTimeSpan)),
+            time);
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => listener.IsReady && time.ActiveTimers >= 2);
+        time.Advance(TimeSpan.FromSeconds(10));
+        await WaitUntilAsync(() => credentials.RequestCount == 2);
+
+        if (expireLease)
+        {
+            time.Advance(TimeSpan.FromSeconds(5));
+        }
+        else
+        {
+            endOldStream.SetResult();
+        }
+        await WaitUntilAsync(() => !listener.IsReady);
+        release.SetResult();
+        await WaitUntilAsync(() => listener.IsReady);
+        Assert.Equal(2, clients);
+    }
+
+    [Fact]
+    public async Task InitialConnectionDeadlineIncludesCredentialAcquisition()
+    {
+        var time = new TimerTimeProvider();
+        var cancelled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var credentials = new ScriptedCredentialProvider(async (_, token) =>
+        {
+            try
+            {
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+            }
+            catch (OperationCanceledException)
+            {
+                cancelled.TrySetResult();
+                throw;
+            }
+            return ScheduledCredential(270, 300);
+        });
+        await using var listener = new FirebaseRealtimeListener(credentials, _ => { }, _ => CreateClient(), time);
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => credentials.RequestCount == 1);
+        time.Advance(TimeSpan.FromSeconds(20));
+        await cancelled.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        Assert.False(listener.IsReady);
+        await listener.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task LeaseExpiryDiscardsPartiallyReadyCandidateBeforeRebuildingLiveBaseline()
+    {
+        var time = new TimerTimeProvider();
+        var events = new System.Collections.Concurrent.ConcurrentQueue<BackendEvent>();
+        var peer = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        var credentials = new ScriptedCredentialProvider((request, _) => ValueTask.FromResult(
+            ScheduledCredential(request == 1 ? 10 : 270, request == 1 ? 15 : 300)));
+        int clients = 0;
+        int candidateStreamsDisposed = 0;
+        await using var listener = new FirebaseRealtimeListener(credentials, events.Enqueue, _ =>
+        {
+            int client = Interlocked.Increment(ref clients);
+            if (client == 1)
+            {
+                return CreateClient();
+            }
+            if (client == 3)
+            {
+                return CreateClient(Task.Delay(Timeout.InfiniteTimeSpan),
+                    RoomTransientEvents(peer, s_userId, time.GetUtcNow().ToUnixTimeMilliseconds()));
+            }
+            var urls = new FirebaseRtdbUrlBuilder(new Uri("https://sidey.asia-southeast1.firebasedatabase.app"));
+            return FirebaseRtdbRestClient.CreateForTesting(urls, (request, _) =>
+            {
+                bool inbox = request.RequestUri!.AbsolutePath.Contains("/v2/n/", StringComparison.Ordinal);
+                string prefix = inbox ? string.Empty : TypingRoomEvents(peer, time.GetUtcNow().ToUnixTimeMilliseconds());
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StreamContent(new PrefixThenWaitStream(Encoding.UTF8.GetBytes(prefix),
+                        () => Interlocked.Increment(ref candidateStreamsDisposed))),
+                });
+            });
+        }, time);
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => listener.IsReady && time.ActiveTimers >= 2);
+        time.Advance(TimeSpan.FromSeconds(10));
+        await WaitUntilAsync(() => events.OfType<BackendEvent.TypingChanged>().Any(item => item.Active));
+
+        time.Advance(TimeSpan.FromSeconds(5));
+        await WaitUntilAsync(() => clients == 3 && listener.IsReady
+            && events.OfType<BackendEvent.CharacterPulsed>().Any());
+        Assert.Equal(2, candidateStreamsDisposed);
+        Assert.Contains(events, item => item is BackendEvent.TypingChanged { Active: false });
+        Assert.Single(events.OfType<BackendEvent.CharacterPulsed>());
+    }
+
+    [Fact]
     public async Task InitialSnapshotsAreBaselinesAndHigherChatHintInvalidatesOnce()
     {
         var events = new List<BackendEvent>();
@@ -824,6 +969,67 @@ public sealed class FirebaseRealtimeListenerTests
         }
     }
 
+    private static FirebaseRealtimeCredential ScheduledCredential(int refreshSeconds, int expirySeconds) => new(
+        s_userId, s_sessionId, "id-token", new Uri("https://sidey.asia-southeast1.firebasedatabase.app"), 1,
+        refreshAfter: TimeSpan.FromSeconds(refreshSeconds), expiresAfter: TimeSpan.FromSeconds(expirySeconds));
+
+    private sealed class ScriptedCredentialProvider(
+        Func<int, CancellationToken, ValueTask<FirebaseRealtimeCredential>> acquire) : IFirebaseRealtimeCredentialProvider
+    {
+        private int _requests;
+        public int RequestCount => Volatile.Read(ref _requests);
+        public ValueTask<FirebaseRealtimeCredential> GetCredentialAsync(CancellationToken cancellationToken = default) =>
+            acquire(Interlocked.Increment(ref _requests), cancellationToken);
+        public ValueTask ResetAsync(CancellationToken cancellationToken = default) => ValueTask.CompletedTask;
+    }
+
+    private sealed class TimerTimeProvider : TimeProvider
+    {
+        private readonly Lock _gate = new();
+        private readonly List<ManualTimer> _timers = [];
+        private long _timestamp;
+        public override long TimestampFrequency => TimeSpan.TicksPerSecond;
+        public override long GetTimestamp() { lock (_gate) return _timestamp; }
+        public override DateTimeOffset GetUtcNow() => DateTimeOffset.FromUnixTimeMilliseconds(1_750_000_000_000).AddTicks(GetTimestamp());
+        public int ActiveTimers { get { lock (_gate) return _timers.Count(timer => timer.DueAt != long.MaxValue); } }
+        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+        {
+            var timer = new ManualTimer(this, callback, state);
+            lock (_gate)
+            {
+                _timers.Add(timer);
+                timer.Change(dueTime, period);
+            }
+            return timer;
+        }
+        public void Advance(TimeSpan elapsed)
+        {
+            ManualTimer[] due;
+            lock (_gate)
+            {
+                _timestamp += elapsed.Ticks;
+                due = [.. _timers.Where(timer => timer.DueAt <= _timestamp)];
+                foreach (ManualTimer timer in due)
+                    timer.DueAt = long.MaxValue;
+            }
+            foreach (ManualTimer timer in due)
+                timer.Fire();
+        }
+        private sealed class ManualTimer(TimerTimeProvider owner, TimerCallback callback, object? state) : ITimer
+        {
+            public long DueAt { get; set; } = long.MaxValue;
+            public bool Change(TimeSpan dueTime, TimeSpan period)
+            {
+                lock (owner._gate)
+                    DueAt = dueTime == Timeout.InfiniteTimeSpan ? long.MaxValue : owner._timestamp + dueTime.Ticks;
+                return true;
+            }
+            public void Fire() => callback(state);
+            public void Dispose() { lock (owner._gate) DueAt = long.MaxValue; }
+            public ValueTask DisposeAsync() { Dispose(); return ValueTask.CompletedTask; }
+        }
+    }
+
     private sealed class FakeCredentialProvider : IFirebaseRealtimeCredentialProvider
     {
         public int RequestCount { get; private set; }
@@ -869,9 +1075,10 @@ public sealed class FirebaseRealtimeListenerTests
             ValueTask.CompletedTask;
     }
 
-    private sealed class PrefixThenWaitStream(byte[] prefix) : Stream
+    private sealed class PrefixThenWaitStream(byte[] prefix, Action? onDispose = null) : Stream
     {
         private int _offset;
+        private int _disposed;
 
         public override bool CanRead => true;
         public override bool CanSeek => false;
@@ -903,6 +1110,12 @@ public sealed class FirebaseRealtimeListenerTests
         }
 
         public override void Flush() => throw new NotSupportedException();
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && Interlocked.Exchange(ref _disposed, 1) == 0)
+                onDispose?.Invoke();
+            base.Dispose(disposing);
+        }
         public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
         public override void SetLength(long value) => throw new NotSupportedException();
         public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();

@@ -75,6 +75,8 @@ public sealed class FirebaseRealtimeCredentialProviderTests
         time.Advance(TimeSpan.FromSeconds(79));
         FirebaseRealtimeCredential beforeDeadline = await provider.GetCredentialAsync();
         Assert.Equal(initial.IdToken, beforeDeadline.IdToken);
+        Assert.Equal(TimeSpan.FromSeconds(1), beforeDeadline.RefreshAfter);
+        Assert.Equal(TimeSpan.FromSeconds(21), beforeDeadline.ExpiresAfter);
         Assert.Equal(0, handler.RefreshRequests);
 
         time.SetUtcNow(time.GetUtcNow().AddDays(-60));
@@ -111,6 +113,9 @@ public sealed class FirebaseRealtimeCredentialProviderTests
         time.Advance(TimeSpan.FromSeconds(269));
         FirebaseRealtimeCredential beforeDeadline = await provider.GetCredentialAsync();
         Assert.Equal(initial.IdToken, beforeDeadline.IdToken);
+
+        Assert.Equal(TimeSpan.FromSeconds(1), beforeDeadline.RefreshAfter);
+        Assert.Equal(TimeSpan.FromSeconds(31), beforeDeadline.ExpiresAfter);
 
         time.Advance(TimeSpan.FromSeconds(1));
         time.SetUtcNow(s_initialTime.AddSeconds(270));

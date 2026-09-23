@@ -40,7 +40,9 @@ internal sealed class FirebaseRealtimeCredential
         Uri databaseUrl,
         long generation,
         CancellationToken lifetimeToken = default,
-        IReadOnlyList<string>? wireItems = null)
+        IReadOnlyList<string>? wireItems = null,
+        TimeSpan? refreshAfter = null,
+        TimeSpan? expiresAfter = null)
     {
         UserId = userId;
         SessionId = sessionId;
@@ -49,6 +51,8 @@ internal sealed class FirebaseRealtimeCredential
         Generation = generation;
         LifetimeToken = lifetimeToken;
         WireItems = wireItems ?? [];
+        RefreshAfter = refreshAfter ?? TimeSpan.FromSeconds(275);
+        ExpiresAfter = expiresAfter ?? TimeSpan.FromSeconds(300);
     }
 
     public Guid UserId { get; }
@@ -58,6 +62,8 @@ internal sealed class FirebaseRealtimeCredential
     public long Generation { get; }
     public CancellationToken LifetimeToken { get; }
     public IReadOnlyList<string> WireItems { get; }
+    public TimeSpan RefreshAfter { get; }
+    public TimeSpan ExpiresAfter { get; }
 
     public override string ToString() =>
         $"FirebaseRealtimeCredential(UserId={UserId:D}, SessionId={SessionId:D}, Generation={Generation})";
@@ -148,7 +154,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                         minimumAccessRevision) < 0;
                 if (!requiresRebootstrap && tokenAge < state.RefreshAfter)
                 {
-                    return state.CreateCredential();
+                    return state.CreateCredential(_timeProvider);
                 }
             }
 
@@ -215,7 +221,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                     state.Bootstrap.AccessRevision,
                     minimumAccessRevision) >= 0)
             {
-                return state.CreateCredential();
+                return state.CreateCredential(_timeProvider);
             }
 
             if (_minimumAccessRevisions.TryGetValue(key, out string? existingMinimum)
@@ -440,7 +446,8 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 response.WireItems,
                 response.RolloutLeaseExpiresAt,
                 receivedTimestamp,
-                TimeSpan.FromMilliseconds(refreshDelayMilliseconds)),
+                TimeSpan.FromMilliseconds(refreshDelayMilliseconds),
+                TimeSpan.FromMilliseconds(remainingLeaseMilliseconds)),
             response.CustomToken);
     }
 
@@ -660,6 +667,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 generationToken,
                 grant.ReceivedTimestamp,
                 RefreshAfter(grant.ExpiresIn),
+                grant.ExpiresIn,
                 bootstrap);
             _states[key] = state;
             if (_minimumAccessRevisions.TryGetValue(key, out string? minimumAccessRevision)
@@ -670,7 +678,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 _minimumAccessRevisions.Remove(key);
             }
             RemoveInflightWithinGate(key, generation);
-            return state.CreateCredential();
+            return state.CreateCredential(_timeProvider);
         }
         finally
         {
@@ -962,7 +970,8 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         IReadOnlyList<string> WireItems,
         long RolloutLeaseExpiresAt,
         long ReceivedTimestamp,
-        TimeSpan RefreshAfter)
+        TimeSpan RefreshAfter,
+        TimeSpan ExpiresAfter)
     {
         public override string ToString() =>
             $"{nameof(ValidatedBootstrap)}(DatabaseUrl={DatabaseUrl})";
@@ -985,16 +994,27 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         CancellationToken LifetimeToken,
         long IssuedTimestamp,
         TimeSpan RefreshAfter,
+        TimeSpan ExpiresAfter,
         ValidatedBootstrap Bootstrap)
     {
-        public FirebaseRealtimeCredential CreateCredential() => new(
-            UserId,
-            SessionId,
-            IdToken,
-            Bootstrap.DatabaseUrl,
-            Generation,
-            LifetimeToken,
-            Bootstrap.WireItems);
+        public FirebaseRealtimeCredential CreateCredential(TimeProvider timeProvider)
+        {
+            TimeSpan tokenAge = timeProvider.GetElapsedTime(IssuedTimestamp);
+            TimeSpan bootstrapAge = timeProvider.GetElapsedTime(Bootstrap.ReceivedTimestamp);
+            return new FirebaseRealtimeCredential(
+                UserId,
+                SessionId,
+                IdToken,
+                Bootstrap.DatabaseUrl,
+                Generation,
+                LifetimeToken,
+                Bootstrap.WireItems,
+                Remaining(RefreshAfter - tokenAge, Bootstrap.RefreshAfter - bootstrapAge),
+                Remaining(ExpiresAfter - tokenAge, Bootstrap.ExpiresAfter - bootstrapAge));
+        }
+
+        private static TimeSpan Remaining(TimeSpan token, TimeSpan bootstrap) =>
+            TimeSpan.FromTicks(Math.Max(0, Math.Min(token.Ticks, bootstrap.Ticks)));
 
         public override string ToString() =>
             $"{nameof(TokenState)}(UserId={UserId:D}, SessionId={SessionId:D})";

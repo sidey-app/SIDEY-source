@@ -341,6 +341,40 @@ public sealed class FirebaseV2RealtimeTransportTests
     }
 
     [Fact]
+    public async Task UnchangedSelectorRenewalKeepsListenerAndInFlightChatAlive()
+    {
+        var selector = new FakeSelector(enabled: true) { CacheTtl = TimeSpan.FromMilliseconds(100) };
+        var listener = new FakeFirebaseListener();
+        var chat = new FakeChatClient { Block = true };
+        await using var transport = new FirebaseV2RealtimeTransport(
+            new FakeLegacyTransport(), selector, chat, new FakeCredentialProvider(),
+            sink => listener.WithSink(sink));
+        await transport.SynchronizeAsync(
+            new Dictionary<Guid, long> { [s_roomId] = 1 },
+            s_roomId, PresenceState.Online, CancellationToken.None);
+        Task<FirebaseRealtimeChatResult?> pending = transport.PublishChatAsync(
+            s_messageId, s_roomId, "private chat", CancellationToken.None);
+        await chat.Started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        int selections = 0;
+        await foreach (BackendEvent item in transport.ReadEventsAsync(timeout.Token))
+        {
+            if (item is BackendEvent.Diagnostic { Stage: "firebase-selector transport=v2 source=Server" }
+                && ++selections == 2)
+            {
+                break;
+            }
+        }
+
+        Assert.Equal(0, listener.ReconnectCount);
+        Assert.True(transport.ConnectionStatus.IsReady);
+        Assert.False(pending.IsCompleted);
+        chat.Complete.TrySetResult();
+        Assert.Equal(s_messageId, (await pending.WaitAsync(timeout.Token))?.MessageId);
+    }
+
+    [Fact]
     public async Task SelectorFailureStopsListenerAndFailsClosedForReadsAndWrites()
     {
         var selector = new FakeSelector(enabled: true)
@@ -499,6 +533,57 @@ public sealed class FirebaseV2RealtimeTransportTests
             or BackendEvent.CharacterThrown);
     }
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task SendDiagnosticDistinguishesServerOutcomeWithoutPayload(bool chat, bool fail)
+    {
+        Exception? failure = fail ? new HttpRequestException("private server detail") : null;
+        var listener = new FakeFirebaseListener();
+        await using var transport = new FirebaseV2RealtimeTransport(
+            new FakeLegacyTransport(), new FakeSelector(enabled: true),
+            new FakeChatClient { Failure = failure }, new FakeCredentialProvider(),
+            sink => listener.WithSink(sink), new FakeTransientClient { Failure = failure });
+        await transport.SynchronizeAsync(
+            new Dictionary<Guid, long> { [s_roomId] = 1 },
+            s_roomId, PresenceState.Online, CancellationToken.None);
+        Task sending = chat
+            ? transport.PublishChatAsync(s_messageId, s_roomId, "private message body", CancellationToken.None)
+            : transport.PublishCharacterThrowAsync(s_roomId, s_userId, "patch_soft_ball", CancellationToken.None);
+        if (fail)
+        {
+            Assert.Same(failure, await Assert.ThrowsAsync<HttpRequestException>(() => sending));
+        }
+        else
+        {
+            await sending;
+        }
+
+        BackendEvent.Diagnostic sentinel = new("send-complete");
+        listener.Publish(sentinel);
+        List<string> diagnostics = [];
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        await foreach (BackendEvent item in transport.ReadEventsAsync(timeout.Token))
+        {
+            if (ReferenceEquals(item, sentinel))
+            {
+                break;
+            }
+            if (item is BackendEvent.Diagnostic diagnostic
+                && diagnostic.Stage.StartsWith("firebase-send", StringComparison.Ordinal))
+            {
+                diagnostics.Add(diagnostic.Stage);
+            }
+        }
+        string kind = chat ? "chat" : "throw";
+        string result = fail ? "failed reason=transport" : chat ? "committed" : "accepted";
+        Assert.Equal(
+            [$"firebase-send kind={kind} result=started", $"firebase-send kind={kind} result={result}"],
+            diagnostics);
+    }
+
     private sealed class FakeSelector(bool enabled) : IFirebaseRealtimeRolloutSelector
     {
         public TimeSpan CacheTtl { get; init; } = TimeSpan.FromMinutes(5);
@@ -534,7 +619,10 @@ public sealed class FirebaseV2RealtimeTransportTests
     {
         public int SendCount { get; private set; }
         public bool Block { get; init; }
+        public Exception? Failure { get; init; }
         public TaskCompletionSource Started { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource Complete { get; } =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public async ValueTask<FirebaseRealtimeChatResult> SendAsync(
@@ -546,9 +634,13 @@ public sealed class FirebaseV2RealtimeTransportTests
             cancellationToken.ThrowIfCancellationRequested();
             SendCount++;
             Started.TrySetResult();
+            if (Failure is not null)
+            {
+                throw Failure;
+            }
             if (Block)
             {
-                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+                await Complete.Task.WaitAsync(cancellationToken);
             }
             return new FirebaseRealtimeChatResult(
                 messageId,
@@ -599,6 +691,7 @@ public sealed class FirebaseV2RealtimeTransportTests
         public int StopCount { get; private set; }
         public Guid? ActiveRoomId { get; private set; }
         public bool PublishReadyOnStart { get; init; } = true;
+        public int ReconnectCount { get; private set; }
 
         public FakeFirebaseListener WithSink(Action<BackendEvent> sink)
         {
@@ -611,7 +704,7 @@ public sealed class FirebaseV2RealtimeTransportTests
             cancellationToken.ThrowIfCancellationRequested();
             StartCount++;
             ActiveRoomId = activeRoomId;
-            if (PublishReadyOnStart)
+            if (PublishReadyOnStart && !IsReady)
             {
                 PublishReady();
             }
@@ -645,6 +738,8 @@ public sealed class FirebaseV2RealtimeTransportTests
 
         public void RequestReconnect()
         {
+            ReconnectCount++;
+            PublishDisconnected();
         }
 
         public ValueTask DisposeAsync()
@@ -656,6 +751,7 @@ public sealed class FirebaseV2RealtimeTransportTests
 
     private sealed class FakeTransientClient : IFirebaseRealtimeTransientClient
     {
+        public Exception? Failure { get; init; }
         public int TypingCount { get; private set; }
         public int PulseCount { get; private set; }
         public int ThrowCount { get; private set; }
@@ -684,7 +780,7 @@ public sealed class FirebaseV2RealtimeTransportTests
         {
             ThrowCount++;
             LastWireCode = wireCode;
-            return Task.CompletedTask;
+            return Failure is null ? Task.CompletedTask : Task.FromException(Failure);
         }
     }
 

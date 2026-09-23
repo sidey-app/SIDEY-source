@@ -130,6 +130,27 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
         string body,
         CancellationToken cancellationToken)
     {
+        EmitSendDiagnostic("chat", "started");
+        try
+        {
+            FirebaseRealtimeChatResult? result = await PublishChatCoreAsync(
+                messageId, roomId, body, cancellationToken).ConfigureAwait(false);
+            EmitSendDiagnostic("chat", "committed");
+            return result;
+        }
+        catch (Exception exception)
+        {
+            EmitSendFailure("chat", exception);
+            throw;
+        }
+    }
+
+    private async Task<FirebaseRealtimeChatResult?> PublishChatCoreAsync(
+        Guid messageId,
+        Guid roomId,
+        string body,
+        CancellationToken cancellationToken)
+    {
         ObjectDisposedException.ThrowIf(
             Volatile.Read(ref _sessionInvalidated) != 0,
             this);
@@ -194,7 +215,8 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
                 targetUserId,
                 wireCode,
                 token),
-            cancellationToken);
+            cancellationToken,
+            diagnosticKind: "throw");
     }
 
     public void ConfigureThrowableWireCodes(
@@ -442,14 +464,11 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
                 return;
             }
 
-            bool wasEnabled = UsesFirebaseChat;
             Volatile.Write(ref _firebaseEnabled, 1);
             Volatile.Write(ref _selectorFailedClosed, 0);
+            // The listener renews its actual credential lease with overlapping streams.
+            // An unchanged selector must not tear down healthy streams or in-flight writes.
             await _firebase.StartAsync(_activeRoomId, cancellationToken).ConfigureAwait(false);
-            if (forceRefresh && wasEnabled)
-            {
-                _firebase.RequestReconnect();
-            }
             Emit(new BackendEvent.Diagnostic(
                 $"firebase-selector transport=v2 source={selection.Source}"));
             EmitConnectionStatus();
@@ -511,16 +530,56 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
     private async Task PublishTransientAsync(
         Guid roomId,
         Func<CancellationToken, Task> operation,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? diagnosticKind = null)
     {
-        ObjectDisposedException.ThrowIf(
-            Volatile.Read(ref _sessionInvalidated) != 0,
-            this);
-        using FirebaseWriteOperation writeOperation = CreateFirebaseWriteOperation(
-            roomId,
-            "Firebase realtime transient transport is not ready.",
-            cancellationToken);
-        await operation(writeOperation.Token).ConfigureAwait(false);
+        if (diagnosticKind is not null)
+        {
+            EmitSendDiagnostic(diagnosticKind, "started");
+        }
+        try
+        {
+            ObjectDisposedException.ThrowIf(
+                Volatile.Read(ref _sessionInvalidated) != 0,
+                this);
+            using FirebaseWriteOperation writeOperation = CreateFirebaseWriteOperation(
+                roomId,
+                "Firebase realtime transient transport is not ready.",
+                cancellationToken);
+            await operation(writeOperation.Token).ConfigureAwait(false);
+            if (diagnosticKind is not null)
+            {
+                // RTDB accepting a write does not acknowledge another client's rendering.
+                EmitSendDiagnostic(diagnosticKind, "accepted");
+            }
+        }
+        catch (Exception exception)
+        {
+            if (diagnosticKind is not null)
+            {
+                EmitSendFailure(diagnosticKind, exception);
+            }
+            throw;
+        }
+    }
+
+    private void EmitSendDiagnostic(string kind, string result) =>
+        Emit(new BackendEvent.Diagnostic($"firebase-send kind={kind} result={result}"));
+
+    private void EmitSendFailure(string kind, Exception exception)
+    {
+        string reason = exception switch
+        {
+            FirebaseRealtimeChatException
+            { Classification: FirebaseRealtimeChatFailureClassification.CommitAmbiguous } => "commit-ambiguous",
+            FirebaseRealtimeChatException => "rejected",
+            FirebaseRtdbRequestException request => request.FailureKind.ToString().ToLowerInvariant(),
+            OperationCanceledException => "canceled",
+            InvalidOperationException => "not-ready-or-rejected",
+            _ => "transport",
+        };
+        // Only bounded local categories: never body, identifiers, token, URL or server errors.
+        Emit(new BackendEvent.Diagnostic($"firebase-send kind={kind} result=failed reason={reason}"));
     }
 
     private FirebaseWriteOperation CreateFirebaseWriteOperation(
