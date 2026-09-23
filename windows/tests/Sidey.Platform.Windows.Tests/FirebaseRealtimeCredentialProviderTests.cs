@@ -155,6 +155,44 @@ public sealed class FirebaseRealtimeCredentialProviderTests
     }
 
     [Fact]
+    public async Task BootstrapLeaseUsesServerDateWhenLocalClockTrailsServer()
+    {
+        var sessionId = Guid.NewGuid();
+        StoredSupabaseSession session = SupabaseSession(s_userId, sessionId, "supabase-a");
+        var time = new ManualTimeProvider();
+        time.SetUtcNow(s_initialTime.AddMilliseconds(-800));
+        var handler = new FirebaseProtocolHandler
+        {
+            BootstrapServerDate = s_initialTime,
+            RolloutLeaseExpiresAt = s_initialTime.AddMilliseconds(300_500)
+                .ToUnixTimeMilliseconds(),
+        };
+        handler.AddSession(session, "id-a-0", "refresh-a-0", expiresIn: 3_600);
+        using var client = new HttpClient(handler);
+        var provider = new FirebaseRealtimeCredentialProvider(
+            new FixedSessionAccessor(session),
+            new MemoryCredentialStore(),
+            client,
+            time);
+
+        FirebaseRealtimeCredential credential = await provider.GetCredentialAsync();
+
+        Assert.Equal(s_userId, credential.UserId);
+        Assert.Equal(sessionId, credential.SessionId);
+        Assert.Equal(["bootstrap", "exchange"], [.. handler.RequestKinds]);
+
+        time.Advance(TimeSpan.FromMilliseconds(270_499));
+        _ = await provider.GetCredentialAsync();
+        Assert.Equal(["bootstrap", "exchange"], [.. handler.RequestKinds]);
+
+        time.Advance(TimeSpan.FromMilliseconds(1));
+        _ = await provider.GetCredentialAsync();
+        Assert.Equal(
+            ["bootstrap", "exchange", "bootstrap", "exchange"],
+            [.. handler.RequestKinds]);
+    }
+
+    [Fact]
     public async Task RestartBootstrapsThenRefreshesTheExactPersistedSession()
     {
         var sessionId = Guid.NewGuid();
@@ -569,6 +607,7 @@ public sealed class FirebaseRealtimeCredentialProviderTests
         public bool BlockRefresh { get; init; }
         public bool BlockExchanges { get; init; }
         public bool RejectNextRefresh { get; set; }
+        public DateTimeOffset? BootstrapServerDate { get; init; }
         public long RolloutLeaseExpiresAt { get; set; } =
             s_initialTime.AddMinutes(5).ToUnixTimeMilliseconds();
         public TaskCompletionSource RefreshStarted { get; } =
@@ -639,7 +678,7 @@ public sealed class FirebaseRealtimeCredentialProviderTests
                     rolloutLeaseExpiresAt = RolloutLeaseExpiresAt,
                     rooms = new[] { s_roomId },
                     wireItems = new[] { "0" },
-                });
+                }, BootstrapServerDate);
             }
 
             if (request.RequestUri?.AbsolutePath == "/v1/accounts:signInWithCustomToken")
@@ -700,10 +739,17 @@ public sealed class FirebaseRealtimeCredentialProviderTests
             return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
 
-        private static HttpResponseMessage Json(object value) => new(HttpStatusCode.OK)
+        private static HttpResponseMessage Json(
+            object value,
+            DateTimeOffset? serverDate = null)
         {
-            Content = JsonContent.Create(value),
-        };
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = JsonContent.Create(value),
+            };
+            response.Headers.Date = serverDate;
+            return response;
+        }
 
         private static string QueryApiKey(Uri uri) => uri.Query[1..]
             .Split('&')

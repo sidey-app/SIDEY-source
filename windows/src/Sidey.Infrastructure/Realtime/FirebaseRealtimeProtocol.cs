@@ -82,6 +82,7 @@ internal static class FirebaseRealtimeProtocol
     private const long MaxSafeInteger = 9_007_199_254_740_991;
     private const int MaxPayloadBytes = 256 * 1024;
     private const long MaximumRolloutLeaseMilliseconds = 300_000;
+    private const long ServerDatePrecisionMilliseconds = 1_000;
     private const long RefreshLeadMilliseconds = 30_000;
     private static readonly Uri s_databaseUrl =
         new("https://sidey.asia-southeast1.firebasedatabase.app");
@@ -142,6 +143,7 @@ internal static class FirebaseRealtimeProtocol
         if (rolloutLeaseExpiresAt <= receivedAtUnixMilliseconds
             || rolloutLeaseExpiresAt > receivedAtUnixMilliseconds
                 + MaximumRolloutLeaseMilliseconds
+                + ServerDatePrecisionMilliseconds
             || refreshAfter > rolloutLeaseExpiresAt
             || refreshAfter < rolloutLeaseExpiresAt - RefreshLeadMilliseconds)
         {

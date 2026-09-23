@@ -50,6 +50,20 @@ public sealed class FirebaseRealtimeProtocolTests
         Assert.Equal(s_receivedAt + 30_000, result.RolloutLeaseExpiresAt);
     }
 
+    [Fact]
+    public void BootstrapLeaseAllowsHttpDateSecondPrecisionWindow()
+    {
+        FirebaseRealtimeBootstrapConfiguration result = ParseBootstrap(
+            CreateBootstrapJson(root =>
+            {
+                root["refreshAfter"] = s_receivedAt + 271_000;
+                root["rolloutLeaseExpiresAt"] = s_receivedAt + 301_000;
+            }));
+
+        Assert.Equal(s_receivedAt + 271_000, result.RefreshAfter);
+        Assert.Equal(s_receivedAt + 301_000, result.RolloutLeaseExpiresAt);
+    }
+
     [Theory]
     [InlineData("protocolVersion", 1)]
     [InlineData("databaseURL", "https://sidey.asia-southeast1.firebasedatabase.app/")]
@@ -67,7 +81,7 @@ public sealed class FirebaseRealtimeProtocolTests
     }
 
     [Theory]
-    [InlineData(300_001, 270_001)]
+    [InlineData(301_001, 271_001)]
     [InlineData(300_000, 269_999)]
     [InlineData(300_000, 300_001)]
     public void BootstrapLeaseAndRefreshWindowAreBounded(long leaseOffset, long refreshOffset)

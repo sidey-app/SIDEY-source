@@ -394,22 +394,26 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         request.Content = new ByteArrayContent(
             FirebaseRealtimeProtocol.CreateBootstrapRequestBody(minimumAccessRevision));
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        byte[] responseBody = await SendAndReadBytesAsync(
+        BoundedHttpResponse bootstrapResponse = await SendAndReadBytesAsync(
             request,
             "Realtime bootstrap request failed.",
             cancellationToken).ConfigureAwait(false);
         long receivedTimestamp = _timeProvider.GetTimestamp();
         long receivedAtUnixMilliseconds = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds();
+        long serverNowUnixMilliseconds = bootstrapResponse.ServerDateUnixMilliseconds
+            ?? receivedAtUnixMilliseconds;
         FirebaseRealtimeBootstrapConfiguration response =
             FirebaseRealtimeProtocol.ParseBootstrapResponse(
-                responseBody,
-                receivedAtUnixMilliseconds,
+                bootstrapResponse.Payload,
+                serverNowUnixMilliseconds,
                 minimumAccessRevision);
         ValidateCustomToken(response.CustomToken, key, response.RolloutLeaseExpiresAt);
         long remainingLeaseMilliseconds = checked(
-            response.RolloutLeaseExpiresAt - receivedAtUnixMilliseconds);
-        long refreshDelayMilliseconds = response.RefreshAfter > receivedAtUnixMilliseconds
-            ? response.RefreshAfter - receivedAtUnixMilliseconds
+            response.RolloutLeaseExpiresAt - serverNowUnixMilliseconds);
+        long refreshDelayMilliseconds = response.RefreshAfter > serverNowUnixMilliseconds
+            ? Math.Min(
+                response.RefreshAfter - serverNowUnixMilliseconds,
+                remainingLeaseMilliseconds - 1)
             : Math.Max(1, remainingLeaseMilliseconds / 2);
         return new BootstrapGrant(
             new ValidatedBootstrap(
@@ -479,7 +483,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             rolloutLeaseExpiresAt);
     }
 
-    private async Task<byte[]> SendAndReadBytesAsync(
+    private async Task<BoundedHttpResponse> SendAndReadBytesAsync(
         HttpRequestMessage request,
         string failureMessage,
         CancellationToken cancellationToken)
@@ -494,7 +498,11 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             {
                 throw new HttpRequestException(failureMessage, inner: null, response.StatusCode);
             }
-            return await ReadBoundedAsync(response.Content, cancellationToken).ConfigureAwait(false);
+            byte[] payload = await ReadBoundedAsync(response.Content, cancellationToken)
+                .ConfigureAwait(false);
+            return new BoundedHttpResponse(
+                payload,
+                response.Headers.Date?.ToUnixTimeMilliseconds());
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -923,6 +931,10 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
     {
         public override string ToString() => nameof(FirebaseTokenGrant);
     }
+
+    private sealed record BoundedHttpResponse(
+        byte[] Payload,
+        long? ServerDateUnixMilliseconds);
 
     private sealed record ValidatedBootstrap(
         Uri DatabaseUrl,
