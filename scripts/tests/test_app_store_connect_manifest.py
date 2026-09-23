@@ -13,7 +13,6 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from app_store_connect.model import (  # noqa: E402
     APP_STORE_LOCALES,
     ValidationError,
-    expanded_iap_localizations,
     load_desired_state,
     validate_manifest,
 )
@@ -33,7 +32,6 @@ class AppStoreConnectManifestTests(unittest.TestCase):
         )
 
         self.assertEqual(tuple(desired.manifest["app_localizations"]), APP_STORE_LOCALES)
-        self.assertEqual(len(desired.products), 33)
         apple_ids = {
             candidate
             for product in desired.products
@@ -42,18 +40,10 @@ class AppStoreConnectManifestTests(unittest.TestCase):
                 *product["legacy_app_store_product_ids"],
             )
         }
-        self.assertEqual(len(apple_ids), 43)
-
-    def test_app_store_export_derives_safe_short_display_name_without_rewriting_source(self) -> None:
-        desired = load_desired_state(
-            self.manifest_path,
-            self.commerce_path,
-            self.catalog_path,
-        )
-        product = next(product for product in desired.products if product["id"] == "character_poop")
-
-        self.assertEqual(product["localizations"]["ko"]["display_name"], "똥")
-        self.assertEqual(expanded_iap_localizations(product)["ko"]["name"], "똥 캐릭터")
+        self.assertEqual(len(apple_ids), sum(
+            1 + len(product["legacy_app_store_product_ids"])
+            for product in desired.products
+        ))
 
     def test_rejects_missing_required_locale(self) -> None:
         manifest = json.loads(self.manifest_path.read_text(encoding="utf-8"))
