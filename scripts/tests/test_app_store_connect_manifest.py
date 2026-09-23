@@ -53,7 +53,7 @@ class AppStoreConnectManifestTests(unittest.TestCase):
         product = next(product for product in desired.products if product["id"] == "character_poop")
 
         self.assertEqual(product["localizations"]["ko"]["display_name"], "똥")
-        self.assertEqual(expanded_iap_localizations(product)["ko"]["name"], "똥 캐릭터")
+        self.assertEqual(expanded_iap_localizations(product)["ko"]["name"], "똥이")
 
     def test_rejects_missing_required_locale(self) -> None:
         manifest = json.loads(self.manifest_path.read_text(encoding="utf-8"))
