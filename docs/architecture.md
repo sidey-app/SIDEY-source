@@ -93,6 +93,16 @@ backend가 상품 변경을 필요로 하면 검토된 private source commit의 
 provenance를 별도로 받아 서버용 매핑을 생성한다. Source catalog 변경만으로 backend가
 배포되지는 않는다.
 
+네이티브 앱 UI 번역은 [`assets/v1/ui-localizations.json`](../assets/v1/ui-localizations.json)이
+원본이다. 공통 문구와 플랫폼 고유 문구를 구분해 보존하고, 결정론적 생성기가 macOS
+String Catalog와 Windows 언어별 JSON mirror를 만든다. 각 플랫폼의 지원 언어와 fallback,
+placeholder 및 plural 형식은 다를 수 있지만 생성된 bundle을 직접 고쳐 원본과 갈라지게
+하지 않는다. 상품명과 상품 설명은
+[`assets/v1/commerce-localizations.json`](../assets/v1/commerce-localizations.json)이 별도로
+소유하며, Windows 언어 bundle은 UI 원본과 commerce 원본을 한 생성기에서 합쳐 생성한다.
+두 원본이 같은 Windows key를 함께 소유하면 검증을 실패시킨다. App Store listing 문구는
+앱 내부 문구와 사용처 및 길이 제한이 다르므로 전용 manifest가 계속 소유한다.
+
 ## 배포 산출물
 
 Mac App Store target version/build는 [`release/macos.json`](../release/macos.json)과

@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "locales": [
     "ko",
     "en",
@@ -30,6 +30,20 @@
           "iap_description": "抱著迷路小星星入睡的六角恐龍。",
           "marketing_description": "牠帶回了一顆迷路的小星星，聽說連睡覺時也會緊緊抱著。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "星光美西螈",
+          "marketing_description": "带回了一颗迷路的小星星。听说睡觉时也要紧紧抱着。"
+        },
+        "uk": {
+          "display_name": "Зоряний аксолотль",
+          "marketing_description": "Прихистив маленьку зірку, що заблукала. Кажуть, навіть уві сні не випускає її з обіймів."
+        },
+        "ru": {
+          "display_name": "Звёздный аксолотль",
+          "marketing_description": "Приютил заблудившуюся звёздочку. Говорят, даже во сне не выпускает её из объятий."
+        }
       }
     },
     {
@@ -54,6 +68,20 @@
           "display_name": "天竺鼠寶寶",
           "iap_description": "忘了零食藏哪裡，臉頰卻還鼓鼓的。",
           "marketing_description": "牠忘了把零食藏在哪裡。看牠臉頰鼓鼓的，應該不會太遠。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "豚鼠宝宝",
+          "marketing_description": "忘了把零食藏在哪儿了。看那鼓鼓的脸颊，应该没藏太远。"
+        },
+        "uk": {
+          "display_name": "Морська свинка",
+          "marketing_description": "Забув, де сховав смаколик. Судячи з повних щічок, далеко шукати не доведеться."
+        },
+        "ru": {
+          "display_name": "Морская свинка",
+          "marketing_description": "Забыл, где спрятал угощение. Судя по полным щёчкам, искать далеко не придётся."
         }
       }
     },
@@ -80,6 +108,20 @@
           "iap_description": "帶香蕉來分享，怎麼只剩一半了？",
           "marketing_description": "牠帶香蕉來跟大家分享。牠說路上只吃了一口……怎麼只剩一半了？"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "猴子宝宝",
+          "marketing_description": "带着香蕉来分享了。说路上只咬了一口……怎么只剩半根了？"
+        },
+        "uk": {
+          "display_name": "Мавпеня",
+          "marketing_description": "Прийшов поділитися бананом. Каже, дорогою відкусив лише трішки… Але лишилася тільки половинка."
+        },
+        "ru": {
+          "display_name": "Обезьянка",
+          "marketing_description": "Пришёл поделиться бананом. Говорит, по дороге откусил совсем чуть-чуть… Но осталась только половинка."
+        }
       }
     },
     {
@@ -104,6 +146,20 @@
           "display_name": "龍貓寶寶",
           "iap_description": "剛做完沙浴，急著炫耀蓬鬆的毛。",
           "marketing_description": "牠做完沙浴來玩。還沒打招呼，就先炫耀蓬鬆的毛。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "龙猫宝宝",
+          "marketing_description": "洗完沙浴来串门了。还没打招呼，就先炫耀起蓬松的毛。"
+        },
+        "uk": {
+          "display_name": "Шиншила",
+          "marketing_description": "Завітав у гості після піщаної ванни. Спершу хизується пухнастою шубкою, а вже потім вітається."
+        },
+        "ru": {
+          "display_name": "Шиншилла",
+          "marketing_description": "Заглянул в гости после песочной ванны. Сначала хвастается пушистой шубкой, а уже потом здоровается."
         }
       }
     },
@@ -130,6 +186,20 @@
           "iap_description": "可以欣賞牠的寶貝貝殼，但別拿走。",
           "marketing_description": "牠來展示最喜歡的貝殼。看看沒關係，但拿走的話牠會鬧彆扭。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "小水獭",
+          "marketing_description": "带着最喜欢的贝壳来给你看。看看可以，拿走可要闹别扭。"
+        },
+        "uk": {
+          "display_name": "Маленька видра",
+          "marketing_description": "Приніс показати улюблену мушлю. Подивитися можна, а заберете — образиться."
+        },
+        "ru": {
+          "display_name": "Малыш-выдра",
+          "marketing_description": "Принёс показать любимую ракушку. Смотреть можно, а заберёте — обидится."
+        }
       }
     },
     {
@@ -154,6 +224,20 @@
           "display_name": "小豬寶寶",
           "iap_description": "循著零食香味而來，乾脆住下來了。",
           "marketing_description": "牠循著零食香味而來，結果就住下來了。現在已經把這裡當成自己家。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "小猪",
+          "marketing_description": "闻着零食的香味就住下了。现在好像已经把这里当成自己的家。"
+        },
+        "uk": {
+          "display_name": "Поросятко",
+          "marketing_description": "Прийшов на запах смаколиків і залишився. Здається, тепер вважає це місце своїм домом."
+        },
+        "ru": {
+          "display_name": "Поросёнок",
+          "marketing_description": "Пришёл на запах вкусного и остался. Кажется, теперь считает это место своим домом."
         }
       }
     },
@@ -180,6 +264,20 @@
           "iap_description": "出門散步，卻開始挑選落地生根的地方。",
           "marketing_description": "這棵小樹出門散步。叫牠休息一下，牠卻開始挑選要落地生根的地方。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "小树",
+          "marketing_description": "出来散步的小树。让它歇一会儿，它却开始找地方扎根了。"
+        },
+        "uk": {
+          "display_name": "Дерево",
+          "marketing_description": "Маленьке дерево вийшло на прогулянку. Попросили перепочити — а воно вже шукає, де пустити коріння."
+        },
+        "ru": {
+          "display_name": "Дерево",
+          "marketing_description": "Маленькое дерево вышло на прогулку. Попросили отдохнуть — и оно уже ищет, где пустить корни."
+        }
       }
     },
     {
@@ -204,6 +302,20 @@
           "display_name": "粉紅兔兔對話框",
           "iap_description": "帶有兔兔裝飾的粉紅色對話框。",
           "marketing_description": "帶有兔兔裝飾的粉紅色對話框。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "粉红兔兔气泡",
+          "marketing_description": "粉红色气泡配有兔兔装饰和清晰的深色文字。"
+        },
+        "uk": {
+          "display_name": "Рожева бульбашка із зайчиком",
+          "marketing_description": "Рожева бульбашка із зайчиком і чітким темним текстом."
+        },
+        "ru": {
+          "display_name": "Розовое облачко с зайчиком",
+          "marketing_description": "Розовое облачко с зайчиком и чётким тёмным текстом."
         }
       }
     },
@@ -230,6 +342,20 @@
           "iap_description": "帶有小雞裝飾的奶油色對話框。",
           "marketing_description": "帶有小雞裝飾的奶油色對話框。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "奶油小鸡气泡",
+          "marketing_description": "奶油黄色气泡配有小鸡装饰和清晰的深色文字。"
+        },
+        "uk": {
+          "display_name": "Вершкова бульбашка з курчатком",
+          "marketing_description": "Вершково-жовта бульбашка з курчатком і чітким темним текстом."
+        },
+        "ru": {
+          "display_name": "Сливочное облачко с цыплёнком",
+          "marketing_description": "Сливочно-жёлтое облачко с цыплёнком и чётким тёмным текстом."
+        }
       }
     },
     {
@@ -254,6 +380,20 @@
           "display_name": "星空貓咪對話框",
           "iap_description": "帶有星空貓裝飾的藍紫色對話框。",
           "marketing_description": "帶有星空貓裝飾的藍紫色對話框。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "星夜猫咪气泡",
+          "marketing_description": "深紫色气泡配有星夜猫咪装饰和明亮文字。"
+        },
+        "uk": {
+          "display_name": "Зоряна бульбашка з котиком",
+          "marketing_description": "Темно-фіолетова бульбашка із зоряним котиком і світлим текстом."
+        },
+        "ru": {
+          "display_name": "Звёздное облачко с котиком",
+          "marketing_description": "Тёмно-фиолетовое облачко со звёздным котиком и светлым текстом."
         }
       }
     },
@@ -280,6 +420,20 @@
           "iap_description": "一路彈跳飛出去的愛心投擲物。",
           "marketing_description": "一路彈跳飛出去的愛心投擲物。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "弹弹爱心",
+          "marketing_description": "一颗蹦蹦跳跳飞过去、替你传递心意的爱心。"
+        },
+        "uk": {
+          "display_name": "Стрибуче серце",
+          "marketing_description": "Сердечко, що весело стрибає в повітрі й передає трішки тепла."
+        },
+        "ru": {
+          "display_name": "Прыгучее сердце",
+          "marketing_description": "Сердечко, которое весело скачет по воздуху и передаёт немного тепла."
+        }
       }
     },
     {
@@ -304,6 +458,20 @@
           "display_name": "迷你大砲",
           "iap_description": "發射引信砲彈的迷你大砲投擲物。",
           "marketing_description": "發射引信砲彈的迷你大砲投擲物。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "迷你大炮",
+          "marketing_description": "角色面前会出现一门迷你大炮，炮弹命中后会砰地炸开。"
+        },
+        "uk": {
+          "display_name": "Мінігармата",
+          "marketing_description": "Перед персонажем з’являється крихітна гармата й стріляє ядром, яке вибухає від удару."
+        },
+        "ru": {
+          "display_name": "Мини-пушка",
+          "marketing_description": "Перед персонажем появляется крохотная пушка и стреляет ядром, которое взрывается при попадании."
         }
       }
     },
@@ -330,6 +498,20 @@
           "iap_description": "鴨子丟鴨子，看來不是家庭糾紛。",
           "marketing_description": "鴨子丟出另一隻鴨子。看來應該不是家庭糾紛。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "吱吱小黄鸭",
+          "marketing_description": "一只俏皮的小黄鸭旋转着飞过空中。"
+        },
+        "uk": {
+          "display_name": "Качечка-пищалка",
+          "marketing_description": "Грайлива жовта качечка крутиться в польоті."
+        },
+        "ru": {
+          "display_name": "Уточка-пищалка",
+          "marketing_description": "Забавная жёлтая уточка крутится в полёте."
+        }
       }
     },
     {
@@ -354,6 +536,20 @@
           "display_name": "雪花",
           "iap_description": "命中後會散成細小結晶碎片的雪花。",
           "marketing_description": "命中後會散成細小結晶碎片的雪花。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "雪花",
+          "marketing_description": "冰晶碰撞后散成细小的碎片。"
+        },
+        "uk": {
+          "display_name": "Сніжинка",
+          "marketing_description": "Крижаний кристал розсипається на дрібні уламки під час удару."
+        },
+        "ru": {
+          "display_name": "Снежинка",
+          "marketing_description": "Ледяной кристалл рассыпается на мелкие осколки при ударе."
         }
       }
     },
@@ -380,6 +576,20 @@
           "iap_description": "帶紅色縫線的球，壓扁後又會彈起。",
           "marketing_description": "帶紅色縫線的球，壓扁後又會彈起。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "棒球",
+          "marketing_description": "带着红色缝线的棒球，碰撞时压扁再弹起。"
+        },
+        "uk": {
+          "display_name": "Бейсбольний м’яч",
+          "marketing_description": "М’яч із червоними швами кумедно сплющується й відскакує."
+        },
+        "ru": {
+          "display_name": "Бейсбольный мяч",
+          "marketing_description": "Мяч с красными швами смешно сплющивается и отскакивает."
+        }
       }
     },
     {
@@ -404,6 +614,20 @@
           "display_name": "Wakku 球",
           "iap_description": "喀嚓！享受碎成小塊的酥脆聲響。",
           "marketing_description": "喀嚓！感受 Wakku 球碎成一小塊一小塊的酥脆聲響。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "哇咔球",
+          "marketing_description": "咔嚓咔嚓！听外壳碎成小片的清脆声音。"
+        },
+        "uk": {
+          "display_name": "Ваккубол",
+          "marketing_description": "Хр-р-русь! Послухайте, як хрустка оболонка розсипається на шматочки."
+        },
+        "ru": {
+          "display_name": "Ваккубол",
+          "marketing_description": "Хр-р-русь! Послушайте, как хрустящая оболочка рассыпается на кусочки."
         }
       }
     },
@@ -430,6 +654,20 @@
           "iap_description": "可可外皮和綠色內餡壓下時會發出脆響。",
           "marketing_description": "可可外皮和綠色內餡被壓下時，會發出酥脆的聲響。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "迪拜嚼嚼曲奇",
+          "marketing_description": "圆圆的可可外皮，裹着会被压扁、拉长的绿色内馅。"
+        },
+        "uk": {
+          "display_name": "Дуджонку",
+          "marketing_description": "Кругла оболонка з какао й зелена начинка, що мнеться та тягнеться."
+        },
+        "ru": {
+          "display_name": "Дуджонку",
+          "marketing_description": "Круглая оболочка из какао и зелёная начинка, которая мнётся и тянется."
+        }
       }
     },
     {
@@ -454,6 +692,20 @@
           "display_name": "天竺鼠的迷你甜椒",
           "iap_description": "珍藏的零食，丟出後三秒內撿起來就沒關係吧？",
           "marketing_description": "這是牠珍藏的點心。丟出去後，只要三秒內撿起來就沒關係吧？"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "豚鼠的小甜椒",
+          "marketing_description": "珍藏的小零食。扔出去后，三秒内捡起来还算数吧？"
+        },
+        "uk": {
+          "display_name": "Перчик морської свинки",
+          "marketing_description": "Дбайливо прихований смаколик. Правило трьох секунд іще діє, правда?"
+        },
+        "ru": {
+          "display_name": "Перчик морской свинки",
+          "marketing_description": "Заботливо припрятанный перекус. Правило трёх секунд ведь ещё действует?"
         }
       }
     },
@@ -480,6 +732,20 @@
           "iap_description": "小猴子拿來分享的香蕉。是不是自願的還沒問。",
           "marketing_description": "這是小猴子拿來分享的香蕉。至於牠是不是真的自願，還沒來得及問。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "猴子的香蕉",
+          "marketing_description": "猴子拿来分享的香蕉。是不是愿意分享……还没问过它。"
+        },
+        "uk": {
+          "display_name": "Банан мавпочки",
+          "marketing_description": "Мавпочка поділилася бананом. Щоправда, її саму ми поки не запитали."
+        },
+        "ru": {
+          "display_name": "Банан обезьянки",
+          "marketing_description": "Обезьянка поделилась бананом. Правда, её саму мы пока не спросили."
+        }
       }
     },
     {
@@ -504,6 +770,20 @@
           "display_name": "龍貓的浴沙袋",
           "iap_description": "龍貓的浴沙。丟這個應該不是叫你洗澡。",
           "marketing_description": "這是龍貓洗澡用的沙。把它丟出去……應該不是在叫你洗澡。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "龙猫的沙袋",
+          "marketing_description": "龙猫洗澡用的沙子。应该不是在暗示你该洗澡了吧。"
+        },
+        "uk": {
+          "display_name": "Мішечок із піском шиншили",
+          "marketing_description": "Пісок для купання шиншили. Це ж не натяк, що час помитися?"
+        },
+        "ru": {
+          "display_name": "Мешочек с песком шиншиллы",
+          "marketing_description": "Песок для купания шиншиллы. Это ведь не намёк, что пора помыться?"
         }
       }
     },
@@ -530,6 +810,20 @@
           "iap_description": "把星光揉成一團。天空是不是少了一顆星？",
           "marketing_description": "把星光用力揉成一團。聽說天空少了一顆星，是這顆嗎？"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "星光美西螈的星光球",
+          "marketing_description": "把星光揉成了一团。听说天上少了一颗星？"
+        },
+        "uk": {
+          "display_name": "Зоряна кулька аксолотля",
+          "marketing_description": "Жменька зоряного світла. А на небі точно не стало на одну зірку менше?"
+        },
+        "ru": {
+          "display_name": "Звёздный шар аксолотля",
+          "marketing_description": "Пригоршня звёздного света. А на небе точно не стало на одну звезду меньше?"
+        }
       }
     },
     {
@@ -554,6 +848,20 @@
           "display_name": "水獺的貝殼",
           "iap_description": "沒有珍珠，只有水獺的一點依依不捨。",
           "marketing_description": "這是水獺一直抱在懷裡的貝殼。裡面沒有珍珠，只有一點依依不捨。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "水獭的贝壳",
+          "marketing_description": "水獭珍爱的贝壳。里面没有珍珠，倒是有点舍不得。"
+        },
+        "uk": {
+          "display_name": "Мушля видри",
+          "marketing_description": "Улюблена мушля видри. Перлини всередині немає, зате розлучатися шкода."
+        },
+        "ru": {
+          "display_name": "Ракушка выдры",
+          "marketing_description": "Любимая ракушка выдры. Жемчужины внутри нет, а вот расставаться с ней жалко."
         }
       }
     },
@@ -580,6 +888,20 @@
           "iap_description": "啪！話說隔壁的小豬是不是好幾天沒出現了？",
           "marketing_description": "紮實的一聲啪！話說回來，隔壁的小豬是不是好幾天沒出現了……？"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "小猪的猪肉",
+          "marketing_description": "啪！话说，最近是不是没见到隔壁的小猪？"
+        },
+        "uk": {
+          "display_name": "Свинина поросятка",
+          "marketing_description": "Лясь! До речі, сусідського поросятка давно ніхто не бачив…"
+        },
+        "ru": {
+          "display_name": "Свинина поросёнка",
+          "marketing_description": "Шлёп! Кстати, соседского поросёнка давно никто не видел…"
+        }
       }
     },
     {
@@ -604,6 +926,20 @@
           "display_name": "小樹的小小樹",
           "iap_description": "樹丟出一棵小樹。先查查族譜吧。",
           "marketing_description": "樹丟出一棵小樹。要不要先從族譜開始查起？"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "小树的小小树",
+          "marketing_description": "小树扔小树。要不先查查家谱？"
+        },
+        "uk": {
+          "display_name": "Деревце маленького дерева",
+          "marketing_description": "Дерево кидає дерево. Може, спершу зазирнемо в родовід?"
+        },
+        "ru": {
+          "display_name": "Деревце маленького дерева",
+          "marketing_description": "Дерево бросает дерево. Может, сначала заглянем в родословную?"
         }
       }
     },
@@ -832,5 +1168,10 @@
         }
       }
     }
+  ],
+  "windows_locales": [
+    "zh-Hans",
+    "uk",
+    "ru"
   ]
 }
