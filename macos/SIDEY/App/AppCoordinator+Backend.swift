@@ -126,19 +126,30 @@ extension AppCoordinator {
                     let lease = try await messagingTransport.rolloutLeaseStatus()
                     if lease != nil {
                         observedFirebaseLease = true
-                    } else if observedFirebaseLease {
-                        return
                     }
                     let now = clock.now
                     let policyDelay = max(.zero, now.duration(to: policyDeadline))
-                    let leaseDelay = lease?.refreshIn ?? policyDelay
+                    let leaseDelay = RealtimeRolloutTiming.leaseDelay(
+                        lease,
+                        observedFirebaseLease: observedFirebaseLease,
+                        fallback: policyDelay
+                    )
                     let wakeDelay = max(
                         .milliseconds(1),
                         min(policyDelay, leaseDelay)
                     )
                     try await Task.sleep(for: wakeDelay)
 
-                    let leaseDue = lease.map { $0.refreshIn <= .milliseconds(1) } ?? false
+                    // A Duration snapshot does not count down while this task
+                    // sleeps. Re-read the transport so wake-from-sleep and
+                    // network stalls cannot consume the lease safety margin.
+                    let currentLease = try await messagingTransport.rolloutLeaseStatus()
+                    let recoveringFromClosedLease = currentLease == nil
+                        && observedFirebaseLease
+                    let leaseDue = RealtimeRolloutTiming.isLeaseDue(
+                        currentLease,
+                        observedFirebaseLease: observedFirebaseLease
+                    )
                     let policyDue = clock.now >= policyDeadline
                     guard leaseDue || policyDue else { continue }
 
@@ -166,9 +177,22 @@ extension AppCoordinator {
                         refreshStatusItem()
                         return
                     }
-                } catch is CancellationError {
-                    return
+                    if renewal.leaseRenewed, recoveringFromClosedLease {
+                        model.connectionState = .online
+                        model.setActiveRoomRealtimeConnected(true)
+                        model.errorMessage = nil
+                        refreshStatusItem()
+                    }
                 } catch {
+                    // URLSession and SDK operations can report their own
+                    // CancellationError during connection churn. Only the
+                    // rollout task's actual cancellation may stop monitoring.
+                    if RealtimeRolloutTiming.shouldStopAfterError(
+                        error,
+                        taskIsCancelled: Task.isCancelled
+                    ) {
+                        return
+                    }
                     // A selector outage or malformed enabled response must not
                     // authorize a downgrade. The active Firebase adapter stays
                     // selected; server dispatch and Rules retain the hard stop.
@@ -190,7 +214,6 @@ extension AppCoordinator {
                         model.setActiveRoomRealtimeConnected(false)
                         model.errorMessage = error.localizedDescription
                         refreshStatusItem()
-                        return
                     }
                     // Keep the last explicitly enabled Firebase lease selected,
                     // retry briefly, and let its monotonic hard deadline close
