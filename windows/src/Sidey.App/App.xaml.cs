@@ -158,7 +158,7 @@ public partial class App : Application
             $"language-initialized language={I18n.Language} "
             + $"saved={(coordinator.State.Preferences.Language is not null).ToString().ToLowerInvariant()}");
         string? completedUpdateVersion = _updateCompletionTracker.PendingNotificationVersion(
-            _updateService.CurrentVersion);
+            _updateService.CurrentUpdateVersion);
         coordinator.ComposerRequested += RequestComposer;
         coordinator.PulseRequested += RequestPulse;
         coordinator.TreeMovementToggleRequested += RequestTreeMovementToggle;
@@ -196,7 +196,7 @@ public partial class App : Application
             StartupDiagnostics.Stage("tray-started");
             if (completedUpdateVersion is not null)
             {
-                _tray.NotifyUpdateInstalled(completedUpdateVersion);
+                _tray.NotifyUpdateInstalled(_updateService.CurrentVersion);
                 StartupDiagnostics.Stage("update-completed-notification-posted");
             }
             if (_pendingUpdateNotificationVersion is { } pendingVersion)
@@ -216,7 +216,7 @@ public partial class App : Application
         if (completedUpdateVersion is null || _tray is not null)
         {
             StartupDiagnostics.Stage(
-                $"update-completion-state-saved result={_updateCompletionTracker.TryMarkLaunched(_updateService.CurrentVersion).ToString().ToLowerInvariant()}");
+                $"update-completion-state-saved result={_updateCompletionTracker.TryMarkLaunched(_updateService.CurrentUpdateVersion).ToString().ToLowerInvariant()}");
         }
 #if DEBUG
         _developmentUpdate = DevelopmentUpdateService.Start(OnDevelopmentUpdateAccepted);

@@ -73,9 +73,19 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           winget install NSIS.NSIS --exact --version 3.12 --silent `
             --accept-package-agreements --accept-source-agreements --disable-interactivity
-          $version = ([xml](Get-Content ./windows/src/Sidey.App/Sidey.App.csproj -Raw)).Project.PropertyGroup.Version | Where-Object { $_ }
-          ./scripts/windows/New-WindowsInstaller.ps1 -PublishDirectory ./build/windows/publish `
-            -OutputDirectory ./build/windows/artifacts -Version $version
+          $productVersion = python -X utf8 ./scripts/sidey_version.py --get productVersion
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unable to resolve the SIDEY Product Version: exit code $LASTEXITCODE"
+          }
+          $releaseVersion = python -X utf8 ./scripts/sidey_version.py --get windowsReleaseVersion
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unable to resolve the SIDEY Windows Release Version: exit code $LASTEXITCODE"
+          }
+          ./scripts/windows/New-WindowsInstaller.ps1 `
+            -PublishDirectory ./build/windows/publish `
+            -OutputDirectory ./build/windows/artifacts `
+            -ProductVersion $productVersion `
+            -ReleaseVersion $releaseVersion
 
       - name: Upload coverage
         if: ${{ always() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure') }}

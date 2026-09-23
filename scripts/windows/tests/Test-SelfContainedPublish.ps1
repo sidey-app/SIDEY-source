@@ -82,6 +82,19 @@ if ($missingRuntimeFiles.Count -gt 0) {
     throw "Self-contained runtime files are missing: $($missingRuntimeFiles -join ', ')"
 }
 
+$versionPropertiesPath = Join-Path $repositoryRootPath 'windows/Version.props'
+$versionProperties = [xml](Get-Content -LiteralPath $versionPropertiesPath -Raw -Encoding UTF8)
+$expectedProductVersion = [string]$versionProperties.Project.PropertyGroup.SideyProductVersion
+$expectedFileVersion = [string]$versionProperties.Project.PropertyGroup.SideyMsixVersion
+$hostVersionInfo = [Diagnostics.FileVersionInfo]::GetVersionInfo(
+    (Join-Path $runtimeDirectoryPath 'SIDEY.Host.exe'))
+if ($hostVersionInfo.ProductVersion -cne $expectedProductVersion) {
+    throw "Published SIDEY.Host.exe ProductVersion does not match: $($hostVersionInfo.ProductVersion) / $expectedProductVersion"
+}
+if ($hostVersionInfo.FileVersion -cne $expectedFileVersion) {
+    throw "Published SIDEY.Host.exe FileVersion does not match: $($hostVersionInfo.FileVersion) / $expectedFileVersion"
+}
+
 $publishedFiles = @(Get-ChildItem -LiteralPath $publishDirectoryPath -Recurse -File)
 $unexpectedPackages = @($publishedFiles | Where-Object {
     $_.Extension -in @('.msix', '.msixbundle', '.appx', '.appxbundle') -or

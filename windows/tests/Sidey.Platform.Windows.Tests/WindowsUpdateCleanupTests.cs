@@ -20,7 +20,10 @@ public sealed class WindowsUpdateCleanupTests : IDisposable
         string nested = CreateFile("1.0.10/nested", "keep.txt");
         string invalidVersion = CreateFile("not-a-version", "SIDEY-Windows-x64-vnot-a-version-Setup.exe");
         string oversizedVersion = CreateFile("999999999999999999.0.0", "keep.txt");
-        var service = new WindowsUpdateService(currentVersion: "1.0.10", updateCacheDirectory: _cache);
+        var service = new WindowsUpdateService(
+            currentProductVersion: "1.0.10",
+            currentUpdateVersion: "1.0.10",
+            updateCacheDirectory: _cache);
 
         Assert.Equal(5, service.CleanupInstalledUpdates());
 
@@ -41,7 +44,10 @@ public sealed class WindowsUpdateCleanupTests : IDisposable
     {
         string installer = CreateFile("1.0.10", "SIDEY-Windows-x64-v1.0.10-Setup.exe");
         string partial = CreateFile("1.0.10", "SIDEY-Windows-x64-v1.0.10-Setup.exe.download");
-        var service = new WindowsUpdateService(currentVersion: "1.0.10", updateCacheDirectory: _cache);
+        var service = new WindowsUpdateService(
+            currentProductVersion: "1.0.10",
+            currentUpdateVersion: "1.0.10",
+            updateCacheDirectory: _cache);
 
         using (FileStream locked = File.Open(installer, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
@@ -58,7 +64,10 @@ public sealed class WindowsUpdateCleanupTests : IDisposable
     public void MissingCacheDoesNotGetCreated()
     {
         string missing = Path.Combine(_cache, "missing");
-        var service = new WindowsUpdateService(updateCacheDirectory: missing);
+        var service = new WindowsUpdateService(
+            currentProductVersion: "1.0.10",
+            currentUpdateVersion: "1.0.10",
+            updateCacheDirectory: missing);
 
         Assert.Equal(0, service.CleanupInstalledUpdates());
         Assert.False(Directory.Exists(missing));

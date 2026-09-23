@@ -1659,7 +1659,17 @@ public sealed class MainWindowViewModelTests
         (FakeSideyCoordinator coordinator, _) = CreateRoomState();
         var updates = new FakeUpdateService
         {
-            AvailableUpdate = new AvailableUpdate("0.3.0-alpha.3"),
+            AvailableUpdate = new AvailableUpdate(
+                "2.0.1",
+                UpdateVersion: "2.0.1000",
+                UpdateTag: "windows-v2.0.1"),
+            DownloadHandler = (update, _, _) =>
+            {
+                Assert.Equal("2.0.1", update.Version);
+                Assert.Equal("2.0.1000", update.UpdateVersion);
+                Assert.Equal("windows-v2.0.1", update.UpdateTag);
+                return Task.CompletedTask;
+            },
         };
         var viewModel = new MainWindowViewModel(
             coordinator,
@@ -1741,6 +1751,7 @@ public sealed class MainWindowViewModelTests
 
         await viewModel.CheckForUpdatesCommand.ExecuteAsync(null);
 
+        Assert.Equal("2.0.1", dialogs.ConfirmedUpdateVersion);
         Assert.Equal(1, updates.InstallerLaunchCount);
     }
 

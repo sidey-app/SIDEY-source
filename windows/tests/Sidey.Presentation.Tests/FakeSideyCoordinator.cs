@@ -326,6 +326,8 @@ internal sealed class FakeMainWindowDialogService : IMainWindowDialogService
 
     public bool? ConfirmedLeaveRoomIsOwner { get; private set; }
 
+    public string? ConfirmedUpdateVersion { get; private set; }
+
     public Task<bool> ConfirmInviteCodeRotationAsync() => Task.FromResult(true);
 
     public Task<string?> PromptForRoomNameAsync(string currentName) =>
@@ -353,7 +355,7 @@ internal sealed class FakeMainWindowDialogService : IMainWindowDialogService
 
     public Task<bool> ConfirmUpdateDownloadAsync(string version)
     {
-        _ = version;
+        ConfirmedUpdateVersion = version;
         return Task.FromResult(ConfirmUpdateDownload);
     }
 }
@@ -361,6 +363,8 @@ internal sealed class FakeMainWindowDialogService : IMainWindowDialogService
 internal sealed class FakeUpdateService : IUpdateService
 {
     public string CurrentVersion { get; set; } = "1.0.6";
+
+    public string CurrentUpdateVersion { get; set; } = "1.0.6";
 
     public DateTimeOffset? LastCheckedAt { get; set; }
 
