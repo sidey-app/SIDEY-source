@@ -200,7 +200,7 @@ class CommerceLocalizationTests(unittest.TestCase):
                     values,
                 )
 
-    def test_short_iap_names_use_kind_suffix_without_changing_source(self):
+    def test_short_iap_names_use_approved_name_or_kind_suffix_without_changing_source(self):
         korean_name = next(
             product["localizations"]["ko"]["display_name"]
             for product in self.source["products"]
@@ -214,7 +214,7 @@ class CommerceLocalizationTests(unittest.TestCase):
                 korean_name,
                 "character",
             ),
-            "똥 캐릭터",
+            "똥이",
         )
         self.assertEqual(korean_name, "똥")
 
