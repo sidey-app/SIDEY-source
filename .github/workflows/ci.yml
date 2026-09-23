@@ -40,6 +40,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - run: python3 scripts/skills/validate_contributor_architecture.py
+      - name: Validate version transition
+        env:
+          VERSION_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ -n "$VERSION_BASE" && ! "$VERSION_BASE" =~ ^0+$ ]]; then
+            python3 scripts/sidey_version.py --check-transition "$VERSION_BASE"
+          fi
       - run: python3 -m unittest discover -s scripts/tests
       - run: python3 -m unittest discover -s scripts/skills/release-notes/tests
       - run: python3 scripts/commerce_catalog.py --target shared --check
@@ -162,9 +169,17 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           winget install NSIS.NSIS --exact --version 3.12 --silent `
             --accept-package-agreements --accept-source-agreements --disable-interactivity
-          $version = ([xml](Get-Content ./windows/src/Sidey.App/Sidey.App.csproj -Raw)).Project.PropertyGroup.Version | Where-Object { $_ }
+          $productVersion = python ./scripts/sidey_version.py --get productVersion
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($productVersion)) {
+            throw 'Unable to resolve Product Version from release/version.json.'
+          }
+          $releaseVersion = python ./scripts/sidey_version.py --get windowsReleaseVersion
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($releaseVersion)) {
+            throw 'Unable to resolve Windows Release Version from release/version.json.'
+          }
           ./scripts/windows/New-WindowsInstaller.ps1 -PublishDirectory ./build/windows/publish `
-            -OutputDirectory ./build/windows/artifacts -Version $version
+            -OutputDirectory ./build/windows/artifacts `
+            -ProductVersion $productVersion -ReleaseVersion $releaseVersion
 
       - name: Upload coverage
         if: ${{ always() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure') }}

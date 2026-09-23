@@ -651,6 +651,10 @@ class WorkflowTests(unittest.TestCase):
         )
 
     def test_release_manifests_run_the_matching_native_checks(self):
+        self.assertEqual(
+            w.required_scopes(['release/version.json']),
+            ['macos', 'shared', 'web', 'windows'],
+        )
         self.assertEqual(w.required_scopes(['release/macos.json']), ['macos', 'shared'])
         self.assertEqual(w.required_scopes(['release/windows.json']), ['shared', 'windows'])
 
@@ -665,8 +669,6 @@ class WorkflowTests(unittest.TestCase):
             w.required_scopes(['.github/workflows/windows-release.yml']),
             ['shared', 'windows'],
         )
-        self.assertEqual(w.required_scopes(['.github/workflows/database.yml']),
-                         ['shared'])
         self.assertEqual(
             w.required_scopes(
                 ['.github/workflows/website-deployment.yml']
@@ -675,15 +677,6 @@ class WorkflowTests(unittest.TestCase):
         )
         self.assertEqual(w.required_scopes(['scripts/pages/prepare_release_metadata.py']),
                          ['shared', 'web'])
-        self.assertEqual(w.required_scopes(['.github/workflows/download-metrics.yml']),
-                         ['shared'])
-
-    def test_backend_removal_does_not_require_removed_ci_jobs(self):
-        self.assertEqual(w.required_scopes([
-            'supabase/migrations/20260915000000_admin_app_store_revenue.sql',
-            'services/app-store-verifier/src/server.ts',
-            'scripts/supabase/test_concurrency.sh',
-        ]), ['shared'])
 
     def test_platform_workflow_only_changes_do_not_require_app_review(self):
         self.assertFalse(

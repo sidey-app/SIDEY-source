@@ -26,6 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--windows-release-manifest", type=Path, required=True)
     parser.add_argument("--windows-release-installer", type=Path, required=True)
+    parser.add_argument("--windows-legacy-installer", type=Path)
     parser.add_argument(
         "--public-repository",
         default=DEFAULT_PUBLIC_REPOSITORY,
@@ -43,11 +44,21 @@ def validate_repository(repository: str) -> str:
 def read_manifest(path: Path, platform: str) -> dict[str, object]:
     manifest = json.loads(path.read_text(encoding="utf-8"))
     version = str(manifest.get("version", ""))
+    update_version = str(manifest.get("updateVersion", ""))
+    release_version = str(manifest.get("releaseVersion", ""))
+    msix_version = str(manifest.get("msixVersion", ""))
+    windows_revision = manifest.get("windowsRevision")
     if (
         manifest.get("schema") != 1
         or manifest.get("platform") != platform
         or manifest.get("channel") != "production"
         or re.fullmatch(r"\d+\.\d+\.\d+", version) is None
+        or re.fullmatch(r"\d+\.\d+\.\d+", update_version) is None
+        or re.fullmatch(r"\d+\.\d+\.\d+", release_version) is None
+        or msix_version != f"{update_version}.0"
+        or type(windows_revision) is not int
+        or not 0 <= windows_revision <= 999
+        or release_version != (version if windows_revision == 0 else update_version)
     ):
         raise ValueError(
             f"release/{platform}.json must describe a stable production {platform} release."
@@ -106,6 +117,7 @@ def prepare(
     windows_release_manifest: Path,
     windows_release_installer: Path,
     public_repository: str = DEFAULT_PUBLIC_REPOSITORY,
+    windows_legacy_installer: Path | None = None,
 ) -> tuple[str, str]:
     website_dir = website_dir.resolve(strict=True)
     windows_release_manifest = windows_release_manifest.resolve(strict=True)
@@ -114,29 +126,55 @@ def prepare(
     public_repository = validate_repository(public_repository)
 
     windows_manifest = read_manifest(windows_release_manifest, "windows")
-    windows_version = str(windows_manifest["version"])
-    windows_name = f"SIDEY-Windows-x64-v{windows_version}-Setup.exe"
-    if windows_release_installer.name != windows_name:
+    product_version = str(windows_manifest["version"])
+    update_version = str(windows_manifest["updateVersion"])
+    release_version = str(windows_manifest["releaseVersion"])
+    release_name = f"SIDEY-Windows-x64-v{release_version}-Setup.exe"
+    if windows_release_installer.name != release_name:
         raise ValueError(
             "Windows release installer filename does not match the public contract: "
-            + windows_name
+            + release_name
+        )
+    if windows_legacy_installer is None:
+        if release_version != product_version:
+            raise ValueError(
+                "A Product Version bridge installer is required for a Windows revision release."
+            )
+        windows_legacy_installer = windows_release_installer
+    else:
+        windows_legacy_installer = windows_legacy_installer.resolve(strict=True)
+    legacy_name = f"SIDEY-Windows-x64-v{product_version}-Setup.exe"
+    if windows_legacy_installer.name != legacy_name:
+        raise ValueError(
+            "Windows bridge installer filename does not match the Product Version contract: "
+            + legacy_name
         )
     if output_dir.exists() and any(output_dir.iterdir()):
         raise ValueError(f"Pages output directory must be empty: {output_dir}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     shutil.copytree(website_dir, output_dir, dirs_exist_ok=True)
-    windows_hash = sha256(windows_release_installer)
-    windows_url = (
+    update_hash = sha256(windows_release_installer)
+    legacy_hash = sha256(windows_legacy_installer)
+    update_url = (
         f"https://github.com/{public_repository}/releases/download/"
-        f"windows-v{windows_version}/{windows_name}"
+        f"windows-v{release_version}/{release_name}"
+    )
+    legacy_url = (
+        f"https://github.com/{public_repository}/releases/download/"
+        f"windows-v{product_version}/{legacy_name}"
     )
     published_windows_manifest = {
         "channel": "production",
-        "version": windows_version,
-        "tag": f"windows-v{windows_version}",
-        "installer_url": windows_url,
-        "sha256": windows_hash,
+        "version": product_version,
+        "tag": f"windows-v{product_version}",
+        "installer_url": legacy_url,
+        "sha256": legacy_hash,
+        "product_version": product_version,
+        "update_version": update_version,
+        "update_tag": f"windows-v{release_version}",
+        "update_installer_url": update_url,
+        "update_sha256": update_hash,
     }
     manifest_text = json.dumps(published_windows_manifest, indent=2) + "\n"
     for relative_path in ("windows-latest.json", "windows/update.json"):
@@ -151,23 +189,23 @@ def prepare(
             raise ValueError(f"Localized landing page is missing: {relative_path.as_posix()}")
         html = path.read_text(encoding="utf-8")
         html = replace_anchor_attribute(
-            html, "primary-download-action", "data-windows-url", windows_url
+            html, "primary-download-action", "data-windows-url", update_url
         )
         html = replace_anchor_attribute(
-            html, "windows-download-action", "href", windows_url
+            html, "windows-download-action", "href", update_url
         )
         require_anchor(
             html,
             "primary-download-action",
             href=app_store_url,
-            **{"data-macos-url": app_store_url, "data-windows-url": windows_url},
+            **{"data-macos-url": app_store_url, "data-windows-url": update_url},
         )
         require_anchor(html, "macos-download-action", href=app_store_url)
-        require_anchor(html, "windows-download-action", href=windows_url)
-        html = replace_checksum(html, "windows", windows_hash)
+        require_anchor(html, "windows-download-action", href=update_url)
+        html = replace_checksum(html, "windows", update_hash)
         path.write_text(html, encoding="utf-8", newline="\n")
 
-    return windows_version, windows_hash
+    return release_version, update_hash
 
 
 def main() -> int:
@@ -178,6 +216,7 @@ def main() -> int:
         args.windows_release_manifest,
         args.windows_release_installer,
         args.public_repository,
+        args.windows_legacy_installer,
     )
     print("ReleaseMetadataPrepared=true")
     print(f"WindowsVersion={windows_version}")

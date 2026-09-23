@@ -529,7 +529,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--apply", action="store_true", help="Apply the generated plan")
     parser.add_argument(
         "--release-approval",
-        help="Approved release identity, for example macos-1.3.0-build-32",
+        help="Approved release identity in macos-<version>-build-<build> format",
     )
     return parser.parse_args(argv)
 
