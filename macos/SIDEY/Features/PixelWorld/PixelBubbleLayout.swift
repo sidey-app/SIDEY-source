@@ -1,9 +1,18 @@
 import AppKit
 
+enum PixelBubbleTailAttachment: Equatable, Sendable {
+    case bottom
+    case left
+    case right
+}
+
 struct PixelBubbleLayout: Equatable, Sendable {
     let size: CGSize
-    let localCenterX: CGFloat
-    let tailTipX: CGFloat
+    let nodePosition: CGPoint
+    let nodeRotation: CGFloat
+    let labelRotation: CGFloat
+    let tailTip: CGPoint
+    let tailAttachment: PixelBubbleTailAttachment
     let bodyFrame: CGRect
     let totalFrame: CGRect
 
@@ -15,9 +24,10 @@ struct PixelBubbleLayout: Equatable, Sendable {
         edge: OverlayEdge,
         bodyMinY: CGFloat = 52,
         includesTail: Bool = true,
-        leadingDecorationOverflow: CGFloat = 0
+        leadingDecorationOverflow: CGFloat = 0,
+        maximumContentWidth: CGFloat? = nil
     ) -> Self {
-        let maximumWidth = min(220, max(24, tangentLength - 16))
+        let maximumWidth = min(220, max(24, maximumContentWidth ?? (tangentLength - 16)))
         let size: CGSize
         if isTyping {
             size = CGSize(width: min(42, maximumWidth), height: 30)
@@ -28,39 +38,83 @@ struct PixelBubbleLayout: Equatable, Sendable {
             )
         }
 
-        let halfWidth = size.width / 2
+        let nodeRotation = edge.bubbleCounterRotation
+        let bodyRect = CGRect(
+            x: -size.width / 2,
+            y: -size.height / 2,
+            width: size.width,
+            height: size.height
+        )
+        let transform = CGAffineTransform(rotationAngle: nodeRotation)
+        let relativeBodyFrame = bodyRect.applying(transform)
+        var relativeVisualFrame = relativeBodyFrame
+        if leadingDecorationOverflow > 0 {
+            let decorationFrame = CGRect(
+                x: bodyRect.minX - leadingDecorationOverflow,
+                y: bodyRect.maxY - PixelBubbleStyle.decorationSize / 2,
+                width: PixelBubbleStyle.decorationSize,
+                height: PixelBubbleStyle.decorationSize
+            )
+            relativeVisualFrame = relativeVisualFrame.union(decorationFrame.applying(transform))
+        }
+
         let tangentSign: CGFloat = switch edge {
         case .bottom, .right: 1
         case .top, .left: -1
         }
-        let minimumCenter = halfWidth + 4 + (tangentSign > 0 ? leadingDecorationOverflow : 0)
-        let maximumCenter = tangentLength - halfWidth - 4
-            - (tangentSign < 0 ? leadingDecorationOverflow : 0)
+        let firstVisualDelta = relativeVisualFrame.minX * tangentSign
+        let secondVisualDelta = relativeVisualFrame.maxX * tangentSign
+        let minimumVisualDelta = min(firstVisualDelta, secondVisualDelta)
+        let maximumVisualDelta = max(firstVisualDelta, secondVisualDelta)
+        let minimumCenter = 4 - minimumVisualDelta
+        let maximumCenter = tangentLength - 4 - maximumVisualDelta
         let worldCenter = min(
             max(tangentPosition, minimumCenter),
             max(minimumCenter, maximumCenter)
         )
         let localCenterX = (worldCenter - tangentPosition) * tangentSign
-        let tailTipX = -localCenterX
-        let bodyFrame = CGRect(
-            x: localCenterX - halfWidth,
-            y: bodyMinY,
-            width: size.width,
-            height: size.height
+        let nodePosition = CGPoint(
+            x: localCenterX,
+            y: bodyMinY - relativeBodyFrame.minY
         )
-        let total: CGRect
+        let bodyFrame = relativeBodyFrame.offsetBy(dx: nodePosition.x, dy: nodePosition.y)
+        let visualFrame = relativeVisualFrame.offsetBy(dx: nodePosition.x, dy: nodePosition.y)
+        let tailTarget = CGPoint(x: 0, y: 44)
+        let tailTip = CGPoint(
+            x: tailTarget.x - nodePosition.x,
+            y: tailTarget.y - nodePosition.y
+        ).applying(CGAffineTransform(rotationAngle: -nodeRotation))
+        let totalFrame: CGRect
         if includesTail {
-            let tailPoint = CGPoint(x: 0, y: 44)
-            total = bodyFrame.union(CGRect(origin: tailPoint, size: CGSize(width: 0.001, height: 0.001)))
+            totalFrame = visualFrame.union(CGRect(
+                origin: tailTarget,
+                size: CGSize(width: 0.001, height: 0.001)
+            ))
         } else {
-            total = bodyFrame
+            totalFrame = visualFrame
+        }
+        let tailAttachment: PixelBubbleTailAttachment = switch edge {
+        case .left: .left
+        case .right: .right
+        case .bottom, .top: .bottom
         }
         return Self(
             size: size,
-            localCenterX: localCenterX,
-            tailTipX: tailTipX,
+            nodePosition: nodePosition,
+            nodeRotation: nodeRotation,
+            labelRotation: edge.readableContentCounterRotation,
+            tailTip: tailTip,
+            tailAttachment: tailAttachment,
             bodyFrame: bodyFrame,
-            totalFrame: total
+            totalFrame: totalFrame
+        )
+    }
+
+    var tailTipInPresentation: CGPoint {
+        let rotatedTip = tailTip.applying(CGAffineTransform(rotationAngle: nodeRotation))
+        return CGPoint(
+            x: rotatedTip.x + nodePosition.x,
+            y: rotatedTip.y + nodePosition.y
         )
     }
 
@@ -88,15 +142,49 @@ enum PixelBubbleStackLayout {
         bubbles: [ActiveBubble],
         tangentPosition: CGFloat,
         tangentLength: CGFloat,
-        edge: OverlayEdge
+        edge: OverlayEdge,
+        inwardNormalLength: CGFloat? = nil
     ) -> [PixelBubbleStackEntry] {
         let ordered = bubbles.sorted(by: ActiveBubble.presentationOrder)
+        let visible = Array(ordered.suffix(ActiveBubbleLedger.maximumVisiblePerSender))
+        let decorationOverflow: CGFloat = switch edge {
+        case .right:
+            visible.reduce(CGFloat.zero) { total, bubble in
+                total + (PixelBubbleTheme.resolve(bubble.bubbleStyleID).decorationAssetName == nil
+                    ? 0
+                    : PixelBubbleStyle.decorationLeadingOverflow)
+            }
+        case .left:
+            visible.dropLast().reduce(CGFloat.zero) { total, bubble in
+                total + (PixelBubbleTheme.resolve(bubble.bubbleStyleID).decorationAssetName == nil
+                    ? 0
+                    : PixelBubbleStyle.decorationLeadingOverflow)
+            }
+        case .bottom, .top:
+            0
+        }
+        let maximumContentWidth: CGFloat? = if !edge.isHorizontal,
+                                               let inwardNormalLength,
+                                               !visible.isEmpty {
+            max(
+                24,
+                min(
+                    220,
+                    (inwardNormalLength - 52 - bodySpacing * CGFloat(visible.count - 1) - 4
+                        - decorationOverflow) / CGFloat(visible.count)
+                )
+            )
+        } else {
+            nil
+        }
         var nextBodyMinY: CGFloat = 52
         var reversedEntries: [PixelBubbleStackEntry] = []
 
-        for bubble in ordered.suffix(ActiveBubbleLedger.maximumVisiblePerSender).reversed() {
+        for bubble in visible.reversed() {
             let isLatest = bubble.messageID == ordered.last?.messageID
-            let layout = PixelBubbleLayout.make(
+            let decorationLeadingOverflow = PixelBubbleTheme.resolve(bubble.bubbleStyleID)
+                .decorationAssetName == nil ? 0 : PixelBubbleStyle.decorationLeadingOverflow
+            var layout = PixelBubbleLayout.make(
                 text: bubble.body,
                 isTyping: false,
                 tangentPosition: tangentPosition,
@@ -104,15 +192,32 @@ enum PixelBubbleStackLayout {
                 edge: edge,
                 bodyMinY: nextBodyMinY,
                 includesTail: isLatest,
-                leadingDecorationOverflow: PixelBubbleTheme.resolve(bubble.bubbleStyleID)
-                    .decorationAssetName == nil ? 0 : PixelBubbleStyle.decorationLeadingOverflow
+                leadingDecorationOverflow: decorationLeadingOverflow,
+                maximumContentWidth: maximumContentWidth
             )
+            if !edge.isHorizontal, !reversedEntries.isEmpty {
+                let leadingVisualOverflow = max(0, layout.bodyFrame.minY - layout.totalFrame.minY)
+                if leadingVisualOverflow > 0 {
+                    layout = PixelBubbleLayout.make(
+                        text: bubble.body,
+                        isTyping: false,
+                        tangentPosition: tangentPosition,
+                        tangentLength: tangentLength,
+                        edge: edge,
+                        bodyMinY: nextBodyMinY + leadingVisualOverflow,
+                        includesTail: isLatest,
+                        leadingDecorationOverflow: decorationLeadingOverflow,
+                        maximumContentWidth: maximumContentWidth
+                    )
+                }
+            }
             reversedEntries.append(PixelBubbleStackEntry(
                 bubble: bubble,
                 layout: layout,
                 includesTail: isLatest
             ))
-            nextBodyMinY = layout.bodyFrame.maxY + bodySpacing
+            nextBodyMinY = (edge.isHorizontal ? layout.bodyFrame.maxY : layout.totalFrame.maxY)
+                + bodySpacing
         }
 
         return Array(reversedEntries.reversed())
