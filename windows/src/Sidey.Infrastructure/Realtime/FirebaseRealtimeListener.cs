@@ -35,6 +35,7 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
     private readonly TimeProvider _timeProvider;
     private readonly SemaphoreSlim _lifecycleGate = new(1, 1);
     private readonly Lock _snapshotGate = new();
+    private readonly Lock _liveEmitGate = new();
     private readonly CancellationTokenSource _shutdown = new();
     private CancellationTokenSource? _generationCancellation;
     private Task _generationTask = Task.CompletedTask;
@@ -49,8 +50,10 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
             ["0"] = "patch_soft_ball",
         };
     private CancellationTokenSource? _typingExpiryCancellation;
+    private readonly HashSet<Guid> _activeTypingUserIds = [];
     private int _ready;
     private long _generation;
+    private long _liveActionGeneration;
 
     public FirebaseRealtimeListener(
         IFirebaseRealtimeCredentialProvider credentials,
@@ -194,9 +197,18 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
                 }
                 catch (Exception exception)
                 {
+                    bool initialConnectionFailure = current is null;
+                    if (initialConnectionFailure)
+                    {
+                        BeginDisconnect(generation);
+                    }
                     if (next is not null)
                     {
                         await next.DisposeAsync().ConfigureAwait(false);
+                    }
+                    if (initialConnectionFailure)
+                    {
+                        ClearLiveState(activeRoomId);
                     }
                     _emit(new BackendEvent.Diagnostic(
                         $"firebase-listener-connect-failed {FailureDiagnostic(exception)}"));
@@ -206,7 +218,7 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
 
                 StreamSet? previous = current;
                 current = next;
-                Volatile.Write(ref _ready, 1);
+                SetReady(ready: true);
                 _emit(new BackendEvent.Diagnostic(
                     $"firebase-listener-ready streams={(activeRoomId.HasValue ? 2 : 1)} generation={generation}"));
                 if (previous is not null)
@@ -226,11 +238,12 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
                 if (!cancellationToken.IsCancellationRequested)
                 {
                     Exception? failure = current.Failure;
-                    _emit(new BackendEvent.Diagnostic(
-                        $"firebase-listener-disconnected {FailureDiagnostic(failure)}"));
-                    Volatile.Write(ref _ready, 0);
+                    BeginDisconnect(generation);
                     await current.DisposeAsync().ConfigureAwait(false);
                     current = null;
+                    ClearLiveState(activeRoomId);
+                    _emit(new BackendEvent.Diagnostic(
+                        $"firebase-listener-disconnected {FailureDiagnostic(failure)}"));
                     await DelayForReconnectAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
@@ -240,11 +253,12 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
         }
         finally
         {
-            Volatile.Write(ref _ready, 0);
+            BeginDisconnect(generation);
             if (current is not null)
             {
                 await current.DisposeAsync().ConfigureAwait(false);
             }
+            ClearLiveState(activeRoomId);
         }
     }
 
@@ -257,6 +271,7 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
             await _credentials.GetCredentialAsync(cancellationToken).ConfigureAwait(false);
         FirebaseRtdbRestClient client = _createClient(credential.DatabaseUrl);
         var streamSet = new StreamSet(client, activeRoomId.HasValue ? 2 : 1, cancellationToken);
+        BeginLiveGeneration(generation);
         streamSet.Add(PumpStreamAsync(
             streamSet,
             FirebaseRealtimeProtocol.InboxPath(credential.UserId),
@@ -421,34 +436,52 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
                 _timeProvider.GetUtcNow().ToUnixTimeMilliseconds());
             throwableCatalogItemIds = _throwableCatalogItemIdsByWireCode;
         }
-        foreach (FirebaseRealtimeLiveAction action in actions)
+        lock (_liveEmitGate)
         {
-            switch (action)
+            if (_liveActionGeneration != generation)
             {
-                case FirebaseRealtimeLiveAction.Typing typing when typing.UserId != localUserId:
-                    _emit(new BackendEvent.TypingChanged(roomId, typing.UserId, typing.Active));
-                    break;
-                case FirebaseRealtimeLiveAction.Pulse pulse when pulse.UserId != localUserId:
-                    _emit(new BackendEvent.CharacterPulsed(
-                        new CharacterPulseEvent(Guid.NewGuid(), roomId, pulse.UserId)));
-                    break;
-                case FirebaseRealtimeLiveAction.Throw characterThrow
-                    when characterThrow.ActorUserId != localUserId
-                        && characterThrow.ActorUserId != characterThrow.Payload.TargetUserId
-                        && throwableCatalogItemIds.TryGetValue(
-                            characterThrow.Payload.WireCode,
-                            out string? throwableCatalogItemId):
-                    _emit(new BackendEvent.CharacterThrown(new CharacterThrowEvent(
-                        Guid.NewGuid(),
-                        roomId,
-                        characterThrow.ActorUserId,
-                        characterThrow.Payload.TargetUserId,
-                        PixelCharacterCatalog.FallbackId,
-                        throwableCatalogItemId)));
-                    break;
+                return;
             }
+            foreach (FirebaseRealtimeLiveAction action in actions)
+            {
+                switch (action)
+                {
+                    case FirebaseRealtimeLiveAction.Typing typing when typing.UserId != localUserId:
+                        lock (_snapshotGate)
+                        {
+                            if (typing.Active)
+                            {
+                                _activeTypingUserIds.Add(typing.UserId);
+                            }
+                            else
+                            {
+                                _activeTypingUserIds.Remove(typing.UserId);
+                            }
+                        }
+                        _emit(new BackendEvent.TypingChanged(roomId, typing.UserId, typing.Active));
+                        break;
+                    case FirebaseRealtimeLiveAction.Pulse pulse when pulse.UserId != localUserId:
+                        _emit(new BackendEvent.CharacterPulsed(
+                            new CharacterPulseEvent(Guid.NewGuid(), roomId, pulse.UserId)));
+                        break;
+                    case FirebaseRealtimeLiveAction.Throw characterThrow
+                        when characterThrow.ActorUserId != localUserId
+                            && characterThrow.ActorUserId != characterThrow.Payload.TargetUserId
+                            && throwableCatalogItemIds.TryGetValue(
+                                characterThrow.Payload.WireCode,
+                                out string? throwableCatalogItemId):
+                        _emit(new BackendEvent.CharacterThrown(new CharacterThrowEvent(
+                            Guid.NewGuid(),
+                            roomId,
+                            characterThrow.ActorUserId,
+                            characterThrow.Payload.TargetUserId,
+                            PixelCharacterCatalog.FallbackId,
+                            throwableCatalogItemId)));
+                        break;
+                }
+            }
+            ScheduleTypingExpiry(roomId, localUserId, generation);
         }
-        ScheduleTypingExpiry(roomId, localUserId, generation);
     }
 
     private void ScheduleTypingExpiry(Guid roomId, Guid localUserId, long generation)
@@ -498,14 +531,25 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
                 actions = _liveReconciler.ExpireTyping(
                     _timeProvider.GetUtcNow().ToUnixTimeMilliseconds());
             }
-            foreach (FirebaseRealtimeLiveAction.Typing typing in actions)
+            lock (_liveEmitGate)
             {
-                if (typing.UserId != localUserId)
+                if (_liveActionGeneration != generation)
                 {
-                    _emit(new BackendEvent.TypingChanged(roomId, typing.UserId, false));
+                    return;
                 }
+                foreach (FirebaseRealtimeLiveAction.Typing typing in actions)
+                {
+                    if (typing.UserId != localUserId)
+                    {
+                        lock (_snapshotGate)
+                        {
+                            _activeTypingUserIds.Remove(typing.UserId);
+                        }
+                        _emit(new BackendEvent.TypingChanged(roomId, typing.UserId, false));
+                    }
+                }
+                ScheduleTypingExpiry(roomId, localUserId, generation);
             }
-            ScheduleTypingExpiry(roomId, localUserId, generation);
         }
         catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
         {
@@ -549,6 +593,8 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
             null);
         if (cancellation is null)
         {
+            SetReady(ready: false);
+            ClearLiveState(_activeRoomId);
             return;
         }
         cancellation.Cancel();
@@ -563,7 +609,63 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
         {
             cancellation.Dispose();
             _generationTask = Task.CompletedTask;
-            Volatile.Write(ref _ready, 0);
+            SetReady(ready: false);
+            ClearLiveState(_activeRoomId);
+        }
+    }
+
+    private void SetReady(bool ready)
+    {
+        int next = ready ? 1 : 0;
+        if (Interlocked.Exchange(ref _ready, next) == next)
+        {
+            return;
+        }
+        _emit(new BackendEvent.ConnectionChanged(
+            ready
+                ? new RealtimeConnectionStatus(true, true, true)
+                : RealtimeConnectionStatus.Disconnected));
+    }
+
+    private void BeginLiveGeneration(long generation)
+    {
+        lock (_liveEmitGate)
+        {
+            _liveActionGeneration = generation;
+        }
+    }
+
+    private void BeginDisconnect(long generation)
+    {
+        lock (_liveEmitGate)
+        {
+            if (_liveActionGeneration == generation)
+            {
+                _liveActionGeneration = 0;
+            }
+            SetReady(ready: false);
+        }
+    }
+
+    private void ClearLiveState(Guid? roomId)
+    {
+        Guid[] typingUserIds;
+        lock (_snapshotGate)
+        {
+            _typingExpiryCancellation?.Cancel();
+            _typingExpiryCancellation?.Dispose();
+            _typingExpiryCancellation = null;
+            typingUserIds = [.. _activeTypingUserIds.OrderBy(userId => userId)];
+            _activeTypingUserIds.Clear();
+            _liveReconciler = new FirebaseRealtimeLiveReconciler();
+        }
+        if (roomId is not { } id)
+        {
+            return;
+        }
+        foreach (Guid userId in typingUserIds)
+        {
+            _emit(new BackendEvent.TypingChanged(id, userId, false));
         }
     }
 

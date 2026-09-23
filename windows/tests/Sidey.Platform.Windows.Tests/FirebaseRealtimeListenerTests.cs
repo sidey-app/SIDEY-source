@@ -188,6 +188,216 @@ public sealed class FirebaseRealtimeListenerTests
     }
 
     [Fact]
+    public async Task ReadyStreamEofPublishesDisconnectedStatusAndClearsPeerTyping()
+    {
+        var peerUserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var roomEnd = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var events = new List<BackendEvent>();
+        object eventGate = new();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            backendEvent =>
+            {
+                lock (eventGate)
+                {
+                    events.Add(backendEvent);
+                }
+            },
+            _ => CreateClient(roomEnd.Task, TypingRoomEvents(peerUserId, now)));
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => listener.IsReady);
+        await WaitUntilAsync(() =>
+        {
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.TypingChanged>()
+                    .Any(item => item.UserId == peerUserId && item.Active);
+            }
+        });
+
+        roomEnd.TrySetResult();
+
+        await WaitUntilAsync(() =>
+        {
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.ConnectionChanged>()
+                        .Any(item => !item.Status.IsReady)
+                    && events.OfType<BackendEvent.TypingChanged>()
+                        .Any(item => item.UserId == peerUserId && !item.Active);
+            }
+        });
+        Assert.False(listener.IsReady);
+        lock (eventGate)
+        {
+            Assert.Contains(events, item => item is BackendEvent.ConnectionChanged
+            { Status.IsReady: true });
+            Assert.Contains(events, item => item is BackendEvent.Diagnostic diagnostic
+                && diagnostic.Stage == "firebase-listener-disconnected kind=eof");
+        }
+    }
+
+    [Fact]
+    public async Task ReadyStreamAuthRevocationPublishesDisconnectedStatus()
+    {
+        var revoke = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var events = new List<BackendEvent>();
+        object eventGate = new();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            backendEvent =>
+            {
+                lock (eventGate)
+                {
+                    events.Add(backendEvent);
+                }
+            },
+            _ => CreateAuthRevokingClient(revoke.Task));
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => listener.IsReady);
+
+        revoke.TrySetResult();
+
+        await WaitUntilAsync(() =>
+        {
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.Diagnostic>().Any(diagnostic =>
+                    diagnostic.Stage == "firebase-listener-disconnected kind=access-denied");
+            }
+        });
+        Assert.False(listener.IsReady);
+        lock (eventGate)
+        {
+            Assert.Contains(events, item => item is BackendEvent.ConnectionChanged
+            { Status.IsReady: false });
+        }
+    }
+
+    [Fact]
+    public async Task DisconnectWaitsForInFlightTypingEmitBeforePublishingStatusAndCleanup()
+    {
+        var peerUserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var publishTyping = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var endInbox = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var typingEntered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var allowTyping = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var events = new List<BackendEvent>();
+        object eventGate = new();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            backendEvent =>
+            {
+                if (backendEvent is BackendEvent.TypingChanged { Active: true })
+                {
+                    typingEntered.TrySetResult();
+                    allowTyping.Task.GetAwaiter().GetResult();
+                }
+                lock (eventGate)
+                {
+                    events.Add(backendEvent);
+                }
+            },
+            _ => CreateTypingRaceClient(
+                endInbox.Task,
+                publishTyping.Task,
+                peerUserId,
+                now));
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => listener.IsReady);
+        publishTyping.TrySetResult();
+        await typingEntered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        endInbox.TrySetResult();
+        try
+        {
+            await Task.Delay(100);
+            lock (eventGate)
+            {
+                Assert.DoesNotContain(events, item => item is BackendEvent.ConnectionChanged
+                { Status.IsReady: false });
+            }
+        }
+        finally
+        {
+            allowTyping.TrySetResult();
+        }
+
+        await WaitUntilAsync(() =>
+        {
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.TypingChanged>()
+                        .Any(item => item.UserId == peerUserId && !item.Active)
+                    && events.OfType<BackendEvent.ConnectionChanged>()
+                        .Any(item => !item.Status.IsReady);
+            }
+        });
+        lock (eventGate)
+        {
+            int typingOn = events.FindIndex(item => item is BackendEvent.TypingChanged
+            { UserId: var userId, Active: true } && userId == peerUserId);
+            int disconnected = events.FindIndex(item => item is BackendEvent.ConnectionChanged
+            { Status.IsReady: false });
+            int typingOff = events.FindIndex(item => item is BackendEvent.TypingChanged
+            { UserId: var userId, Active: false } && userId == peerUserId);
+            Assert.True(typingOn >= 0 && typingOn < disconnected);
+            Assert.True(disconnected < typingOff);
+        }
+    }
+
+    [Fact]
+    public async Task InitialConnectionFailureDrainsPartialRoomAndClearsTyping()
+    {
+        var peerUserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var allowInboxFailure = new TaskCompletionSource(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var typingObserved = new TaskCompletionSource(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var events = new List<BackendEvent>();
+        object eventGate = new();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            backendEvent =>
+            {
+                lock (eventGate)
+                {
+                    events.Add(backendEvent);
+                }
+                if (backendEvent is BackendEvent.TypingChanged { Active: true })
+                {
+                    typingObserved.TrySetResult();
+                }
+            },
+            _ => CreatePartialFailureClient(
+                allowInboxFailure.Task,
+                peerUserId,
+                now));
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await typingObserved.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        allowInboxFailure.TrySetResult();
+
+        await WaitUntilAsync(() =>
+        {
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.Diagnostic>().Any(diagnostic =>
+                        diagnostic.Stage == "firebase-listener-connect-failed kind=protocol stream=inbox")
+                    && events.OfType<BackendEvent.TypingChanged>()
+                        .Any(item => item.UserId == peerUserId && !item.Active);
+            }
+        });
+        Assert.False(listener.IsReady);
+    }
+
+    [Fact]
     public async Task FreshFirebasePulseAndThrowSnapshotsEmitPeerActions()
     {
         var actorUserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
@@ -259,6 +469,84 @@ public sealed class FirebaseRealtimeListenerTests
             Stream stream = path.Contains("/v2/n/", StringComparison.Ordinal)
                 ? new PrefixThenWaitStream(Encoding.UTF8.GetBytes(content))
                 : new PrefixThenSignalStream(Encoding.UTF8.GetBytes(content), roomEnd);
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StreamContent(stream),
+            };
+            return Task.FromResult(response);
+        });
+    }
+
+    private static FirebaseRtdbRestClient CreateAuthRevokingClient(Task revoke)
+    {
+        var urls = new FirebaseRtdbUrlBuilder(
+            new Uri("https://sidey.asia-southeast1.firebasedatabase.app"));
+        return FirebaseRtdbRestClient.CreateForTesting(urls, (request, _) =>
+        {
+            bool inbox = request.RequestUri!.AbsolutePath.Contains(
+                "/v2/n/",
+                StringComparison.Ordinal);
+            Stream stream = inbox
+                ? new PrefixThenWaitStream(Encoding.UTF8.GetBytes(InboxEvents()))
+                : new PrefixThenSuffixStream(
+                    Encoding.UTF8.GetBytes(RoomEvents()),
+                    Encoding.UTF8.GetBytes(
+                        "event: auth_revoked\ndata: \"expired\"\n\n"),
+                    revoke);
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StreamContent(stream),
+            };
+            return Task.FromResult(response);
+        });
+    }
+
+    private static FirebaseRtdbRestClient CreateTypingRaceClient(
+        Task endInbox,
+        Task publishTyping,
+        Guid peerUserId,
+        long timestamp)
+    {
+        var urls = new FirebaseRtdbUrlBuilder(
+            new Uri("https://sidey.asia-southeast1.firebasedatabase.app"));
+        return FirebaseRtdbRestClient.CreateForTesting(urls, (request, _) =>
+        {
+            bool inbox = request.RequestUri!.AbsolutePath.Contains(
+                "/v2/n/",
+                StringComparison.Ordinal);
+            Stream stream = inbox
+                ? new PrefixThenSignalStream(Encoding.UTF8.GetBytes(InboxEvents()), endInbox)
+                : new PrefixThenSuffixStream(
+                    Encoding.UTF8.GetBytes(RoomEvents()),
+                    Encoding.UTF8.GetBytes(TypingPatchEvent(peerUserId, timestamp)),
+                    publishTyping);
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StreamContent(stream),
+            };
+            return Task.FromResult(response);
+        });
+    }
+
+    private static FirebaseRtdbRestClient CreatePartialFailureClient(
+        Task allowInboxFailure,
+        Guid peerUserId,
+        long timestamp)
+    {
+        var urls = new FirebaseRtdbUrlBuilder(
+            new Uri("https://sidey.asia-southeast1.firebasedatabase.app"));
+        return FirebaseRtdbRestClient.CreateForTesting(urls, (request, _) =>
+        {
+            bool inbox = request.RequestUri!.AbsolutePath.Contains(
+                "/v2/n/",
+                StringComparison.Ordinal);
+            Stream stream = inbox
+                ? new PrefixThenSuffixStream(
+                    [],
+                    Encoding.UTF8.GetBytes(MalformedInboxEvents()),
+                    allowInboxFailure)
+                : new PrefixThenWaitStream(Encoding.UTF8.GetBytes(
+                    TypingRoomEvents(peerUserId, timestamp)));
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StreamContent(stream),
@@ -372,6 +660,36 @@ public sealed class FirebaseRealtimeListenerTests
             + $"event: put\ndata: {characterThrow}\n\n";
     }
 
+    private static string TypingRoomEvents(Guid userId, long timestamp)
+    {
+        string user = userId.ToString("D");
+        string session = Guid.Parse("ffffffff-ffff-ffff-ffff-ffffffffffff").ToString("D");
+        string initial = JsonSerializer.Serialize(new
+        {
+            path = "/",
+            data = new
+            {
+                t = new Dictionary<string, object>
+                {
+                    [user] = new Dictionary<string, long> { [session] = timestamp },
+                },
+            },
+        });
+        return $"event: put\ndata: {initial}\n\n";
+    }
+
+    private static string TypingPatchEvent(Guid userId, long timestamp)
+    {
+        string user = userId.ToString("D");
+        string session = Guid.Parse("ffffffff-ffff-ffff-ffff-ffffffffffff").ToString("D");
+        string update = JsonSerializer.Serialize(new
+        {
+            path = $"/t/{user}/{session}",
+            data = timestamp,
+        });
+        return $"event: put\ndata: {update}\n\n";
+    }
+
     private static async Task WaitUntilAsync(Func<bool> predicate)
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -471,6 +789,53 @@ public sealed class FirebaseRealtimeListenerTests
             }
 
             await end.WaitAsync(cancellationToken);
+            return 0;
+        }
+
+        public override void Flush() => throw new NotSupportedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+    }
+
+    private sealed class PrefixThenSuffixStream(byte[] prefix, byte[] suffix, Task release) : Stream
+    {
+        private int _prefixOffset;
+        private int _suffixOffset;
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) =>
+            throw new NotSupportedException();
+
+        public override async ValueTask<int> ReadAsync(
+            Memory<byte> buffer,
+            CancellationToken cancellationToken = default)
+        {
+            if (_prefixOffset < prefix.Length)
+            {
+                int count = Math.Min(buffer.Length, prefix.Length - _prefixOffset);
+                prefix.AsMemory(_prefixOffset, count).CopyTo(buffer);
+                _prefixOffset += count;
+                return count;
+            }
+            await release.WaitAsync(cancellationToken);
+            if (_suffixOffset < suffix.Length)
+            {
+                int count = Math.Min(buffer.Length, suffix.Length - _suffixOffset);
+                suffix.AsMemory(_suffixOffset, count).CopyTo(buffer);
+                _suffixOffset += count;
+                return count;
+            }
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return 0;
         }
 

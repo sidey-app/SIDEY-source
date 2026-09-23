@@ -19,6 +19,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
     private readonly IFirebaseRealtimeTransientClient _transients;
     private readonly RealtimeEventQueue _events = new();
     private readonly SemaphoreSlim _selectionGate = new(1, 1);
+    private readonly SemaphoreSlim _selectionWake = new(0, 1);
     private readonly CancellationTokenSource _shutdown = new();
     private readonly Lock _stateGate = new();
     private IReadOnlyDictionary<string, string> _throwableWireCodes =
@@ -35,6 +36,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
     private int _selectorFailedClosed;
     private int _sessionInvalidated;
     private int _disposed;
+    private CancellationTokenSource? _firebaseWriteFence;
 
     public FirebaseV2RealtimeTransport(
         IRealtimeTransport legacy,
@@ -97,7 +99,15 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
             Volatile.Read(ref _sessionInvalidated) != 0,
             this);
         ArgumentNullException.ThrowIfNull(roomEpochs);
-        _activeRoomId = activeRoomId is { } id && roomEpochs.ContainsKey(id) ? id : null;
+        Guid? nextActiveRoomId = activeRoomId is { } id && roomEpochs.ContainsKey(id) ? id : null;
+        lock (_stateGate)
+        {
+            if (_activeRoomId != nextActiveRoomId)
+            {
+                CancelFirebaseWriteFenceWithinLock();
+            }
+            _activeRoomId = nextActiveRoomId;
+        }
         await _legacy.SynchronizeAsync(
             roomEpochs,
             _activeRoomId,
@@ -122,18 +132,27 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
         ObjectDisposedException.ThrowIf(
             Volatile.Read(ref _sessionInvalidated) != 0,
             this);
-        if (!UsesFirebaseChat || Volatile.Read(ref _selectorFailedClosed) != 0)
-        {
-            throw new InvalidOperationException("Firebase realtime chat is not active.");
-        }
-        using var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
-            cancellationToken,
-            _shutdown.Token);
-        return await _chat.SendAsync(
-            messageId,
+        using FirebaseWriteOperation operation = CreateFirebaseWriteOperation(
             roomId,
-            body,
-            linkedCancellation.Token).ConfigureAwait(false);
+            "Firebase realtime chat is not ready.",
+            cancellationToken);
+        try
+        {
+            return await _chat.SendAsync(
+                messageId,
+                roomId,
+                body,
+                operation.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (
+            !cancellationToken.IsCancellationRequested
+            && !_shutdown.IsCancellationRequested
+            && operation.FenceToken.IsCancellationRequested)
+        {
+            throw new FirebaseRealtimeChatException(
+                "transport-canceled",
+                FirebaseRealtimeChatFailureClassification.CommitAmbiguous);
+        }
     }
 
     public Task PublishTypingAsync(
@@ -227,10 +246,12 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
             || !cancellationToken.IsCancellationRequested && !_shutdown.IsCancellationRequested)
         {
             Volatile.Write(ref _selectorFailedClosed, 1);
+            CancelFirebaseWriteFence();
             await _firebase.StopAsync(CancellationToken.None).ConfigureAwait(false);
             Emit(new BackendEvent.Diagnostic(
                 "firebase-grant-convergence-failed mode=fail-closed"));
             Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
+            SignalSelectionRefresh();
             return;
         }
         if (UsesFirebaseChat && Volatile.Read(ref _selectorFailedClosed) == 0)
@@ -247,6 +268,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
             return;
         }
         _shutdown.Cancel();
+        CancelFirebaseWriteFence();
         await _credentials.ResetAsync(cancellationToken).ConfigureAwait(false);
         await _firebase.StopAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -293,8 +315,13 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
             await IgnoreCancellationAsync(_selectionLoop).ConfigureAwait(false);
         }
         _events.Complete();
+        lock (_stateGate)
+        {
+            CancelFirebaseWriteFenceWithinLock();
+        }
         _shutdown.Dispose();
         _selectionGate.Dispose();
+        _selectionWake.Dispose();
     }
 
     private void EnsureLegacyPumpStarted()
@@ -351,7 +378,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
                     TimeSpan.FromSeconds(30).Ticks,
                     _selectionTtl.Ticks / 2));
                 TimeSpan delay = _selectionTtl - lead;
-                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                await WaitForSelectionRefreshAsync(delay, cancellationToken).ConfigureAwait(false);
                 await RefreshSelectionAsync(forceRefresh: true, cancellationToken).ConfigureAwait(false);
             }
         }
@@ -388,6 +415,8 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
                 {
                     _selectionTtl = s_selectorFailureRetry;
                     Volatile.Write(ref _selectorFailedClosed, 1);
+                    CancelFirebaseWriteFence();
+                    await _firebase.StopAsync(CancellationToken.None).ConfigureAwait(false);
                     Emit(new BackendEvent.Diagnostic("firebase-selector-failed mode=fail-closed"));
                     Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
                     return;
@@ -404,6 +433,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
             {
                 Volatile.Write(ref _firebaseEnabled, 0);
                 Volatile.Write(ref _selectorFailedClosed, 0);
+                CancelFirebaseWriteFence();
                 await _firebase.StopAsync(cancellationToken).ConfigureAwait(false);
                 Emit(new BackendEvent.Diagnostic(
                     $"firebase-selector transport=legacy source={selection.Source}"));
@@ -431,13 +461,32 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
 
     private void OnFirebaseEvent(BackendEvent backendEvent)
     {
-        Emit(backendEvent);
-        if (backendEvent is BackendEvent.Diagnostic diagnostic
-            && diagnostic.Stage.StartsWith("firebase-listener-ready", StringComparison.Ordinal))
+        if (backendEvent is BackendEvent.ConnectionChanged firebaseConnection)
         {
+            if (firebaseConnection.Status.IsReady
+                && UsesFirebaseChat
+                && Volatile.Read(ref _selectorFailedClosed) == 0)
+            {
+                ArmFirebaseWriteFence();
+            }
+            else
+            {
+                CancelFirebaseWriteFence();
+            }
             Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
-            Emit(new BackendEvent.ReconciliationRequired());
+            if (firebaseConnection.Status.IsReady)
+            {
+                Emit(new BackendEvent.ReconciliationRequired());
+            }
+            return;
         }
+        if (Volatile.Read(ref _selectorFailedClosed) != 0
+            && backendEvent is not BackendEvent.Diagnostic
+            && backendEvent is not BackendEvent.TypingChanged { Active: false })
+        {
+            return;
+        }
+        Emit(backendEvent);
     }
 
     private void Emit(BackendEvent backendEvent) => _events.TryWrite(backendEvent);
@@ -450,17 +499,89 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
         ObjectDisposedException.ThrowIf(
             Volatile.Read(ref _sessionInvalidated) != 0,
             this);
-        if (!UsesFirebaseChat
-            || Volatile.Read(ref _selectorFailedClosed) != 0
-            || !_firebase.IsReady
-            || _activeRoomId != roomId)
+        using FirebaseWriteOperation writeOperation = CreateFirebaseWriteOperation(
+            roomId,
+            "Firebase realtime transient transport is not ready.",
+            cancellationToken);
+        await operation(writeOperation.Token).ConfigureAwait(false);
+    }
+
+    private FirebaseWriteOperation CreateFirebaseWriteOperation(
+        Guid roomId,
+        string notReadyMessage,
+        CancellationToken cancellationToken)
+    {
+        lock (_stateGate)
         {
-            throw new InvalidOperationException("Firebase realtime transient transport is not ready.");
+            if (!UsesFirebaseChat
+                || Volatile.Read(ref _selectorFailedClosed) != 0
+                || !_firebase.IsReady
+                || _activeRoomId != roomId
+                || _firebaseWriteFence is null
+                || _firebaseWriteFence.IsCancellationRequested)
+            {
+                throw new InvalidOperationException(notReadyMessage);
+            }
+            CancellationToken fenceToken = _firebaseWriteFence.Token;
+            var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken,
+                _shutdown.Token,
+                fenceToken);
+            return new FirebaseWriteOperation(linkedCancellation, fenceToken);
         }
-        using var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
-            cancellationToken,
-            _shutdown.Token);
-        await operation(linkedCancellation.Token).ConfigureAwait(false);
+    }
+
+    private void ArmFirebaseWriteFence()
+    {
+        lock (_stateGate)
+        {
+            CancelFirebaseWriteFenceWithinLock();
+            _firebaseWriteFence = new CancellationTokenSource();
+        }
+    }
+
+    private void CancelFirebaseWriteFence()
+    {
+        lock (_stateGate)
+        {
+            CancelFirebaseWriteFenceWithinLock();
+        }
+    }
+
+    private void CancelFirebaseWriteFenceWithinLock()
+    {
+        CancellationTokenSource? fence = _firebaseWriteFence;
+        _firebaseWriteFence = null;
+        if (fence is null)
+        {
+            return;
+        }
+        fence.Cancel();
+        fence.Dispose();
+    }
+
+    private void SignalSelectionRefresh()
+    {
+        try
+        {
+            _selectionWake.Release();
+        }
+        catch (SemaphoreFullException)
+        {
+        }
+    }
+
+    private async Task WaitForSelectionRefreshAsync(
+        TimeSpan delay,
+        CancellationToken cancellationToken)
+    {
+        using var waitCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken);
+        var timer = Task.Delay(delay, waitCancellation.Token);
+        Task wake = _selectionWake.WaitAsync(waitCancellation.Token);
+        Task completed = await Task.WhenAny(timer, wake).ConfigureAwait(false);
+        await completed.ConfigureAwait(false);
+        waitCancellation.Cancel();
     }
 
     private static bool IsCanonicalWireCode(string value) =>
@@ -478,5 +599,15 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
         catch (OperationCanceledException)
         {
         }
+    }
+
+    private sealed class FirebaseWriteOperation(
+        CancellationTokenSource cancellation,
+        CancellationToken fenceToken) : IDisposable
+    {
+        public CancellationToken Token => cancellation.Token;
+        public CancellationToken FenceToken { get; } = fenceToken;
+
+        public void Dispose() => cancellation.Dispose();
     }
 }

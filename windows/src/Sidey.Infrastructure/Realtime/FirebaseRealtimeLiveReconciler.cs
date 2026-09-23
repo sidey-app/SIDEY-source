@@ -125,6 +125,6 @@ internal sealed class FirebaseRealtimeLiveReconciler
     private static bool IsFresh(long timestamp, long receivedAtMilliseconds)
     {
         long age = receivedAtMilliseconds - timestamp;
-        return age is >= 0 and <= FreshnessWindowMilliseconds;
+        return age is >= -FreshnessWindowMilliseconds and <= FreshnessWindowMilliseconds;
     }
 }
