@@ -229,6 +229,35 @@ public sealed class FirebaseRealtimeListenerTests
     }
 
     [Fact]
+    public async Task CredentialProtocolDiagnosticIdentifiesSafeSubstageWithoutPayload()
+    {
+        var events = new List<BackendEvent>();
+        object eventGate = new();
+        await using var listener = new FirebaseRealtimeListener(
+            new StagedMalformedCredentialProvider(),
+            backendEvent =>
+            {
+                lock (eventGate)
+                {
+                    events.Add(backendEvent);
+                }
+            });
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() =>
+        {
+            lock (eventGate)
+            {
+                return events.OfType<BackendEvent.Diagnostic>().Any(diagnostic =>
+                    diagnostic.Stage ==
+                    "firebase-listener-connect-failed kind=protocol stage=credential detail=bootstrap-response")
+                    && events.OfType<BackendEvent.Diagnostic>().All(diagnostic =>
+                        !diagnostic.Stage.Contains("secret credential payload", StringComparison.Ordinal));
+            }
+        });
+    }
+
+    [Fact]
     public async Task StreamRequestDiagnosticIdentifiesStageStatusAndStreamWithoutPayload()
     {
         var events = new List<BackendEvent>();
@@ -822,6 +851,19 @@ public sealed class FirebaseRealtimeListenerTests
             CancellationToken cancellationToken = default) =>
             ValueTask.FromException<FirebaseRealtimeCredential>(
                 new InvalidDataException("secret credential payload"));
+
+        public ValueTask ResetAsync(CancellationToken cancellationToken = default) =>
+            ValueTask.CompletedTask;
+    }
+
+    private sealed class StagedMalformedCredentialProvider : IFirebaseRealtimeCredentialProvider
+    {
+        public ValueTask<FirebaseRealtimeCredential> GetCredentialAsync(
+            CancellationToken cancellationToken = default) =>
+            ValueTask.FromException<FirebaseRealtimeCredential>(
+                new FirebaseRealtimeCredentialStageException(
+                    "bootstrap-response",
+                    new InvalidDataException("secret credential payload")));
 
         public ValueTask ResetAsync(CancellationToken cancellationToken = default) =>
             ValueTask.CompletedTask;

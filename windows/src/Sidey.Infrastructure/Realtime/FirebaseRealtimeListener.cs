@@ -272,9 +272,17 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
         {
             credential = await _credentials.GetCredentialAsync(cancellationToken).ConfigureAwait(false);
         }
+        catch (FirebaseRealtimeCredentialStageException exception)
+        {
+            throw new FirebaseRealtimeCredentialProtocolException(
+                exception.Stage,
+                exception);
+        }
         catch (InvalidDataException exception)
         {
-            throw new FirebaseRealtimeCredentialProtocolException(exception);
+            throw new FirebaseRealtimeCredentialProtocolException(
+                detail: null,
+                innerException: exception);
         }
         FirebaseRtdbRestClient client = _createClient(credential.DatabaseUrl);
         var streamSet = new StreamSet(client, activeRoomId.HasValue ? 2 : 1, cancellationToken);
@@ -730,8 +738,8 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
 
     private static string FailureDiagnostic(Exception? exception) => exception switch
     {
-        FirebaseRealtimeCredentialProtocolException =>
-            "kind=protocol stage=credential",
+        FirebaseRealtimeCredentialProtocolException credential =>
+            $"kind=protocol stage=credential{DetailDiagnostic(credential.Detail)}",
         FirebaseRealtimeStreamEndedException ended =>
             $"kind=eof stream={ended.StreamKind} phase={ended.Phase}",
         FirebaseRealtimeStreamRequestException request =>
@@ -750,10 +758,17 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
     private static string StatusDiagnostic(System.Net.HttpStatusCode? statusCode) =>
         statusCode is { } value ? $" status={(int)value}" : string.Empty;
 
+    private static string DetailDiagnostic(string? detail) =>
+        detail is not null ? $" detail={detail}" : string.Empty;
+
     private sealed class FirebaseRealtimeCredentialProtocolException(
-        InvalidDataException innerException) : Exception(
+        string? detail,
+        Exception innerException) : Exception(
             "Firebase realtime credential payload is invalid.",
-            innerException);
+            innerException)
+    {
+        public string? Detail { get; } = detail;
+    }
 
     private sealed class FirebaseRealtimeStreamProtocolException(
         string streamKind,

@@ -22,6 +22,15 @@ internal interface IFirebaseRealtimeCredentialProvider
     public ValueTask ResetAsync(CancellationToken cancellationToken = default);
 }
 
+internal sealed class FirebaseRealtimeCredentialStageException(
+    string stage,
+    InvalidDataException innerException) : Exception(
+        "Firebase realtime credential payload is invalid.",
+        innerException)
+{
+    public string Stage { get; } = stage;
+}
+
 internal sealed class FirebaseRealtimeCredential
 {
     public FirebaseRealtimeCredential(
@@ -56,7 +65,6 @@ internal sealed class FirebaseRealtimeCredential
 
 internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCredentialProvider
 {
-    private const int ProtocolVersion = 2;
     private const int MaximumTokenCharacters = 32 * 1024;
     private const int MaximumApiKeyCharacters = 200;
     private const int MaximumResponseBytes = 256 * 1024;
@@ -115,7 +123,9 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         StoredSupabaseSession supabaseSession =
             await _sessions.GetStoredSessionAsync(cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException("An authenticated Supabase session is required.");
-        SessionKey key = ParseSupabaseSessionKey(supabaseSession);
+        SessionKey key = ValidateAtStage(
+            "supabase-session",
+            () => ParseSupabaseSessionKey(supabaseSession));
         Task<FirebaseRealtimeCredential> operation;
         PersistedSession? persistedSession = null;
 
@@ -192,7 +202,9 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             await _sessions.GetStoredSessionAsync(cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException("An authenticated Supabase session is required.");
         EnsureCurrentGeneration(requestGeneration, generationToken);
-        SessionKey key = ParseSupabaseSessionKey(session);
+        SessionKey key = ValidateAtStage(
+            "supabase-session",
+            () => ParseSupabaseSessionKey(session));
         Task<FirebaseRealtimeCredential>? existingOperation = null;
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -331,6 +343,10 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                     }
                     catch (Exception exception) when (
                         exception is InvalidDataException
+                        || exception is FirebaseRealtimeCredentialStageException
+                        {
+                            Stage: "firebase-token",
+                        }
                         || exception is HttpRequestException httpException
                             && IsRejectedRefresh(httpException.StatusCode))
                     {
@@ -402,12 +418,12 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         long receivedAtUnixMilliseconds = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds();
         long serverNowUnixMilliseconds = bootstrapResponse.ServerDateUnixMilliseconds
             ?? receivedAtUnixMilliseconds;
-        FirebaseRealtimeBootstrapConfiguration response =
-            FirebaseRealtimeProtocol.ParseBootstrapResponse(
+        FirebaseRealtimeBootstrapConfiguration response = ValidateAtStage(
+            "bootstrap-response",
+            () => FirebaseRealtimeProtocol.ParseBootstrapResponse(
                 bootstrapResponse.Payload,
                 serverNowUnixMilliseconds,
-                minimumAccessRevision);
-        ValidateCustomToken(response.CustomToken, key, response.RolloutLeaseExpiresAt);
+                minimumAccessRevision));
         long remainingLeaseMilliseconds = checked(
             response.RolloutLeaseExpiresAt - serverNowUnixMilliseconds);
         long refreshDelayMilliseconds = response.RefreshAfter > serverNowUnixMilliseconds
@@ -446,13 +462,15 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 request,
                 "Firebase custom-token exchange request failed.",
                 cancellationToken).ConfigureAwait(false);
-        return ValidateTokenGrant(
-            payload.IdToken,
-            payload.RefreshToken,
-            payload.ExpiresIn,
-            payload.LocalId,
-            key,
-            rolloutLeaseExpiresAt);
+        return ValidateAtStage(
+            "firebase-token",
+            () => ValidateTokenGrant(
+                payload.IdToken,
+                payload.RefreshToken,
+                payload.ExpiresIn,
+                payload.LocalId,
+                key,
+                rolloutLeaseExpiresAt));
     }
 
     private async Task<FirebaseTokenGrant> RefreshTokenAsync(
@@ -474,13 +492,15 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             request,
             "Firebase token refresh request failed.",
             cancellationToken).ConfigureAwait(false);
-        return ValidateTokenGrant(
-            payload.IdToken,
-            payload.RefreshToken,
-            payload.ExpiresIn,
-            payload.UserId,
-            key,
-            rolloutLeaseExpiresAt);
+        return ValidateAtStage(
+            "firebase-token",
+            () => ValidateTokenGrant(
+                payload.IdToken,
+                payload.RefreshToken,
+                payload.ExpiresIn,
+                payload.UserId,
+                key,
+                rolloutLeaseExpiresAt));
     }
 
     private async Task<BoundedHttpResponse> SendAndReadBytesAsync(
@@ -785,23 +805,6 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         return new SessionKey(session.UserId, sessionId);
     }
 
-    private static void ValidateCustomToken(
-        string customToken,
-        SessionKey key,
-        long rolloutLeaseExpiresAt)
-    {
-        using JsonDocument payload = ParseJwtPayload(customToken, "Firebase custom token");
-        JsonElement root = payload.RootElement;
-        if (!root.TryGetProperty("uid", out JsonElement uid)
-            || !Guid.TryParse(uid.GetString(), out Guid userId)
-            || userId != key.UserId
-            || !root.TryGetProperty("claims", out JsonElement claims)
-            || !HasFirebaseSessionClaims(claims, key, rolloutLeaseExpiresAt))
-        {
-            throw new InvalidDataException("Firebase custom token claims were invalid.");
-        }
-    }
-
     private static void ValidateFirebaseIdToken(
         string idToken,
         SessionKey key,
@@ -826,15 +829,28 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         JsonElement claims,
         SessionKey key,
         long rolloutLeaseExpiresAt) =>
-        claims.TryGetProperty("sideyProtocol", out JsonElement protocol)
-        && protocol.TryGetInt32(out int protocolVersion)
-        && protocolVersion == ProtocolVersion
-        && claims.TryGetProperty("sideySessionId", out JsonElement session)
+        claims.TryGetProperty("sideySessionId", out JsonElement session)
         && Guid.TryParse(session.GetString(), out Guid sessionId)
         && sessionId == key.SessionId
         && claims.TryGetProperty("sideyRolloutUntil", out JsonElement rolloutLease)
         && rolloutLease.TryGetInt64(out long tokenRolloutLeaseExpiresAt)
         && tokenRolloutLeaseExpiresAt == rolloutLeaseExpiresAt;
+
+    private static T ValidateAtStage<T>(string stage, Func<T> validation)
+    {
+        try
+        {
+            return validation();
+        }
+        catch (FirebaseRealtimeCredentialStageException)
+        {
+            throw;
+        }
+        catch (InvalidDataException exception)
+        {
+            throw new FirebaseRealtimeCredentialStageException(stage, exception);
+        }
+    }
 
     private static JsonDocument ParseJwtPayload(string token, string tokenKind)
     {
