@@ -208,6 +208,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
 
     public event Action<CoordinatorState>? StateChanged;
     public event Action? ComposerRequested;
+    public event Action<int>? CharacterClicked;
     public event Action? PulseRequested;
     public event Action<Guid?>? TreeMovementToggleRequested;
     public event Action<Guid>? CharacterThrowRequested;
@@ -336,6 +337,12 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             return;
         }
 
+        RealtimeTransportSelection realtimeTransport = RealtimeTransportConfiguration.FromEnvironment(
+            firebaseV2Ready: true);
+        StartupDiagnostics.Stage(
+            $"realtime-transport requested={realtimeTransport.Requested} "
+            + $"effective={realtimeTransport.Effective} reason={realtimeTransport.Reason}");
+
         bool developmentCommerceEnabled = WindowsCommerceConfiguration.IsEnabled(configuration);
         AuthCallbackScheme = WindowsCommerceConfiguration.IsProduction(configuration)
             ? WindowsAuthCallback.ProductionScheme : WindowsAuthCallback.DevelopmentScheme;
@@ -378,7 +385,12 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             }
             SetState(_state with { GoogleAuthentication = GoogleAuthenticationState.Verified, ErrorMessage = null });
             ShowStartupOverlay();
-            _backend = new SupabaseBackendGateway(configuration, auth, _credentialStore);
+            _backend = new SupabaseBackendGateway(
+                configuration,
+                auth,
+                _credentialStore,
+                appVersion: typeof(AppCoordinator).Assembly.GetName().Version?.ToString(3),
+                firebaseV2Capable: realtimeTransport.Effective == RealtimeTransportMode.FirebaseV2);
         }
         var backend = (SupabaseBackendGateway)_backend;
 
@@ -946,7 +958,22 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
 
             if (_backend is SupabaseBackendGateway backend)
             {
-                await backend.DisposeAsync().ConfigureAwait(false);
+                try
+                {
+                    await backend.InvalidateRealtimeSessionAsync(cleanupToken).ConfigureAwait(false);
+                }
+                catch (Exception exception) when (exception is not OperationCanceledException)
+                {
+                    StartupDiagnostics.NonFatal("account-session-realtime-invalidate", exception);
+                }
+                try
+                {
+                    await backend.DisposeAsync().ConfigureAwait(false);
+                }
+                catch (Exception exception) when (exception is not OperationCanceledException)
+                {
+                    StartupDiagnostics.NonFatal("account-session-backend-dispose", exception);
+                }
             }
             _backend = null;
 
@@ -1113,6 +1140,12 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                 normalized,
                 cancellationToken);
             _messages.Confirm(confirmed);
+            PublishState();
+        }
+        catch (ChatCommitAmbiguousException)
+        {
+            // Keep the original UUID pending. Firebase notification or the next
+            // authoritative history reconciliation will confirm the same entry.
             PublishState();
         }
         catch
@@ -1491,6 +1524,8 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
 
     public void RequestComposer() => ComposerRequested?.Invoke();
 
+    private void RequestCharacterClick(int clickCount) => CharacterClicked?.Invoke(clickCount);
+
     public void RequestCharacterPulse() => PulseRequested?.Invoke();
 
     public void RequestCharacterThrow(Guid targetUserId) =>
@@ -1767,9 +1802,11 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                         Room? activeRoom = _state.ActiveRoomId is { } activeRoomId
                             ? _state.Rooms.FirstOrDefault(room => room.Id == activeRoomId)
                             : null;
+                        RoomMember? actor = activeRoom?.Members.FirstOrDefault(
+                            member => member.UserId == characterThrow.ActorUserId);
                         if (activeRoom?.Id == characterThrow.RoomId
                             && characterThrow.ActorUserId != characterThrow.TargetUserId
-                            && activeRoom.Members.Any(member => member.UserId == characterThrow.ActorUserId)
+                            && actor is not null
                             && activeRoom.Members.Any(member => member.UserId == characterThrow.TargetUserId)
                             && _throwCooldown.Accept(
                                 characterThrow.RoomId,
@@ -1777,7 +1814,10 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                                 TimeSpan.FromSeconds(
                                     Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency)))
                         {
-                            QueueThrowForWorld(characterThrow);
+                            QueueThrowForWorld(characterThrow with
+                            {
+                                SourceCharacterId = PixelCharacterCatalog.NormalizeId(actor.CharacterId),
+                            });
                         }
                         break;
                     case BackendEvent.ConnectionChanged connection:
@@ -2177,7 +2217,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             _overlay = NativePixelWorldSession.Start(
                 _state.Preferences.OverlayRegion,
                 snapshot,
-                RequestComposer,
+                RequestCharacterClick,
                 RequestCharacterPulse,
                 RequestCharacterThrow,
                 _state.Preferences.RequiresRightClickToThrow,

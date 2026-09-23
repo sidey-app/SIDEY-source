@@ -51,32 +51,44 @@ public sealed class OverlayBehaviorPolicyTests
     }
 
     [Theory]
-    [InlineData(OverlayEdge.Left, 3, 2, new byte[] { 5, 3, 1, 6, 4, 2 })]
-    [InlineData(OverlayEdge.Right, 3, 2, new byte[] { 2, 4, 6, 1, 3, 5 })]
-    [InlineData(OverlayEdge.Top, 2, 3, new byte[] { 6, 5, 4, 3, 2, 1 })]
-    public void TextVisualsRotateWithTheCharacter(
-        OverlayEdge edge,
-        int expectedWidth,
-        int expectedHeight,
-        byte[] expectedBlueValues)
+    [InlineData(OverlayEdge.Bottom)]
+    [InlineData(OverlayEdge.Top)]
+    [InlineData(OverlayEdge.Left)]
+    [InlineData(OverlayEdge.Right)]
+    public void TextVisualsStayUprightForEveryCharacterEdge(OverlayEdge edge)
     {
-        PremultipliedVisual oriented = PixelVisualOrientation.Apply(Visual(2, 3), edge);
+        PremultipliedVisual source = Visual(2, 3);
+        PremultipliedVisual oriented = PixelVisualOrientation.Apply(source, edge);
 
-        Assert.Equal(expectedWidth, oriented.Width);
-        Assert.Equal(expectedHeight, oriented.Height);
-        Assert.Equal(expectedBlueValues, BlueValues(oriented));
+        Assert.Same(source, oriented);
+        Assert.Equal(2, oriented.Width);
+        Assert.Equal(3, oriented.Height);
+        Assert.Equal([1, 2, 3, 4, 5, 6], BlueValues(oriented));
     }
 
     [Theory]
-    [InlineData(OverlayEdge.Top, 2, 1, 6, 4)]
-    [InlineData(OverlayEdge.Left, 1, 2, 4, 6)]
-    [InlineData(OverlayEdge.Right, 3, 2, 4, 6)]
-    public void RotatedBubbleKeepsTrackOfItsBodyBounds(
+    [InlineData(OverlayEdge.Bottom, 2, 3, new byte[] { 1, 2, 3, 4, 5, 6 })]
+    [InlineData(OverlayEdge.Top, 2, 3, new byte[] { 6, 5, 4, 3, 2, 1 })]
+    [InlineData(OverlayEdge.Left, 3, 2, new byte[] { 5, 3, 1, 6, 4, 2 })]
+    [InlineData(OverlayEdge.Right, 3, 2, new byte[] { 2, 4, 6, 1, 3, 5 })]
+    public void NameplateFollowsCharacterRotation(
         OverlayEdge edge,
-        int expectedX,
-        int expectedY,
-        int expectedWidth,
-        int expectedHeight)
+        int width,
+        int height,
+        byte[] expected)
+    {
+        PremultipliedVisual oriented = PixelVisualOrientation.ApplyToNameplate(Visual(2, 3), edge);
+
+        Assert.Equal(width, oriented.Width);
+        Assert.Equal(height, oriented.Height);
+        Assert.Equal(expected, BlueValues(oriented));
+    }
+
+    [Theory]
+    [InlineData(OverlayEdge.Top)]
+    [InlineData(OverlayEdge.Left)]
+    [InlineData(OverlayEdge.Right)]
+    public void UprightBubblePreservesItsBodyBounds(OverlayEdge edge)
     {
         var source = new PremultipliedVisual(
             new byte[10 * 8 * 4],
@@ -87,7 +99,7 @@ public sealed class OverlayBehaviorPolicyTests
         PremultipliedVisual oriented = PixelVisualOrientation.Apply(source, edge);
 
         Assert.Equal(
-            new PixelVisualBodyBounds(expectedX, expectedY, expectedWidth, expectedHeight),
+            new PixelVisualBodyBounds(2, 3, 6, 4),
             oriented.BubbleBodyBounds);
     }
 

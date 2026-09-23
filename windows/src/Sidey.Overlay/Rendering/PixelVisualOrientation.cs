@@ -4,7 +4,7 @@ namespace Sidey.Overlay.Rendering;
 
 internal static class PixelVisualOrientation
 {
-    internal static PremultipliedVisual Apply(PremultipliedVisual source, OverlayEdge edge)
+    internal static PremultipliedVisual ApplyToNameplate(PremultipliedVisual source, OverlayEdge edge)
     {
         if (edge == OverlayEdge.Bottom)
         {
@@ -30,42 +30,15 @@ internal static class PixelVisualOrientation
         }
 
         Array.Clear(source.Pixels);
-        return new PremultipliedVisual(
-            pixels,
-            width,
-            height,
-            source.BubblePalette,
-            RotateBodyBounds(source, edge));
+        return new PremultipliedVisual(pixels, width, height);
     }
 
-    private static PixelVisualBodyBounds? RotateBodyBounds(
-        PremultipliedVisual source,
-        OverlayEdge edge)
+    internal static PremultipliedVisual Apply(PremultipliedVisual source, OverlayEdge edge)
     {
-        if (source.BubbleBodyBounds is not { } body)
-        {
-            return null;
-        }
-
-        return edge switch
-        {
-            OverlayEdge.Top => new PixelVisualBodyBounds(
-                source.Width - body.X - body.Width,
-                source.Height - body.Y - body.Height,
-                body.Width,
-                body.Height),
-            OverlayEdge.Left => new PixelVisualBodyBounds(
-                source.Height - body.Y - body.Height,
-                body.X,
-                body.Height,
-                body.Width),
-            OverlayEdge.Right => new PixelVisualBodyBounds(
-                body.Y,
-                source.Width - body.X - body.Width,
-                body.Height,
-                body.Width),
-            _ => throw new ArgumentOutOfRangeException(nameof(edge)),
-        };
+        _ = edge;
+        // Message, typing, and doze visuals stay aligned to the physical screen.
+        // Nameplates use ApplyToNameplate so they follow the character edge.
+        return source;
     }
 
     private static (int X, int Y) SourceCoordinate(
