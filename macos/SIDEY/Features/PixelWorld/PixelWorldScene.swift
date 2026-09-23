@@ -381,7 +381,8 @@ final class PixelWorldScene: SKScene {
                 bubbles: activeBubbles[member.id] ?? [],
                 edge: edge,
                 tangentPosition: tangent,
-                tangentLength: geometry.tangentLength
+                tangentLength: geometry.tangentLength,
+                inwardNormalLength: bubbleInwardNormalLength
             )
         }
         if activityFrameChanged {
@@ -457,6 +458,7 @@ final class PixelWorldScene: SKScene {
             node.updatePresentationLayout(
                 tangentPosition: agent.trackPosition,
                 tangentLength: geometry.tangentLength,
+                inwardNormalLength: bubbleInwardNormalLength,
                 edge: edge
             )
         }
@@ -494,7 +496,8 @@ final class PixelWorldScene: SKScene {
                 bubbles: entry.value,
                 tangentPosition: agent.trackPosition,
                 tangentLength: geometry.tangentLength,
-                edge: edge
+                edge: edge,
+                inwardNormalLength: bubbleInwardNormalLength
             )
             ranges[entry.key] = PixelBubbleStackLayout.bodyTangentRange(
                 for: layouts,
@@ -524,6 +527,10 @@ final class PixelWorldScene: SKScene {
         characterNodes[memberID]?.bubbleBodyFrames ?? []
     }
 
+    func renderedBubbleTotalFrames(for memberID: UUID) -> [CGRect] {
+        characterNodes[memberID]?.bubbleTotalFrames ?? []
+    }
+
     func renderedBubbleIsTyping(for memberID: UUID) -> Bool {
         characterNodes[memberID]?.bubbleIsTyping ?? false
     }
@@ -534,6 +541,10 @@ final class PixelWorldScene: SKScene {
 
     func renderedBubbleTextWorldRotations(for memberID: UUID) -> [CGFloat] {
         characterNodes[memberID]?.bubbleTextWorldRotations ?? []
+    }
+
+    func renderedBubbleWorldRotations(for memberID: UUID) -> [CGFloat] {
+        characterNodes[memberID]?.bubbleWorldRotations ?? []
     }
 
     func renderedVisualState(for memberID: UUID) -> PixelCharacterVisualState? {
@@ -643,6 +654,17 @@ final class PixelWorldScene: SKScene {
               activityFrame.height > 0
         else { return frame }
         return activityFrame
+    }
+
+    private var bubbleInwardNormalLength: CGFloat {
+        let geometry = trackGeometry
+        let anchor = geometry.point(for: geometry.trackRange.lowerBound)
+        return switch edge {
+        case .bottom: size.height - anchor.y
+        case .top: anchor.y
+        case .left: size.width - anchor.x
+        case .right: anchor.x
+        }
     }
 
     private func stableTrackPosition(roomID: UUID?, userID: UUID, salt: UInt64 = 0) -> CGFloat {
@@ -1010,6 +1032,13 @@ private final class PixelCharacterNode: SKNode {
     var bubbleBodyFrames: [CGRect] {
         orderedMessageIDs.compactMap { messageBubbleNodes[$0]?.bodyFrame }
     }
+    var bubbleTotalFrames: [CGRect] {
+        let messageFrames = orderedMessageIDs.compactMap {
+            messageBubbleNodes[$0]?.totalFrame
+        }
+        let typingFrame = typingBubbleNode.map { [$0.totalFrame] } ?? []
+        return messageFrames + typingFrame
+    }
     var bubbleIsTyping: Bool { typingBubbleNode != nil }
     var nicknameWorldRotation: CGFloat {
         presentation.zRotation + nameplateLayer.zRotation
@@ -1019,6 +1048,13 @@ private final class PixelCharacterNode: SKNode {
             messageBubbleNodes[$0]?.textCounterRotation
         }
         let typingRotation = typingBubbleNode.map { [$0.textCounterRotation] } ?? []
+        return (messageRotations + typingRotation).map { presentation.zRotation + $0 }
+    }
+    var bubbleWorldRotations: [CGFloat] {
+        let messageRotations = orderedMessageIDs.compactMap {
+            messageBubbleNodes[$0]?.zRotation
+        }
+        let typingRotation = typingBubbleNode.map { [$0.zRotation] } ?? []
         return (messageRotations + typingRotation).map { presentation.zRotation + $0 }
     }
     var dozeText: String? { dozeLabel.text }
@@ -1110,7 +1146,8 @@ private final class PixelCharacterNode: SKNode {
         bubbles: [ActiveBubble],
         edge: OverlayEdge,
         tangentPosition: CGFloat,
-        tangentLength: CGFloat
+        tangentLength: CGFloat,
+        inwardNormalLength: CGFloat
     ) {
         let canonicalID = PixelCharacterCatalog.canonicalID(for: member.characterID)
         if canonicalID != characterID {
@@ -1141,6 +1178,7 @@ private final class PixelCharacterNode: SKNode {
             typingBubbleStyleID: member.equippedBubbleStyleID,
             tangentPosition: tangentPosition,
             tangentLength: tangentLength,
+            inwardNormalLength: inwardNormalLength,
             edge: edge
         )
         updateMotion(member: member, moving: false, velocity: 0, edge: edge)
@@ -1286,7 +1324,12 @@ private final class PixelCharacterNode: SKNode {
         sprite.run(.repeatForever(.animate(with: textures, timePerFrame: duration)), withKey: Self.animationKey)
     }
 
-    func updatePresentationLayout(tangentPosition: CGFloat, tangentLength: CGFloat, edge: OverlayEdge) {
+    func updatePresentationLayout(
+        tangentPosition: CGFloat,
+        tangentLength: CGFloat,
+        inwardNormalLength: CGFloat,
+        edge: OverlayEdge
+    ) {
         if messageBubbles.isEmpty {
             guard let typingBubbleNode else { return }
             typingBubbleNode.apply(layout: PixelBubbleLayout.make(
@@ -1297,15 +1340,24 @@ private final class PixelCharacterNode: SKNode {
                 edge: edge,
                 leadingDecorationOverflow: typingBubbleNode.hasDecoration
                     ? PixelBubbleStyle.decorationLeadingOverflow
-                    : 0
+                    : 0,
+                maximumContentWidth: edge.isHorizontal
+                    ? nil
+                    : max(
+                        24,
+                        inwardNormalLength - 56
+                            - (edge == .right && typingBubbleNode.hasDecoration
+                                ? PixelBubbleStyle.decorationLeadingOverflow
+                                : 0)
+                    )
             ))
-            typingBubbleNode.applyReadableContentRotation(for: edge)
             return
         }
 
         applyMessageLayouts(
             tangentPosition: tangentPosition,
             tangentLength: tangentLength,
+            inwardNormalLength: inwardNormalLength,
             edge: edge
         )
     }
@@ -1316,6 +1368,7 @@ private final class PixelCharacterNode: SKNode {
         typingBubbleStyleID: String?,
         tangentPosition: CGFloat,
         tangentLength: CGFloat,
+        inwardNormalLength: CGFloat,
         edge: OverlayEdge
     ) {
         messageBubbles = Array(bubbles.suffix(ActiveBubbleLedger.maximumVisiblePerSender))
@@ -1339,16 +1392,23 @@ private final class PixelCharacterNode: SKNode {
                 edge: edge,
                 leadingDecorationOverflow: requestedTheme.decorationAssetName == nil
                     ? 0
-                    : PixelBubbleStyle.decorationLeadingOverflow
+                    : PixelBubbleStyle.decorationLeadingOverflow,
+                maximumContentWidth: edge.isHorizontal
+                    ? nil
+                    : max(
+                        24,
+                        inwardNormalLength - 56
+                            - (edge == .right && requestedTheme.decorationAssetName != nil
+                                ? PixelBubbleStyle.decorationLeadingOverflow
+                                : 0)
+                    )
             )
             let requestedThemeID = requestedTheme.id
             if let typingBubbleNode, typingBubbleNode.theme.id == requestedThemeID {
                 typingBubbleNode.apply(layout: layout)
-                typingBubbleNode.applyReadableContentRotation(for: edge)
             } else {
                 typingBubbleNode?.removeFromParent()
                 let node = TypingIndicatorNode(layout: layout, bubbleStyleID: typingBubbleStyleID)
-                node.applyReadableContentRotation(for: edge)
                 presentation.addChild(node)
                 typingBubbleNode = node
             }
@@ -1364,6 +1424,7 @@ private final class PixelCharacterNode: SKNode {
         applyMessageLayouts(
             tangentPosition: tangentPosition,
             tangentLength: tangentLength,
+            inwardNormalLength: inwardNormalLength,
             edge: edge
         )
     }
@@ -1371,19 +1432,20 @@ private final class PixelCharacterNode: SKNode {
     private func applyMessageLayouts(
         tangentPosition: CGFloat,
         tangentLength: CGFloat,
+        inwardNormalLength: CGFloat,
         edge: OverlayEdge
     ) {
         let entries = PixelBubbleStackLayout.make(
             bubbles: messageBubbles,
             tangentPosition: tangentPosition,
             tangentLength: tangentLength,
-            edge: edge
+            edge: edge,
+            inwardNormalLength: inwardNormalLength
         )
         orderedMessageIDs = entries.map { $0.bubble.messageID }
         for entry in entries {
             if let node = messageBubbleNodes[entry.bubble.messageID] {
                 node.apply(layout: entry.layout, includesTail: entry.includesTail)
-                node.applyReadableContentRotation(for: edge)
             } else {
                 let node = MessageBubbleNode(
                     body: entry.bubble.body,
@@ -1391,7 +1453,6 @@ private final class PixelCharacterNode: SKNode {
                     includesTail: entry.includesTail,
                     bubbleStyleID: entry.bubble.bubbleStyleID
                 )
-                node.applyReadableContentRotation(for: edge)
                 presentation.addChild(node)
                 messageBubbleNodes[entry.bubble.messageID] = node
             }
@@ -1683,11 +1744,8 @@ class PixelBubbleNode: SKNode {
 
     var hasDecoration: Bool { decoration != nil }
     var decorationFrame: CGRect? { decoration?.frame }
-    var textCounterRotation: CGFloat { label.zRotation }
-
-    func applyReadableContentRotation(for edge: OverlayEdge) {
-        label.zRotation = edge.readableContentCounterRotation
-    }
+    var totalFrame: CGRect { lastLayout?.totalFrame ?? .zero }
+    var textCounterRotation: CGFloat { zRotation + label.zRotation }
 
     func apply(layout: PixelBubbleLayout) {
         apply(layout: layout, includesTail: includesTail)
@@ -1698,7 +1756,9 @@ class PixelBubbleNode: SKNode {
         lastLayout = layout
         self.includesTail = includesTail
         bodyFrame = layout.bodyFrame
-        position = CGPoint(x: layout.localCenterX, y: layout.bodyFrame.midY)
+        position = layout.nodePosition
+        zRotation = layout.nodeRotation
+        label.zRotation = layout.labelRotation
         label.preferredMaxLayoutWidth = max(8, layout.size.width - 16)
         label.position.x = 0
         let rect = CGRect(
@@ -1711,10 +1771,23 @@ class PixelBubbleNode: SKNode {
         path.addRoundedRect(in: rect, cornerWidth: 9, cornerHeight: 9)
         if includesTail {
             let halfBase: CGFloat = 6
-            let baseCenter = min(max(layout.tailTipX, rect.minX + 10), rect.maxX - 10)
-            path.move(to: CGPoint(x: baseCenter - halfBase, y: rect.minY + 1))
-            path.addLine(to: CGPoint(x: layout.tailTipX, y: rect.minY - 8))
-            path.addLine(to: CGPoint(x: baseCenter + halfBase, y: rect.minY + 1))
+            switch layout.tailAttachment {
+            case .bottom:
+                let baseCenter = min(max(layout.tailTip.x, rect.minX + 10), rect.maxX - 10)
+                path.move(to: CGPoint(x: baseCenter - halfBase, y: rect.minY + 1))
+                path.addLine(to: layout.tailTip)
+                path.addLine(to: CGPoint(x: baseCenter + halfBase, y: rect.minY + 1))
+            case .left:
+                let baseCenter = min(max(layout.tailTip.y, rect.minY + 10), rect.maxY - 10)
+                path.move(to: CGPoint(x: rect.minX + 1, y: baseCenter - halfBase))
+                path.addLine(to: layout.tailTip)
+                path.addLine(to: CGPoint(x: rect.minX + 1, y: baseCenter + halfBase))
+            case .right:
+                let baseCenter = min(max(layout.tailTip.y, rect.minY + 10), rect.maxY - 10)
+                path.move(to: CGPoint(x: rect.maxX - 1, y: baseCenter + halfBase))
+                path.addLine(to: layout.tailTip)
+                path.addLine(to: CGPoint(x: rect.maxX - 1, y: baseCenter - halfBase))
+            }
             path.closeSubpath()
         }
         background.path = path

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 
 const catalog = JSON.parse(readFileSync(new URL("../../assets/v1/commerce-catalog.json", import.meta.url)));
+const commerceLocalizations = JSON.parse(readFileSync(new URL("../../assets/v1/commerce-localizations.json", import.meta.url)));
 const read = (path) => readFileSync(new URL(`../dist/${path}`, import.meta.url), "utf8");
 const manifest = JSON.parse(readFileSync(new URL("../../assets/v1/manifest.json", import.meta.url)));
 const root = new URL("../../", import.meta.url);
@@ -118,15 +119,16 @@ async function createCheckoutHarness({ fetchResponse, requestPayment } = {}) {
   return { elements, requests, paymentRequests, assigned };
 }
 
-for (const locale of ["ko", "en", "ja"]) {
+for (const locale of ["ko", "en", "ja", "zh-Hant"]) {
+  const routeLocale = locale === "zh-Hant" ? "zh-hant" : locale;
   for (const category of Object.keys(included)) {
     test(`${locale}/${category}: complete catalog, exact reference prices, assets, separate keepsakes`, () => {
-      const html = read(`${locale}/store/${category}/index.html`);
+      const html = read(`${routeLocale}/store/${category}/index.html`);
       const cards = [...html.matchAll(/<button class="store-product-card"[^>]*>[\s\S]*?<\/button>/g)].map(([card]) => card);
       const paid = catalog.filter((entry) => entry.kind === category.slice(0, -1));
       assert.equal(cards.length, paid.length + included[category]);
       assert.match(html, /store-price-basis/);
-      assert.match(html, /reference prices|참고 가격|参考価格/);
+      assert.match(html, /reference prices|참고 가격|参考価格|參考價/);
       assert.doesNotMatch(html, /Windows direct-purchase|Windows 직접 결제|Windows版の直接決済/);
       assert.doesNotMatch(html, /direct macOS edition|macOS 직배포판|macOS直接配布版/);
       for (const entry of paid) {
@@ -134,7 +136,10 @@ for (const locale of ["ko", "en", "ja"]) {
         assert.ok(card, entry.id);
         const price = locale === "ko" ? `${entry.direct_price.toLocaleString("ko-KR")}원` : `₩${entry.direct_price.toLocaleString("en-US")}`;
         assert.ok(card.includes(`<strong>${price}</strong>`), `${entry.id}: ${price}`);
-        if (locale === "ko") assert.ok(card.includes(entry.name));
+        const localized = commerceLocalizations.products.find((product) => product.id === entry.id)?.localizations[locale];
+        assert.ok(localized, `${entry.id}: ${locale} localization`);
+        assert.ok(card.includes(localized.display_name), `${entry.id}: localized display name`);
+        assert.ok(card.includes(localized.marketing_description), `${entry.id}: localized marketing description`);
         const keepsake = catalog.find((candidate) => candidate.related_character_product_id === entry.id);
         if (keepsake) {
           assert.match(card, /store-keepsake-summary/);
@@ -163,7 +168,7 @@ for (const locale of ["ko", "en", "ja"]) {
   }
   test(`${locale}: store entry and character tab show the same products`, () => {
     const ids = (html) => [...html.matchAll(/<button class="store-product-card"[^>]*data-product-id="([^"]+)"/g)].map((match) => match[1]);
-    assert.deepEqual(ids(read(`${locale}/store/index.html`)), ids(read(`${locale}/store/characters/index.html`)));
+    assert.deepEqual(ids(read(`${routeLocale}/store/index.html`)), ids(read(`${routeLocale}/store/characters/index.html`)));
   });
 }
 
@@ -512,11 +517,169 @@ test("localized terms preserve historical AGPL grants without presenting current
     ko: ["현재 SIDEY 소스코드는 비공개 독점 소프트웨어", "이미 부여된", "철회"],
     en: ["Current SIDEY source code is private proprietary software", "rights already granted", "withdraw"],
     ja: ["現在のSIDEYソースコードは非公開のプロプライエタリソフトウェア", "すでに付与された", "撤回"],
+    "zh-hant": ["目前 SIDEY 原始碼為非公開專有軟體", "不撤回", "先前授予"],
   };
   for (const [locale, phrases] of Object.entries(expectations)) {
     const html = read(`${locale}/terms/index.html`);
     for (const phrase of phrases) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
     assert.ok(html.includes("AGPL-3.0-only"), `${locale}: historical license identifier`);
+  }
+});
+
+test("all locale support pages publish contact, diagnostics, and sensitive-data warnings", () => {
+  const expectations = {
+    ko: ["ryu200112@gmail.com", "운영체제와 SIDEY 버전", "초대 코드", "메시지 내용", "토큰"],
+    en: ["ryu200112@gmail.com", "operating system and SIDEY version", "invite codes", "message contents", "tokens"],
+    ja: ["ryu200112@gmail.com", "OSとSIDEYのバージョン", "招待コード", "メッセージ本文", "トークン"],
+    "zh-hant": ["ryu200112@gmail.com", "作業系統與 SIDEY 版本", "邀請碼", "訊息內容", "權杖"],
+  };
+  for (const [locale, phrases] of Object.entries(expectations)) {
+    const html = read(`${locale}/support/index.html`);
+    for (const phrase of phrases) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
+  }
+});
+
+test("localized pages and sitemap use the zh-Hant language tag with the lowercase route", () => {
+  for (const path of ["", "store/", "terms/", "privacy/", "refund/", "support/", "whats-new/"]) {
+    const html = read(`zh-hant/${path}index.html`);
+    assert.match(html, /<html lang="zh-Hant"/);
+    assert.ok(html.includes('hreflang="zh-Hant"'));
+    assert.ok(html.includes(`/SIDEY/zh-hant/${path}`));
+  }
+  const sitemap = read("sitemap.xml");
+  assert.ok(sitemap.includes('hreflang="zh-Hant" href="https://sidey-app.github.io/SIDEY/zh-hant/'));
+  assert.doesNotMatch(sitemap, /\/SIDEY\/zh-Hant\//);
+});
+
+test("locale-neutral gates route Traditional Chinese regions to zh-hant and unsupported languages to English", () => {
+  for (const path of ["", "store/", "privacy/", "refund/", "terms/", "support/", "whats-new/"]) {
+    const html = read(`${path}index.html`);
+    assert.ok(html.includes('hreflang="zh-Hant"'));
+    assert.ok(html.includes(`/SIDEY/zh-hant/${path}`));
+    for (const language of ["zh-hant", "zh-tw", "zh-hk", "zh-mo"]) {
+      assert.ok(html.includes(`language.startsWith("${language}")`), `${path}: ${language}`);
+    }
+    assert.match(html, /: englishTarget;/, `${path}: unsupported locale fallback`);
+  }
+});
+
+test("Traditional Chinese release dates use zh-TW formatting", () => {
+  const html = read("zh-hant/whats-new/windows/index.html");
+  const releaseDate = html.match(/<time datetime="([^"]+)">([^<]+)<\/time>/);
+  if (releaseDate) {
+    const expected = new Intl.DateTimeFormat("zh-TW", { year: "numeric", month: "long", day: "numeric" }).format(new Date(releaseDate[1]));
+    assert.equal(releaseDate[2], expected);
+  }
+});
+
+test("localized pages use locale-default App Store storefronts consistently", () => {
+  const storefronts = { ko: "kr", en: "us", ja: "jp", "zh-hant": "tw" };
+  for (const [locale, storefront] of Object.entries(storefronts)) {
+    const url = `https://apps.apple.com/${storefront}/app/sidey/id6808528060?mt=12`;
+    const landing = read(`${locale}/index.html`);
+    assert.ok(landing.includes(`href="${url}"`), `${locale}: landing link`);
+    assert.ok(landing.includes(`data-macos-url="${url}"`), `${locale}: platform selector`);
+    assert.ok(landing.includes(`"downloadUrl":"${url}"`), `${locale}: structured data`);
+    assert.ok(landing.match(/data-app-store-link/g)?.length >= 3, `${locale}: adjustable links`);
+    assert.ok(read(`${locale}/whats-new/index.html`).includes(`href="${url}" data-app-store-link`), `${locale}: version history link`);
+  }
+});
+
+test("browser regions update App Store links and the platform-selector macOS target", async () => {
+  const { runInNewContext } = await import("node:vm");
+  const source = readFileSync(new URL("../public/assets/script.js", import.meta.url), "utf8");
+  const regionLanguages = {
+    gb: "en-GB", ca: "en-CA", au: "en-AU", sg: "en-SG", hk: "zh-Hant-HK", mo: "zh-Hant-MO",
+    tw: "zh-Hant-TW", jp: "ja-JP", kr: "ko-KR", us: "en-US",
+  };
+  for (const [storefront, language] of Object.entries(regionLanguages)) {
+    const original = "https://apps.apple.com/us/app/sidey/id6808528060?mt=12";
+    const ordinaryLink = { href: original, dataset: {} };
+    const primary = { href: original, dataset: { macosUrl: original } };
+    const document = {
+      querySelectorAll(selector) {
+        if (selector === "[data-app-store-link]") return [ordinaryLink, primary];
+        if (selector === "[data-macos-url]") return [primary];
+        return [];
+      },
+    };
+    runInNewContext(source, {
+      URL,
+      document,
+      navigator: { languages: [language], language, platform: "Linux", userAgent: "Linux" },
+      window: { location: { href: "https://sidey-app.github.io/SIDEY/en/" }, matchMedia: () => ({ matches: true }) },
+    });
+    const expected = `https://apps.apple.com/${storefront}/app/sidey/id6808528060?mt=12`;
+    assert.equal(ordinaryLink.href, expected, language);
+    assert.equal(primary.href, expected, `${language}: primary href`);
+    assert.equal(primary.dataset.macosUrl, expected, `${language}: macOS selector target`);
+  }
+});
+
+test("localized refund policies cover every paid customization category", () => {
+  const expectations = {
+    ko: ["유료 꾸미기 상품", "기본 햄스터", "기본 말풍선", "기본 투척물"],
+    en: ["Paid SIDEY customization items", "default hamster", "default speech bubble", "default throwable"],
+    ja: ["有料カスタマイズアイテム", "標準のハムスター", "標準の吹き出し", "標準の投げアイテム"],
+    "zh-hant": ["付費自訂商品", "基本小倉鼠", "基本對話框", "基本投擲物"],
+  };
+  for (const [locale, phrases] of Object.entries(expectations)) {
+    const html = read(`${locale}/refund/index.html`);
+    for (const phrase of phrases) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
+  }
+});
+
+test("non-Korean Windows release cards disclose and link to the Korean original", () => {
+  const notices = {
+    en: ["Full release notes are currently available in the original Korean.", "View the Korean original"],
+    ja: ["リリースノート全文は現在、韓国語の原文で提供しています。", "韓国語の原文を見る"],
+    "zh-hant": ["完整版本資訊目前僅提供韓文原文。", "查看韓文原文"],
+  };
+  assert.match(read("ko/whats-new/windows/index.html"), /class="update-copy" lang="ko"/);
+  for (const [locale, phrases] of Object.entries(notices)) {
+    const html = read(`${locale}/whats-new/windows/index.html`);
+    const cards = [...html.matchAll(/<details class="update-card"[\s\S]*?<div class="update-answer"><div class="update-copy">([\s\S]*?)<\/div><\/div>[\s\S]*?<\/details>/g)];
+    assert.ok(cards.length > 0, `${locale}: release cards`);
+    for (const [, card] of cards) {
+      for (const phrase of phrases) assert.ok(card.includes(phrase), `${locale}: every card includes ${phrase}`);
+      assert.doesNotMatch(card, /[\uac00-\ud7af]/, `${locale}: Korean body must not be presented as localized content`);
+      assert.match(card, /href="https:\/\/github\.com\/sidey-app\/SIDEY\/releases\/tag\/windows-v[^"]+"/);
+    }
+  }
+});
+
+test("every localized footer preserves delivery, refund and seller contracts", () => {
+  const expectations = {
+    ko: ["배송일자", "교환·환불", "사업자등록번호", "통신판매업 신고번호"],
+    en: ["Delivery", "Cancellation and refunds", "Korean business registration number", "Online sales registration"],
+    ja: ["提供時期", "キャンセル・返金", "韓国事業者登録番号", "通信販売業届出番号"],
+    "zh-hant": ["提供時間", "取消與退款", "韓國營業登記號碼", "通訊販售業申報號碼"],
+  };
+  for (const [locale, phrases] of Object.entries(expectations)) {
+    const html = read(`${locale}/index.html`);
+    for (const phrase of phrases) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
+    assert.ok(html.includes("388-53-01259"), `${locale}: registration value`);
+    assert.ok(html.includes("ryu200112@gmail.com"), `${locale}: seller contact`);
+  }
+});
+
+test("support navigation and locale-neutral language metadata are explicit", () => {
+  for (const locale of ["ko", "en", "ja", "zh-hant"]) {
+    assert.match(read(`${locale}/support/index.html`), new RegExp(`<a href="/SIDEY/${locale}/support/" aria-current="page">`));
+  }
+  for (const path of ["", "store/", "privacy/", "refund/", "terms/", "support/", "whats-new/"]) {
+    assert.match(read(`${path}index.html`), /<html lang="en">/);
+  }
+});
+
+test("Traditional Chinese public copy uses Taiwan-style status and inclusion terms", () => {
+  const landing = read("zh-hant/index.html");
+  assert.ok(landing.includes("線上、離開或離線"));
+  assert.doesNotMatch(landing, /在線/);
+  for (const category of Object.keys(included)) {
+    const html = read(`zh-hant/store/${category}/index.html`);
+    assert.ok(html.includes("隨附"), category);
+    assert.doesNotMatch(html, /基本提供/, category);
   }
 });
 

@@ -84,8 +84,11 @@ Supabase Presence를 제거하지 않는다.
 
 승인된 asset 구조와 플랫폼 지원 범위는
 [`assets/v1/manifest.json`](../assets/v1/manifest.json), 판매 상품 metadata와 플랫폼
-식별자는 [`assets/v1/commerce-catalog.json`](../assets/v1/commerce-catalog.json)이
-소유한다. 생성 스크립트가 이 원본에서 웹과 네이티브 mirror를 만들고 검증한다.
+식별자는 [`assets/v1/commerce-catalog.json`](../assets/v1/commerce-catalog.json)이,
+사용자에게 보이는 상품 번역은
+[`assets/v1/commerce-localizations.json`](../assets/v1/commerce-localizations.json)이
+소유한다. 생성 스크립트가 이 원본에서 웹과 네이티브 mirror, App Store Connect 입력을
+만들고 검증한다.
 backend가 상품 변경을 필요로 하면 검토된 private source commit의 snapshot과
 provenance를 별도로 받아 서버용 매핑을 생성한다. Source catalog 변경만으로 backend가
 배포되지는 않는다.

@@ -20,6 +20,11 @@ platform은 integer nearest-neighbor 확대, 투명 배경, 고정 frame rate와
 캐릭터 motion을 바꾸지 않는다. 좌표와 animation frame은 network로 보내지 않고 각
 client가 동일한 product rule로 계산한다.
 
+macOS에서 캐릭터가 monitor의 좌측 또는 우측 가장자리에 붙어도 메시지와 typing
+말풍선은 화면 기준 가로 방향을 유지한다. 말풍선 본체·장식·글자는 회전하지 않고,
+꼬리만 해당 캐릭터 쪽을 향한다. 캐릭터 자체는 발이 선택한 가장자리를 향하도록 기존처럼
+회전한다.
+
 Overlay surface는 기본적으로 pointer input을 통과시킨다. 캐릭터 상호작용을 위한 별도
 hotspot만 입력을 받고 나머지 surface는 통과한다. 자신의 캐릭터 pulse와 친구에게 던지는
 projectile은 transient event로 공유하지만 trajectory는 각 client가 현재 위치에서

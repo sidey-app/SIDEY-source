@@ -1,8 +1,8 @@
 ---
 import InfoLayout from "../layouts/InfoLayout.astro";
 import PageTabs from "./PageTabs.astro";
-import { appStoreURL } from "../data/releases";
-import { getTranslations, type Locale } from "../i18n/landing";
+import { appStoreURLForLocale } from "../data/releases";
+import { getTranslations, localePathSegment, type Locale } from "../i18n/landing";
 import { getGitHubReleases, type ReleasePlatform } from "../data/github-releases";
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 const { locale, platform = "macos", canonicalPath } = Astro.props;
 const copy = getTranslations(locale).whatsNew;
 const base = import.meta.env.BASE_URL;
-const localePrefix = `${locale}/`;
+const localePrefix = `${localePathSegment(locale)}/`;
 const platformLabel = copy.tabs[platform];
 const tabs = [
   { href: `${base}${localePrefix}whats-new/macos/`, label: copy.tabs.macos, active: platform === "macos" },
@@ -22,13 +22,14 @@ const tabs = [
 ];
 const resolvedCanonicalPath = canonicalPath ?? `${localePrefix}whats-new/${platform}/`;
 const platformReleases = platform === "windows" ? await getGitHubReleases(platform) : [];
-const dateLocales: Record<Locale, string> = { ko: "ko-KR", en: "en-US", ja: "ja-JP" };
+const dateLocales: Record<Locale, string> = { ko: "ko-KR", en: "en-US", ja: "ja-JP", "zh-Hant": "zh-TW" };
 const dateFormatter = new Intl.DateTimeFormat(dateLocales[locale], {
   year: "numeric",
   month: "long",
   day: "numeric",
 });
 const initialReleaseCount = 3;
+const appStoreURL = appStoreURLForLocale(locale);
 ---
 
 <InfoLayout locale={locale} title={`${platformLabel} ${copy.title} · SIDEY`} description={copy.intro} canonicalPath={resolvedCanonicalPath}>
@@ -38,7 +39,7 @@ const initialReleaseCount = 3;
     <PageTabs label={copy.tabs.label} items={tabs} />
   </section>
   <section class="section update-list" aria-label={`${platformLabel} ${copy.title}`}>
-    {platform === "macos" && <p><a class="release-link" href={appStoreURL}>{copy.appStoreHistory}<span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span></a></p>}
+    {platform === "macos" && <p><a class="release-link" href={appStoreURL} data-app-store-link>{copy.appStoreHistory}<span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span></a></p>}
     {platformReleases.map((release, index) => (
       <details class:list={["update-card", { "is-expanded": index === 0 }]} open={index === 0} data-release-item hidden={index >= initialReleaseCount}>
         <summary>
@@ -48,16 +49,20 @@ const initialReleaseCount = 3;
           </div>
           <span class="update-toggle-label"><span class="when-closed">{copy.openDetails}</span><span class="when-open">{copy.closeDetails}</span><span class="material-symbols-rounded" aria-hidden="true">expand_more</span></span>
         </summary>
-        <div class="update-answer"><div class="update-copy" lang="ko">
-          {release.introduction.map((paragraph) => <p>{paragraph}</p>)}
-          {release.sections.map((section) => (
-            <section class="release-section">
-              {section.heading && <h3>{section.heading}</h3>}
-              {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-              {section.items.length > 0 && <ul>{section.items.map((point) => <li>{point}</li>)}</ul>}
-            </section>
-          ))}
-          <a class="release-link" href={release.url}>{copy.viewRelease}<span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span></a>
+        <div class="update-answer"><div class="update-copy" lang={locale === "ko" ? "ko" : undefined}>
+          {locale === "ko" ? (
+            <>
+              {release.introduction.map((paragraph) => <p>{paragraph}</p>)}
+              {release.sections.map((section) => (
+                <section class="release-section">
+                  {section.heading && <h3>{section.heading}</h3>}
+                  {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+                  {section.items.length > 0 && <ul>{section.items.map((point) => <li>{point}</li>)}</ul>}
+                </section>
+              ))}
+            </>
+          ) : <p>{copy.koreanOriginalNotice}</p>}
+          <a class="release-link" href={release.url}>{locale === "ko" ? copy.viewRelease : copy.viewKoreanOriginal}<span class="material-symbols-rounded" aria-hidden="true">arrow_outward</span></a>
         </div></div>
       </details>
     ))}

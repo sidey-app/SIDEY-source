@@ -10,7 +10,7 @@ pnpm run dev
 ```
 
 - `src/pages/`: page sources; localized public routes live under `/ko/`,
-  `/en/`, and `/ja/`. The root and every locale-neutral counterpart of a localized public
+  `/en/`, `/ja/`, and `/zh-hant/` (`lang`/`hreflang` use `zh-Hant`). The root and every locale-neutral counterpart of a localized public
   route detect the browser language and redirect to the matching localized
   route.
 - `src/styles/styles.scss`: shared SCSS entry point. Component-level rules are

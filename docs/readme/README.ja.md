@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/kr/app/sidey/id6808528060">
+  <a href="https://apps.apple.com/jp/app/sidey/id6808528060">
     <img src="../assets/mac-app-store/mac-app-store.ja.svg" height="48" alt="Mac App StoreでSIDEYをダウンロード">
   </a>
   <span>
@@ -63,7 +63,7 @@ SIDEYは、画面の端にいる2Dピクセル動物を通じて友だちと会�
   <br/>
   <p>Mac App Storeから簡単にインストールできます:</p>
   <p>
-    <a href="https://apps.apple.com/kr/app/sidey/id6808528060">
+    <a href="https://apps.apple.com/jp/app/sidey/id6808528060">
       <img src="../assets/mac-app-store/mac-app-store.ja.svg" height="48" alt="Mac App StoreでSIDEYをダウンロード">
     </a>
   </p>
