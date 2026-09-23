@@ -662,10 +662,33 @@ final class PixelWorldTests: XCTestCase {
                         accuracy: 0.001
                     )
                 } else {
+                    let worldVisualFrames = entries.map {
+                        geometry.worldFrame(for: $0.layout.visualFrame, at: tangent)
+                    }
                     XCTAssertEqual(
-                        entries[0].layout.totalFrame.minY - entries[1].layout.totalFrame.maxY,
+                        worldVisualFrames[0].minY - worldVisualFrames[1].maxY,
                         PixelBubbleStackLayout.bodySpacing,
                         accuracy: 0.001
+                    )
+                    let worldBodyFrames = entries.map {
+                        geometry.worldFrame(for: $0.layout.bodyFrame, at: tangent)
+                    }
+                    if edge == .left {
+                        XCTAssertEqual(
+                            worldBodyFrames[0].minX,
+                            worldBodyFrames[1].minX,
+                            accuracy: 0.001
+                        )
+                    } else {
+                        XCTAssertEqual(
+                            worldBodyFrames[0].maxX,
+                            worldBodyFrames[1].maxX,
+                            accuracy: 0.001
+                        )
+                    }
+                    XCTAssertEqual(
+                        entries[1].layout.tailTipInPresentation,
+                        CGPoint(x: 0, y: 44)
                     )
                 }
                 for entry in entries {
@@ -676,6 +699,71 @@ final class PixelWorldTests: XCTestCase {
                     )
                 }
             }
+        }
+    }
+
+    func testSceneRendersSideBubblesVerticallyWithNewestTailAndUnionCollisionRange() throws {
+        let roomID = UUID()
+        let member = makeMember()
+        let bubbles = [
+            ActiveBubble(
+                senderID: member.id,
+                messageID: UUID(),
+                body: "이전 " + String(repeating: "긴메시지", count: 20),
+                expiresAt: Date(timeIntervalSince1970: 10)
+            ),
+            ActiveBubble(
+                senderID: member.id,
+                messageID: UUID(),
+                body: "최신",
+                expiresAt: Date(timeIntervalSince1970: 11)
+            )
+        ]
+
+        for edge in [OverlayEdge.left, .right] {
+            let scene = PixelWorldScene(size: CGSize(width: 360, height: 720))
+            scene.apply(
+                roomID: roomID,
+                members: [member],
+                bubbles: bubbles,
+                edge: edge,
+                installationSeed: 9
+            )
+
+            XCTAssertEqual(scene.renderedBubbleBodies(for: member.id), bubbles.map(\.body))
+            XCTAssertEqual(scene.renderedBubbleTailFlags(for: member.id), [false, true])
+            XCTAssertTrue(scene.renderedBubbleWorldRotations(for: member.id).allSatisfy {
+                abs($0) < 0.001
+            })
+            let tangent = try XCTUnwrap(scene.agentStates.first?.trackPosition)
+            let worldBodyFrames = scene.renderedBubbleBodyFrames(for: member.id).map {
+                scene.trackGeometry.worldFrame(for: $0, at: tangent)
+            }
+            XCTAssertEqual(worldBodyFrames.count, 2)
+            XCTAssertEqual(
+                worldBodyFrames[0].minY - worldBodyFrames[1].maxY,
+                PixelBubbleStackLayout.bodySpacing,
+                accuracy: 0.001,
+                "\(edge)"
+            )
+            XCTAssertTrue(worldBodyFrames.allSatisfy {
+                scene.frame.insetBy(dx: -0.5, dy: -0.5).contains($0)
+            })
+            let collisionRange = try XCTUnwrap(scene.messageBubbleTangentRanges[member.id])
+            let expectedLowerBound = try XCTUnwrap(worldBodyFrames.map(\.minY).min())
+            let expectedUpperBound = try XCTUnwrap(worldBodyFrames.map(\.maxY).max())
+            XCTAssertEqual(
+                collisionRange.lowerBound,
+                expectedLowerBound,
+                accuracy: 0.001,
+                "\(edge)"
+            )
+            XCTAssertEqual(
+                collisionRange.upperBound,
+                expectedUpperBound,
+                accuracy: 0.001,
+                "\(edge)"
+            )
         }
     }
 

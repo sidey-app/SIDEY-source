@@ -14,6 +14,7 @@ struct PixelBubbleLayout: Equatable, Sendable {
     let tailTip: CGPoint
     let tailAttachment: PixelBubbleTailAttachment
     let bodyFrame: CGRect
+    let visualFrame: CGRect
     let totalFrame: CGRect
 
     static func make(
@@ -22,6 +23,7 @@ struct PixelBubbleLayout: Equatable, Sendable {
         tangentPosition: CGFloat,
         tangentLength: CGFloat,
         edge: OverlayEdge,
+        preferredTangentPosition: CGFloat? = nil,
         bodyMinY: CGFloat = 52,
         includesTail: Bool = true,
         leadingDecorationOverflow: CGFloat = 0,
@@ -69,7 +71,7 @@ struct PixelBubbleLayout: Equatable, Sendable {
         let minimumCenter = 4 - minimumVisualDelta
         let maximumCenter = tangentLength - 4 - maximumVisualDelta
         let worldCenter = min(
-            max(tangentPosition, minimumCenter),
+            max(preferredTangentPosition ?? tangentPosition, minimumCenter),
             max(minimumCenter, maximumCenter)
         )
         let localCenterX = (worldCenter - tangentPosition) * tangentSign
@@ -106,6 +108,7 @@ struct PixelBubbleLayout: Equatable, Sendable {
             tailTip: tailTip,
             tailAttachment: tailAttachment,
             bodyFrame: bodyFrame,
+            visualFrame: visualFrame,
             totalFrame: totalFrame
         )
     }
@@ -125,6 +128,16 @@ struct PixelBubbleLayout: Equatable, Sendable {
         }
         let first = tangentPosition + bodyFrame.minX * tangentSign
         let second = tangentPosition + bodyFrame.maxX * tangentSign
+        return min(first, second)...max(first, second)
+    }
+
+    func visualTangentOffsets(edge: OverlayEdge) -> ClosedRange<CGFloat> {
+        let tangentSign: CGFloat = switch edge {
+        case .bottom, .right: 1
+        case .top, .left: -1
+        }
+        let first = (visualFrame.minX - nodePosition.x) * tangentSign
+        let second = (visualFrame.maxX - nodePosition.x) * tangentSign
         return min(first, second)...max(first, second)
     }
 }
@@ -147,35 +160,16 @@ enum PixelBubbleStackLayout {
     ) -> [PixelBubbleStackEntry] {
         let ordered = bubbles.sorted(by: ActiveBubble.presentationOrder)
         let visible = Array(ordered.suffix(ActiveBubbleLedger.maximumVisiblePerSender))
-        let decorationOverflow: CGFloat = switch edge {
-        case .right:
-            visible.reduce(CGFloat.zero) { total, bubble in
-                total + (PixelBubbleTheme.resolve(bubble.bubbleStyleID).decorationAssetName == nil
-                    ? 0
-                    : PixelBubbleStyle.decorationLeadingOverflow)
-            }
-        case .left:
-            visible.dropLast().reduce(CGFloat.zero) { total, bubble in
-                total + (PixelBubbleTheme.resolve(bubble.bubbleStyleID).decorationAssetName == nil
-                    ? 0
-                    : PixelBubbleStyle.decorationLeadingOverflow)
-            }
-        case .bottom, .top:
-            0
-        }
-        let maximumContentWidth: CGFloat? = if !edge.isHorizontal,
-                                               let inwardNormalLength,
-                                               !visible.isEmpty {
-            max(
-                24,
-                min(
-                    220,
-                    (inwardNormalLength - 52 - bodySpacing * CGFloat(visible.count - 1) - 4
-                        - decorationOverflow) / CGFloat(visible.count)
-                )
+        guard !visible.isEmpty else { return [] }
+        if !edge.isHorizontal {
+            return makeSideEdgeStack(
+                visible: visible,
+                latestMessageID: ordered.last?.messageID,
+                tangentPosition: tangentPosition,
+                tangentLength: tangentLength,
+                edge: edge,
+                inwardNormalLength: inwardNormalLength
             )
-        } else {
-            nil
         }
         var nextBodyMinY: CGFloat = 52
         var reversedEntries: [PixelBubbleStackEntry] = []
@@ -184,7 +178,7 @@ enum PixelBubbleStackLayout {
             let isLatest = bubble.messageID == ordered.last?.messageID
             let decorationLeadingOverflow = PixelBubbleTheme.resolve(bubble.bubbleStyleID)
                 .decorationAssetName == nil ? 0 : PixelBubbleStyle.decorationLeadingOverflow
-            var layout = PixelBubbleLayout.make(
+            let layout = PixelBubbleLayout.make(
                 text: bubble.body,
                 isTyping: false,
                 tangentPosition: tangentPosition,
@@ -193,34 +187,107 @@ enum PixelBubbleStackLayout {
                 bodyMinY: nextBodyMinY,
                 includesTail: isLatest,
                 leadingDecorationOverflow: decorationLeadingOverflow,
-                maximumContentWidth: maximumContentWidth
+                maximumContentWidth: nil
             )
-            if !edge.isHorizontal, !reversedEntries.isEmpty {
-                let leadingVisualOverflow = max(0, layout.bodyFrame.minY - layout.totalFrame.minY)
-                if leadingVisualOverflow > 0 {
-                    layout = PixelBubbleLayout.make(
-                        text: bubble.body,
-                        isTyping: false,
-                        tangentPosition: tangentPosition,
-                        tangentLength: tangentLength,
-                        edge: edge,
-                        bodyMinY: nextBodyMinY + leadingVisualOverflow,
-                        includesTail: isLatest,
-                        leadingDecorationOverflow: decorationLeadingOverflow,
-                        maximumContentWidth: maximumContentWidth
-                    )
-                }
-            }
             reversedEntries.append(PixelBubbleStackEntry(
                 bubble: bubble,
                 layout: layout,
                 includesTail: isLatest
             ))
-            nextBodyMinY = (edge.isHorizontal ? layout.bodyFrame.maxY : layout.totalFrame.maxY)
-                + bodySpacing
+            nextBodyMinY = layout.bodyFrame.maxY + bodySpacing
         }
 
         return Array(reversedEntries.reversed())
+    }
+
+    private static func makeSideEdgeStack(
+        visible: [ActiveBubble],
+        latestMessageID: UUID?,
+        tangentPosition: CGFloat,
+        tangentLength: CGFloat,
+        edge: OverlayEdge,
+        inwardNormalLength: CGFloat?
+    ) -> [PixelBubbleStackEntry] {
+        struct MeasuredBubble {
+            let bubble: ActiveBubble
+            let includesTail: Bool
+            let decorationLeadingOverflow: CGFloat
+            let maximumContentWidth: CGFloat?
+            let tangentOffsets: ClosedRange<CGFloat>
+            let centerOffset: CGFloat
+        }
+
+        var previousUpperBound: CGFloat?
+        var measuredNewestFirst: [MeasuredBubble] = []
+        for bubble in visible.reversed() {
+            let includesTail = bubble.messageID == latestMessageID
+            let decorationLeadingOverflow = PixelBubbleTheme.resolve(bubble.bubbleStyleID)
+                .decorationAssetName == nil ? 0 : PixelBubbleStyle.decorationLeadingOverflow
+            let maximumContentWidth = inwardNormalLength.map {
+                max(
+                    24,
+                    min(
+                        220,
+                        $0 - 56 - (edge == .right ? decorationLeadingOverflow : 0)
+                    )
+                )
+            }
+            let probe = PixelBubbleLayout.make(
+                text: bubble.body,
+                isTyping: false,
+                tangentPosition: tangentLength / 2,
+                tangentLength: tangentLength,
+                edge: edge,
+                includesTail: includesTail,
+                leadingDecorationOverflow: decorationLeadingOverflow,
+                maximumContentWidth: maximumContentWidth
+            )
+            let tangentOffsets = probe.visualTangentOffsets(edge: edge)
+            let centerOffset = previousUpperBound.map {
+                $0 + bodySpacing - tangentOffsets.lowerBound
+            } ?? 0
+            previousUpperBound = centerOffset + tangentOffsets.upperBound
+            measuredNewestFirst.append(MeasuredBubble(
+                bubble: bubble,
+                includesTail: includesTail,
+                decorationLeadingOverflow: decorationLeadingOverflow,
+                maximumContentWidth: maximumContentWidth,
+                tangentOffsets: tangentOffsets,
+                centerOffset: centerOffset
+            ))
+        }
+
+        let groupLowerBound = measuredNewestFirst.map {
+            $0.centerOffset + $0.tangentOffsets.lowerBound
+        }.min() ?? 0
+        let groupUpperBound = measuredNewestFirst.map {
+            $0.centerOffset + $0.tangentOffsets.upperBound
+        }.max() ?? 0
+        let minimumAnchor = 4 - groupLowerBound
+        let maximumAnchor = tangentLength - 4 - groupUpperBound
+        let anchor = min(
+            max(tangentPosition, minimumAnchor),
+            max(minimumAnchor, maximumAnchor)
+        )
+
+        let newestFirst = measuredNewestFirst.map { measured in
+            PixelBubbleStackEntry(
+                bubble: measured.bubble,
+                layout: PixelBubbleLayout.make(
+                    text: measured.bubble.body,
+                    isTyping: false,
+                    tangentPosition: tangentPosition,
+                    tangentLength: tangentLength,
+                    edge: edge,
+                    preferredTangentPosition: anchor + measured.centerOffset,
+                    includesTail: measured.includesTail,
+                    leadingDecorationOverflow: measured.decorationLeadingOverflow,
+                    maximumContentWidth: measured.maximumContentWidth
+                ),
+                includesTail: measured.includesTail
+            )
+        }
+        return Array(newestFirst.reversed())
     }
 
     static func bodyTangentRange(
