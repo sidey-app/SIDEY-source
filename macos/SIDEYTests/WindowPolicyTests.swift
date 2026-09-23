@@ -408,30 +408,72 @@ final class WindowPolicyTests: XCTestCase {
         group.setVisible(true)
 
         group.handleCharacterClick(clickCount: 1)
+        XCTAssertTrue(group.composerVisible, "The first click responds immediately")
         group.handleCharacterClick(clickCount: 2)
 
         XCTAssertEqual(pulseRequests, 1)
         XCTAssertFalse(group.composerVisible)
         group.presentComposer()
         group.handleCharacterClick(clickCount: 1)
+        XCTAssertFalse(group.composerVisible, "The first click responds immediately")
         group.handleCharacterClick(clickCount: 2)
         XCTAssertEqual(pulseRequests, 2)
         XCTAssertTrue(group.composerVisible)
         group.setVisible(false)
     }
 
-    func testExplicitComposerDismissCancelsPendingCharacterClick() async throws {
+    func testCharacterSingleClickTogglesComposerImmediately() {
         let model = AppModel(preferences: .defaults)
         let roomID = UUID()
         model.rooms = [Room(id: roomID, name: "테스트", ownerID: UUID(), members: [], inviteCodeHint: "TEST")]
         model.preferences.activeRoomID = roomID
         let group = OverlayWindowGroup(model: model)
         group.setVisible(true)
+
+        group.handleCharacterClick(clickCount: 1)
+        XCTAssertTrue(group.composerVisible)
+        group.handleCharacterClick(clickCount: 1)
+        XCTAssertFalse(group.composerVisible)
+        group.setVisible(false)
+    }
+
+    func testExplicitComposerDismissPreventsStaleDoubleClickRestore() {
+        let model = AppModel(preferences: .defaults)
+        let roomID = UUID()
+        model.rooms = [Room(id: roomID, name: "테스트", ownerID: UUID(), members: [], inviteCodeHint: "TEST")]
+        model.preferences.activeRoomID = roomID
+        var pulseRequests = 0
+        let group = OverlayWindowGroup(
+            model: model,
+            onCharacterDoubleClick: { pulseRequests += 1 }
+        )
+        group.setVisible(true)
+
         group.handleCharacterClick(clickCount: 1)
         group.dismissComposer()
-        // Wait beyond the system click classification window, not an arbitrary UI delay.
-        try await Task.sleep(for: .seconds(NSEvent.doubleClickInterval + 0.1))
+        group.handleCharacterClick(clickCount: 2)
+
         XCTAssertFalse(group.composerVisible)
+        XCTAssertEqual(pulseRequests, 1)
+        group.setVisible(false)
+    }
+
+    func testStandaloneCharacterDoubleClickDoesNotChangeComposerVisibility() {
+        let model = AppModel(preferences: .defaults)
+        let roomID = UUID()
+        model.rooms = [Room(id: roomID, name: "테스트", ownerID: UUID(), members: [], inviteCodeHint: "TEST")]
+        model.preferences.activeRoomID = roomID
+        var pulseRequests = 0
+        let group = OverlayWindowGroup(
+            model: model,
+            onCharacterDoubleClick: { pulseRequests += 1 }
+        )
+        group.setVisible(true)
+
+        group.handleCharacterClick(clickCount: 2)
+
+        XCTAssertFalse(group.composerVisible)
+        XCTAssertEqual(pulseRequests, 1)
         group.setVisible(false)
     }
 

@@ -50,6 +50,58 @@ final class KeychainStoreTests: XCTestCase {
         XCTAssertEqual(security.copyCallCount, 1)
     }
 
+    func testFreshReadReloadsValueChangedOutsideTheAccessSession() throws {
+        let security = FakeKeychainSecurity()
+        let session = KeychainAccessSession(security: security)
+        let store = KeychainStore(service: "fresh-read-test", session: session)
+
+        XCTAssertNil(try store.readString(account: "refresh-token"))
+        security.replaceExternally(
+            account: "refresh-token",
+            value: Data("new-token".utf8)
+        )
+        XCTAssertNil(try store.readString(account: "refresh-token"))
+
+        XCTAssertEqual(
+            try store.readFreshString(account: "refresh-token"),
+            "new-token"
+        )
+        XCTAssertEqual(security.copyCallCount, 2)
+    }
+
+    func testSessionRestorerUsesFreshTokenWhenCurrentSessionIsMissing() async throws {
+        let restorer = AuthSessionRestorer(
+            loadCurrentSession: { () async throws -> String in
+                throw SessionRestorerTestError.missing
+            },
+            isSessionMissing: { ($0 as? SessionRestorerTestError) == .missing },
+            loadFreshRefreshToken: { "rotated-refresh-token" },
+            refreshSession: { "restored:\($0)" }
+        )
+
+        let session = try await restorer.session()
+
+        XCTAssertEqual(session, "restored:rotated-refresh-token")
+    }
+
+    func testSessionRestorerDoesNotHideNonSessionFailure() async {
+        let restorer = AuthSessionRestorer(
+            loadCurrentSession: { () async throws -> String in
+                throw SessionRestorerTestError.network
+            },
+            isSessionMissing: { ($0 as? SessionRestorerTestError) == .missing },
+            loadFreshRefreshToken: { "unused" },
+            refreshSession: { _ in "unused" }
+        )
+
+        do {
+            _ = try await restorer.session()
+            XCTFail("원래 오류를 전달해야 함")
+        } catch {
+            XCTAssertEqual(error as? SessionRestorerTestError, .network)
+        }
+    }
+
     func testWritingIdenticalCachedDataSkipsSecurityCall() throws {
         let data = Data("same-session".utf8)
         let security = FakeKeychainSecurity(values: ["session": data])
@@ -193,6 +245,12 @@ private final class FakeKeychainSecurity: KeychainSecurityPerforming, @unchecked
     var addCallCount: Int { locked { addCalls } }
     var authenticationContextIDs: [ObjectIdentifier] { locked { contextIDs } }
 
+    func replaceExternally(account: String, value: Data) {
+        lock.lock()
+        values[account] = value
+        lock.unlock()
+    }
+
     func copyMatching(_ query: CFDictionary) -> (status: OSStatus, data: Data?) {
         lock.lock()
         defer { lock.unlock() }
@@ -257,4 +315,9 @@ private final class FakeKeychainSecurity: KeychainSecurityPerforming, @unchecked
         defer { lock.unlock() }
         return operation()
     }
+}
+
+private enum SessionRestorerTestError: Error, Equatable {
+    case missing
+    case network
 }

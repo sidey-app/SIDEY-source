@@ -2,9 +2,14 @@ import AppKit
 
 extension AppCoordinator {
     func startBackend() {
-        if let configurationError {
-            model.connectionState = .failed(configurationError.localizedDescription)
-            model.errorMessage = configurationError.localizedDescription
+        // Static configuration failures cannot recover in-process. A previous
+        // transport factory failure can: Keychain access, rollout selection,
+        // and Firebase bootstrap are all retried after authentication or an
+        // explicit reconnect, so never let the diagnostic from the last
+        // attempt permanently short-circuit this one.
+        if let startupError = configurationError {
+            model.connectionState = .failed(startupError.localizedDescription)
+            model.errorMessage = startupError.localizedDescription
             backendBootstrapState = .failed
             applyRequestedOverlayVisibility()
             refreshStatusItem()
@@ -12,7 +17,7 @@ extension AppCoordinator {
             advanceFirstRunTransition()
             return
         }
-        guard let backend else {
+        guard let backend, let runtimeConfiguration else {
             backendBootstrapState = .failed
             applyRequestedOverlayVisibility()
             refreshStatusItem()
@@ -25,7 +30,6 @@ extension AppCoordinator {
         backendConnectionStatus = nil
         model.setActiveRoomRealtimeConnected(false)
         model.connectionState = .connecting
-        startBackendEventHandling(backend.events)
         roomSession.bootstrapTask?.cancel()
         roomSession.bootstrapTask = Task { [weak self] in
             guard let self else { return }
@@ -33,12 +37,36 @@ extension AppCoordinator {
                 let snapshot = try await backend.boot(requireExistingSession: requireExistingSession)
                 let userID = await backend.currentUserID()
                 guard !Task.isCancelled else { return }
+                let messagingTransport: RoomMessagingTransportRouter
+                if let existing = self.messagingTransport {
+                    messagingTransport = existing
+                } else {
+                    do {
+                        let runtime = try await FirebaseV2ProductionFactory.makeRouter(
+                            backend: backend,
+                            configuration: runtimeConfiguration,
+                            keychain: KeychainStore(
+                                service: releaseChannel.keychainService,
+                                session: keychainAccessSession
+                            )
+                        )
+                        messagingTransport = runtime.router
+                        self.messagingTransport = messagingTransport
+                        realtimeRolloutMonitor = runtime.rolloutMonitor
+                        realtimeRolloutRefreshInterval = runtime.initialRefreshInterval
+                        realtimeTransportInitializationError = nil
+                    } catch {
+                        realtimeTransportInitializationError = error
+                        throw error
+                    }
+                }
+                startBackendEventHandling(messagingTransport.events)
                 applyBackendSnapshot(snapshot, currentUserID: userID)
                 if releaseChannel.requiresAppleAuthentication, userID != nil {
                     await configureAppStoreCommerce(backend: backend)
                 }
                 refreshCommerceState()
-                let reconciliation = try await backend.syncRealtime(
+                let reconciliation = try await messagingTransport.synchronize(
                     rooms: snapshot.rooms,
                     activeRoomID: model.activeRoom?.id
                 )
@@ -48,6 +76,7 @@ extension AppCoordinator {
                 model.errorMessage = nil
                 backendBootstrapState = .ready
                 model.preferences.keychainTransitionComplete = true
+                startRealtimeRolloutMonitoring()
                 applyRequestedOverlayVisibility()
                 overlayWindows.refreshThrowHotspots()
                 refreshStatusItem()
@@ -75,6 +104,99 @@ extension AppCoordinator {
                 refreshStatusItem()
                 if launchReason == .loginItem { showSettings() }
                 advanceFirstRunTransition()
+            }
+        }
+    }
+
+    func startRealtimeRolloutMonitoring() {
+        guard roomSession.rolloutTask == nil,
+              let monitor = realtimeRolloutMonitor,
+              let messagingTransport else { return }
+        roomSession.rolloutTask = Task { [weak self] in
+            guard let self else { return }
+            let clock = ContinuousClock()
+            var policyDeadline = clock.now.advanced(
+                by: min(max(realtimeRolloutRefreshInterval, .seconds(1)), .seconds(300))
+            )
+            var observedFirebaseLease = false
+            defer { roomSession.rolloutTask = nil }
+            while !Task.isCancelled {
+                do {
+                    let lease = try await messagingTransport.rolloutLeaseStatus()
+                    if lease != nil {
+                        observedFirebaseLease = true
+                    } else if observedFirebaseLease {
+                        return
+                    }
+                    let now = clock.now
+                    let policyDelay = max(.zero, now.duration(to: policyDeadline))
+                    let leaseDelay = lease?.refreshIn ?? policyDelay
+                    let wakeDelay = max(
+                        .milliseconds(1),
+                        min(policyDelay, leaseDelay)
+                    )
+                    try await Task.sleep(for: wakeDelay)
+
+                    let leaseDue = lease.map { $0.refreshIn <= .milliseconds(1) } ?? false
+                    let policyDue = clock.now >= policyDeadline
+                    guard leaseDue || policyDue else { continue }
+
+                    // Renewal authority is selector-first. Only an explicit
+                    // enabled decision can mint/install another Firebase lease.
+                    let renewal = try await RealtimeRolloutRenewal.perform(
+                        leaseDue: leaseDue,
+                        refreshPolicy: { try await monitor.refresh() },
+                        refreshLease: {
+                            try await messagingTransport.refreshRolloutLease()
+                        }
+                    )
+                    let decision = renewal.decision
+                    policyDeadline = clock.now.advanced(
+                        by: min(
+                            max(.seconds(decision.cacheTTLSeconds), .seconds(1)),
+                            .seconds(300)
+                        )
+                    )
+                    if decision.state == .legacy {
+                        stopAllTyping()
+                        _ = try await messagingTransport.switchToLegacy()
+                        model.connectionState = .online
+                        model.setActiveRoomRealtimeConnected(true)
+                        refreshStatusItem()
+                        return
+                    }
+                } catch is CancellationError {
+                    return
+                } catch {
+                    // A selector outage or malformed enabled response must not
+                    // authorize a downgrade. The active Firebase adapter stays
+                    // selected; server dispatch and Rules retain the hard stop.
+                    let activeTransport = (try? await messagingTransport.currentSelection())?.active
+                    if activeTransport != .firebaseV2 {
+                        model.connectionState = .failed(error.localizedDescription)
+                        model.setActiveRoomRealtimeConnected(false)
+                        model.errorMessage = "실시간 kill-switch 전환 실패: \(error.localizedDescription)"
+                        refreshStatusItem()
+                        return
+                    }
+                    if let bootstrapError = error as? FirebaseV2BootstrapClientError,
+                       case .server(.rolloutDisabled) = bootstrapError {
+                        await messagingTransport.failClosedForRolloutLease()
+                        model.connectionState = .failed(error.localizedDescription)
+                        model.setActiveRoomRealtimeConnected(false)
+                        model.errorMessage = error.localizedDescription
+                        refreshStatusItem()
+                        return
+                    }
+                    // Keep the last explicitly enabled Firebase lease selected,
+                    // retry briefly, and let its monotonic hard deadline close
+                    // every outbound plane if authority cannot be renewed.
+                    do {
+                        try await Task.sleep(for: .seconds(5))
+                    } catch {
+                        return
+                    }
+                }
             }
         }
     }
@@ -170,7 +292,7 @@ extension AppCoordinator {
     }
 
     func createRoom() {
-        guard let backend else { return }
+        guard let backend, let messagingTransport else { return }
         let roomName = model.newRoomName
         let characterID = PixelCharacterCatalog.canonicalID(for: model.selectedCharacterID)
         guard model.isCharacterSelectable(characterID) else {
@@ -182,18 +304,39 @@ extension AppCoordinator {
                 nickname: self.model.confirmedNickname ?? self.model.normalizedNicknameDraft,
                 characterID: characterID
             )
-            let created = try await backend.createRoom(name: roomName)
+            let mutation = try await RealtimeGrantAwareMutation.perform(
+                selection: try await messagingTransport.currentSelection(),
+                requiresEntitlement: false,
+                legacy: {
+                    try await backend.createRoom(name: roomName)
+                },
+                firebaseV2: {
+                    let grant = try await backend.createRoomV2(name: roomName)
+                    return (grant.room, grant.accessRevision)
+                },
+                converge: { revision, requiresEntitlement in
+                    try await messagingTransport.convergeAccessGrant(
+                        revision: revision,
+                        requiresEntitlement: requiresEntitlement
+                    )
+                }
+            )
+            let created = mutation.value
             self.model.lastCreatedInviteCode = created.inviteCode
             if !created.storedInKeychain {
                 self.model.errorMessage = "그룹은 생성됐지만 초대 코드를 키체인에 저장하지 못했습니다. 지금 표시된 코드를 따로 보관해 주세요."
             }
             self.model.newRoomName = ""
-            self.model.preferences.activeRoomID = created.roomID
+            if let grantError = mutation.grantError {
+                self.model.errorMessage = "그룹은 생성됐지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+            } else {
+                self.model.preferences.activeRoomID = created.roomID
+            }
         }
     }
 
     func joinRoom() {
-        guard let backend else { return }
+        guard let backend, let messagingTransport else { return }
         let inviteCode = model.inviteCode
         let characterID = PixelCharacterCatalog.canonicalID(for: model.selectedCharacterID)
         guard model.isCharacterSelectable(characterID) else {
@@ -205,12 +348,33 @@ extension AppCoordinator {
                 nickname: self.model.confirmedNickname ?? self.model.normalizedNicknameDraft,
                 characterID: characterID
             )
-            let joined = try await backend.joinRoom(inviteCode: inviteCode)
+            let mutation = try await RealtimeGrantAwareMutation.perform(
+                selection: try await messagingTransport.currentSelection(),
+                requiresEntitlement: false,
+                legacy: {
+                    try await backend.joinRoom(inviteCode: inviteCode)
+                },
+                firebaseV2: {
+                    let grant = try await backend.joinRoomV2(inviteCode: inviteCode)
+                    return (grant.room, grant.accessRevision)
+                },
+                converge: { revision, requiresEntitlement in
+                    try await messagingTransport.convergeAccessGrant(
+                        revision: revision,
+                        requiresEntitlement: requiresEntitlement
+                    )
+                }
+            )
+            let joined = mutation.value
             if !joined.storedInKeychain {
                 self.model.errorMessage = "그룹에는 참여했지만 초대 코드를 키체인에 저장하지 못했습니다. 받은 코드를 따로 보관해 주세요."
             }
             self.model.inviteCode = ""
-            self.model.preferences.activeRoomID = joined.roomID
+            if let grantError = mutation.grantError {
+                self.model.errorMessage = "그룹에는 참여했지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+            } else {
+                self.model.preferences.activeRoomID = joined.roomID
+            }
         }
     }
 
@@ -303,13 +467,18 @@ extension AppCoordinator {
     }
 
     func sendMessage(_ body: String, source: MessageInputSource = .overlay) {
-        guard let backend else {
+        guard let messagingTransport else {
             stopAllTyping()
             rejectMessage(body, source: source, message: SideyBackendError.noActiveRoom.localizedDescription)
             return
         }
+        guard model.activeRoomRealtimeAvailable else {
+            stopAllTyping()
+            rejectMessage(body, source: source, message: "실시간 연결이 끊겨 메시지를 전송할 수 없습니다.")
+            return
+        }
         sendMessage(body, source: source) { roomID, body, messageID in
-            try await backend.sendMessage(roomID: roomID, body: body, id: messageID)
+            await messagingTransport.sendChat(roomID: roomID, body: body, id: messageID)
         }
     }
 
@@ -317,6 +486,22 @@ extension AppCoordinator {
         _ body: String,
         source: MessageInputSource,
         send: @escaping (UUID, String, UUID) async throws -> ChatMessage
+    ) {
+        sendMessage(body, source: source) { roomID, body, messageID in
+            do {
+                return .confirmed(try await send(roomID, body, messageID))
+            } catch {
+                // Test seams and the legacy path keep their existing terminal
+                // failure behavior. Firebase v2 returns a classified outcome.
+                return .definitelyRejected(message: error.localizedDescription)
+            }
+        }
+    }
+
+    func sendMessage(
+        _ body: String,
+        source: MessageInputSource,
+        send: @escaping (UUID, String, UUID) async -> RealtimeChatOutcome
     ) {
         stopAllTyping()
         // Guard again at the transport boundary: callers must not send to the
@@ -346,15 +531,15 @@ extension AppCoordinator {
         if revealMessage { scheduleBubbleExpiry() }
         Task { [weak self] in
             guard let self else { return }
-            do {
-                let message = try await send(roomID, body, messageID)
+            switch await send(roomID, body, messageID) {
+            case .confirmed(let message):
                 let revealConfirmation = revealMessage && !model.preferences.quietModeEnabled
                     && model.activeRoom?.id == roomID
                 model.confirmMessage(message, revealBubble: revealConfirmation)
                 if revealConfirmation { scheduleBubbleExpiry() }
                 model.errorMessage = nil
-            } catch {
-                let errorMessage = "전송 실패: \(error.localizedDescription)"
+            case .definitelyRejected(let message):
+                let errorMessage = "전송 실패: \(message)"
                 model.errorMessage = errorMessage
                 _ = model.failMessage(id: messageID, roomID: roomID)
                 if source == .history {
@@ -362,6 +547,11 @@ extension AppCoordinator {
                 } else if model.activeRoom?.id == roomID, model.groupOperation == .idle {
                     overlayWindows.presentComposer()
                 }
+            case .reconciliationPending:
+                // The request may already be committed. Preserve this exact
+                // UUID as pending so a later authoritative snapshot/event can
+                // confirm it. Retrying here could create duplicate messages.
+                break
             }
         }
     }
@@ -381,7 +571,11 @@ extension AppCoordinator {
         groupOperation: GroupOperation? = nil,
         _ operation: @escaping @MainActor () async throws -> Void
     ) {
-        guard let backend, !model.isWorking, model.groupOperation == .idle else { return }
+        guard let backend,
+              let messagingTransport,
+              !model.isWorking,
+              model.groupOperation == .idle
+        else { return }
         model.isWorking = true
         if let groupOperation { model.groupOperation = groupOperation }
         model.errorMessage = nil
@@ -408,7 +602,7 @@ extension AppCoordinator {
 
                 var realtimeWarning: String?
                 do {
-                    let reconciliation = try await backend.syncRealtime(
+                    let reconciliation = try await messagingTransport.synchronize(
                         rooms: snapshot.rooms,
                         activeRoomID: model.resolvedActiveRoomID(in: snapshot.rooms)
                     )
@@ -558,9 +752,9 @@ extension AppCoordinator {
 
     func localPresenceChanged(_ state: PresenceState) {
         model.presence = state
-        guard let backend else { return }
+        guard let messagingTransport else { return }
         Task {
-            do { try await backend.setLocalPresence(state) }
+            do { try await messagingTransport.setLocalPresence(state) }
             catch { model.connectionState = .failed(error.localizedDescription) }
         }
     }
@@ -581,7 +775,8 @@ extension AppCoordinator {
 
     func characterDoubleClicked() {
         if let id = model.currentUserID, model.characterStunState.isStunned(id) { return }
-        guard let room = model.activeRoom,
+        guard model.activeRoomRealtimeAvailable,
+              let room = model.activeRoom,
               let userID = model.currentUserID,
               room.members.contains(where: { $0.userID == userID }),
               roomSession.pulseCooldown.accept(
@@ -593,8 +788,13 @@ extension AppCoordinator {
 
         let event = CharacterPulseEvent(id: UUID(), roomID: room.id, userID: userID)
         overlayWindows.playCharacterPulse(event)
-        guard let backend else { return }
-        Task { try? await backend.broadcastCharacterPulse(roomID: room.id, eventID: event.id) }
+        guard let messagingTransport else { return }
+        Task {
+            try? await messagingTransport.publishCharacterPulse(
+                roomID: room.id,
+                eventID: event.id
+            )
+        }
     }
 
     func characterThrowRequested(targetUserID: UUID) {
@@ -622,9 +822,9 @@ extension AppCoordinator {
             throwableID: model.equippedThrowableID
         )
         overlayWindows.playCharacterThrow(event)
-        guard let backend else { return }
+        guard let messagingTransport else { return }
         Task {
-            try? await backend.broadcastCharacterThrow(
+            try? await messagingTransport.publishCharacterThrow(
                 roomID: room.id,
                 eventID: event.id,
                 targetUserID: targetUserID

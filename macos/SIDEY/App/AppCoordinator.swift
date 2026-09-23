@@ -11,7 +11,7 @@ final class AppCoordinator {
             now: { ProcessInfo.processInfo.systemUptime },
             automaticallySchedule: true,
             publish: { [weak self] roomID, event in
-                try await self?.backend?.broadcastTyping(roomID: roomID, event: event)
+                try await self?.messagingTransport?.publishTyping(roomID: roomID, event: event)
             },
             localTyping: { [weak self] roomID, active in
                 guard let self, let userID = model.currentUserID else { return }
@@ -24,8 +24,12 @@ final class AppCoordinator {
     private let legacyMigrator: LegacySettingsMigrator
     let releaseChannel: AppReleaseChannel
     var backend: SideyBackend?
-    private let runtimeConfiguration: RuntimeConfiguration?
+    var messagingTransport: RoomMessagingTransportRouter?
+    var realtimeRolloutMonitor: RealtimeRolloutMonitor?
+    var realtimeRolloutRefreshInterval: Duration = .seconds(300)
+    let runtimeConfiguration: RuntimeConfiguration?
     let configurationError: Error?
+    var realtimeTransportInitializationError: Error?
     let keychainAccessSession: KeychainAccessSession
     let launchReason: LaunchReason
     private let onLandingFirstFrame: () -> Void
@@ -169,17 +173,20 @@ final class AppCoordinator {
         self.roomSession.switchPipeline = RoomSwitchPipeline(
             debounce: .milliseconds(150),
             performSwitch: { [weak self] roomID in
-                guard let self, let backend = self.backend else {
+                guard let self,
+                      let backend = self.backend,
+                      let messagingTransport = self.messagingTransport
+                else {
                     throw SideyBackendError.realtimeUnavailable
                 }
-                try await backend.setActiveRoom(roomID)
+                try await messagingTransport.setActiveRoom(roomID)
                 return try await backend.recentMessages(roomID: roomID)
             },
             restoreCommittedRoom: { [weak self] in
-                guard let self, let backend = self.backend else {
+                guard let self, let messagingTransport = self.messagingTransport else {
                     throw SideyBackendError.realtimeUnavailable
                 }
-                try await backend.setActiveRoom(self.model.activeRoom?.id)
+                try await messagingTransport.setActiveRoom(self.model.activeRoom?.id)
             },
             operationChanged: { [weak self] operation in
                 self?.model.groupOperation = operation
@@ -205,13 +212,19 @@ final class AppCoordinator {
             return
         }
         if let runtimeConfiguration {
-            backend = SideyBackend(
+            let backend = SideyBackend(
                 configuration: runtimeConfiguration,
                 keychain: KeychainStore(
                     service: releaseChannel.keychainService,
                     session: keychainAccessSession
                 )
             )
+            self.backend = backend
+            // The authenticated remote rollout policy owns transport selection.
+            // Construction therefore happens after `backend.boot` restores and
+            // validates the exact Supabase account/session.
+            messagingTransport = nil
+            realtimeTransportInitializationError = nil
         }
 
         mainThreadProbe.start()
@@ -266,9 +279,14 @@ final class AppCoordinator {
         mainThreadProbe.stop()
         let typingActivity = typingActivity
         let backend = backend
+        let messagingTransport = messagingTransport
         shutdownTask = Task {
             await typingActivity.shutdown()
-            await backend?.shutdown()
+            if let messagingTransport {
+                await messagingTransport.shutdown()
+            } else {
+                await backend?.shutdown()
+            }
         }
         keychainAccessSession.setAccessDeniedHandler(nil)
         persistPreferences()

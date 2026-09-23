@@ -8,7 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		100000000000000000000046 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 100000000000000000000041 /* Supabase */; };
-		200000000000000000000002 /* SideyBuildStamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000003; };
+		200000000000000000000002 /* SideyBuildStamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000003 /* SideyBuildStamp.swift */; };
+		CA6B9384FC22E134AA45C719 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E5FD99A58CC98A7166AF8BE6 /* FirebaseAuth */; };
+		CDF37C452A6B8DD9692DD6EC /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 34D45AC18B6389EC158F8F18 /* FirebaseFunctions */; };
+		F13270AA327A39F45A2EDAFB /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = D775CDBC0B5561A8A4304378 /* FirebaseCore */; };
+		FE52721319329C58C8FDDD47 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = B5D4134B16B27119853BCE3C /* FirebaseDatabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -21,16 +25,11 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		100000000000000000000047 /* SIDEY.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIDEY.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		200000000000000000000003 /* SideyBuildStamp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideyBuildStamp.swift; sourceTree = DERIVED_FILE_DIR; };
 		300000000000000000000004 /* SIDEYTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIDEYTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
-
-
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		100000000000000000000005 /* SIDEY */ = {
@@ -51,6 +50,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				100000000000000000000046 /* Supabase in Frameworks */,
+				F13270AA327A39F45A2EDAFB /* FirebaseCore in Frameworks */,
+				CA6B9384FC22E134AA45C719 /* FirebaseAuth in Frameworks */,
+				FE52721319329C58C8FDDD47 /* FirebaseDatabase in Frameworks */,
+				CDF37C452A6B8DD9692DD6EC /* FirebaseFunctions in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,13 +109,16 @@
 			name = SIDEY;
 			packageProductDependencies = (
 				100000000000000000000041 /* Supabase */,
+				D775CDBC0B5561A8A4304378 /* FirebaseCore */,
+				E5FD99A58CC98A7166AF8BE6 /* FirebaseAuth */,
+				B5D4134B16B27119853BCE3C /* FirebaseDatabase */,
+				34D45AC18B6389EC158F8F18 /* FirebaseFunctions */,
 			);
 			productName = SIDEY;
 			productReference = 100000000000000000000047 /* SIDEY.app */;
 			productType = "com.apple.product-type.application";
 		};
 		300000000000000000000023 /* SIDEYTests */ = {
-			fileSystemSynchronizedGroups = (100000000000000000000006 /* SIDEYTests */, );
 			isa = PBXNativeTarget;
 			buildConfigurationList = 300000000000000000000033 /* Build configuration list for PBXNativeTarget "SIDEYTests" */;
 			buildPhases = (
@@ -124,6 +130,9 @@
 			);
 			dependencies = (
 				300000000000000000000026 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				100000000000000000000006 /* SIDEYTests */,
 			);
 			name = SIDEYTests;
 			productName = SIDEYTests;
@@ -140,12 +149,12 @@
 				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
+					100000000000000000000049 = {
+						CreatedOnToolsVersion = 26.5;
+					};
 					300000000000000000000023 = {
 						CreatedOnToolsVersion = 26.5;
 						TestTargetID = 100000000000000000000049;
-					};
-					100000000000000000000049 = {
-						CreatedOnToolsVersion = 26.5;
 					};
 				};
 			};
@@ -161,6 +170,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				100000000000000000000040 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				1E77ABE95BC3E63691E0B042 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 10000000000000000000000A /* Products */;
@@ -195,10 +205,14 @@
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
-			files = ();
-			inputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)",);
+			files = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)",
+			);
 			name = "Remove App Store resource quarantine";
-			outputPaths = ();
+			outputPaths = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -eu\nSIDEY_RESOURCES=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n/usr/bin/xattr -dr com.apple.quarantine \"$SIDEY_RESOURCES\"\n";
@@ -207,10 +221,15 @@
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
-			files = ();
-			inputPaths = ();
+			files = (
+			);
+			inputPaths = (
+			);
 			name = "Record build inputs";
-			outputPaths = ("$(DERIVED_FILE_DIR)/SideyBuildStamp.swift","$(DERIVED_FILE_DIR)/SideyBuildReceipt.json",);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/SideyBuildStamp.swift",
+				"$(DERIVED_FILE_DIR)/SideyBuildReceipt.json",
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -eu\n/usr/bin/python3 \"$SRCROOT/../scripts/macos/build_provenance.py\" begin\n";
@@ -219,10 +238,14 @@
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
-			files = ();
-			inputPaths = ();
+			files = (
+			);
+			inputPaths = (
+			);
 			name = "Verify build inputs";
-			outputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/SideyBuildReceipt.json",);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/SideyBuildReceipt.json",
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -eu\n/usr/bin/python3 \"$SRCROOT/../scripts/macos/build_provenance.py\" finish\n";
@@ -290,7 +313,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 5T933W86GZ;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -303,9 +326,12 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.3.0;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.sidey.desktop.appstore;
-				PRODUCT_NAME = SIDEY;
 				PRODUCT_MODULE_NAME = SIDEY;
+				PRODUCT_NAME = SIDEY;
 				SIDEY_APP_STORE_VERIFIER_URL = "https://sidey-app-store-verifier-sandbox-802687666602.asia-northeast3.run.app";
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE DEBUG $(inherited)";
@@ -324,7 +350,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 5T933W86GZ;
 				ENABLE_APP_SANDBOX = YES;
@@ -337,9 +363,12 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.3.0;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.sidey.desktop.appstore;
-				PRODUCT_NAME = SIDEY;
 				PRODUCT_MODULE_NAME = SIDEY;
+				PRODUCT_NAME = SIDEY;
 				SIDEY_APP_STORE_VERIFIER_URL = "https://sidey-app-store-verifier-production-eu3layugaq-du.a.run.app";
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE $(inherited)";
@@ -354,6 +383,7 @@
 			buildSettings = {
 				ARCHS = arm64;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Config/SIDEYTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
@@ -363,11 +393,10 @@
 				SIDEY_SUPABASE_PUBLISHABLE_KEY = "";
 				SIDEY_SUPABASE_URL = "";
 				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE $(inherited)";
-				CODE_SIGN_IDENTITY = "-";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SIDEY.app/Contents/MacOS/SIDEY";
 			};
 			name = Debug;
@@ -377,6 +406,7 @@
 			buildSettings = {
 				ARCHS = arm64;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Config/SIDEYTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
@@ -386,10 +416,9 @@
 				SIDEY_SUPABASE_PUBLISHABLE_KEY = "";
 				SIDEY_SUPABASE_URL = "";
 				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE $(inherited)";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE $(inherited)";
-				CODE_SIGN_IDENTITY = "-";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SIDEY.app/Contents/MacOS/SIDEY";
 			};
 			name = Release;
@@ -435,6 +464,14 @@
 				version = 2.55.1;
 			};
 		};
+		1E77ABE95BC3E63691E0B042 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.19.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -442,6 +479,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 100000000000000000000040 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
+		};
+		34D45AC18B6389EC158F8F18 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E77ABE95BC3E63691E0B042 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
+		B5D4134B16B27119853BCE3C /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E77ABE95BC3E63691E0B042 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		D775CDBC0B5561A8A4304378 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E77ABE95BC3E63691E0B042 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		E5FD99A58CC98A7166AF8BE6 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E77ABE95BC3E63691E0B042 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
