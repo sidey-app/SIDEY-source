@@ -88,12 +88,16 @@ struct SettingsRootView: View {
     private var settingsNavigation: some View {
         NavigationSplitView {
             List(SettingsPage.allCases, selection: $model.activeSettingsPage) { page in
-                Label(page.title, systemImage: page.systemImage)
+                Label {
+                    Text(page.localizedTitle)
+                } icon: {
+                    Image(systemName: page.systemImage)
+                }
                     .tag(page)
                     .font(.body.weight(.medium))
                     .padding(.vertical, 8)
             }
-            .navigationTitle("SIDEY")
+            .navigationTitle(Text(verbatim: "SIDEY"))
             .navigationSplitViewColumnWidth(min: 210, ideal: 240, max: 280)
             .safeAreaInset(edge: .bottom) {
                 ConnectionBadge(state: model.connectionState)
@@ -155,5 +159,16 @@ struct SettingsRootView: View {
         .navigationSplitViewStyle(.balanced)
         .background(.background)
         .animation(.snappy, value: model.errorMessage)
+    }
+}
+
+private extension SettingsPage {
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .profile: "settings.navigation.profile"
+        case .groups: "settings.navigation.groups"
+        case .store: "settings.navigation.store"
+        case .app: "settings.navigation.app"
+        }
     }
 }

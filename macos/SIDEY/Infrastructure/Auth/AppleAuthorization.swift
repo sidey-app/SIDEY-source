@@ -61,9 +61,10 @@ enum AppleAuthorizationError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingIdentityToken: "Apple 로그인 응답에 identity token이 없습니다."
-        case .missingRequestNonce: "Apple 로그인 응답에 요청 nonce가 없습니다."
-        case .missingAuthorizationCode: "계정 탈퇴에는 새로운 Apple 인증 코드가 필요합니다."
+        case .missingIdentityToken: L10n.text("apple_auth.error.missing_identity_token")
+        case .missingRequestNonce: L10n.text("apple_auth.error.missing_request_nonce")
+        case .missingAuthorizationCode:
+            L10n.text("apple_auth.error.missing_authorization_code")
         }
     }
 }

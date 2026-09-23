@@ -27,10 +27,10 @@ enum OverlayEdge: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .bottom: "하단"
-        case .left: "좌측"
-        case .right: "우측"
-        case .top: "상단"
+        case .bottom: L10n.text("overlay.edge.bottom")
+        case .left: L10n.text("overlay.edge.left")
+        case .right: L10n.text("overlay.edge.right")
+        case .top: L10n.text("overlay.edge.top")
         }
     }
 
@@ -75,7 +75,7 @@ enum OverlaySpan: String, Codable, CaseIterable, Identifiable, Sendable {
         switch self {
         case .third: "1/3"
         case .half: "1/2"
-        case .full: "전체"
+        case .full: L10n.text("overlay.span.full")
         }
     }
 

@@ -51,7 +51,9 @@ extension AppCoordinator {
             } catch {
                 guard !Task.isCancelled, model.currentUserID == request.userID,
                       model.treeMovement.finish(request) else { return }
-                if !migrating { model.errorMessage = "나무 움직임을 저장하지 못했습니다. 다시 시도해 주세요." }
+                if !migrating {
+                    model.errorMessage = L10n.text("tree_movement.error.save_failed")
+                }
             }
         }
     }

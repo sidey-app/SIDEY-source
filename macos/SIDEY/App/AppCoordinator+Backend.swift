@@ -96,8 +96,9 @@ extension AppCoordinator {
                     advanceFirstRunTransition()
                     return
                 }
-                model.connectionState = .failed(error.localizedDescription)
-                model.errorMessage = "서버 연결 실패: \(error.localizedDescription)"
+                let message = error.localizedDescription
+                model.connectionState = .failed(message)
+                model.errorMessage = L10n.format("backend.connect.failed_detail", message)
                 backendBootstrapState = .failed
                 applyRequestedOverlayVisibility()
                 overlayWindows.refreshThrowHotspots()
@@ -175,7 +176,10 @@ extension AppCoordinator {
                     if activeTransport != .firebaseV2 {
                         model.connectionState = .failed(error.localizedDescription)
                         model.setActiveRoomRealtimeConnected(false)
-                        model.errorMessage = "실시간 kill-switch 전환 실패: \(error.localizedDescription)"
+                        model.errorMessage = L10n.format(
+                            "realtime.kill_switch.transition_failed",
+                            error.localizedDescription
+                        )
                         refreshStatusItem()
                         return
                     }
@@ -222,7 +226,7 @@ extension AppCoordinator {
         guard ProfileValidator.isValidNickname(model.nickname) else { return }
         let characterID = PixelCharacterCatalog.canonicalID(for: model.selectedCharacterID)
         guard model.isCharacterSelectable(characterID) else {
-            model.errorMessage = "보유한 캐릭터만 프로필에 선택할 수 있습니다."
+            model.errorMessage = L10n.text("profile.error.character_not_owned")
             model.selectedCharacterID = PixelCharacterCatalog.pixelHamsterID
             return
         }
@@ -239,12 +243,14 @@ extension AppCoordinator {
                     characterID: characterID
                 )
                 model.apply(profile: profile)
-                model.presentSuccess(hadProfile ? "닉네임을 변경했습니다." : "프로필을 저장했습니다.")
+                model.presentSuccess(L10n.text(
+                    hadProfile ? "profile.success.nickname_updated" : "profile.success.saved"
+                ))
                 applyRequestedOverlayVisibility()
                 refreshStatusItem()
                 persistPreferences()
             } catch {
-                model.errorMessage = error.localizedDescription
+                model.errorMessage = SideyBackendError.normalized(error).localizedDescription
             }
         }
     }
@@ -278,7 +284,7 @@ extension AppCoordinator {
                     throw SideyBackendError.malformedResponse
                 }
                 model.apply(profile: profile)
-                model.presentSuccess("\(displayName) 캐릭터를 장착했습니다.")
+                model.presentSuccess(L10n.format("commerce.character.equip.success", displayName))
                 model.errorMessage = nil
                 applyRequestedOverlayVisibility()
                 refreshStatusItem()
@@ -286,7 +292,10 @@ extension AppCoordinator {
             } catch is CancellationError {
                 return
             } catch {
-                model.errorMessage = "캐릭터를 장착하지 못했습니다: \(error.localizedDescription)"
+                model.errorMessage = L10n.format(
+                    "commerce.character.equip.failed",
+                    SideyBackendError.normalized(error).localizedDescription
+                )
             }
         }
     }
@@ -296,7 +305,7 @@ extension AppCoordinator {
         let roomName = model.newRoomName
         let characterID = PixelCharacterCatalog.canonicalID(for: model.selectedCharacterID)
         guard model.isCharacterSelectable(characterID) else {
-            model.errorMessage = "보유한 캐릭터만 프로필에 선택할 수 있습니다."
+            model.errorMessage = L10n.text("profile.error.character_not_owned")
             return
         }
         runMutation(groupOperation: .creating) {
@@ -324,11 +333,14 @@ extension AppCoordinator {
             let created = mutation.value
             self.model.lastCreatedInviteCode = created.inviteCode
             if !created.storedInKeychain {
-                self.model.errorMessage = "그룹은 생성됐지만 초대 코드를 키체인에 저장하지 못했습니다. 지금 표시된 코드를 따로 보관해 주세요."
+                self.model.errorMessage = L10n.text("group.create.keychain_warning")
             }
             self.model.newRoomName = ""
             if let grantError = mutation.grantError {
-                self.model.errorMessage = "그룹은 생성됐지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+                self.model.errorMessage = L10n.format(
+                    "group.create.realtime_grant_pending",
+                    grantError.localizedDescription
+                )
             } else {
                 self.model.preferences.activeRoomID = created.roomID
             }
@@ -340,7 +352,7 @@ extension AppCoordinator {
         let inviteCode = model.inviteCode
         let characterID = PixelCharacterCatalog.canonicalID(for: model.selectedCharacterID)
         guard model.isCharacterSelectable(characterID) else {
-            model.errorMessage = "보유한 캐릭터만 프로필에 선택할 수 있습니다."
+            model.errorMessage = L10n.text("profile.error.character_not_owned")
             return
         }
         runMutation(groupOperation: .joining) {
@@ -367,11 +379,14 @@ extension AppCoordinator {
             )
             let joined = mutation.value
             if !joined.storedInKeychain {
-                self.model.errorMessage = "그룹에는 참여했지만 초대 코드를 키체인에 저장하지 못했습니다. 받은 코드를 따로 보관해 주세요."
+                self.model.errorMessage = L10n.text("group.join.keychain_warning")
             }
             self.model.inviteCode = ""
             if let grantError = mutation.grantError {
-                self.model.errorMessage = "그룹에는 참여했지만 새 실시간 권한을 확인 중입니다: \(grantError.localizedDescription)"
+                self.model.errorMessage = L10n.format(
+                    "group.join.realtime_grant_pending",
+                    grantError.localizedDescription
+                )
             } else {
                 self.model.preferences.activeRoomID = joined.roomID
             }
@@ -380,7 +395,7 @@ extension AppCoordinator {
 
     func renameRoom(_ roomID: UUID, name: String) {
         guard let backend else { return }
-        runMutation(successMessage: "그룹 이름을 변경했습니다.") {
+        runMutation(successMessage: L10n.text("group.rename.success")) {
             try await backend.renameRoom(roomID, name: name)
         }
     }
@@ -390,8 +405,8 @@ extension AppCoordinator {
         let nickname = model.rooms
             .first(where: { $0.id == roomID })?
             .members.first(where: { $0.userID == userID })?
-            .nickname ?? "멤버"
-        runMutation(successMessage: "\(nickname)님을 그룹에서 내보냈습니다.") {
+            .nickname ?? L10n.text("profile.nickname.unknown_member")
+        runMutation(successMessage: L10n.format("group.remove_member.success", nickname)) {
             try await backend.removeRoomMember(roomID, userID: userID)
         }
     }
@@ -399,8 +414,9 @@ extension AppCoordinator {
     func leaveRoom(_ roomID: UUID) {
         if model.activeRoom?.id == roomID { stopAllTyping() }
         guard let backend else { return }
-        let roomName = model.rooms.first(where: { $0.id == roomID })?.name ?? "그룹"
-        runMutation(successMessage: "‘\(roomName)’ 그룹에서 나갔습니다.") {
+        let roomName = model.rooms.first(where: { $0.id == roomID })?.name
+            ?? L10n.text("group.name.unknown")
+        runMutation(successMessage: L10n.format("group.leave.success", roomName)) {
             try await backend.leaveRoom(roomID)
         }
     }
@@ -408,8 +424,9 @@ extension AppCoordinator {
     func deleteRoom(_ roomID: UUID) {
         if model.activeRoom?.id == roomID { stopAllTyping() }
         guard let backend else { return }
-        let roomName = model.rooms.first(where: { $0.id == roomID })?.name ?? "그룹"
-        runMutation(successMessage: "‘\(roomName)’ 그룹을 삭제했습니다.") {
+        let roomName = model.rooms.first(where: { $0.id == roomID })?.name
+            ?? L10n.text("group.name.unknown")
+        runMutation(successMessage: L10n.format("group.delete.success", roomName)) {
             try await backend.deleteRoom(roomID)
         }
     }
@@ -457,11 +474,15 @@ extension AppCoordinator {
 
     func handleRoomSwitchFailure(_ error: any Error, restoreError: (any Error)?) {
         if let restoreError {
-            model.connectionState = .failed(restoreError.localizedDescription)
+            let message = restoreError.localizedDescription
+            model.connectionState = .failed(message)
             model.setActiveRoomRealtimeConnected(false)
-            model.errorMessage = "실시간 연결 복구 실패: \(restoreError.localizedDescription)"
+            model.errorMessage = L10n.format("backend.realtime_recovery_failed", message)
         } else {
-            model.errorMessage = "그룹 전환 실패: \(error.localizedDescription)"
+            model.errorMessage = L10n.format(
+                "group.switch.failed",
+                error.localizedDescription
+            )
         }
         refreshStatusItem()
     }
@@ -474,7 +495,11 @@ extension AppCoordinator {
         }
         guard model.activeRoomRealtimeAvailable else {
             stopAllTyping()
-            rejectMessage(body, source: source, message: "실시간 연결이 끊겨 메시지를 전송할 수 없습니다.")
+            rejectMessage(
+                body,
+                source: source,
+                message: L10n.text("message.error.realtime_disconnected")
+            )
             return
         }
         sendMessage(body, source: source) { roomID, body, messageID in
@@ -507,7 +532,11 @@ extension AppCoordinator {
         // Guard again at the transport boundary: callers must not send to the
         // previously active room while a room switch is in flight.
         guard model.groupOperation == .idle, !model.isWorking else {
-            rejectMessage(body, source: source, message: "그룹 전환이 끝난 뒤 전송해 주세요.")
+            rejectMessage(
+                body,
+                source: source,
+                message: L10n.text("message.error.wait_for_group_switch")
+            )
             return
         }
         guard let roomID = model.activeRoom?.id else {
@@ -515,7 +544,11 @@ extension AppCoordinator {
             return
         }
         guard let senderID = model.currentUserID else {
-            rejectMessage(body, source: source, message: "현재 사용자 정보를 확인하지 못했습니다.")
+            rejectMessage(
+                body,
+                source: source,
+                message: L10n.text("backend.error.current_user_unavailable")
+            )
             return
         }
         let messageID = UUID()
@@ -539,7 +572,10 @@ extension AppCoordinator {
                 if revealConfirmation { scheduleBubbleExpiry() }
                 model.errorMessage = nil
             case .definitelyRejected(let message):
-                let errorMessage = "전송 실패: \(message)"
+                let errorMessage = L10n.format(
+                    "message.send.failed",
+                    message
+                )
                 model.errorMessage = errorMessage
                 _ = model.failMessage(id: messageID, roomID: roomID)
                 if source == .history {
@@ -613,7 +649,7 @@ extension AppCoordinator {
                 } catch {
                     model.connectionState = .connecting
                     model.setActiveRoomRealtimeConnected(false)
-                    realtimeWarning = "변경사항은 서버에 저장됐습니다. 실시간 연결을 복구 중입니다."
+                    realtimeWarning = L10n.text("mutation.realtime_recovering")
                 }
                 let warnings = [postCommitWarning, realtimeWarning].compactMap { $0 }
                 model.errorMessage = warnings.isEmpty ? nil : warnings.joined(separator: " ")
@@ -631,9 +667,10 @@ extension AppCoordinator {
                 persistPreferences()
             } catch {
                 model.dismissSuccess()
+                let message = error.localizedDescription
                 model.errorMessage = serverMutationCommitted
-                    ? "서버 작업은 완료됐지만 상태 동기화에 실패했습니다: \(error.localizedDescription)"
-                    : error.localizedDescription
+                    ? L10n.format("mutation.post_commit_sync_failed", message)
+                    : message
             }
         }
     }
@@ -683,7 +720,10 @@ extension AppCoordinator {
                     let messages = try await backend.recentMessages(roomID: roomID)
                     model.replaceMessages(roomID: roomID, with: messages)
                 } catch {
-                    model.errorMessage = "메시지 보관 상태 동기화 실패: \(error.localizedDescription)"
+                    model.errorMessage = L10n.format(
+                        "message.retention_sync_failed",
+                        SideyBackendError.normalized(error).localizedDescription
+                    )
                 }
             }
         case .messagesReplaced(let roomID, let messages):
@@ -755,7 +795,11 @@ extension AppCoordinator {
         guard let messagingTransport else { return }
         Task {
             do { try await messagingTransport.setLocalPresence(state) }
-            catch { model.connectionState = .failed(error.localizedDescription) }
+            catch {
+                model.connectionState = .failed(
+                    error.localizedDescription
+                )
+            }
         }
     }
 

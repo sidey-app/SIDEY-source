@@ -470,7 +470,10 @@ final class AppCoordinator {
             persistPreferences()
         } catch {
             model.launchAtLogin = launchAtLoginController.isEnabled
-            model.errorMessage = "로그인 자동 실행을 변경하지 못했습니다: \(error.localizedDescription)"
+            model.errorMessage = L10n.format(
+                "launch_at_login.update_failed",
+                error.localizedDescription
+            )
             refreshStatusItem()
         }
     }
@@ -478,12 +481,12 @@ final class AppCoordinator {
     private func copyInviteCode(roomID: UUID) async -> Bool {
         guard model.rooms.first(where: { $0.id == roomID })?.inviteCodeReady == true else {
             model.dismissSuccess()
-            model.errorMessage = "이 그룹의 이전 초대 코드는 폐기됐습니다. 방장이 새 코드를 발급해야 합니다."
+            model.errorMessage = L10n.text("invite.error.revoked")
             return false
         }
         guard let backend else {
             model.dismissSuccess()
-            model.errorMessage = "초대 코드를 읽을 서버 구성이 없습니다."
+            model.errorMessage = L10n.text("invite.error.backend_unavailable")
             return false
         }
         do {
@@ -491,13 +494,13 @@ final class AppCoordinator {
                   !inviteCode.isEmpty
             else {
                 model.dismissSuccess()
-                model.errorMessage = "이 기기에 이 그룹의 초대 코드 원문이 없습니다. 보안상 데이터베이스의 해시에서는 복구할 수 없습니다."
+                model.errorMessage = L10n.text("invite.error.not_stored_on_device")
                 return false
             }
             NSPasteboard.general.clearContents()
             guard NSPasteboard.general.setString(inviteCode, forType: .string) else {
                 model.dismissSuccess()
-                model.errorMessage = "초대 코드를 클립보드에 복사하지 못했습니다."
+                model.errorMessage = L10n.text("invite.error.clipboard_failed")
                 return false
             }
             model.errorMessage = nil
@@ -505,18 +508,21 @@ final class AppCoordinator {
             return true
         } catch {
             model.dismissSuccess()
-            model.errorMessage = "초대 코드를 읽지 못했습니다: \(error.localizedDescription)"
+            model.errorMessage = L10n.format(
+                "invite.error.read_failed",
+                SideyBackendError.normalized(error).localizedDescription
+            )
             return false
         }
     }
 
     private func rotateInviteCode(roomID: UUID) {
         guard let backend else { return }
-        runMutation(successMessage: "새 초대 코드를 발급했습니다.") {
+        runMutation(successMessage: L10n.text("invite.rotate.success")) {
             let created = try await backend.rotateInviteCode(roomID: roomID)
             self.model.lastCreatedInviteCode = created.inviteCode
             if !created.storedInKeychain {
-                self.model.errorMessage = "새 코드는 발급됐지만 키체인에 저장하지 못했습니다. 지금 표시된 코드를 따로 보관해 주세요."
+                self.model.errorMessage = L10n.text("invite.rotate.keychain_warning")
             }
         }
     }

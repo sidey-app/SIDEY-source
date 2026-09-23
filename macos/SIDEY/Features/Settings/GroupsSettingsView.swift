@@ -7,15 +7,18 @@ struct GroupsSettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 34) {
             SettingsSection(
-                title: "현재 그룹",
-                subtitle: "함께 표시할 친구와 활성 그룹을 관리할 수 있습니다. 그룹당 최대 \(ProductLimits.maximumRoomMembers)명까지 참여할 수 있습니다.",
+                title: "groups.current.title",
+                verbatimSubtitle: L10n.format(
+                    "groups.current.subtitle",
+                    ProductLimits.maximumRoomMembers
+                ),
                 systemImage: "person.2"
             ) {
                 if model.rooms.isEmpty {
                     ContentUnavailableView(
-                        "아직 연결된 그룹 없음",
+                        "groups.current.empty.title",
                         systemImage: "person.2",
-                        description: Text("새 그룹을 만들거나 친구에게 받은 초대 코드를 입력해 주세요.")
+                        description: Text("groups.current.empty.description")
                     )
                     .frame(maxWidth: .infinity, minHeight: 150)
                 } else {
@@ -43,23 +46,23 @@ struct GroupsSettingsView: View {
             }
 
             SettingsSection(
-                title: "새 그룹 만들기",
-                subtitle: "새 공간을 만들고 생성된 초대 코드를 친구에게 공유할 수 있습니다.",
+                title: "groups.create.title",
+                subtitle: "groups.create.subtitle",
                 systemImage: "plus.circle"
             ) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("그룹 이름")
+                    Text("groups.create.name.title")
                         .font(.headline)
-                    Text("1~20자의 이름을 입력해 새로운 비공개 그룹을 만들 수 있습니다.")
+                    Text("groups.create.name.description")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    TextField("새 그룹 이름", text: $model.newRoomName)
+                    TextField("groups.create.name.placeholder", text: $model.newRoomName)
                         .textFieldStyle(.roundedBorder)
                     Button(action: actions.onCreateRoom) {
                         OperationButtonLabel(
-                            title: model.groupOperation.createButtonTitle,
+                            title: model.groupOperation.localizedCreateButtonTitle,
                             showsProgress: model.groupOperation == .creating
                         )
                     }
@@ -70,10 +73,10 @@ struct GroupsSettingsView: View {
                 if let invite = model.lastCreatedInviteCode {
                     Divider()
                     SettingsControlRow(
-                        title: "방금 발급한 초대 코드",
-                        description: "이 코드를 전달받은 친구만 그룹에 참여할 수 있습니다."
+                        title: "groups.create.invite_code.title",
+                        description: "groups.create.invite_code.description"
                     ) {
-                        Text(invite)
+                        Text(verbatim: invite)
                             .font(.system(.body, design: .monospaced).bold())
                             .textSelection(.enabled)
                     }
@@ -81,19 +84,19 @@ struct GroupsSettingsView: View {
             }
 
             SettingsSection(
-                title: "초대 코드로 참여",
-                subtitle: "친구에게 받은 코드를 입력해 기존 비공개 그룹에 참여할 수 있습니다.",
+                title: "groups.join.title",
+                subtitle: "groups.join.subtitle",
                 systemImage: "ticket"
             ) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("초대 코드")
+                    Text("groups.join.invite_code.title")
                         .font(.headline)
-                    Text("초대 코드를 입력하면 서버에서 멤버십과 인원 제한을 확인합니다.")
+                    Text("groups.join.invite_code.description")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    TextField("초대 코드", text: $model.inviteCode)
+                    TextField("groups.join.invite_code.placeholder", text: $model.inviteCode)
                         .textFieldStyle(.roundedBorder)
                         .onChange(of: model.inviteCode) { _, value in
                             let uppercased = value.uppercased()
@@ -101,7 +104,7 @@ struct GroupsSettingsView: View {
                         }
                     Button(action: actions.onJoinRoom) {
                         OperationButtonLabel(
-                            title: model.groupOperation.joinButtonTitle,
+                            title: model.groupOperation.localizedJoinButtonTitle,
                             showsProgress: model.groupOperation == .joining
                         )
                     }
@@ -179,42 +182,44 @@ struct RoomRow: View {
             inviteCopyFeedback.cancel()
         }
         .alert(
-            removalCandidate.map { "‘\($0.nickname)’님을 내보낼까요?" } ?? "멤버 내보내기",
+            removalCandidate.map {
+                L10n.format("groups.member.remove.confirmation_title", $0.nickname)
+            } ?? L10n.text("groups.member.remove.title"),
             isPresented: Binding(
                 get: { removalCandidate != nil },
                 set: { if !$0 { removalCandidate = nil } }
             )
         ) {
-            Button("취소", role: .cancel) { removalCandidate = nil }
-            Button("내보내기", role: .destructive) {
+            Button("common.cancel", role: .cancel) { removalCandidate = nil }
+            Button("groups.member.remove.action", role: .destructive) {
                 guard let candidate = removalCandidate else { return }
                 removalCandidate = nil
                 onRemoveMember(candidate.userID)
             }
         } message: {
-            Text("이 멤버는 그룹과 기존 메시지에 접근할 수 없게 됩니다.")
+            Text("groups.member.remove.message")
         }
-        .alert("‘\(room.name)’ 그룹을 삭제할까요?", isPresented: $showsDeleteConfirmation) {
-            Button("취소", role: .cancel) {}
-            Button("그룹 삭제", role: .destructive, action: onDelete)
+        .alert(L10n.format("groups.delete.confirmation_title", room.name), isPresented: $showsDeleteConfirmation) {
+            Button("common.cancel", role: .cancel) {}
+            Button("groups.delete.action", role: .destructive, action: onDelete)
         } message: {
-            Text("멤버와 모든 메시지가 영구 삭제되며 복구할 수 없습니다.")
+            Text("groups.delete.message")
         }
-        .alert("‘\(room.name)’ 그룹에서 나갈까요?", isPresented: $showsLeaveConfirmation) {
-            Button("취소", role: .cancel) {}
-            Button("그룹 나가기", role: .destructive, action: onLeave)
+        .alert(L10n.format("groups.leave.confirmation_title", room.name), isPresented: $showsLeaveConfirmation) {
+            Button("common.cancel", role: .cancel) {}
+            Button("groups.leave.action", role: .destructive, action: onLeave)
         } message: {
             Text(RoomLeaveConfirmation.resolve(
                 room: room,
                 currentUserID: currentUserID
-            ).message)
+            ).localizedMessage)
         }
     }
 
     private var expandedContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             if room.members.isEmpty {
-                Text("표시할 멤버가 없습니다.")
+                Text("groups.members.empty")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .padding(.leading, 48)
@@ -235,7 +240,7 @@ struct RoomRow: View {
             }
             Divider()
                 .padding(.leading, 48)
-            Button("그룹 나가기", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
+            Button("groups.leave.action", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
                 showsLeaveConfirmation = true
             }
             .disabled(mutationsDisabled)
@@ -254,16 +259,14 @@ struct RoomRow: View {
                         .foregroundStyle(isActive ? .mint : .secondary)
                         .frame(width: 34)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(room.name).font(.headline)
-                        Text(room.inviteCodeReady
-                             ? "\(room.members.count)/\(ProductLimits.maximumRoomMembers)명 · 초대 코드 \(room.inviteCodeHint)"
-                             : "\(room.members.count)/\(ProductLimits.maximumRoomMembers)명 · 초대 코드 재발급 필요")
+                        Text(verbatim: room.name).font(.headline)
+                        Text(verbatim: roomSummary)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     if isActive {
-                        Label("활성", systemImage: "checkmark.circle.fill")
+                        Label("groups.active", systemImage: "checkmark.circle.fill")
                             .foregroundStyle(.mint)
                     }
                 }
@@ -274,7 +277,9 @@ struct RoomRow: View {
             if !isActive || isSwitchingTarget {
                 Button(action: onSelect) {
                     OperationButtonLabel(
-                        title: isSwitchingTarget ? "연결 중…" : "그룹 참가",
+                        title: isSwitchingTarget
+                            ? "groups.operation.switching"
+                            : "groups.operation.select",
                         showsProgress: isSwitchingTarget
                     )
                 }
@@ -282,21 +287,22 @@ struct RoomRow: View {
             }
             if !room.inviteCodeReady,
                RoomManagementPolicy.canManage(room, currentUserID: currentUserID) {
-                Button("초대 코드 재발급", systemImage: "arrow.clockwise", action: onRotateInviteCode)
+                Button("groups.invite_code.rotate", systemImage: "arrow.clockwise", action: onRotateInviteCode)
                     .disabled(mutationsDisabled)
-                    .help("노출 위험이 있던 이전 코드를 폐기하고 새 128-bit 코드를 한 번 발급합니다.")
+                    .help("groups.invite_code.rotate.help")
             } else {
                 Button(action: copyInviteCode) {
-                    Label(
-                        inviteCopyFeedback.showsConfirmation ? "복사 완료" : "초대 코드 복사",
-                        systemImage: inviteCopyFeedback.showsConfirmation
-                            ? "checkmark.circle.fill"
-                            : "doc.on.doc"
-                    )
+                    Label {
+                        Text(copyButtonTitle)
+                    } icon: {
+                        Image(systemName: inviteCopyFeedback.showsConfirmation
+                              ? "checkmark.circle.fill"
+                              : "doc.on.doc")
+                    }
                     .foregroundStyle(inviteCopyFeedback.showsConfirmation ? .green : .primary)
                 }
                 .disabled(mutationsDisabled || !room.inviteCodeReady)
-                .help("이 기기의 키체인에 보관된 초대 코드를 복사합니다.")
+                .help("groups.invite_code.copy.help")
             }
 
             Button(action: toggleExpansion) {
@@ -307,24 +313,50 @@ struct RoomRow: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .help(isExpanded ? "그룹 접기" : "그룹 펼치기")
-            .accessibilityLabel(isExpanded ? "그룹 접기" : "그룹 펼치기")
+            .help(Text(expansionLabel))
+            .accessibilityLabel(Text(expansionLabel))
         }
     }
 
     private var managementButtons: some View {
         HStack(spacing: 8) {
-            Button("이름 변경", systemImage: "pencil") {
+            Button("groups.rename.action", systemImage: "pencil") {
                 renameDraft = room.name
                 isRenaming = true
             }
             .disabled(mutationsDisabled)
-            Button("그룹 삭제", systemImage: "trash", role: .destructive) {
+            Button("groups.delete.action", systemImage: "trash", role: .destructive) {
                 showsDeleteConfirmation = true
             }
             .disabled(mutationsDisabled)
         }
         .padding(.leading, 48)
+    }
+
+    private var roomSummary: String {
+        if room.inviteCodeReady {
+            return L10n.format(
+                "groups.room.summary.invite_ready",
+                room.members.count,
+                ProductLimits.maximumRoomMembers,
+                room.inviteCodeHint
+            )
+        }
+        return L10n.format(
+            "groups.room.summary.invite_rotation_required",
+            room.members.count,
+            ProductLimits.maximumRoomMembers
+        )
+    }
+
+    private var copyButtonTitle: LocalizedStringResource {
+        inviteCopyFeedback.showsConfirmation
+            ? "groups.invite_code.copy.complete"
+            : "groups.invite_code.copy.action"
+    }
+
+    private var expansionLabel: LocalizedStringResource {
+        isExpanded ? "groups.collapse" : "groups.expand"
     }
 
     private func toggleExpansion() {
@@ -356,20 +388,20 @@ struct RoomRow: View {
 
     private var renameEditor: some View {
         HStack(spacing: 8) {
-            TextField("그룹 이름 1~20자", text: $renameDraft)
+            TextField("groups.rename.placeholder", text: $renameDraft)
                 .textFieldStyle(.roundedBorder)
                 .onChange(of: renameDraft) { _, value in
                     let limited = RoomNameValidator.limitedDraft(value)
                     if value != limited { renameDraft = limited }
                 }
-            Button("저장") {
+            Button("common.save") {
                 let value = renameDraft
                 isRenaming = false
                 onRename(value)
             }
             .buttonStyle(.borderedProminent)
             .disabled(mutationsDisabled || !RoomNameValidator.isValid(renameDraft))
-            Button("취소") {
+            Button("common.cancel") {
                 renameDraft = room.name
                 isRenaming = false
             }
@@ -393,11 +425,11 @@ struct RoomRow: View {
                 if RoomManagementPolicy.isOwner(member, in: room) {
                     Image(systemName: "crown.fill")
                         .foregroundStyle(Color(red: 0.95, green: 0.68, blue: 0.12))
-                        .accessibilityLabel("방장")
+                        .accessibilityLabel("groups.member.owner")
                 }
-                Text(member.nickname)
+                Text(verbatim: member.nickname)
                 if member.userID == currentUserID {
-                    Text("나")
+                    Text("groups.member.me")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)
@@ -411,7 +443,7 @@ struct RoomRow: View {
                 from: room,
                 currentUserID: currentUserID
             ) {
-                Button("내보내기", role: .destructive) {
+                Button("groups.member.remove.action", role: .destructive) {
                     removalCandidate = member
                 }
                 .disabled(mutationsDisabled)
@@ -421,8 +453,18 @@ struct RoomRow: View {
     }
 }
 
+private extension RoomLeaveConfirmation {
+    var localizedMessage: LocalizedStringResource {
+        switch self {
+        case .member: "groups.leave.message.member"
+        case .ownerWithRemainingMembers: "groups.leave.message.owner_transfer"
+        case .lastOwner: "groups.leave.message.last_owner"
+        }
+    }
+}
+
 struct OperationButtonLabel: View {
-    let title: String
+    let title: LocalizedStringResource
     let showsProgress: Bool
 
     var body: some View {

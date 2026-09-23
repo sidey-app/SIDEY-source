@@ -5,7 +5,9 @@ enum StatusItemIconProvider {
     static let unreadAssetName = "SideyMenuIconUnread"
 
     static func image(hasUnread: Bool) -> NSImage? {
-        let description = hasUnread ? "\(AppPresentation.displayName), 읽지 않은 메시지 있음" : AppPresentation.displayName
+        let description = hasUnread
+            ? L10n.format("status.icon.unread.accessibility", AppPresentation.displayName)
+            : AppPresentation.displayName
         let assetName = hasUnread ? unreadAssetName : regularAssetName
         if let asset = NSImage(named: NSImage.Name(assetName))?.copy() as? NSImage {
             asset.isTemplate = true
@@ -101,7 +103,9 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         let menu = NSMenu(title: AppPresentation.displayName)
         menu.delegate = self
         let overlay = NSMenuItem(
-            title: overlayVisible ? "오버레이 숨기기" : "오버레이 보이기",
+            title: L10n.text(
+                overlayVisible ? "status.menu.overlay.hide" : "status.menu.overlay.show"
+            ),
             action: #selector(toggleOverlay),
             keyEquivalent: ""
         )
@@ -109,7 +113,11 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         overlay.target = self
         menu.addItem(overlay)
 
-        let message = NSMenuItem(title: "메시지 작성…", action: #selector(focusMessage), keyEquivalent: "")
+        let message = NSMenuItem(
+            title: L10n.text("status.menu.compose"),
+            action: #selector(focusMessage),
+            keyEquivalent: ""
+        )
         annotateShortcut(.toggleComposer, on: message)
         message.target = self
         message.isEnabled = !rooms.isEmpty
@@ -117,43 +125,75 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
         menu.addItem(.separator())
 
-        let groups = NSMenuItem(title: "활성 그룹", action: nil, keyEquivalent: "")
+        let groups = NSMenuItem(
+            title: L10n.text("status.menu.active_group"),
+            action: nil,
+            keyEquivalent: ""
+        )
         groups.submenu = makeRoomsMenu()
         groups.isEnabled = !rooms.isEmpty
         menu.addItem(groups)
 
-        let quiet = NSMenuItem(title: "조용히 모드", action: #selector(toggleQuietMode), keyEquivalent: "")
+        let quiet = NSMenuItem(
+            title: L10n.text("status.menu.quiet_mode"),
+            action: #selector(toggleQuietMode),
+            keyEquivalent: ""
+        )
         annotateShortcut(.toggleQuietMode, on: quiet)
         quiet.target = self
         quiet.state = quietModeEnabled ? .on : .off
         menu.addItem(quiet)
 
-        let history = NSMenuItem(title: "최근 기록…", action: #selector(openHistory), keyEquivalent: "")
+        let history = NSMenuItem(
+            title: L10n.text("status.menu.history"),
+            action: #selector(openHistory),
+            keyEquivalent: ""
+        )
         annotateShortcut(.openHistory, on: history)
         history.target = self
         history.isEnabled = !rooms.isEmpty
         menu.addItem(history)
 
-        let store = NSMenuItem(title: "상점…", action: #selector(openStore), keyEquivalent: "")
+        let store = NSMenuItem(
+            title: L10n.text("status.menu.store"),
+            action: #selector(openStore),
+            keyEquivalent: ""
+        )
         store.target = self
         menu.addItem(store)
 
-        let groupSettings = NSMenuItem(title: "그룹 설정…", action: #selector(openGroupSettings), keyEquivalent: "")
+        let groupSettings = NSMenuItem(
+            title: L10n.text("status.menu.group_settings"),
+            action: #selector(openGroupSettings),
+            keyEquivalent: ""
+        )
         groupSettings.target = self
         menu.addItem(groupSettings)
 
-        let login = NSMenuItem(title: "로그인 시 자동 실행", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+        let login = NSMenuItem(
+            title: L10n.text("status.menu.launch_at_login"),
+            action: #selector(toggleLaunchAtLogin),
+            keyEquivalent: ""
+        )
         login.target = self
         login.state = launchAtLogin ? .on : .off
         menu.addItem(login)
         menu.addItem(.separator())
 
-        let settings = NSMenuItem(title: "설정…", action: #selector(openSettings), keyEquivalent: ",")
+        let settings = NSMenuItem(
+            title: L10n.text("status.menu.settings"),
+            action: #selector(openSettings),
+            keyEquivalent: ","
+        )
         settings.target = self
         menu.addItem(settings)
         menu.addItem(.separator())
 
-        let quit = NSMenuItem(title: "\(AppPresentation.displayName) 종료", action: #selector(quit), keyEquivalent: "q")
+        let quit = NSMenuItem(
+            title: L10n.format("status.menu.quit", AppPresentation.displayName),
+            action: #selector(quit),
+            keyEquivalent: "q"
+        )
         quit.target = self
         menu.addItem(quit)
         return menu
@@ -172,16 +212,26 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     }
 
     private func makeRoomsMenu() -> NSMenu {
-        let menu = NSMenu(title: "활성 그룹")
+        let menu = NSMenu(title: L10n.text("status.menu.active_group"))
         if rooms.isEmpty {
-            let empty = NSMenuItem(title: "연결된 그룹 없음", action: nil, keyEquivalent: "")
+            let empty = NSMenuItem(
+                title: L10n.text("status.menu.no_connected_groups"),
+                action: nil,
+                keyEquivalent: ""
+            )
             empty.isEnabled = false
             menu.addItem(empty)
             return menu
         }
         for room in rooms {
             let unread = unreadCounts[room.id, default: 0]
-            let suffix = unread > 0 ? " (\(unread))" : ""
+            let localizedCount = NumberFormatter.localizedString(
+                from: NSNumber(value: unread),
+                number: .decimal
+            )
+            let suffix = unread > 0
+                ? L10n.format("status.room.unread_count", localizedCount)
+                : ""
             let item = NSMenuItem(
                 title: room.name + suffix,
                 action: #selector(selectRoom(_:)),
@@ -198,7 +248,9 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private func updateStatusIcon() {
         let hasUnread = unreadCounts.values.contains(where: { $0 > 0 })
         statusItem?.button?.image = StatusItemIconProvider.image(hasUnread: hasUnread)
-        statusItem?.button?.toolTip = hasUnread ? "\(AppPresentation.displayName) · 읽지 않은 메시지 있음" : AppPresentation.displayName
+        statusItem?.button?.toolTip = hasUnread
+            ? L10n.format("status.tooltip.unread", AppPresentation.displayName)
+            : AppPresentation.displayName
     }
 
     @objc private func toggleOverlay() { onToggleOverlay() }

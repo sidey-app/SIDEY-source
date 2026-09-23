@@ -49,9 +49,9 @@ struct ComposerDragHandle: NSViewRepresentable {
     private final class Handle: NSView {
         override init(frame: NSRect) {
             super.init(frame: frame)
-            toolTip = "입력창 이동"
+            toolTip = L10n.text("composer.drag.tooltip")
             setAccessibilityElement(true)
-            setAccessibilityLabel("입력창 이동 손잡이")
+            setAccessibilityLabel(L10n.text("composer.drag.accessibility"))
         }
         required init?(coder: NSCoder) { nil }
         override var acceptsFirstResponder: Bool { false }

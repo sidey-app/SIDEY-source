@@ -40,9 +40,12 @@ struct OverlayHistoryView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Label("최근 메시지", systemImage: "clock.arrow.circlepath")
+                Label(L10n.text("history.title"), systemImage: "clock.arrow.circlepath")
                     .font(.headline)
-                Text("메시지는 서버에서 \(ProductLimits.messageRetentionDays)일 후 자동 삭제됩니다.")
+                Text(L10n.format(
+                    "history.retention_notice",
+                    Int64(ProductLimits.messageRetentionDays)
+                ))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -52,7 +55,7 @@ struct OverlayHistoryView: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(.secondary)
-            .accessibilityLabel("최근 메시지 닫기")
+            .accessibilityLabel(L10n.text("history.close.accessibility"))
         }
     }
 
@@ -60,7 +63,7 @@ struct OverlayHistoryView: View {
         VStack(spacing: 10) {
             ProgressView()
                 .controlSize(.large)
-            Text("최근 메시지를 불러오는 중…")
+            Text(L10n.text("history.loading"))
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }
@@ -68,19 +71,22 @@ struct OverlayHistoryView: View {
 
     private func initialFailureView(message: String) -> some View {
         ContentUnavailableView {
-            Label("기록을 불러오지 못했어요", systemImage: "exclamationmark.arrow.triangle.2.circlepath")
+            Label(
+                L10n.text("history.error.load_failed"),
+                systemImage: "exclamationmark.arrow.triangle.2.circlepath"
+            )
         } description: {
             Text(message)
         } actions: {
-            Button("다시 시도") { history.retryInitial() }
+            Button(L10n.text("common.retry")) { history.retryInitial() }
         }
     }
 
     private var emptyView: some View {
         ContentUnavailableView(
-            "아직 메시지 없음",
+            L10n.text("history.empty.title"),
             systemImage: "bubble.left.and.bubble.right",
-            description: Text("이 그룹의 최근 메시지가 여기에 표시됩니다.")
+            description: Text(L10n.text("history.empty.description"))
         )
     }
 
@@ -92,7 +98,8 @@ struct OverlayHistoryView: View {
             HStack(spacing: 10) {
                 ZStack(alignment: .leading) {
                     if model.draft.isEmpty {
-                        Text("메시지를 입력해 주세요").foregroundStyle(.tertiary)
+                        Text(L10n.text("message.composer.placeholder"))
+                            .foregroundStyle(.tertiary)
                     }
                     NativeMessageField(
                         text: $model.draft,
@@ -109,7 +116,7 @@ struct OverlayHistoryView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(!model.canSubmitDraft)
-                .accessibilityLabel("메시지 전송")
+                .accessibilityLabel(L10n.text("message.send.accessibility"))
             }
             .padding(.horizontal, 10)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
@@ -145,7 +152,7 @@ struct OverlayHistoryView: View {
             HStack(spacing: 8) {
                 ProgressView()
                     .controlSize(.small)
-                Text("이전 메시지를 불러오는 중…")
+                Text(L10n.text("history.older.loading"))
             }
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -153,19 +160,22 @@ struct OverlayHistoryView: View {
             .padding(.vertical, 8)
         case .failed(let message):
             VStack(spacing: 6) {
-                Text("이전 메시지를 불러오지 못했어요")
+                Text(L10n.text("history.older.load_failed"))
                     .font(.caption.weight(.semibold))
                 Text(message)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
-                Button("다시 시도") { history.retryNextPage() }
+                Button(L10n.text("common.retry")) { history.retryNextPage() }
                     .controlSize(.small)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
         case .exhausted:
-            Text("최근 \(ProductLimits.messageRetentionDays)일 기록을 모두 봤어요")
+            Text(L10n.format(
+                "history.older.exhausted",
+                Int64(ProductLimits.messageRetentionDays)
+            ))
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
                 .frame(maxWidth: .infinity)
@@ -217,7 +227,7 @@ struct HistoryMessageCard: View {
                         .font(.system(.callout, design: .rounded, weight: .semibold))
                         .lineLimit(1)
                     if participant.isCurrentUser {
-                        Text("나")
+                        Text(L10n.text("profile.current_user.badge"))
                             .font(.caption2.weight(.bold))
                             .foregroundStyle(.tint)
                             .padding(.horizontal, 6)
@@ -250,11 +260,14 @@ struct HistoryMessageCard: View {
     private var deliveryStatus: some View {
         switch entry.state {
         case .pending:
-            Label("전송 중", systemImage: "clock")
+            Label(L10n.text("message.delivery.pending"), systemImage: "clock")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         case .failed:
-            Label("전송 실패", systemImage: "exclamationmark.triangle.fill")
+            Label(
+                L10n.text("message.delivery.failed"),
+                systemImage: "exclamationmark.triangle.fill"
+            )
                 .font(.caption2)
                 .foregroundStyle(.red)
         case .confirmed:

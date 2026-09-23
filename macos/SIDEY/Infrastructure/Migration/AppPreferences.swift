@@ -39,7 +39,7 @@ struct AppPreferences: Codable, Equatable, Sendable {
     var overlayFrame: CodableRect?
     var overlayScreenIdentifier: String?
     var composerPosition: ComposerPositionPreference?
-    var nickname = "나"
+    var nickname = ""
     var selectedCharacterID = PixelCharacterCatalog.pixelHamsterID
     var activeRoomID: UUID?
     var installationSeed = UInt64.random(in: UInt64.min...UInt64.max)
@@ -112,7 +112,7 @@ struct AppPreferences: Codable, Equatable, Sendable {
             span: .full,
             screenIdentifier: overlayScreenIdentifier
         )
-        nickname = try values.decodeIfPresent(String.self, forKey: .nickname) ?? "나"
+        nickname = try values.decodeIfPresent(String.self, forKey: .nickname) ?? ""
         selectedCharacterID = PixelCharacterCatalog.canonicalID(
             for: try values.decodeIfPresent(String.self, forKey: .selectedCharacterID)
                 ?? PixelCharacterCatalog.pixelHamsterID

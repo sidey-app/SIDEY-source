@@ -155,15 +155,15 @@ enum FirebaseV2CompositeTransportError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .shutDown:
-            "Firebase 실시간 연결이 종료되었습니다."
+            L10n.text("firebase.transport.error.shut_down")
         case .roomNotAuthorized:
-            "현재 Firebase 권한으로 이 방을 열 수 없습니다."
+            L10n.text("firebase.transport.error.room_not_authorized")
         case .accessGrantClosed:
-            "Firebase 실시간 권한 갱신이 아직 완료되지 않았습니다."
+            L10n.text("firebase.transport.error.access_grant_closed")
         case .liveListenerUnavailable:
-            "Firebase 방 수신 연결을 준비할 수 없습니다."
+            L10n.text("firebase.transport.error.live_listener_unavailable")
         case .rolloutLeaseDidNotAdvance:
-            "Firebase 실시간 rollout lease가 갱신되지 않았습니다."
+            L10n.text("firebase.auth.error.rollout_lease_expired")
         }
     }
 }
@@ -434,7 +434,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             activeRoomTransportConnected: false
         )))
         eventContinuation.yield(.technicalError(
-            "Firebase 실시간 rollout 승인이 만료되었거나 중지되었습니다."
+            L10n.text("firebase.bootstrap.error.rollout_disabled")
         ))
         await retire(shutdownSupabase: false)
     }
@@ -533,7 +533,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             activeRoomTransportConnected: false
         )))
         eventContinuation.yield(.technicalError(
-            "Firebase 인증 세션이 현재 SIDEY 로그인과 일치하지 않습니다."
+            L10n.text("firebase.auth.error.login_mismatch")
         ))
         await shutdown()
     }
@@ -907,7 +907,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
                 break
             } catch {
                 eventContinuation.yield(.technicalError(
-                    "실시간 변경 후 서버 상태를 다시 확인하지 못했습니다."
+                    L10n.text("firebase.transport.error.reconciliation_failed")
                 ))
                 if requestedAccessRevision != nil {
                     isReconcilingHint = false
@@ -1011,7 +1011,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             activeRoomTransportConnected: false
         )))
         eventContinuation.yield(.technicalError(
-            "Firebase 실시간 수신 연결을 유지하지 못했습니다."
+            L10n.text("firebase.transport.error.listener_failed")
         ))
         // A terminal RTDB listener means Firebase can no longer prove that
         // this session still has room access. Close the complete composite

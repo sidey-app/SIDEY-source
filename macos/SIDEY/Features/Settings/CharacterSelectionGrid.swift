@@ -46,7 +46,7 @@ struct CharacterSelectionGrid: View {
             }
         }
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("캐릭터 선택")
+        .accessibilityLabel("profile.character.selection.accessibility")
     }
 }
 
@@ -65,7 +65,7 @@ private struct CharacterSelectionCard: View {
                     .resizable()
                     .frame(width: 72, height: 72)
                     .accessibilityHidden(true)
-                Text(character.displayName)
+                Text(localizedName)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
@@ -81,7 +81,37 @@ private struct CharacterSelectionCard: View {
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
-        .accessibilityLabel(character.displayName)
-        .accessibilityValue(isPending ? "장착 중" : (isSelected ? "선택됨" : "선택 안 됨"))
+        .accessibilityLabel(Text(localizedName))
+        .accessibilityValue(Text(accessibilityValue))
+    }
+
+    private var localizedName: LocalizedStringResource {
+        switch character.id {
+        case "pixel_hamster": "character.pixel_hamster.name"
+        case "pixel_cat": "character.pixel_cat.name"
+        case "pixel_puppy": "character.pixel_puppy.name"
+        case "pixel_rabbit": "character.pixel_rabbit.name"
+        case "pixel_penguin": "character.pixel_penguin.name"
+        case "pixel_guinea_pig": "character.pixel_guinea_pig.name"
+        case "pixel_monkey": "character.pixel_monkey.name"
+        case "pixel_chinchilla": "character.pixel_chinchilla.name"
+        case "pixel_starlight_upalupa": "character.pixel_starlight_upalupa.name"
+        case "pixel_otter": "character.pixel_otter.name"
+        case "pixel_pig": "character.pixel_pig.name"
+        case "pixel_tree": "character.pixel_tree.name"
+        case "pixel_shiba": "character.pixel_shiba.name"
+        case "pixel_duck": "character.pixel_duck.name"
+        case "pixel_poop": "character.pixel_poop.name"
+        case "pixel_tteokbokki": "character.pixel_tteokbokki.name"
+        case "pixel_quokka": "character.pixel_quokka.name"
+        default: "character.unknown.name"
+        }
+    }
+
+    private var accessibilityValue: LocalizedStringResource {
+        if isPending { return "profile.character.state.equipping" }
+        return isSelected
+            ? "profile.selection.state.selected"
+            : "profile.selection.state.not_selected"
     }
 }

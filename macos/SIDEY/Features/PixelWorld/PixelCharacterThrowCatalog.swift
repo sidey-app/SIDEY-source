@@ -19,8 +19,8 @@ enum PixelCharacterThrowCatalog {
 
     static func interactionDescription(for characterID: String) -> String {
         characterID == PixelCharacterCatalog.pixelTreeID
-            ? "나무를 우클릭하면 멈추거나 걸어요."
-            : "친구를 클릭하면 기본 말랑공을 던져요."
+            ? L10n.text("pixel_world.interaction.tree")
+            : L10n.text("pixel_world.interaction.throw")
     }
 
     static func supports(objectID: String?) -> Bool {

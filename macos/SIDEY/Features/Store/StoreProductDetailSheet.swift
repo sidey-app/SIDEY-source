@@ -15,20 +15,20 @@ struct StoreProductDetailSheet: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                Text(productState.product.displayName).font(.title2.bold())
+                Text(productState.displayName).font(.title2.bold())
                 if productState.product.kind != .character {
-                    Text(productState.product.description)
+                    Text(productState.displayDescription)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                StorePreviewStage(product: productState.product,
+                StorePreviewStage(product: productState.displayProduct,
                     onCharacterImpact: { object, time in
                         if playsPreviewSound { actions.onCharacterImpact(object, time) }
                     }, onStopCharacterSounds: actions.onStopCharacterSounds)
                     .overlay(alignment: .topLeading) {
                         if productState.product.characterID == PixelCharacterCatalog.pixelTreeID {
-                            Text("나무를 우클릭하면 멈추고, 다시 우클릭하면 걸어요.")
+                            Text(L10n.text("store.preview.tree_toggle_hint"))
                                 .font(.caption).foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .padding(.trailing, 60).padding(12)
@@ -37,14 +37,18 @@ struct StoreProductDetailSheet: View {
                     }
                     .overlay(alignment: .topTrailing) {
                         if productState.product.kind != .bubble {
-                            Button(playsPreviewSound ? "미리보기 소리 끄기" : "미리보기 소리 켜기",
+                            Button(playsPreviewSound
+                                   ? L10n.text("store.preview.sound.off")
+                                   : L10n.text("store.preview.sound.on"),
                                    systemImage: playsPreviewSound ? "speaker.wave.2.fill" : "speaker.slash.fill") {
                                 playsPreviewSound.toggle()
                                 if !playsPreviewSound { actions.onStopCharacterSounds() }
                             }
                             .labelStyle(.iconOnly)
                             .buttonStyle(.bordered)
-                            .help(playsPreviewSound ? "미리보기 소리 끄기" : "미리보기 소리 켜기")
+                            .help(playsPreviewSound
+                                  ? L10n.text("store.preview.sound.off")
+                                  : L10n.text("store.preview.sound.on"))
                             .padding(12)
                         }
                     }
@@ -67,9 +71,9 @@ struct StoreProductDetailSheet: View {
         }
         .frame(width: 600, height: min(contentHeight, 720))
         .overlay(alignment: .topTrailing) {
-            Button("닫기", systemImage: "xmark", action: onClose)
+            Button(L10n.text("common.close"), systemImage: "xmark", action: onClose)
                 .labelStyle(.iconOnly).buttonStyle(.plain).padding(12)
-                .accessibilityLabel("상품 상세 닫기")
+                .accessibilityLabel(L10n.text("store.product.detail.close"))
         }
         .onDisappear { actions.onStopCharacterSounds() }
     }
@@ -83,7 +87,7 @@ private struct StoreDetailPurchaseCard: View {
     var showsDescription = false
 
     private var kindLabel: String {
-        state.product.isKeepsake ? "애착 물건" : state.product.kind.title
+        state.product.isKeepsake ? L10n.text("store.kind.keepsake") : state.product.kind.title
     }
     var body: some View {
         VStack(spacing: 10) {
@@ -91,17 +95,17 @@ private struct StoreDetailPurchaseCard: View {
                 Text(kindLabel).font(.caption.weight(.medium))
                 Spacer(minLength: 2)
                 if state.product.isKeepsake {
-                    Text("별도 판매").font(.caption2.weight(.semibold))
+                    Text(L10n.text("store.product.sold_separately")).font(.caption2.weight(.semibold))
                         .padding(.horizontal, 8).padding(.vertical, 4)
                         .background(Color.accentColor.opacity(0.14), in: Capsule())
                 }
             }
             .frame(height: 22)
-            StoreProductPreview(product: state.product, pointSize: 64).frame(height: 64)
-            Text(state.product.displayName).font(.callout.weight(.semibold))
+            StoreProductPreview(product: state.displayProduct, pointSize: 64).frame(height: 64)
+            Text(state.displayName).font(.callout.weight(.semibold))
                 .lineLimit(2, reservesSpace: true).multilineTextAlignment(.center)
             if showsDescription {
-                Text(state.product.storeDescription)
+                Text(state.displayDescription)
                     .font(.caption).foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -119,28 +123,31 @@ private struct StoreDetailPurchaseCard: View {
                 .frame(maxWidth: .infinity, minHeight: 30)
         } else if state.isWorking {
             ProgressView().controlSize(.small).frame(maxWidth: .infinity, minHeight: 30)
-                .accessibilityLabel("\(state.product.displayName) 처리 중")
+                .accessibilityLabel(L10n.format("store.product.processing.accessibility", state.displayName))
         } else if state.purchaseState == .owned {
-            Text(state.isEquipped ? "사용 중" : "보유 중")
+            Text(state.isEquipped
+                 ? L10n.text("store.product.equipped")
+                 : L10n.text("store.purchase.owned"))
                 .font(.callout.weight(.medium)).frame(maxWidth: .infinity, minHeight: 30)
         } else if case .error = state.purchaseState {
-            Button("상태 다시 확인") { actions.onRefreshCommerceState(state.id) }
+            Button(L10n.text("store.status.retry")) { actions.onRefreshCommerceState(state.id) }
                 .disabled(purchaseInProgress)
         } else if state.purchaseState == .unavailable {
             VStack(spacing: 6) {
-                Text("이 상품은 아직 구매할 수 없어요.")
+                Text(L10n.text("store.product.unavailable.detail"))
                     .font(.caption).foregroundStyle(.secondary)
-                Button("상태 다시 확인") { actions.onRefreshCommerceState(state.id) }
+                Button(L10n.text("store.status.retry")) { actions.onRefreshCommerceState(state.id) }
                     .disabled(purchaseInProgress)
             }
             .frame(maxWidth: .infinity, minHeight: 30)
-        } else if availability.usesAppStore && state.localizedPrice == nil {
+        } else if availability.usesAppStore && !state.storefrontProductAvailable {
             VStack(spacing: 6) {
                 Text(state.priceLoadState == .loading
-                     ? "가격을 불러오는 중이에요" : "App Store 가격을 확인할 수 없어요")
+                     ? L10n.text("store.price.loading")
+                     : L10n.text("store.price.unavailable"))
                     .font(.caption).foregroundStyle(.secondary)
                 if state.priceLoadState != .loading {
-                    Button("가격 다시 확인") { actions.onRefreshCommerceState(state.id) }
+                    Button(L10n.text("store.price.retry")) { actions.onRefreshCommerceState(state.id) }
                         .disabled(purchaseInProgress)
                 }
             }
@@ -149,12 +156,14 @@ private struct StoreDetailPurchaseCard: View {
             Button {
                 actions.onPurchase(state.id)
             } label: {
-                Text("\(kindLabel) · \(state.formattedPrice) 구매")
+                Text(L10n.format("store.purchase.action", kindLabel, state.formattedPrice))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(purchaseInProgress || (availability.usesAppStore && state.localizedPrice == nil))
-            .accessibilityLabel("\(state.product.displayName), \(state.formattedPrice) 구매")
+            .disabled(purchaseInProgress || (availability.usesAppStore && !state.storefrontProductAvailable))
+            .accessibilityLabel(L10n.format(
+                "store.purchase.accessibility", state.displayName, state.formattedPrice
+            ))
         }
     }
 }

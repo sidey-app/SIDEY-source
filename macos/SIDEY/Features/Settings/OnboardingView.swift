@@ -17,17 +17,15 @@ struct OnboardingView: View {
             ScrollView {
                 VStack(spacing: 28) {
                     HStack(spacing: 8) {
-                        stepBadge(number: 1, title: "프로필", complete: model.hasProfile)
+                        stepBadge(number: 1, title: "onboarding.step.profile", complete: model.hasProfile)
                         Image(systemName: "chevron.right").foregroundStyle(.tertiary)
-                        stepBadge(number: 2, title: "그룹", complete: model.preferences.onboardingComplete)
+                        stepBadge(number: 2, title: "onboarding.step.group", complete: model.preferences.onboardingComplete)
                     }
 
                     VStack(spacing: 8) {
-                        Text(model.hasProfile ? "친구와 연결하기" : "SIDEY에서 쓸 이름 정하기")
+                        Text(headerTitle)
                             .font(.system(size: 34, weight: .bold, design: .rounded))
-                        Text(model.hasProfile
-                             ? "그룹을 만들거나 받은 초대 코드로 참여하면 픽셀 월드가 나타납니다."
-                             : "나중에 설정에서 언제든 바꿀 수 있습니다.")
+                        Text(headerDescription)
                             .font(.title3)
                             .foregroundStyle(.secondary)
                     }
@@ -75,7 +73,7 @@ struct OnboardingView: View {
 
     private var profileStep: some View {
         VStack(alignment: .leading, spacing: 22) {
-            Text("내 캐릭터")
+            Text("onboarding.profile.character.title")
                 .font(.title2.bold())
             CharacterSelectionGrid(
                 maximumColumns: 4,
@@ -83,7 +81,7 @@ struct OnboardingView: View {
                 confirmedSelection: model.selectedCharacterID,
                 onSelect: { model.selectedCharacterID = $0 }
             )
-            TextField("닉네임 2~8자", text: $model.nickname)
+            TextField("onboarding.profile.nickname.placeholder", text: $model.nickname)
                 .textFieldStyle(.roundedBorder)
                 .font(.title3)
                 .onChange(of: model.nickname) { _, value in
@@ -91,11 +89,11 @@ struct OnboardingView: View {
                     if limited != value { model.nickname = limited }
                 }
             HStack {
-                Text("같은 그룹에서 캐릭터와 닉네임이 겹쳐도 괜찮습니다.")
+                Text("profile.duplicates_allowed")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Button("다음") {
+                Button("common.next") {
                     PendingTextInputCommitter.commitThen(actions.onSaveProfile)
                 }
                     .buttonStyle(.glassProminent)
@@ -106,7 +104,7 @@ struct OnboardingView: View {
 
     private var groupStep: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Picker("그룹 연결 방식", selection: $groupPath) {
+            Picker("onboarding.group.path.accessibility", selection: $groupPath) {
                 ForEach(GroupPath.allCases) { path in
                     Text(path.title).tag(path)
                 }
@@ -114,14 +112,14 @@ struct OnboardingView: View {
             .pickerStyle(.segmented)
 
             if groupPath == .create {
-                TextField("새 그룹 이름", text: $model.newRoomName)
+                TextField("groups.create.name.placeholder", text: $model.newRoomName)
                     .textFieldStyle(.roundedBorder)
                 HStack {
-                    Text("새 비공개 그룹을 직접 만들 수 있습니다.").foregroundStyle(.secondary)
+                    Text("onboarding.group.create.description").foregroundStyle(.secondary)
                     Spacer()
                     Button(action: actions.onCreateRoom) {
                         OperationButtonLabel(
-                            title: model.groupOperation.createButtonTitle,
+                            title: model.groupOperation.localizedCreateButtonTitle,
                             showsProgress: model.groupOperation == .creating
                         )
                     }
@@ -129,19 +127,22 @@ struct OnboardingView: View {
                         .disabled(model.groupMutationsDisabled || !validRoomName)
                 }
             } else {
-                TextField("친구에게 받은 초대 코드", text: $model.inviteCode)
+                TextField("onboarding.group.invite_code.placeholder", text: $model.inviteCode)
                     .textFieldStyle(.roundedBorder)
                     .onChange(of: model.inviteCode) { _, value in
                         let uppercased = value.uppercased()
                         if value != uppercased { model.inviteCode = uppercased }
                     }
                 HStack {
-                    Text("그룹에는 최대 \(ProductLimits.maximumRoomMembers)명까지 참여할 수 있습니다.")
+                    Text(verbatim: L10n.format(
+                        "onboarding.group.member_limit",
+                        ProductLimits.maximumRoomMembers
+                    ))
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button(action: actions.onJoinRoom) {
                         OperationButtonLabel(
-                            title: model.groupOperation.joinButtonTitle,
+                            title: model.groupOperation.localizedJoinButtonTitle,
                             showsProgress: model.groupOperation == .joining
                         )
                     }
@@ -152,7 +153,11 @@ struct OnboardingView: View {
         }
     }
 
-    private func stepBadge(number: Int, title: String, complete: Bool) -> some View {
+    private func stepBadge(
+        number: Int,
+        title: LocalizedStringResource,
+        complete: Bool
+    ) -> some View {
         HStack(spacing: 7) {
             Image(systemName: complete ? "checkmark.circle.fill" : "\(number).circle.fill")
             Text(title)
@@ -169,11 +174,41 @@ struct OnboardingView: View {
         RoomNameValidator.isValid(model.newRoomName)
     }
 
+    private var headerTitle: LocalizedStringResource {
+        model.hasProfile
+            ? "onboarding.group.title"
+            : "onboarding.profile.title"
+    }
+
+    private var headerDescription: LocalizedStringResource {
+        model.hasProfile
+            ? "onboarding.group.description"
+            : "onboarding.profile.description"
+    }
+
     private enum GroupPath: String, CaseIterable, Identifiable {
         case create
         case join
 
         var id: String { rawValue }
-        var title: String { self == .create ? "새 그룹 만들기" : "초대 코드 참여" }
+        var title: LocalizedStringResource {
+            self == .create
+                ? "onboarding.group.path.create"
+                : "onboarding.group.path.join"
+        }
+    }
+}
+
+extension GroupOperation {
+    var localizedCreateButtonTitle: LocalizedStringResource {
+        self == .creating
+            ? "groups.operation.creating"
+            : "groups.operation.create"
+    }
+
+    var localizedJoinButtonTitle: LocalizedStringResource {
+        self == .joining
+            ? "groups.operation.joining"
+            : "groups.operation.join"
     }
 }

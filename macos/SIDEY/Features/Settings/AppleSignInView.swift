@@ -11,9 +11,9 @@ struct AppleSignInView: View {
                 .font(.system(size: 54))
                 .foregroundStyle(.mint)
             VStack(spacing: 8) {
-                Text("Apple로 SIDEY 시작하기")
+                Text("auth.apple.title")
                     .font(.system(size: 30, weight: .bold, design: .rounded))
-                Text("구매 복원과 계정 보호를 위해 App Store 버전은 Apple 로그인이 필요합니다.")
+                Text("auth.apple.description")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -31,9 +31,9 @@ struct AppleSignInView: View {
             .frame(width: 280, height: 44)
             .disabled(model.accountOperationInProgress)
 
-            if model.accountOperationInProgress { ProgressView("로그인 확인 중") }
+            if model.accountOperationInProgress { ProgressView("auth.apple.verifying") }
             if let error = model.errorMessage {
-                Text(error).font(.callout).foregroundStyle(.red).multilineTextAlignment(.center)
+                Text(verbatim: error).font(.callout).foregroundStyle(.red).multilineTextAlignment(.center)
             }
         }
         .padding(48)

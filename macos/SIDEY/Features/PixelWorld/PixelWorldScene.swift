@@ -47,7 +47,7 @@ struct PixelCharacterVisualState: Equatable {
 }
 
 enum PixelDozeLabelStyle {
-    static let text = "Zzz"
+    static var text: String { L10n.text("pixel_world.doze_label") }
     static let fontSize: CGFloat = 14
     static let outlineWidth: CGFloat = 2
     static let restingAlpha: CGFloat = 0.55
@@ -1161,7 +1161,9 @@ private final class PixelCharacterNode: SKNode {
         presentation.zRotation = edge.presentationRotation
         nameplateLayer.zRotation = edge.readableContentCounterRotation
         dozeEffect.zRotation = edge.readableContentCounterRotation
-        nickname.text = member.isCurrentUser ? "\(member.nickname) · 나" : member.nickname
+        nickname.text = member.isCurrentUser
+            ? L10n.format("pixel_world.nickname.current_user", member.nickname)
+            : member.nickname
         let backgroundFrame = PixelNameplateLayout.backgroundFrame(nicknameFrame: nickname.frame)
         let backgroundPath = CGMutablePath()
         backgroundPath.addRoundedRect(

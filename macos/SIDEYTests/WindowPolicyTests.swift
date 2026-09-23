@@ -804,18 +804,19 @@ final class WindowPolicyTests: XCTestCase {
         )
 
         let menu = controller.makeMenu()
-        XCTAssertNotNil(menu.item(withTitle: "메시지 작성…"))
+        XCTAssertNotNil(menu.item(withTitle: L10n.text("status.menu.compose")))
         XCTAssertNil(menu.item(withTitle: "캐릭터 이동 모드"))
-        XCTAssertNotNil(menu.item(withTitle: "최근 기록…"))
+        XCTAssertNotNil(menu.item(withTitle: L10n.text("status.menu.history")))
         XCTAssertNil(menu.item(withTitle: "오버레이 잠금 해제"))
         XCTAssertNil(menu.item(withTitle: "오버레이 위치 초기화"))
-        XCTAssertNotNil(menu.item(withTitle: "그룹 설정…"))
+        XCTAssertNotNil(menu.item(withTitle: L10n.text("status.menu.group_settings")))
         XCTAssertNil(menu.item(withTitle: "업데이트 확인…"))
-        XCTAssertEqual(menu.item(withTitle: "조용히 모드")?.state, .on)
-        XCTAssertEqual(menu.item(withTitle: "로그인 시 자동 실행")?.state, .on)
-        let groups = try XCTUnwrap(menu.item(withTitle: "활성 그룹")?.submenu)
+        XCTAssertEqual(menu.item(withTitle: L10n.text("status.menu.quiet_mode"))?.state, .on)
+        XCTAssertEqual(menu.item(withTitle: L10n.text("status.menu.launch_at_login"))?.state, .on)
+        let groups = try XCTUnwrap(menu.item(withTitle: L10n.text("status.menu.active_group"))?.submenu)
         XCTAssertEqual(groups.item(withTitle: "작업방")?.state, .on)
-        XCTAssertNotNil(groups.item(withTitle: "친구방 (3)"))
+        let count = NumberFormatter.localizedString(from: NSNumber(value: 3), number: .decimal)
+        XCTAssertNotNil(groups.item(withTitle: "친구방" + L10n.format("status.room.unread_count", count)))
     }
 
     func testStatusItemUsesTemplateHamsterAssetsForReadAndUnreadStates() throws {

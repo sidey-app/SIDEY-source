@@ -103,10 +103,10 @@ enum BackendConnectionState: Equatable, Sendable {
 
     var label: String {
         switch self {
-        case .idle: "대기 중"
-        case .connecting: "연결 중"
-        case .online: "연결됨"
-        case .failed: "연결 오류"
+        case .idle: L10n.text("backend.connection.idle")
+        case .connecting: L10n.text("backend.connection.connecting")
+        case .online: L10n.text("backend.connection.online")
+        case .failed: L10n.text("backend.connection.failed")
         }
     }
 }
@@ -636,6 +636,7 @@ struct RotateInviteCodeParameters: Encodable, Sendable {
 enum SideyBackendError: LocalizedError, Equatable {
     case invalidProfile
     case invalidRoomName
+    case invalidMessage
     case invalidInviteCode
     case inviteRateLimited
     case roomLimitReached
@@ -652,30 +653,43 @@ enum SideyBackendError: LocalizedError, Equatable {
     case sessionRecoveryFailed
     case realtimeUnavailable
     case staleRealtimeEpoch
-    case remote(String)
+    case authenticationRequired
+    case remote(diagnostic: String)
 
     var errorDescription: String? {
         switch self {
-        case .invalidProfile: "닉네임은 줄바꿈 없이 2~8자로 입력해 주세요."
-        case .invalidRoomName: "그룹 이름은 줄바꿈 없이 1~20자로 입력해 주세요."
-        case .invalidInviteCode: "초대 코드를 다시 확인해 주세요."
-        case .inviteRateLimited: "초대 코드 시도가 너무 많습니다. 10분 뒤 다시 시도해 주세요."
-        case .roomLimitReached: "한 사용자는 그룹을 최대 5개까지 사용할 수 있습니다."
-        case .memberLimitReached: "이 그룹은 이미 \(ProductLimits.maximumRoomMembers)명으로 가득 찼습니다."
-        case .alreadyMember: "이미 참여 중인 그룹입니다."
-        case .profileRequired: "프로필을 먼저 저장해 주세요."
-        case .ownerRequired: "방장만 이 작업을 할 수 있습니다."
-        case .memberNotFound: "내보낼 멤버를 찾지 못했습니다."
-        case .membershipRequired: "이 그룹의 멤버만 이 작업을 할 수 있습니다."
-        case .ownerCannotRemoveSelf: "방장 본인은 내보낼 수 없습니다."
-        case .noActiveRoom: "메시지를 보낼 그룹이 없습니다."
-        case .malformedResponse: "서버 응답 형식을 해석하지 못했습니다."
-        case .invalidTimestamp: "서버 메시지 시각을 해석하지 못했습니다."
-        case .sessionRecoveryFailed: "기존 로그인 세션을 복구하지 못했습니다. 새 계정은 만들지 않았으니 다시 로그인하거나 지원을 요청해 주세요."
-        case .realtimeUnavailable: "실시간 연결이 준비되지 않았습니다."
-        case .staleRealtimeEpoch: "그룹 권한이 변경되어 실시간 연결을 새로 고쳐야 합니다."
-        case .remote(let message): message
+        case .invalidProfile: L10n.text("backend.error.invalid_profile")
+        case .invalidRoomName: L10n.text("backend.error.invalid_room_name")
+        case .invalidMessage: L10n.text("backend.error.invalid_message")
+        case .invalidInviteCode: L10n.text("backend.error.invalid_invite_code")
+        case .inviteRateLimited: L10n.text("backend.error.invite_rate_limited")
+        case .roomLimitReached: L10n.text("backend.error.room_limit_reached")
+        case .memberLimitReached:
+            L10n.format(
+                "backend.error.member_limit_reached",
+                Int64(ProductLimits.maximumRoomMembers)
+            )
+        case .alreadyMember: L10n.text("backend.error.already_member")
+        case .profileRequired: L10n.text("backend.error.profile_required")
+        case .ownerRequired: L10n.text("backend.error.owner_required")
+        case .memberNotFound: L10n.text("backend.error.member_not_found")
+        case .membershipRequired: L10n.text("backend.error.membership_required")
+        case .ownerCannotRemoveSelf: L10n.text("backend.error.owner_cannot_remove_self")
+        case .noActiveRoom: L10n.text("backend.error.no_active_room")
+        case .malformedResponse: L10n.text("backend.error.malformed_response")
+        case .invalidTimestamp: L10n.text("backend.error.invalid_timestamp")
+        case .sessionRecoveryFailed: L10n.text("backend.error.session_recovery_failed")
+        case .realtimeUnavailable: L10n.text("backend.error.realtime_unavailable")
+        case .staleRealtimeEpoch: L10n.text("backend.error.stale_realtime_epoch")
+        case .authenticationRequired: L10n.text("backend.error.authentication_required")
+        case .remote: L10n.text("backend.error.generic")
         }
+    }
+
+    /// Remote details are retained for diagnostics only. UI must use `localizedDescription`.
+    var diagnosticDescription: String? {
+        guard case .remote(let diagnostic) = self else { return nil }
+        return diagnostic
     }
 
     static func business(code: String) -> Self {
@@ -692,7 +706,10 @@ enum SideyBackendError: LocalizedError, Equatable {
         case "owner_must_leave": .ownerCannotRemoveSelf
         case "invalid_room_name": .invalidRoomName
         case "stale_realtime_epoch": .staleRealtimeEpoch
-        default: .remote(code)
+        case "invalid_profile": .invalidProfile
+        case "invalid_message": .invalidMessage
+        case "authentication_required": .authenticationRequired
+        default: .remote(diagnostic: code)
         }
     }
 
@@ -701,15 +718,25 @@ enum SideyBackendError: LocalizedError, Equatable {
         let description = error.localizedDescription
         let diagnostic = description + " " + String(reflecting: error)
         let knownCodes = [
-            "invalid_room_name",
+            "invalid_invite_code",
+            "invite_rate_limited",
+            "room_limit_reached",
+            "member_limit_reached",
+            "already_a_member",
+            "profile_required",
             "owner_required",
             "member_not_found",
             "membership_required",
-            "owner_must_leave"
+            "owner_must_leave",
+            "invalid_room_name",
+            "stale_realtime_epoch",
+            "invalid_profile",
+            "invalid_message",
+            "authentication_required"
         ]
         if let code = knownCodes.first(where: { diagnostic.contains($0) }) {
             return business(code: code)
         }
-        return .remote(description)
+        return .remote(diagnostic: diagnostic)
     }
 }

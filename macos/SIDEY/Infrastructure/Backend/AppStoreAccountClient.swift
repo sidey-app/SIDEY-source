@@ -36,5 +36,5 @@ private struct DeleteAccountRequest: Encodable {
 
 enum AppStoreAccountError: LocalizedError {
     case deletionRejected
-    var errorDescription: String? { "계정 삭제 요청을 완료하지 못했습니다." }
+    var errorDescription: String? { L10n.text("account_delete.error.request_failed") }
 }

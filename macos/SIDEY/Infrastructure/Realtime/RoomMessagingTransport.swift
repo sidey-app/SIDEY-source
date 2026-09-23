@@ -385,7 +385,7 @@ actor RoomMessagingTransportRouter {
         } catch {
             operationalState = .blocked
             eventContinuation.yield(.technicalError(
-                "실시간 kill-switch용 Supabase 연결을 만들지 못했습니다."
+                L10n.text("realtime.kill_switch.error.legacy_connection_creation_failed")
             ))
             throw error
         }
@@ -406,7 +406,7 @@ actor RoomMessagingTransportRouter {
             blockedLegacyTransport = legacyTransport
             operationalState = .blocked
             eventContinuation.yield(.technicalError(
-                "실시간 kill-switch 적용 후 Supabase 연결을 복구하지 못했습니다."
+                L10n.text("realtime.kill_switch.error.legacy_connection_recovery_failed")
             ))
             throw error
         }

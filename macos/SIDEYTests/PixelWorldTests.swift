@@ -1068,7 +1068,7 @@ final class PixelWorldTests: XCTestCase {
         for characterID in ["pixel_guinea_pig", "pixel_monkey", "pixel_chinchilla", "pixel_starlight_upalupa", "unknown"] {
             XCTAssertEqual(PixelCharacterThrowCatalog.objectID(for: characterID), "patch_soft_ball")
             XCTAssertEqual(PixelCharacterThrowCatalog.interactionDescription(for: characterID),
-                           "친구를 클릭하면 기본 말랑공을 던져요.")
+                           L10n.text("pixel_world.interaction.throw"))
         }
         XCTAssertEqual(
             PixelCharacterThrowCatalog.resolvedObjectID(

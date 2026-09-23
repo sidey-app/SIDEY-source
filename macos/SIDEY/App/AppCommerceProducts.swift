@@ -14,7 +14,6 @@ final class AppCommerceProducts {
 
     func apply(_ state: CommerceState) -> Bool {
         guard let index = commerceProducts.firstIndex(where: { $0.id == state.product.id }) else { return false }
-        commerceProducts[index].product = state.product
         commerceProducts[index].purchaseState = state.purchaseState
         commerceProducts[index].isEquipped = state.isEquipped
         return true
@@ -49,14 +48,18 @@ final class AppCommerceProducts {
 
     func failCommercePriceLoading() {
         for index in commerceProducts.indices {
+            commerceProducts[index].storefrontMetadata = nil
+            commerceProducts[index].localizedPrice = nil
             commerceProducts[index].priceLoadState = .failed
         }
     }
 
-    func setCommerceLocalizedPrices(_ prices: [String: String]) {
+    func setCommerceStorefrontMetadata(_ metadata: [String: StorefrontProductMetadata]) {
         for index in commerceProducts.indices {
-            commerceProducts[index].localizedPrice = prices[commerceProducts[index].id]
-            commerceProducts[index].priceLoadState = commerceProducts[index].localizedPrice == nil
+            let productMetadata = metadata[commerceProducts[index].id]
+            commerceProducts[index].storefrontMetadata = productMetadata
+            commerceProducts[index].localizedPrice = productMetadata?.displayPrice
+            commerceProducts[index].priceLoadState = productMetadata == nil
                 ? .unavailable : .available
         }
     }

@@ -11,9 +11,24 @@
       "displayPrice": "2200",
       "localizations": [
         {
-          "description": "진주빛 몸과 별빛 아가미를 가진 우파루파 캐릭터",
+          "description": "길 잃은 별 하나를 데려왔어요. 잘 때도 품에 꼭 안고 잔대요.",
           "displayName": "별빛 우파루파",
           "locale": "ko_KR"
+        },
+        {
+          "description": "An axolotl who hugs a lost star to sleep.",
+          "displayName": "Starlight Axolotl",
+          "locale": "en_US"
+        },
+        {
+          "description": "迷子の星を抱いて眠るウーパールーパーです。",
+          "displayName": "星明かりのウーパールーパー",
+          "locale": "ja"
+        },
+        {
+          "description": "抱著迷路小星星入睡的六角恐龍。",
+          "displayName": "星光六角恐龍",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -41,9 +56,24 @@
       "displayPrice": "1100",
       "localizations": [
         {
-          "description": "비대칭 삼색 무늬의 아기 기니피그 캐릭터",
+          "description": "간식을 숨긴 곳을 잊어버렸어요. 볼이 빵빵한 걸 보니 멀리 있진 않네요.",
           "displayName": "아기 기니피그",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A forgetful snack hoarder with full cheeks.",
+          "displayName": "Baby Guinea Pig",
+          "locale": "en_US"
+        },
+        {
+          "description": "おやつの隠し場所を忘れた、ほっぺがパンパンの子。",
+          "displayName": "こどもモルモット",
+          "locale": "ja"
+        },
+        {
+          "description": "忘了零食藏哪裡，臉頰卻還鼓鼓的。",
+          "displayName": "天竺鼠寶寶",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -74,6 +104,21 @@
           "description": "바나나를 나눠 주러 왔어요. 오는 길에 한 입만 먹었다는데… 반쪽이네요?",
           "displayName": "아기 원숭이",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Came to share a banana. Why is half gone?",
+          "displayName": "Baby Monkey",
+          "locale": "en_US"
+        },
+        {
+          "description": "バナナを分けに来ました。残りはなぜか半分です。",
+          "displayName": "こざる",
+          "locale": "ja"
+        },
+        {
+          "description": "帶香蕉來分享，怎麼只剩一半了？",
+          "displayName": "小猴子",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -146,9 +191,24 @@
       "displayPrice": "1100",
       "localizations": [
         {
-          "description": "파란 목도리를 두른 아기 친칠라 캐릭터",
+          "description": "모래 목욕을 마치고 놀러 왔어요. 인사보다 먼저 뽀송한 털 자랑부터 해요.",
           "displayName": "아기 친칠라",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Fresh from a sand bath and extra fluffy.",
+          "displayName": "Baby Chinchilla",
+          "locale": "en_US"
+        },
+        {
+          "description": "砂浴び帰りで、ふわふわの毛が自慢です。",
+          "displayName": "こどもチンチラ",
+          "locale": "ja"
+        },
+        {
+          "description": "剛做完沙浴，急著炫耀蓬鬆的毛。",
+          "displayName": "龍貓寶寶",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -176,6 +236,21 @@
           "description": "토끼 장식이 있는 분홍 말풍선",
           "displayName": "핑크 토끼 말풍선",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A pink speech bubble with a bunny decoration.",
+          "displayName": "Pink Bunny Bubble",
+          "locale": "en_US"
+        },
+        {
+          "description": "うさぎの飾りがついたピンクの吹き出しです。",
+          "displayName": "ピンクうさぎの吹き出し",
+          "locale": "ja"
+        },
+        {
+          "description": "帶有兔兔裝飾的粉紅色對話框。",
+          "displayName": "粉紅兔兔對話框",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "bubble_bunny_pink",
@@ -191,6 +266,21 @@
           "description": "병아리 장식이 있는 버터색 말풍선",
           "displayName": "버터 병아리 말풍선",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A butter-yellow bubble with a little chick.",
+          "displayName": "Butter Chick Bubble",
+          "locale": "en_US"
+        },
+        {
+          "description": "ひよこの飾りがついたバター色の吹き出しです。",
+          "displayName": "バターひよこの吹き出し",
+          "locale": "ja"
+        },
+        {
+          "description": "帶有小雞裝飾的奶油色對話框。",
+          "displayName": "奶油小雞對話框",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "bubble_butter_chick",
@@ -206,6 +296,21 @@
           "description": "별고양이 장식이 있는 남보라 말풍선",
           "displayName": "별밤 고양이 말풍선",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A violet bubble with a starry cat decoration.",
+          "displayName": "Starry Cat Bubble",
+          "locale": "en_US"
+        },
+        {
+          "description": "星ねこの飾りがついた青紫色の吹き出しです。",
+          "displayName": "星空ねこの吹き出し",
+          "locale": "ja"
+        },
+        {
+          "description": "帶有星空貓裝飾的藍紫色對話框。",
+          "displayName": "星空貓咪對話框",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "bubble_starry_cat",
@@ -221,6 +326,21 @@
           "description": "통통 튀며 날아가는 하트 투척물",
           "displayName": "통통 하트",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A throwable heart that bounces as it flies.",
+          "displayName": "Bouncy Heart",
+          "locale": "en_US"
+        },
+        {
+          "description": "ぴょんぴょん弾みながら飛んでいくハートです。",
+          "displayName": "はずむハート",
+          "locale": "ja"
+        },
+        {
+          "description": "一路彈跳飛出去的愛心投擲物。",
+          "displayName": "彈跳愛心",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "throwable_bouncy_heart",
@@ -236,6 +356,21 @@
           "description": "심지탄을 쏘는 미니 대포 투척물",
           "displayName": "미니 대포",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A mini cannon that fires a fuse-lit shell.",
+          "displayName": "Mini Cannon",
+          "locale": "en_US"
+        },
+        {
+          "description": "導火線つきの弾を撃つミニ大砲です。",
+          "displayName": "ミニ大砲",
+          "locale": "ja"
+        },
+        {
+          "description": "發射引信砲彈的迷你大砲投擲物。",
+          "displayName": "迷你大砲",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "throwable_toy_cannon",
@@ -248,9 +383,24 @@
       "internalID": "03000000-0000-4000-8000-000000000003",
       "localizations": [
         {
-          "description": "노란 오리가 빙글빙글 날아가는 투척물",
+          "description": "오리가 오리를 던져요. 가족 문제는 아닌 것 같아요.",
           "displayName": "삑삑 오리",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A duck throwing a duck. Not a family dispute.",
+          "displayName": "Squeaky Duck",
+          "locale": "en_US"
+        },
+        {
+          "description": "アヒルがアヒルを投げます。家庭の事情ではなさそう。",
+          "displayName": "キュッキュッアヒル",
+          "locale": "ja"
+        },
+        {
+          "description": "鴨子丟鴨子，看來不是家庭糾紛。",
+          "displayName": "吱吱小鴨",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "throwable_squeaky_duck",
@@ -263,9 +413,24 @@
       "internalID": "01000000-0000-4000-8000-000000000011",
       "localizations": [
         {
-          "description": "크림색 배와 보라 목도리를 두른 수달이에요.",
+          "description": "마음에 드는 조개를 보여 주러 왔어요. 구경은 되지만 가져가면 삐져요.",
           "displayName": "아기 수달",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Admire its favorite clam, but don't take it.",
+          "displayName": "Baby Otter",
+          "locale": "en_US"
+        },
+        {
+          "description": "お気に入りの貝は見てもいいけど、持ち去り禁止です。",
+          "displayName": "こどもカワウソ",
+          "locale": "ja"
+        },
+        {
+          "description": "可以欣賞牠的寶貝貝殼，但別拿走。",
+          "displayName": "水獺寶寶",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "character_otter",
@@ -278,9 +443,24 @@
       "internalID": "01000000-0000-4000-8000-000000000012",
       "localizations": [
         {
-          "description": "동그란 코와 보라 목도리의 돼지예요.",
+          "description": "간식 냄새를 따라왔다가 눌러앉았어요. 이제 여기가 자기 집인 줄 알아요.",
           "displayName": "아기 돼지",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Followed a snack scent and moved right in.",
+          "displayName": "Baby Pig",
+          "locale": "en_US"
+        },
+        {
+          "description": "おやつの匂いを追って、そのまま居つきました。",
+          "displayName": "こぶた",
+          "locale": "ja"
+        },
+        {
+          "description": "循著零食香味而來，乾脆住下來了。",
+          "displayName": "小豬寶寶",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "character_pig",
@@ -293,9 +473,24 @@
       "internalID": "C4478E77-6BC7-4D27-861A-0D8819307D63",
       "localizations": [
         {
-          "description": "둥근 초록 잎과 보라 목도리의 작은 나무예요.",
+          "description": "산책 나온 작은 나무예요. 잠깐 쉬랬더니 뿌리내릴 자리를 고르고 있어요.",
           "displayName": "나무",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Out for a walk and scouting a place to root.",
+          "displayName": "Little Tree",
+          "locale": "en_US"
+        },
+        {
+          "description": "散歩の途中で、根を下ろす場所を探しています。",
+          "displayName": "小さな木",
+          "locale": "ja"
+        },
+        {
+          "description": "出門散步，卻開始挑選落地生根的地方。",
+          "displayName": "小樹",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "character_tree_2",
@@ -326,6 +521,21 @@
           "description": "맞으면 작은 결정 조각으로 흩어지는 눈송이예요.",
           "displayName": "눈송이",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A snowflake that scatters into tiny crystals.",
+          "displayName": "Snowflake",
+          "locale": "en_US"
+        },
+        {
+          "description": "当たると小さな結晶のかけらになって散ります。",
+          "displayName": "雪の結晶",
+          "locale": "ja"
+        },
+        {
+          "description": "命中後會散成細小結晶碎片的雪花。",
+          "displayName": "雪花",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "throwable_snowflake",
@@ -341,6 +551,21 @@
           "description": "붉은 실밥이 있는 공이 눌렸다 튕겨요.",
           "displayName": "야구공",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Red stitches, a little squash, and a bounce.",
+          "displayName": "Baseball",
+          "locale": "en_US"
+        },
+        {
+          "description": "赤い縫い目のボールが、つぶれて弾みます。",
+          "displayName": "野球ボール",
+          "locale": "ja"
+        },
+        {
+          "description": "帶紅色縫線的球，壓扁後又會彈起。",
+          "displayName": "棒球",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "throwable_baseball",
@@ -356,6 +581,21 @@
           "description": "와그작! 왁뿌볼이 조각조각 부서지는 바삭한 소리를 느껴보세요.",
           "displayName": "왁뿌볼",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Crunch! A ball that shatters into pieces.",
+          "displayName": "Wakku Ball",
+          "locale": "en_US"
+        },
+        {
+          "description": "ザクザク！かけらに砕ける軽快な音を楽しめます。",
+          "displayName": "ワックボール",
+          "locale": "ja"
+        },
+        {
+          "description": "喀嚓！享受碎成小塊的酥脆聲響。",
+          "displayName": "Wakku 球",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "throwable_wakkuball",
@@ -371,6 +611,21 @@
           "description": "코코아 겉피와 초록색 속이 눌리며 바삭한 소리가 나요.",
           "displayName": "두쫀쿠",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A cocoa shell with a crisp green filling.",
+          "displayName": "Dujjonku",
+          "locale": "en_US"
+        },
+        {
+          "description": "ココアの皮と緑の中身がつぶれてサクッと鳴ります。",
+          "displayName": "ドゥチョンク",
+          "locale": "ja"
+        },
+        {
+          "description": "可可外皮和綠色內餡壓下時會發出脆響。",
+          "displayName": "Dujjonku",
+          "locale": "zh_Hant"
         }
       ],
       "productID": "throwable_dujjonku",
@@ -389,6 +644,21 @@
           "description": "아껴 둔 간식이에요. 던진 뒤엔 3초 안에 주우면 괜찮겠죠?",
           "displayName": "기니피그의 미니 파프리카",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A saved snack. Three-second rule applies!",
+          "displayName": "Guinea Pig's Mini Pepper",
+          "locale": "en_US"
+        },
+        {
+          "description": "大事なおやつ。投げても3秒以内なら大丈夫ですよね？",
+          "displayName": "モルモットのミニパプリカ",
+          "locale": "ja"
+        },
+        {
+          "description": "珍藏的零食，丟出後三秒內撿起來就沒關係吧？",
+          "displayName": "天竺鼠的迷你甜椒",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -404,6 +674,21 @@
           "description": "원숭이가 양보한 바나나예요. 양보한 게 맞는지는 아직 못 물어봤어요.",
           "displayName": "원숭이의 바나나",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A banana the monkey shared. Allegedly.",
+          "displayName": "Monkey's Banana",
+          "locale": "en_US"
+        },
+        {
+          "description": "こざるが譲ったバナナ。本当に譲ったかは未確認です。",
+          "displayName": "こざるのバナナ",
+          "locale": "ja"
+        },
+        {
+          "description": "小猴子拿來分享的香蕉。是不是自願的還沒問。",
+          "displayName": "小猴子的香蕉",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -419,6 +704,21 @@
           "description": "친칠라의 목욕 모래예요. 씻으라고 던지는 건… 아마 아닐 거예요.",
           "displayName": "친칠라의 모래주머니",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Bath sand. Probably not a hint to wash up.",
+          "displayName": "Chinchilla's Sand Pouch",
+          "locale": "en_US"
+        },
+        {
+          "description": "砂浴び用の砂。洗ってという意味では…たぶんありません。",
+          "displayName": "チンチラの砂袋",
+          "locale": "ja"
+        },
+        {
+          "description": "龍貓的浴沙。丟這個應該不是叫你洗澡。",
+          "displayName": "龍貓的浴沙袋",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -434,6 +734,21 @@
           "description": "별빛을 꾹꾹 뭉쳤어요. 하늘에서 별 하나가 없어졌다는데요?",
           "displayName": "별빛 우파루파의 별빛 구슬",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Packed starlight. Is the sky missing a star?",
+          "displayName": "Starlight Axolotl's Star Orb",
+          "locale": "en_US"
+        },
+        {
+          "description": "星明かりを丸めました。空の星がひとつ減ったとか？",
+          "displayName": "星明かりのウーパールーパーの星玉",
+          "locale": "ja"
+        },
+        {
+          "description": "把星光揉成一團。天空是不是少了一顆星？",
+          "displayName": "星光六角恐龍的星光球",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -449,6 +764,21 @@
           "description": "수달이 품고 다니던 조개예요. 진주는 없고, 미련은 좀 있어요.",
           "displayName": "수달의 조개",
           "locale": "ko_KR"
+        },
+        {
+          "description": "No pearl inside, only lingering attachment.",
+          "displayName": "Otter's Clam",
+          "locale": "en_US"
+        },
+        {
+          "description": "大事にしていた貝。真珠はなく、未練は少しあります。",
+          "displayName": "カワウソの貝",
+          "locale": "ja"
+        },
+        {
+          "description": "沒有珍珠，只有水獺的一點依依不捨。",
+          "displayName": "水獺的貝殼",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -479,6 +809,21 @@
           "description": "찰진 촵! 근데 옆집 꿀꿀이가 며칠 전부터 안 보이던데…?",
           "displayName": "아기 돼지의 돼지고기",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Slap! Has anyone seen the pig next door?",
+          "displayName": "Baby Pig's Pork",
+          "locale": "en_US"
+        },
+        {
+          "description": "ぺちっ！そういえば隣のぶたさんを見ませんね…？",
+          "displayName": "こぶたの豚肉",
+          "locale": "ja"
+        },
+        {
+          "description": "啪！話說隔壁的小豬是不是好幾天沒出現了？",
+          "displayName": "小豬的豬肉",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -509,6 +854,21 @@
           "description": "나무가 작은 나무를 던져요. 일단 족보부터 확인해 볼까요?",
           "displayName": "나무의 작은 나무",
           "locale": "ko_KR"
+        },
+        {
+          "description": "A tree throws a tree. Check the family tree.",
+          "displayName": "Little Tree's Tiny Tree",
+          "locale": "en_US"
+        },
+        {
+          "description": "木が小さな木を投げます。まず家系図を確認しましょう。",
+          "displayName": "小さな木のちび木",
+          "locale": "ja"
+        },
+        {
+          "description": "樹丟出一棵小樹。先查查族譜吧。",
+          "displayName": "小樹的小小樹",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -524,6 +884,21 @@
           "description": "산책은 다녀왔어요. 시바는 그 사실을 인정하지 않아요.",
           "displayName": "시바견",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Already walked. The Shiba denies everything.",
+          "displayName": "Shiba Inu",
+          "locale": "en_US"
+        },
+        {
+          "description": "散歩は済みました。柴犬は認めていません。",
+          "displayName": "柴犬",
+          "locale": "ja"
+        },
+        {
+          "description": "已經散步回來了，但柴犬拒絕承認。",
+          "displayName": "柴犬",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -539,6 +914,21 @@
           "description": "던질 사람은 정했어요. 주워 올 사람은 아직이요.",
           "displayName": "테니스공",
           "locale": "ko_KR"
+        },
+        {
+          "description": "The thrower is set. Who will fetch it?",
+          "displayName": "Tennis Ball",
+          "locale": "en_US"
+        },
+        {
+          "description": "投げる人は決まりました。拾う人はまだです。",
+          "displayName": "テニスボール",
+          "locale": "ja"
+        },
+        {
+          "description": "負責丟的人選好了，撿球的人還沒。",
+          "displayName": "網球",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -554,6 +944,21 @@
           "description": "오리발 내미는 데는 자신 있어요. 진짜 오리발이거든요.",
           "displayName": "오리",
           "locale": "ko_KR"
+        },
+        {
+          "description": "An expert at ducking blame—with duck feet.",
+          "displayName": "Duck",
+          "locale": "en_US"
+        },
+        {
+          "description": "知らんぷりなら得意です。本物のアヒルですから。",
+          "displayName": "アヒル",
+          "locale": "ja"
+        },
+        {
+          "description": "很會裝傻，畢竟牠真的有一雙鴨掌。",
+          "displayName": "鴨子",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -569,6 +974,21 @@
           "description": "누가 불렀는지는 모르겠지만, 일단 나왔어요.",
           "displayName": "똥 캐릭터",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Not sure who called, but here it is.",
+          "displayName": "Poop",
+          "locale": "en_US"
+        },
+        {
+          "description": "誰に呼ばれたかは不明ですが、とりあえず出ました。",
+          "displayName": "うんち",
+          "locale": "ja"
+        },
+        {
+          "description": "不知道是誰叫牠，總之先出來了。",
+          "displayName": "便便",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -584,6 +1004,21 @@
           "description": "똥휴지인지 아닌지는 모르겠어요. 일단 피하세요!",
           "displayName": "휴지 뭉치",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Used or not? No one knows. Just dodge it!",
+          "displayName": "Tissue Ball",
+          "locale": "en_US"
+        },
+        {
+          "description": "使用済みかは不明です。とにかく避けて！",
+          "displayName": "ティッシュのかたまり",
+          "locale": "ja"
+        },
+        {
+          "description": "不知道是不是用過的，總之快閃！",
+          "displayName": "衛生紙團",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -599,6 +1034,21 @@
           "description": "순한맛이라더니요. 누구 기준인지는 안 알려줬어요.",
           "displayName": "떡볶이",
           "locale": "ko_KR"
+        },
+        {
+          "description": "They said mild. They never said for whom.",
+          "displayName": "Tteokbokki",
+          "locale": "en_US"
+        },
+        {
+          "description": "甘口だそうです。誰にとってかは教えてくれません。",
+          "displayName": "トッポッキ",
+          "locale": "ja"
+        },
+        {
+          "description": "說是微辣，卻沒說是以誰的標準。",
+          "displayName": "辣炒年糕",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -614,6 +1064,21 @@
           "description": "드시라고 드린 건데 왜 휘두르세요?",
           "displayName": "어묵꼬치",
           "locale": "ko_KR"
+        },
+        {
+          "description": "It was for eating. Why are you swinging it?",
+          "displayName": "Fish Cake Skewer",
+          "locale": "en_US"
+        },
+        {
+          "description": "食べてほしくて渡したのに、なぜ振り回すの？",
+          "displayName": "オムク串（練り天）",
+          "locale": "ja"
+        },
+        {
+          "description": "是給你吃的，為什麼揮來揮去？",
+          "displayName": "魚板串",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -629,6 +1094,21 @@
           "description": "항상 웃고 있어요. 방금 잎사귀를 던진 것도 얘예요.",
           "displayName": "쿼카",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Still smiling after throwing that leaf.",
+          "displayName": "Quokka",
+          "locale": "en_US"
+        },
+        {
+          "description": "いつも笑顔。さっき葉っぱを投げたのもこの子です。",
+          "displayName": "クオッカ",
+          "locale": "ja"
+        },
+        {
+          "description": "總是在笑，剛才丟葉子的也是牠。",
+          "displayName": "短尾矮袋鼠",
+          "locale": "zh_Hant"
         }
       ]
     },
@@ -644,6 +1124,21 @@
           "description": "쿼카의 도시락이에요. 던져도 되는지는 안 물어봤어요.",
           "displayName": "잎사귀",
           "locale": "ko_KR"
+        },
+        {
+          "description": "Quokka's lunch. Thrown without asking.",
+          "displayName": "Leaf",
+          "locale": "en_US"
+        },
+        {
+          "description": "クオッカのお弁当。投げていいかは聞いていません。",
+          "displayName": "葉っぱ",
+          "locale": "ja"
+        },
+        {
+          "description": "短尾矮袋鼠的便當。沒問過能不能丟。",
+          "displayName": "葉子",
+          "locale": "zh_Hant"
         }
       ]
     }
