@@ -101,6 +101,56 @@ public sealed class FirebaseV2RealtimeTransportTests
         Assert.Equal(0, chat.SendCount);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task UnchangedSynchronizationDoesNotRestartRecoveryButActualDisconnectDoes(bool reconnect)
+    {
+        // The durable transport leaves reconciliation to the gateway and reports false here.
+        var legacy = new FakeLegacyTransport
+        {
+            ConnectionStatus = new RealtimeConnectionStatus(true, true, false),
+        };
+        var listener = new FakeFirebaseListener { PublishReadyOnStart = false };
+        await using var transport = new FirebaseV2RealtimeTransport(
+            legacy,
+            new FakeSelector(enabled: true),
+            new FakeChatClient(),
+            new FakeCredentialProvider(),
+            sink => listener.WithSink(sink));
+        var epochs = new Dictionary<Guid, long> { [s_roomId] = 1 };
+        await transport.SynchronizeAsync(epochs, s_roomId, PresenceState.Online, CancellationToken.None);
+        listener.PublishReady();
+
+        // Every reconciled snapshot is applied by synchronizing the same room again.
+        for (int index = 0; index < 5; index++)
+        {
+            await transport.SynchronizeAsync(epochs, s_roomId, PresenceState.Online, CancellationToken.None);
+        }
+        if (reconnect)
+        {
+            listener.PublishDisconnected();
+            listener.PublishReady();
+        }
+        BackendEvent.Diagnostic sentinel = new("synchronization-complete");
+        listener.Publish(sentinel);
+        List<BackendEvent> received = [];
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        await foreach (BackendEvent backendEvent in transport.ReadEventsAsync(timeout.Token))
+        {
+            if (ReferenceEquals(backendEvent, sentinel))
+            {
+                break;
+            }
+            received.Add(backendEvent);
+        }
+
+        bool[] activeRoomStates = [.. received.OfType<BackendEvent.ConnectionChanged>()
+            .Select(change => change.Status.ActiveRoomTransportConnected)];
+        Assert.Equal(reconnect ? [false, true, false, true] : [false, true], activeRoomStates);
+        Assert.Equal(reconnect ? 2 : 1, received.OfType<BackendEvent.ReconciliationRequired>().Count());
+    }
+
     [Fact]
     public async Task ExplicitSessionInvalidationResetsFirebaseCredentialGeneration()
     {
@@ -642,7 +692,7 @@ public sealed class FirebaseV2RealtimeTransportTests
         IReadOnlyList<BackendEvent>? events = null) : IRealtimeTransport
     {
         public int SynchronizeCount { get; private set; }
-        public RealtimeConnectionStatus ConnectionStatus { get; } = new(true, true, true);
+        public RealtimeConnectionStatus ConnectionStatus { get; init; } = new(true, true, true);
         public bool IsRecoveryPaused => false;
 
         public async IAsyncEnumerable<BackendEvent> ReadEventsAsync(

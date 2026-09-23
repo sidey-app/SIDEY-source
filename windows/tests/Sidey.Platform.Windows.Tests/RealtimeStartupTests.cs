@@ -180,6 +180,117 @@ public sealed class RealtimeStartupTests
         Assert.True(transport.ConnectionStatus.ActiveRoomTransportConnected);
     }
 
+    [Theory]
+    [InlineData("Unauthorized", "authorization")]
+    [InlineData("ClientPresenceRateLimitReached", "capacity")]
+    public async Task ChannelSystemFailureReportsOnlySafeCategoryAndRecoversTheWholeSubscriptionSet(
+        string errorCode,
+        string expectedCategory)
+    {
+        var sendFailure = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        await using var server = new LocalServer(async (socket, connection, token) =>
+        {
+            JsonElement[] joins = [await ReadAsync(socket, token), await ReadAsync(socket, token)];
+            foreach (JsonElement join in joins)
+            {
+                await ReplyAsync(socket, join, token);
+            }
+
+            if (connection != 1)
+            {
+                return;
+            }
+
+            await sendFailure.Task.WaitAsync(token);
+            string databaseTopic = Assert.Single(
+                joins.Select(join => join.GetProperty("topic").GetString()!),
+                topic => topic.EndsWith(":db", StringComparison.Ordinal));
+            await SendEventAsync(
+                socket,
+                databaseTopic,
+                "system",
+                new { status = "error", message = $"{errorCode}: private-server-detail" },
+                token);
+        });
+        await using SupabaseRealtimeTransport transport = CreateTransport(server);
+        var roomId = Guid.NewGuid();
+        await transport.SynchronizeAsync(
+            new Dictionary<Guid, long> { [roomId] = 1 },
+            roomId,
+            PresenceState.Online,
+            server.Token);
+
+        sendFailure.SetResult();
+        BackendEvent.Diagnostic termination = await WaitForEventAsync<BackendEvent.Diagnostic>(
+            transport,
+            item => item.Stage.StartsWith("realtime-channel-terminated", StringComparison.Ordinal));
+        Assert.Equal(
+            $"realtime-channel-terminated kind=database event=system failure={expectedCategory}",
+            termination.Stage);
+        Assert.DoesNotContain("private-server-detail", termination.Stage);
+        await WaitForEventAsync(
+            transport,
+            item => item is BackendEvent.ConnectionChanged { Status.TransportConnected: false });
+        await WaitForEventAsync(
+            transport,
+            item => item is BackendEvent.ConnectionChanged { Status.ActiveRoomTransportConnected: true });
+
+        Assert.Equal(2, server.ConnectionCount);
+        Assert.True(transport.ConnectionStatus.ActiveRoomTransportConnected);
+    }
+
+    [Fact]
+    public async Task IdenticalPresenceIsSuppressedButStateChangesAndNewSubscriptionsPublish()
+    {
+        var initialStates = new TaskCompletionSource<string[]>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var reconnectedState = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await using var server = new LocalServer(async (socket, connection, token) =>
+        {
+            JsonElement[] joins = [await ReadAsync(socket, token), await ReadAsync(socket, token)];
+            foreach (JsonElement join in joins)
+            {
+                await ReplyAsync(socket, join, token);
+            }
+
+            var states = new List<string>();
+            while (true)
+            {
+                JsonElement message = await ReadAsync(socket, token);
+                if (message.GetProperty("event").GetString() != "presence")
+                {
+                    continue;
+                }
+
+                string state = message.GetProperty("payload").GetProperty("payload").GetProperty("state").GetString()!;
+                if (connection != 1)
+                {
+                    reconnectedState.TrySetResult(state);
+                    return;
+                }
+
+                states.Add(state);
+                if (state == "away")
+                {
+                    initialStates.TrySetResult([.. states]);
+                    return;
+                }
+            }
+        });
+        await using SupabaseRealtimeTransport transport = CreateTransport(server);
+        var roomId = Guid.NewGuid();
+        var rooms = new Dictionary<Guid, long> { [roomId] = 1 };
+        for (int index = 0; index < 10; index++)
+        {
+            await transport.SynchronizeAsync(rooms, roomId, PresenceState.Online, server.Token);
+        }
+        await transport.PublishPresenceAsync(roomId, PresenceState.Away, server.Token);
+
+        Assert.Equal(new[] { "online", "away" }, await initialStates.Task.WaitAsync(TimeSpan.FromSeconds(3)));
+        transport.RequestReconnect(userInitiated: true);
+        Assert.Equal("away", await reconnectedState.Task.WaitAsync(TimeSpan.FromSeconds(3)));
+        Assert.Equal(2, server.ConnectionCount);
+    }
+
     [Fact]
     public async Task TransientSessionRefreshFailureKeepsTheHealthySocketConnected()
     {

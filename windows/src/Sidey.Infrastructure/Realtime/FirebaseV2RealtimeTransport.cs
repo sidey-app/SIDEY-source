@@ -22,6 +22,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
     private readonly SemaphoreSlim _selectionWake = new(0, 1);
     private readonly CancellationTokenSource _shutdown = new();
     private readonly Lock _stateGate = new();
+    private RealtimeConnectionStatus? _lastEmittedConnectionStatus;
     private IReadOnlyDictionary<string, string> _throwableWireCodes =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
@@ -250,7 +251,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
             await _firebase.StopAsync(CancellationToken.None).ConfigureAwait(false);
             Emit(new BackendEvent.Diagnostic(
                 "firebase-grant-convergence-failed mode=fail-closed"));
-            Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
+            EmitConnectionStatus();
             SignalSelectionRefresh();
             return;
         }
@@ -357,7 +358,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
                 }
                 if (backendEvent is BackendEvent.ConnectionChanged)
                 {
-                    Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
+                    EmitConnectionStatus();
                     continue;
                 }
                 Emit(backendEvent);
@@ -418,7 +419,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
                     CancelFirebaseWriteFence();
                     await _firebase.StopAsync(CancellationToken.None).ConfigureAwait(false);
                     Emit(new BackendEvent.Diagnostic("firebase-selector-failed mode=fail-closed"));
-                    Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
+                    EmitConnectionStatus();
                     return;
                 }
                 Emit(new BackendEvent.Diagnostic("firebase-selector-failed mode=legacy-not-enabled"));
@@ -437,7 +438,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
                 await _firebase.StopAsync(cancellationToken).ConfigureAwait(false);
                 Emit(new BackendEvent.Diagnostic(
                     $"firebase-selector transport=legacy source={selection.Source}"));
-                Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
+                EmitConnectionStatus();
                 return;
             }
 
@@ -451,7 +452,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
             }
             Emit(new BackendEvent.Diagnostic(
                 $"firebase-selector transport=v2 source={selection.Source}"));
-            Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
+            EmitConnectionStatus();
         }
         finally
         {
@@ -473,7 +474,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
             {
                 CancelFirebaseWriteFence();
             }
-            Emit(new BackendEvent.ConnectionChanged(ConnectionStatus));
+            EmitConnectionStatus();
             if (firebaseConnection.Status.IsReady)
             {
                 Emit(new BackendEvent.ReconciliationRequired());
@@ -490,6 +491,22 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
     }
 
     private void Emit(BackendEvent backendEvent) => _events.TryWrite(backendEvent);
+
+    private void EmitConnectionStatus()
+    {
+        lock (_stateGate)
+        {
+            RealtimeConnectionStatus status = ConnectionStatus;
+            if (_lastEmittedConnectionStatus == status)
+            {
+                return;
+            }
+            // Applying a reconciled snapshot synchronizes rooms again. Re-emitting an
+            // unchanged status here would request another reconciliation indefinitely.
+            _lastEmittedConnectionStatus = status;
+            Emit(new BackendEvent.ConnectionChanged(status));
+        }
+    }
 
     private async Task PublishTransientAsync(
         Guid roomId,
