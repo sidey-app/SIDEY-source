@@ -204,8 +204,10 @@ final class GlobalShortcutTests: XCTestCase {
         var controller: GlobalShortcutController? = GlobalShortcutController(
             registrar: registrar, onAction: { _ in XCTFail("종료한 컨트롤러에서 실행됨") }
         )
+        weak var releasedController = controller
         controller?.install()
         controller = nil
+        XCTAssertNil(releasedController)
         XCTAssertEqual(registrar.unregisterCount, 1)
         registrar.send(.toggleComposer, pressed: true)
     }
