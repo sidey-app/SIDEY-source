@@ -1,3 +1,5 @@
+using Sidey.Core.Domain;
+
 namespace Sidey.Platform.Windows.Tests;
 
 public sealed class FirebaseThrowableWireCatalogTests
@@ -5,10 +7,11 @@ public sealed class FirebaseThrowableWireCatalogTests
     [Fact]
     public void FutureThrowableItemsRemainAvailableForForwardCompatibleRendering()
     {
+        const string FutureThrowableId = "throwable_future_test";
         SupabaseBackendGateway.DatabaseFirebaseWireItem[] rows =
         [
             new("throwable", "throwable_banana", 7),
-            new("throwable", "throwable_tennis_ball", 18),
+            new("throwable", FutureThrowableId, 18),
             new("character", "character_pixel_shiba", 19),
             new("throwable", "throwable_without_wire_code", null),
         ];
@@ -16,8 +19,10 @@ public sealed class FirebaseThrowableWireCatalogTests
         IReadOnlyDictionary<string, string> result =
             SupabaseBackendGateway.BuildFirebaseThrowableWireCodes(rows);
 
+        Assert.DoesNotContain(FutureThrowableId, CosmeticCatalog.ThrowableIds);
         Assert.Equal("7", result["throwable_banana"]);
-        Assert.Equal("18", result["throwable_tennis_ball"]);
+        Assert.Equal("18", result[FutureThrowableId]);
+        Assert.Equal("patch_soft_ball", CosmeticCatalog.ResolveThrowableAssetId(FutureThrowableId));
         Assert.Equal(2, result.Count);
     }
 
