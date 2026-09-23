@@ -1119,27 +1119,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
             DatabaseFirebaseWireItem[] rows = await ReadRequiredAsync<DatabaseFirebaseWireItem[]>(
                 response,
                 cancellationToken).ConfigureAwait(false);
-            Dictionary<string, string> result = new(StringComparer.Ordinal);
-            HashSet<string> wireCodes = new(StringComparer.Ordinal) { "0" };
-            foreach (DatabaseFirebaseWireItem row in rows)
-            {
-                if (!StringComparer.Ordinal.Equals(row.ProductKind, "throwable")
-                    || row.WireCode is null)
-                {
-                    continue;
-                }
-                if (!CosmeticCatalog.ThrowableIds.Contains(row.CatalogItemId)
-                    || row.WireCode is < 1 or > 999_999)
-                {
-                    throw new InvalidDataException("Firebase throwable wire catalog is invalid.");
-                }
-                string wireCode = row.WireCode.Value.ToString(
-                    System.Globalization.CultureInfo.InvariantCulture);
-                if (!result.TryAdd(row.CatalogItemId, wireCode) || !wireCodes.Add(wireCode))
-                {
-                    throw new InvalidDataException("Firebase throwable wire catalog has duplicates.");
-                }
-            }
+            IReadOnlyDictionary<string, string> result = BuildFirebaseThrowableWireCodes(rows);
             Volatile.Write(ref _firebaseThrowableWireCodes, result);
             return result;
         }
@@ -1147,6 +1127,34 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         {
             _firebaseWireCodeGate.Release();
         }
+    }
+
+    internal static IReadOnlyDictionary<string, string> BuildFirebaseThrowableWireCodes(
+        IEnumerable<DatabaseFirebaseWireItem> rows)
+    {
+        ArgumentNullException.ThrowIfNull(rows);
+        Dictionary<string, string> result = new(StringComparer.Ordinal);
+        HashSet<string> wireCodes = new(StringComparer.Ordinal) { "0" };
+        foreach (DatabaseFirebaseWireItem row in rows)
+        {
+            if (!StringComparer.Ordinal.Equals(row.ProductKind, "throwable")
+                || row.WireCode is null)
+            {
+                continue;
+            }
+            if (string.IsNullOrWhiteSpace(row.CatalogItemId)
+                || row.WireCode is < 1 or > 999_999)
+            {
+                throw new InvalidDataException("Firebase throwable wire catalog is invalid.");
+            }
+            string wireCode = row.WireCode.Value.ToString(
+                System.Globalization.CultureInfo.InvariantCulture);
+            if (!result.TryAdd(row.CatalogItemId, wireCode) || !wireCodes.Add(wireCode))
+            {
+                throw new InvalidDataException("Firebase throwable wire catalog has duplicates.");
+            }
+        }
+        return result;
     }
 
     private static string FailureDiagnostic(Exception exception)
@@ -1380,7 +1388,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         [property: JsonPropertyName("entitlement_status")] string? EntitlementStatus,
         [property: JsonPropertyName("latest_order_status")] string? LatestOrderStatus);
 
-    private sealed record DatabaseFirebaseWireItem(
+    internal sealed record DatabaseFirebaseWireItem(
         [property: JsonPropertyName("product_kind")] string ProductKind,
         [property: JsonPropertyName("catalog_item_id")] string CatalogItemId,
         [property: JsonPropertyName("wireCode")] int? WireCode);
