@@ -73,6 +73,8 @@ Var InstallerErrorResultLoaded
     StrCpy $InstallerErrorSideyCode "0x51DE220A"
   ${ElseIf} $InstallerErrorSymbol == "RECOVERY_INITIALIZATION_FAILED"
     StrCpy $InstallerErrorSideyCode "0x51DE220B"
+  ${ElseIf} $InstallerErrorSymbol == "LEGACY_RELOCATION_TARGET_UNAVAILABLE"
+    StrCpy $InstallerErrorSideyCode "0x51DE220C"
   ${ElseIf} $InstallerErrorSymbol == "EXISTING_REMOVAL_FAILED"
     StrCpy $InstallerErrorSideyCode "0x51DE2002"
   ${ElseIf} $InstallerErrorSymbol == "TRANSACTION_FAILED"

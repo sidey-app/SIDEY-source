@@ -54,17 +54,22 @@ function Invoke-Helper([string]$Arguments) {
 
 function Get-TransactionArguments(
     [string]$Action,
-    [string]$StagingDirectory = $staging
+    [string]$StagingDirectory = $staging,
+    [switch]$UseRealParentPolicy,
+    [string]$InstallDirectory = $install
 ) {
-    return @(
+    $arguments = @(
         '--action', (ConvertTo-NativeArgument $Action),
-        '--install-directory', (ConvertTo-NativeArgument $install),
+        '--install-directory', (ConvertTo-NativeArgument $InstallDirectory),
         '--staging-directory', (ConvertTo-NativeArgument $StagingDirectory),
-        '--rollback-directory', (ConvertTo-NativeArgument $rollback),
+        '--rollback-directory', (ConvertTo-NativeArgument ($InstallDirectory + '.sidey-rollback')),
         '--version', (ConvertTo-NativeArgument $version),
-        '--log-path', (ConvertTo-NativeArgument $logPath),
-        '--allow-user-writable-parent-for-tests'
-    ) -join ' '
+        '--log-path', (ConvertTo-NativeArgument $logPath)
+    )
+    if (-not $UseRealParentPolicy) {
+        $arguments += '--allow-user-writable-parent-for-tests'
+    }
+    return $arguments -join ' '
 }
 
 function Start-TransactionProcess([string]$Action) {
@@ -159,6 +164,65 @@ try {
 
     [IO.Directory]::CreateDirectory($install) | Out-Null
     [IO.File]::WriteAllText((Join-Path $install 'marker.txt'), 'old')
+
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 79) `
+        'A clean legacy install under a user-writable parent was not eligible for relocation.'
+    Assert-True ([IO.File]::Exists((Join-Path $install 'marker.txt'))) `
+        'Legacy inspection changed the previous installation.'
+    $statePath = $install + '.sidey-transaction.json'
+    [IO.File]::WriteAllText($statePath, 'not-json')
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 1) `
+        'Legacy inspection ignored a pending transaction state.'
+    Assert-True ([IO.File]::Exists($statePath)) `
+        'Legacy inspection removed a pending transaction state.'
+    [IO.File]::Delete($statePath)
+    [IO.File]::WriteAllText($statePath + '.tmp', 'incomplete')
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 1) `
+        'Legacy inspection ignored an unpublished transaction state.'
+    [IO.File]::Delete($statePath + '.tmp')
+    [IO.Directory]::CreateDirectory($rollback) | Out-Null
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 1) `
+        'Legacy inspection ignored a rollback directory.'
+    Assert-True ([IO.Directory]::Exists($rollback)) `
+        'Legacy inspection removed a rollback directory.'
+    Remove-Item -LiteralPath $rollback -Recurse -Force
+    [IO.Directory]::CreateDirectory($staging) | Out-Null
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 1) `
+        'Legacy inspection ignored a staging directory.'
+    Assert-True ([IO.Directory]::Exists($staging)) `
+        'Legacy inspection removed a staging directory.'
+    Remove-Item -LiteralPath $staging -Recurse -Force
+    $relocationTargetInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectRelocationTarget')
+    Assert-True ($relocationTargetInspection.ExitCode -eq 1) `
+        'Relocation target inspection accepted an existing installation.'
+    $relocationTarget = Join-Path $probeRoot 'relocation-target'
+    $targetArguments = Get-TransactionArguments 'InspectRelocationTarget' `
+        ($relocationTarget + '.sidey-staging-1234') -InstallDirectory $relocationTarget
+    $unsafeTargetArguments = Get-TransactionArguments 'InspectRelocationTarget' `
+        ($relocationTarget + '.sidey-staging-1234') -InstallDirectory $relocationTarget `
+        -UseRealParentPolicy
+    $relocationTargetInspection = Invoke-Helper $unsafeTargetArguments
+    Assert-True ($relocationTargetInspection.ExitCode -eq 1) `
+        'Relocation target inspection accepted a user-writable parent.'
+    $relocationTargetInspection = Invoke-Helper $targetArguments
+    Assert-True ($relocationTargetInspection.ExitCode -eq 0) `
+        'Relocation target inspection rejected an empty test target.'
+    [IO.File]::WriteAllText($relocationTarget + '.sidey-transaction.json', 'pending')
+    $relocationTargetInspection = Invoke-Helper $targetArguments
+    Assert-True ($relocationTargetInspection.ExitCode -eq 1) `
+        'Relocation target inspection accepted a pending transaction.'
+    [IO.File]::Delete($relocationTarget + '.sidey-transaction.json')
 
     Invoke-Transaction Prepare
     $initialState = Get-Content -LiteralPath ($install + '.sidey-transaction.json') -Raw -Encoding UTF8 | ConvertFrom-Json

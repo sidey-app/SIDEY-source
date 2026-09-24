@@ -30,6 +30,12 @@ namespace Sidey.Installer
         private const int RecoveryAccessDenied = 76;
         private const int RecoveryIoFailure = 77;
         private const int RecoveryInitializationFailure = 78;
+        private const int LegacyRelocationEligible = 79;
+
+        private sealed class InsecureTransactionParentException : InvalidOperationException
+        {
+            public InsecureTransactionParentException(string message) : base(message) { }
+        }
 
         [STAThread]
         private static int Main(string[] arguments)
@@ -276,7 +282,9 @@ namespace Sidey.Installer
 
             public static bool IsKnownAction(string value)
             {
-                return string.Equals(value, "Recover", StringComparison.OrdinalIgnoreCase)
+                return string.Equals(value, "InspectLegacyLocation", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(value, "InspectRelocationTarget", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(value, "Recover", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(value, "Prepare", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(value, "Activate", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(value, "BeginRegistration", StringComparison.OrdinalIgnoreCase)
@@ -288,6 +296,38 @@ namespace Sidey.Installer
 
             public int Run()
             {
+                if (EqualsAction("InspectLegacyLocation"))
+                {
+                    Operation = "inspect-legacy.parent-security";
+                    try
+                    {
+                        AssertSecureTransactionParent();
+                        return 0;
+                    }
+                    catch (InsecureTransactionParentException)
+                    {
+                        Operation = "inspect-legacy.transaction-artifacts";
+                        if (HasTransactionArtifacts())
+                        {
+                            throw new InvalidOperationException(
+                                "A SIDEY transaction must be recovered at its original location.");
+                        }
+                        return LegacyRelocationEligible;
+                    }
+                }
+                if (EqualsAction("InspectRelocationTarget"))
+                {
+                    Operation = "inspect-relocation.parent-security";
+                    AssertSecureTransactionParent();
+                    Operation = "inspect-relocation.target";
+                    if (Directory.Exists(installPath) || File.Exists(installPath)
+                        || HasTransactionArtifacts())
+                    {
+                        throw new InvalidOperationException(
+                            "The SIDEY relocation target is already in use.");
+                    }
+                    return 0;
+                }
                 if (EqualsAction("Recover"))
                 {
                     Operation = "recover.parent-security";
@@ -547,15 +587,16 @@ namespace Sidey.Installer
                     && (state.PreviousRegistration == null || !state.PreviousRegistration.Existed);
                 Version prior;
                 Version current;
-                bool upgrade = state.PreviousInstallExisted
-                    && state.PreviousRegistration != null
+                bool upgrade = state.PreviousRegistration != null
+                    && state.PreviousRegistration.Existed
                     && Version.TryParse(state.PreviousRegistration.Version, out prior)
                     && Version.TryParse(state.Version, out current)
                     && current > prior;
+                bool relocated = upgrade && !state.PreviousInstallExisted;
                 string markerPath = Path.Combine(installPath, "install-completion.txt");
                 File.WriteAllLines(markerPath, new[]
                 {
-                    fresh ? "fresh" : (upgrade ? "upgrade" : "repair"),
+                    fresh ? "fresh" : (relocated ? "relocate" : (upgrade ? "upgrade" : "repair")),
                     state.Version,
                     state.CompletionId,
                 });
@@ -770,7 +811,7 @@ namespace Sidey.Installer
                     as SecurityIdentifier;
                 if (owner == null || !privileged.Contains(owner.Value))
                 {
-                    throw new InvalidOperationException(
+                    throw new InsecureTransactionParentException(
                         "The SIDEY install directory parent must be owned by Administrators, SYSTEM, or TrustedInstaller.");
                 }
 
@@ -798,11 +839,28 @@ namespace Sidey.Installer
                         && (((rule.FileSystemRights & writeRights) != 0) || hasGenericWrite)
                         && !privileged.Contains(identity))
                     {
-                        throw new InvalidOperationException(
+                        throw new InsecureTransactionParentException(
                             "The SIDEY install directory parent is writable by an unprivileged identity: "
                             + identity);
                     }
                 }
+            }
+
+            private bool HasTransactionArtifacts()
+            {
+                if (File.Exists(statePath) || Directory.Exists(statePath)
+                    || File.Exists(statePath + ".tmp") || Directory.Exists(statePath + ".tmp")
+                    || File.Exists(rollbackPath) || Directory.Exists(rollbackPath))
+                {
+                    return true;
+                }
+
+                string stagingPattern = Path.GetFileName(installPath) + ".sidey-staging-*";
+                foreach (string entry in Directory.EnumerateFileSystemEntries(parentPath, stagingPattern))
+                {
+                    return true;
+                }
+                return false;
             }
 
             private void ProtectStagingDirectory()

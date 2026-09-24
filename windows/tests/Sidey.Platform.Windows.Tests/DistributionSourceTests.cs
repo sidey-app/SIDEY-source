@@ -295,7 +295,12 @@ public sealed class DistributionSourceTests
         Assert.Contains("--detect-legacy-msi", setup, StringComparison.Ordinal);
         Assert.DoesNotContain("--uninstall-legacy-msi", setup, StringComparison.Ordinal);
         Assert.Contains("Sidey.SetupSupport.exe", setup, StringComparison.Ordinal);
-        Assert.DoesNotContain("--cleanup", setup[..setup.IndexOf("Section \"Uninstall\"", StringComparison.Ordinal)], StringComparison.Ordinal);
+        Assert.Contains("--cleanup-legacy-install-as-desktop-user", setup, StringComparison.Ordinal);
+        Assert.Contains(
+            "ExecWait '\"$INSTDIR\\Runtime\\SIDEY.UninstallHelper.exe\" --cleanup-legacy-install-as-desktop-user",
+            setup,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("--cleanup-legacy-msi", setup, StringComparison.Ordinal);
         Assert.Contains("$(LegacyMigrationManual)", setup, StringComparison.Ordinal);
     }
 
@@ -427,10 +432,13 @@ public sealed class DistributionSourceTests
 
         int onInitStart = setup.IndexOf("Function .onInit", StringComparison.Ordinal);
         string onInit = setup[onInitStart..setup.IndexOf("FunctionEnd", onInitStart, StringComparison.Ordinal)];
+        Assert.Contains("$PendingInstallLocation == \"\"", onInit, StringComparison.Ordinal);
+        Assert.Contains("RunInstallTransaction \"InspectLegacyLocation\"", onInit, StringComparison.Ordinal);
+        Assert.Contains("RunInstallTransaction \"InspectRelocationTarget\"", onInit, StringComparison.Ordinal);
         Assert.True(
             onInit.IndexOf("RunInstallTransaction \"Recover\"", StringComparison.Ordinal)
-                < onInit.IndexOf("\"InstalledVersion\"", StringComparison.Ordinal),
-            "Interrupted installation recovery must precede version classification.");
+                < onInit.LastIndexOf("ReadRegStr $InstalledVersion", StringComparison.Ordinal),
+            "Interrupted installation recovery must precede final version classification.");
 
         Assert.Contains("UndoTransaction", transaction, StringComparison.Ordinal);
         Assert.Contains("FileAttributes.ReparsePoint", transaction, StringComparison.Ordinal);
