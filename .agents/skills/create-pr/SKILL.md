@@ -5,8 +5,10 @@ description: Prepare or create a SIDEY pull request from the exact reviewed and 
 
 # Create Pull Request
 
-Read the root `AGENTS.md` and `CONTRIBUTING.md`, then inspect the complete
-changed-path set. Use `.github/PULL_REQUEST_TEMPLATE/general.md` for all
+Read the root `AGENTS.md` and the internal validation and pull request section
+of [CONTRIBUTING.md](../../../CONTRIBUTING.md#validation-and-pull-requests),
+then inspect the complete changed-path set. Use
+`.github/PULL_REQUEST_TEMPLATE/general.md` for all
 changes, including maintainer asset maintenance. External asset contributions
 are not accepted. This applies equally to agent-created and manual pull requests.
 

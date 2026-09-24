@@ -45,7 +45,7 @@ class WorkflowCommandSurfaceTests(unittest.TestCase):
         output = self.help_text("--help")
 
         self.assertIn(
-            "{doctor,start,sync,check,publish,finish,open}",
+            "{doctor,start,test-installer,sync,check,publish,finish,open}",
             output,
         )
         self.assertIn("--repo REPO", output)
