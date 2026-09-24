@@ -2,9 +2,10 @@
 """Validate and export the canonical commerce localization source.
 
 The source keeps logical product names identical to the Korean legacy catalog.
-App Store Connect requires IAP display names to contain at least two characters,
-so exports append a localized, kind-based suffix only when a source name is
-shorter than that limit. The source value itself is never rewritten.
+App Store Connect requires IAP display names to contain at least two characters.
+Exports use the approved Korean name 똥이 for character_poop and a localized,
+kind-based suffix for other names shorter than that limit. The source value
+itself is never rewritten.
 """
 
 from __future__ import annotations
@@ -237,7 +238,7 @@ def products_by_id(source):
 def app_store_display_name(product_id, locale, display_name, kind):
     """Return a deterministic App Store-safe IAP display name."""
 
-    name = display_name
+    name = "똥이" if (product_id, locale) == ("character_poop", "ko") else display_name
     if len(name) < 2:
         name += IAP_NAME_SUFFIXES[kind][locale]
     if not 2 <= len(name) <= 30:

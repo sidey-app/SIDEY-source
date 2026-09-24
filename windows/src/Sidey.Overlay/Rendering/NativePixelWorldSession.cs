@@ -569,12 +569,15 @@ public sealed class NativePixelWorldSession : IOverlayHost, IDisposable
                 _monitor.MonitorPixels,
                 _edge);
             _renderer.SetEdgeInset(taskbar.EdgeInset);
-            nint shellSurface = taskbar.RevealedAutoHideWindow != nint.Zero
-                ? taskbar.RevealedAutoHideWindow
-                : WindowsShellSurfaceDetector.ForegroundSurface(_monitor.MonitorPixels);
+            WindowsShellYieldSurface yieldSurface = WindowsShellSurfaceDetector.YieldSurface(
+                _monitor.MonitorPixels,
+                taskbar.RevealedAutoHideWindow,
+                _windows.WorldWindowHandle);
+            nint shellSurface = yieldSurface.Window;
             if (IsVisible && shellSurface != nint.Zero)
             {
                 if (shellSurface != _yieldedShellSurface
+                    || yieldSurface.OverlayAboveWindow
                     || Interlocked.Decrement(ref _topmostRefreshCountdown) <= 0)
                 {
                     bool stateChanged = _yieldedShellSurface != shellSurface;

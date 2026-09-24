@@ -1,8 +1,9 @@
 # Platform별 독립 versioning
 
-Status: Accepted
+Status: Superseded
 Decided: 2026-09-07 01:06 KST
 Evidence: [commit 43425d6](https://github.com/sidey-app/SIDEY-source/commit/43425d61e340c4185bf4c6e94775cef678448010)
+Superseded by: [공통 Product Version과 플랫폼별 카운터](20260924-shared-product-version.md)
 
 ## Context
 

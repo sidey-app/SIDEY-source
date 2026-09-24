@@ -22,9 +22,13 @@ private environment 보호에는 의존하지 않는다.
 1. Target platform과 실제 shipped diff를 확정한다.
 2. [version audit](../../.agents/skills/version-audit/SKILL.md) 절차로 최소 version/build
    변경을 판단한다.
-3. Platform project source와 해당 [`release/` manifest](../../release/README.md)를
-   일치시킨다. macOS manifest는 App Store target build 계약이며 공개 게시 여부는
-   App Store Connect에서 별도로 확인한다. Windows manifest는 공개 release를 따른다.
+3. [`release/version.json`](../../release/version.json)의 Product Version과 해당 platform
+   counter를 변경한 뒤 `scripts/sidey_version.py --write <platform>`으로 release/native
+   mirror를 갱신하고 `--check <platform>`으로 검사한다. Product Version을 바꿀 때 Windows
+   revision은 `0`으로 되돌린다. macOS manifest는 App Store target build 계약이며 공개
+   게시 여부는 App Store Connect에서 별도로 확인한다. Windows manifest는 공개 release를
+   따른다. Windows revision `0`은 Product Version tag로 기존 updater가 이동할 bridge를
+   만들고, 이후 revision은 별도의 update/release version을 사용하면서 그 bridge를 보존한다.
 
 Commerce 또는 backend contract가 바뀌는 release라면 private source catalog의 검토된 commit과
 backend snapshot provenance를 먼저 확인한다. Backend migration과 배포는 비공개
@@ -34,7 +38,7 @@ backend 저장소의 절차로 수행하며 이 저장소에서 대신 실행하
 
 1. 변경 경로에 해당하는 integration check와 platform test를 정확한 candidate commit에
    실행한다.
-2. Project version, release manifest, update source와 website metadata의 일치는
+2. 공통 version source, platform build 설정, release manifest, update source와 website metadata의 일치는
    `python3 scripts/skills/verify_release_consistency.py`로 검사한다.
 3. Windows GitHub Release note는 [`docs/releases/`](../releases/)에
    [release-notes skill](../../.agents/skills/release-notes/SKILL.md)의 commit/PR evidence로
