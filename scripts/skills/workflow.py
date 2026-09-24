@@ -13,6 +13,7 @@ import locale
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -479,6 +480,242 @@ def update_main(root, remote, already_locked=False):
     return primary
 
 
+def cleanup_merged_worktrees(root, platform, remote, *, now=None):
+    """Remove old, completed native task worktrees after main is updated.
+
+    Only sibling worktrees registered by this workflow are considered. A task
+    with an open PR, local content, a newer head, or unverified integration is
+    left alone. Branches and task records are retained.
+    """
+    if platform not in ('macos', 'windows'):
+        return []
+    cutoff = (time.time() if now is None else now) - 2 * 24 * 60 * 60
+    current = root.resolve()
+    primary = primary_root(root)
+    entries = {
+        str(Path(entry['worktree']).resolve()): entry
+        for entry in worktrees(root)
+    }
+    repository = source_repository(root)
+    removed = []
+    with lock(root, 'integration'):
+        for task_id, task in read_state(root).items():
+            path = Path(task['worktree']).resolve()
+            if (
+                task.get('platform') != platform
+                or task.get('status') != 'complete'
+                or path in (current, primary)
+                or path.parent != current.parent
+                or not path.is_dir()
+            ):
+                continue
+            entry = entries.get(str(path))
+            checked = task.get('checked') or {}
+            merge = task.get('merge')
+            if (
+                not entry
+                or 'locked' in entry
+                or entry.get('branch') != f"refs/heads/{task.get('branch')}"
+                or not checked.get('head')
+                or entry.get('HEAD') != checked['head']
+                or not merge
+                or not is_ancestor(root, merge, remote)
+                or not same_tree(root, checked['head'], merge)
+            ):
+                continue
+            activity = max(
+                float(git(path, 'show', '-s', '--format=%ct', 'HEAD')),
+                *(float(stamp['time']) for stamp in (
+                    checked, task.get('merge_intent') or {},
+                    task.get('app_review') or {},
+                ) if stamp.get('time') is not None),
+            )
+            if activity >= cutoff:
+                continue
+            # Include ignored outputs: removing a worktree must not silently
+            # discard files produced by a developer or build.
+            if git(path, 'status', '--porcelain', '--untracked-files=all',
+                   '--ignored'):
+                continue
+            if open_task_prs(
+                root, task_pr_head(path, task), repository=repository,
+                base=None,
+            ):
+                continue
+            if head(path) != checked['head']:
+                continue
+            git(root, 'worktree', 'remove', str(path))
+            removed.append({'task': task_id, 'worktree': str(path)})
+    return removed
+
+
+WINDOWS_SETUP_NAME = re.compile(
+    r'SIDEY-Windows-x64-v\d+\.\d+\.\d+-Setup\.exe', re.IGNORECASE,
+)
+
+
+def build_windows_test_installer(source, output):
+    """Build the maintained self-contained Setup from a checked source."""
+    if os.name != 'nt':
+        raise WorkflowError('Windows test Setup requires a Windows host')
+    windows_root = source / 'windows'
+    publish = output / 'publish'
+    artifacts = output / 'artifacts'
+    product_version = run(
+        source, sys.executable, '-X', 'utf8',
+        'scripts/sidey_version.py', '--get', 'productVersion',
+    )
+    release_version = run(
+        source, sys.executable, '-X', 'utf8',
+        'scripts/sidey_version.py', '--get', 'windowsReleaseVersion',
+    )
+    run(windows_root, 'dotnet', 'restore', 'SIDEY.Windows.slnx', capture=False)
+    run(
+        windows_root, 'dotnet', 'publish',
+        'src/Sidey.App/Sidey.App.csproj', '--configuration', 'Release',
+        '--runtime', 'win-x64', '--self-contained', 'true',
+        '--no-restore', '-p:PublishSingleFile=false',
+        '--output', str(publish), capture=False,
+    )
+    run(
+        source, 'powershell.exe', '-NoProfile', '-NonInteractive',
+        '-ExecutionPolicy', 'Bypass', '-File',
+        str(source / 'scripts/windows/New-WindowsInstaller.ps1'),
+        '-PublishDirectory', str(publish),
+        '-OutputDirectory', str(artifacts),
+        '-ProductVersion', product_version,
+        '-ReleaseVersion', release_version,
+        capture=False,
+    )
+    return artifacts / f'SIDEY-Windows-x64-v{release_version}-Setup.exe'
+
+
+def file_sha256(path):
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def windows_downloads_folder():
+    if os.name == 'nt':
+        import winreg
+        try:
+            with winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                r'Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders',
+            ) as key:
+                value, _ = winreg.QueryValueEx(
+                    key, '{374DE290-123F-4565-9164-39C4925E467B}',
+                )
+            return Path(os.path.expandvars(value))
+        except OSError:
+            pass
+    return Path.home() / 'Downloads'
+
+
+def publish_windows_test_installer(
+    source, expected_head, downloads=None, *, base=None,
+    expected_snapshot=None,
+):
+    """Place verified Setup in Downloads before removing older SIDEY Setups."""
+    base = expected_head if base is None else base
+    downloads = (downloads or windows_downloads_folder()).resolve(strict=True)
+    if not downloads.is_dir():
+        raise WorkflowError(f'Windows Downloads folder is missing: {downloads}')
+    if (
+        head(source) != expected_head
+        or dirty_paths(source)
+        or (expected_snapshot and snapshot(source) != expected_snapshot)
+        or not is_ancestor(source, base, expected_head)
+        or fetch_main(source) != base
+    ):
+        raise WorkflowError('Windows test Setup requires exact checked source')
+    with tempfile.TemporaryDirectory(prefix='sidey-test-installer-') as raw:
+        output = Path(raw).resolve()
+        if output.parent != Path(tempfile.gettempdir()).resolve():
+            raise WorkflowError('Installer build directory escaped temporary root')
+        installer = build_windows_test_installer(source, output)
+        if (
+            installer.parent != output / 'artifacts'
+            or not WINDOWS_SETUP_NAME.fullmatch(installer.name)
+            or not installer.is_file()
+            or installer.is_symlink()
+        ):
+            raise WorkflowError('Expected one canonical Windows Setup output')
+        built_hash = file_sha256(installer)
+        if (
+            fetch_main(source) != base
+            or head(source) != expected_head
+            or dirty_paths(source)
+            or (expected_snapshot and snapshot(source) != expected_snapshot)
+        ):
+            raise WorkflowError('Source or main changed during Windows test Setup build')
+        descriptor, raw_stage = tempfile.mkstemp(
+            prefix='.sidey-test-installer-', suffix='.tmp', dir=downloads,
+        )
+        stage = Path(raw_stage)
+        try:
+            with os.fdopen(descriptor, 'wb') as destination:
+                with installer.open('rb') as input_stream:
+                    shutil.copyfileobj(input_stream, destination)
+            if stage.parent.resolve() != downloads or file_sha256(stage) != built_hash:
+                raise WorkflowError('Windows test Setup copy failed verification')
+            target = downloads / installer.name
+            if target.parent.resolve() != downloads:
+                raise WorkflowError('Windows test Setup target escaped Downloads')
+            if (
+                fetch_main(source) != base
+                or head(source) != expected_head
+                or dirty_paths(source)
+                or (expected_snapshot and snapshot(source) != expected_snapshot)
+            ):
+                raise WorkflowError('Source or main changed before Windows Setup placement')
+            os.replace(stage, target)
+        finally:
+            stage.unlink(missing_ok=True)
+    removed = []
+    for old in downloads.iterdir():
+        if (
+            old != target
+            and WINDOWS_SETUP_NAME.fullmatch(old.name)
+            and old.is_file()
+            and not old.is_symlink()
+            and old.parent.resolve() == downloads
+        ):
+            old.unlink()
+            removed.append(str(old))
+    return {
+        'main': base, 'head': expected_head,
+        'path': str(target), 'sha256': built_hash,
+        'removed_installers': removed,
+    }
+
+
+def test_installer_task(root, task_id):
+    task = owned_task(root, task_id)
+    if task['platform'] != 'windows' or task.get('status') not in (
+        'checked', 'published',
+    ):
+        raise WorkflowError('Test Setup requires a checked Windows task')
+    remote = fetch_main(root)
+    attest(root, task, remote)
+    if dirty_paths(root):
+        raise WorkflowError('Test Setup requires a clean checked worktree')
+    return publish_windows_test_installer(
+        root, head(root), base=remote,
+        expected_snapshot=task['checked']['snapshot'],
+    )
+
+
+def completed_windows_installer(task, primary, remote):
+    if (
+        task['platform'] == 'windows'
+        and task.get('status') == 'complete'
+        and (task.get('app_review') or {}).get('main') == remote
+    ):
+        return publish_windows_test_installer(primary, remote)
+    return None
+
+
 def verify_windows_run(remote, metadata, jobs):
     workflow_paths = {
         '.github/workflows/ci.yml',
@@ -734,40 +971,32 @@ def pull_request_record(pull, repository):
     }
 
 
-def task_prs(root, head_ref, *, state='open', repository=None):
+def task_prs(root, head_ref, *, state='open', repository=None, base='main'):
     """List canonical-repository PRs for an owner-qualified head."""
 
     repository = repository or source_repository(root)
     api_state = 'closed' if state == 'merged' else state
-    output = run(
-        root,
-        'gh',
-        'api',
-        '--method',
-        'GET',
-        f'repos/{repository}/pulls',
-        '-f',
-        f'state={api_state}',
-        '-f',
-        'base=main',
-        '-f',
-        'per_page=100',
-        '-f',
-        f'head={head_ref}',
-    )
+    arguments = [
+        'gh', 'api', '--method', 'GET', f'repos/{repository}/pulls',
+        '-f', f'state={api_state}', '-f', 'per_page=100',
+        '-f', f'head={head_ref}',
+    ]
+    if base is not None:
+        arguments.extend(('-f', f'base={base}'))
+    output = run(root, *arguments)
     pulls = json.loads(output)
     if state == 'merged':
         pulls = [pull for pull in pulls if pull.get('merged_at')]
     return [pull_request_record(pull, repository) for pull in pulls]
 
 
-def open_task_prs(root, head_ref=None, *, repository=None):
+def open_task_prs(root, head_ref=None, *, repository=None, base='main'):
     """List open task PRs, including heads hosted in forks."""
 
     if head_ref is None:
         canonical_owner, _ = GITHUB_REPOSITORY.split('/', 1)
         head_ref = f'{canonical_owner}:{branch(root)}'
-    return task_prs(root, head_ref, repository=repository)
+    return task_prs(root, head_ref, repository=repository, base=base)
 
 
 def require_exact_task_pr(root, prs):
@@ -902,6 +1131,26 @@ def finish(root, args):
         if recovered:
             task = recovered
             update_task(root, args.task, task)
+    if task.get('status') == 'complete':
+        merge = task.get('merge')
+        checked_head = (task.get('checked') or {}).get('head')
+        if (
+            not merge or not checked_head
+            or not is_ancestor(root, merge, remote)
+            or not same_tree(root, checked_head, merge)
+        ):
+            raise WorkflowError('Completed task lacks verified main integration')
+        primary = update_main(root, remote)
+        result = {
+            'status': 'complete', 'main': str(primary), 'sha': remote,
+            'removed_worktrees': cleanup_merged_worktrees(
+                root, task['platform'], remote,
+            ),
+        }
+        installer = completed_windows_installer(task, primary, remote)
+        if installer:
+            result['test_installer'] = installer
+        return result
     if task.get('status') in ('integrated', 'main-updated'):
         primary = update_main(root, remote)
         needs_app_review = task.get('checked', {}).get(
@@ -937,7 +1186,16 @@ def finish(root, args):
             }
             task.update(status='complete', app_review=app_review)
         update_task(root, args.task, task)
-        return {'status': task['status'], 'main': str(primary), 'sha': remote}
+        result = {
+            'status': task['status'], 'main': str(primary), 'sha': remote,
+            'removed_worktrees': cleanup_merged_worktrees(
+                root, task['platform'], remote,
+            ),
+        }
+        installer = completed_windows_installer(task, primary, remote)
+        if installer:
+            result['test_installer'] = installer
+        return result
     attest(root, task, remote)
     validate_paths(
         branch(root), changed_paths(root, remote), root=root, base=remote,
@@ -1071,12 +1329,18 @@ def finish(root, args):
         'pr': number,
         'main': str(primary),
         'sha': remote,
+        'removed_worktrees': cleanup_merged_worktrees(
+            root, task['platform'], remote,
+        ),
     }
     if needs_app_review:
         result['app'] = (
             'App verification is a separate required step because app inputs '
             'changed'
         )
+    installer = completed_windows_installer(task, primary, remote)
+    if installer:
+        result['test_installer'] = installer
     return result
 
 
@@ -1098,6 +1362,8 @@ def main(argv=None):
         default='SIDEY',
         choices=['SIDEY', 'sidey-reals', 'windows'],
     )
+    test_installer = subs.add_parser('test-installer')
+    test_installer.add_argument('task')
     for command in ('sync', 'check', 'publish', 'finish'):
         sub = subs.add_parser(command)
         sub.add_argument('task', nargs='?')
@@ -1220,6 +1486,8 @@ def main(argv=None):
         result = {'paths': paths, 'scopes': required_scopes(paths)}
     elif args.command == 'check':
         result = check_task(root, args.task)
+    elif args.command == 'test-installer':
+        result = test_installer_task(root, args.task)
     elif args.command == 'publish':
         result = publish(root, args)
     elif args.command == 'finish':

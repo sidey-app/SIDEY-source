@@ -66,6 +66,216 @@ class WorkflowTests(unittest.TestCase):
             w.main(['--repo', str(self.primary), 'start', name, '--platform', platform, '--worktree', str(path)])
         return path
 
+    def merged_native_worktree(self, platform='windows'):
+        path = self.start('old', platform=platform)
+        (path / 'old.txt').write_text('completed work\n')
+        self.commit(path, 'completed work')
+        checked_head = w.head(path)
+        w.git(self.primary, 'merge', '--squash', f'{platform}/old')
+        self.commit(self.primary, 'squashed completed work')
+        merge = w.head(self.primary)
+        w.git(self.primary, 'push', 'origin', 'main')
+        task = w.read_state(path)['old']
+        task.update(
+            status='complete', merge=merge, pr='1',
+            checked={'head': checked_head, 'time': 0},
+        )
+        w.update_task(path, 'old', task)
+        current = self.start('current', platform=platform)
+        return path, current, task, merge
+
+    def cleanup_native(self, current, platform, merge, now, *, open_prs=None):
+        with (
+            patch.object(w, 'source_repository', return_value='sidey-app/SIDEY-source'),
+            patch.object(w, 'open_task_prs', return_value=open_prs or []),
+        ):
+            return w.cleanup_merged_worktrees(
+                current, platform, merge, now=now,
+            )
+
+    def test_cleanup_removes_only_old_verified_native_worktree(self):
+        old, current, task, merge = self.merged_native_worktree()
+        committed_at = int(w.git(old, 'show', '-s', '--format=%ct', 'HEAD'))
+        removed = self.cleanup_native(
+            current, 'windows', merge, committed_at + 3 * 24 * 60 * 60,
+        )
+        self.assertEqual(removed, [{'task': 'old', 'worktree': str(old.resolve())}])
+        self.assertFalse(old.exists())
+        self.assertTrue(current.exists())
+        self.assertEqual(
+            w.git(self.primary, 'rev-parse', task['branch']),
+            task['checked']['head'],
+        )
+
+    def assert_cleanup_preserves(self, reason):
+        old, current, task, merge = self.merged_native_worktree()
+        committed_at = int(w.git(old, 'show', '-s', '--format=%ct', 'HEAD'))
+        now = committed_at + 3 * 24 * 60 * 60
+        if reason == 'recent':
+            task['checked']['time'] = now - 60 * 60
+            w.update_task(old, 'old', task)
+        elif reason == 'dirty':
+            (old / 'untracked.txt').write_text('keep this')
+        elif reason == 'new commit':
+            (old / 'new.txt').write_text('new work')
+            self.commit(old, 'new work')
+        open_prs = [{'number': 2}] if reason == 'open PR' else []
+        removed = self.cleanup_native(
+            current, 'windows', merge, now, open_prs=open_prs,
+        )
+        self.assertEqual(removed, [])
+        self.assertTrue(old.exists())
+
+    def test_cleanup_preserves_recent_worktree(self):
+        self.assert_cleanup_preserves('recent')
+
+    def test_cleanup_preserves_open_pr_worktree(self):
+        self.assert_cleanup_preserves('open PR')
+
+    def test_cleanup_preserves_dirty_worktree(self):
+        self.assert_cleanup_preserves('dirty')
+
+    def test_cleanup_preserves_worktree_with_new_commit(self):
+        self.assert_cleanup_preserves('new commit')
+
+    def test_cleanup_preserves_locked_worktree(self):
+        old, current, _, merge = self.merged_native_worktree()
+        committed_at = int(w.git(old, 'show', '-s', '--format=%ct', 'HEAD'))
+        w.git(self.primary, 'worktree', 'lock', str(old))
+        self.assertEqual(self.cleanup_native(
+            current, 'windows', merge, committed_at + 3 * 24 * 60 * 60,
+        ), [])
+        self.assertTrue(old.exists())
+
+    def test_cleanup_does_not_cross_platform_boundary(self):
+        old, current, _, merge = self.merged_native_worktree('macos')
+        committed_at = int(w.git(old, 'show', '-s', '--format=%ct', 'HEAD'))
+        self.assertEqual(self.cleanup_native(
+            current, 'windows', merge, committed_at + 3 * 24 * 60 * 60,
+        ), [])
+        self.assertTrue(old.exists())
+
+    def test_finish_retries_cleanup_for_completed_native_task(self):
+        old, current, _, merge = self.merged_native_worktree()
+        task = w.read_state(current)['current']
+        task.update(
+            status='complete', merge=merge,
+            checked={'head': w.head(current)},
+        )
+        w.update_task(current, 'current', task)
+        with (
+            patch.object(w, 'source_repository', return_value='sidey-app/SIDEY-source'),
+            patch.object(w, 'cleanup_merged_worktrees', return_value=[str(old)]) as cleanup,
+            contextlib.redirect_stdout(io.StringIO()) as output,
+        ):
+            w.main(['--repo', str(current), 'finish', 'current'])
+        result = json.loads(output.getvalue())
+        self.assertEqual(result['status'], 'complete')
+        self.assertEqual(result['removed_worktrees'], [str(old)])
+        cleanup.assert_called_once_with(current.resolve(), 'windows', merge)
+
+    def test_windows_test_installer_replaces_old_setup_after_verified_build(self):
+        downloads = self.root / 'Downloads'
+        downloads.mkdir()
+        old = downloads / 'SIDEY-Windows-x64-v1.0.0-Setup.exe'
+        old.write_bytes(b'old installer')
+        same_version = downloads / 'SIDEY-Windows-x64-v1.0.1-Setup.exe'
+        same_version.write_bytes(b'previous build')
+        unrelated = downloads / 'Other-Setup.exe'
+        unrelated.write_bytes(b'keep')
+
+        def build(_primary, output):
+            installer = output / 'artifacts' / 'SIDEY-Windows-x64-v1.0.1-Setup.exe'
+            installer.parent.mkdir()
+            installer.write_bytes(b'verified new installer')
+            return installer
+
+        remote = w.head(self.primary)
+        with patch.object(w, 'build_windows_test_installer', side_effect=build):
+            result = w.publish_windows_test_installer(
+                self.primary, remote, downloads,
+            )
+        self.assertEqual(
+            Path(result['path']).read_bytes(), b'verified new installer',
+        )
+        self.assertEqual(result['removed_installers'], [str(old)])
+        self.assertFalse(old.exists())
+        self.assertEqual(same_version.read_bytes(), b'verified new installer')
+        self.assertEqual(unrelated.read_bytes(), b'keep')
+        self.assertEqual(result['main'], remote)
+
+    def test_windows_test_installer_preserves_old_setup_when_main_changes(self):
+        downloads = self.root / 'Downloads'
+        downloads.mkdir()
+        old = downloads / 'SIDEY-Windows-x64-v1.0.0-Setup.exe'
+        old.write_bytes(b'old installer')
+
+        def build(_primary, output):
+            installer = output / 'artifacts' / 'SIDEY-Windows-x64-v1.0.1-Setup.exe'
+            installer.parent.mkdir()
+            installer.write_bytes(b'stale installer')
+            self.advance()
+            return installer
+
+        remote = w.head(self.primary)
+        with patch.object(w, 'build_windows_test_installer', side_effect=build):
+            with self.assertRaisesRegex(w.WorkflowError, 'main changed'):
+                w.publish_windows_test_installer(
+                    self.primary, remote, downloads,
+                )
+        self.assertEqual(old.read_bytes(), b'old installer')
+        self.assertFalse(
+            (downloads / 'SIDEY-Windows-x64-v1.0.1-Setup.exe').exists(),
+        )
+
+    def test_completed_windows_finish_includes_test_installer(self):
+        _, current, _, merge = self.merged_native_worktree()
+        task = w.read_state(current)['current']
+        task.update(
+            status='complete', merge=merge,
+            checked={'head': w.head(current)},
+            app_review={'main': merge},
+        )
+        w.update_task(current, 'current', task)
+        candidate = {'path': 'Downloads/SIDEY-Setup.exe', 'main': merge}
+        with (
+            patch.object(w, 'source_repository', return_value='sidey-app/SIDEY-source'),
+            patch.object(w, 'cleanup_merged_worktrees', return_value=[]),
+            patch.object(w, 'publish_windows_test_installer', return_value=candidate) as publish,
+            contextlib.redirect_stdout(io.StringIO()) as output,
+        ):
+            w.main(['--repo', str(current), 'finish', 'current'])
+        self.assertEqual(json.loads(output.getvalue())['test_installer'], candidate)
+        publish.assert_called_once_with(self.primary.resolve(), merge)
+
+    def test_checked_windows_task_builds_test_installer_before_merge(self):
+        path = self.start(platform='windows')
+        (path / 'windows').mkdir()
+        (path / 'windows/work.txt').write_text('implementation\n')
+        self.commit(path, 'Windows implementation')
+        with patch.object(w, 'local_checks'):
+            task = w.check_task(path, 'task')
+        downloads = self.root / 'Downloads'
+        downloads.mkdir()
+        old = downloads / 'SIDEY-Windows-x64-v1.0.0-Setup.exe'
+        old.write_bytes(b'old')
+
+        def build(_source, output):
+            installer = output / 'artifacts' / 'SIDEY-Windows-x64-v1.0.1-Setup.exe'
+            installer.parent.mkdir()
+            installer.write_bytes(b'checked branch installer')
+            return installer
+
+        with (
+            patch.object(w, 'windows_downloads_folder', return_value=downloads),
+            patch.object(w, 'build_windows_test_installer', side_effect=build),
+        ):
+            result = w.test_installer_task(path, 'task')
+        self.assertEqual(Path(result['path']).read_bytes(), b'checked branch installer')
+        self.assertEqual(result['head'], task['checked']['head'])
+        self.assertEqual(result['main'], task['checked']['base'])
+        self.assertFalse(old.exists())
+
     def test_recovers_server_squash_after_lost_client_response_only_for_checked_tree(self):
         path = self.start()
         (path / 'change.md').write_text('task')
