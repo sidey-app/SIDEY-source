@@ -22,20 +22,55 @@ namespace Sidey.Installer
         [STAThread]
         private static int Main(string[] arguments)
         {
+            TransactionOptions options = null;
+            InstallTransaction transaction = null;
             try
             {
-                TransactionOptions options = TransactionOptions.Parse(arguments);
-                return new InstallTransaction(options).Run();
+                options = TransactionOptions.Parse(arguments);
+                transaction = new InstallTransaction(options);
+                return transaction.Run();
             }
             catch (ArgumentException exception)
             {
+                WriteFailureDiagnostic(options, transaction, exception);
                 Console.Error.WriteLine(exception.Message);
                 return InvalidArguments;
             }
             catch (Exception exception)
             {
+                WriteFailureDiagnostic(options, transaction, exception);
                 Console.Error.WriteLine(exception.Message);
                 return 1;
+            }
+        }
+
+        private static void WriteFailureDiagnostic(
+            TransactionOptions options,
+            InstallTransaction transaction,
+            Exception exception)
+        {
+            if (options == null || string.IsNullOrWhiteSpace(options.LogPath))
+            {
+                return;
+            }
+
+            try
+            {
+                // Keep support logs useful without copying paths or account data from
+                // exception messages into a file that users may attach to an issue.
+                File.AppendAllText(options.LogPath,
+                    "[InstallTransaction]" + Environment.NewLine
+                    + "action=" + options.Action + Environment.NewLine
+                    + "operation=" + (transaction == null ? "initialize" : transaction.Operation)
+                    + Environment.NewLine
+                    + "exception=" + exception.GetType().Name + Environment.NewLine
+                    + "hresult=0x" + exception.HResult.ToString("X8", CultureInfo.InvariantCulture)
+                    + Environment.NewLine + Environment.NewLine,
+                    Encoding.ASCII);
+            }
+            catch
+            {
+                // Reporting must never replace the original transaction failure.
             }
         }
 
@@ -46,6 +81,7 @@ namespace Sidey.Installer
             public string StagingDirectory;
             public string RollbackDirectory;
             public string Version;
+            public string LogPath;
             public bool AllowUserWritableParentForTests;
 
             public static TransactionOptions Parse(string[] arguments)
@@ -85,9 +121,12 @@ namespace Sidey.Installer
                     StagingDirectory = Required(values, "--staging-directory"),
                     RollbackDirectory = Required(values, "--rollback-directory"),
                     Version = Required(values, "--version"),
+                    LogPath = values.ContainsKey("--log-path") ? values["--log-path"] : null,
                     AllowUserWritableParentForTests = allowTests,
                 };
-                if (values.Count != 5 || !InstallTransaction.IsKnownAction(result.Action))
+                if (values.Count != (result.LogPath == null ? 5 : 6)
+                    || (result.LogPath != null && string.IsNullOrWhiteSpace(result.LogPath))
+                    || !InstallTransaction.IsKnownAction(result.Action))
                 {
                     throw new ArgumentException("Invalid SIDEY install transaction arguments.");
                 }
@@ -154,6 +193,8 @@ namespace Sidey.Installer
             private string transactionStagingPath;
             private string completionId;
 
+            public string Operation { get; private set; }
+
             public InstallTransaction(TransactionOptions options)
             {
                 action = options.Action;
@@ -176,6 +217,7 @@ namespace Sidey.Installer
                 previousRegistration = null;
                 previousInstallExisted = false;
                 transactionStagingPath = stagingPath;
+                Operation = "run";
 
                 ValidateSiblingPath(stagingPath, expectedStagingPrefix, false,
                     "The SIDEY staging directory must be a reserved sibling of the install directory.");
@@ -199,8 +241,11 @@ namespace Sidey.Installer
             {
                 if (EqualsAction("Recover"))
                 {
+                    Operation = "recover.parent-security";
                     AssertSecureTransactionParent();
+                    Operation = "recover.read-state";
                     RecoverInterruptedTransaction();
+                    Operation = "recover.pending-location";
                     ClearPendingInstallLocation();
                     return 0;
                 }
@@ -410,17 +455,20 @@ namespace Sidey.Installer
                 TransactionState state = ReadState();
                 if (state == null)
                 {
+                    Operation = "recover.inspect-orphan";
                     if (Directory.Exists(rollbackPath))
                     {
                         throw new InvalidOperationException(
                             "An unrecognized SIDEY rollback directory already exists.");
                     }
+                    Operation = "recover.remove-staging";
                     RemoveTransactionDirectory(stagingPath);
                     return;
                 }
 
                 if (PhaseEquals(state, "committed"))
                 {
+                    Operation = "recover.complete-committed";
                     string recordedStaging = AssertStagingDirectoryPath(state.StagingDirectory);
                     if (!Directory.Exists(installPath))
                     {
@@ -433,6 +481,7 @@ namespace Sidey.Installer
                     RemoveState();
                     return;
                 }
+                Operation = "recover.rollback";
                 UndoTransaction(state);
             }
 

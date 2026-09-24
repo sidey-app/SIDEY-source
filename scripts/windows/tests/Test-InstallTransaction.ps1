@@ -18,6 +18,7 @@ else {
 $install = Join-Path $probeRoot 'SIDEY'
 $staging = $install + '.sidey-staging-1234'
 $rollback = $install + '.sidey-rollback'
+$logPath = Join-Path $probeRoot 'install-transaction.log'
 $version = '9.8.7'
 $assertions = 0
 
@@ -61,6 +62,7 @@ function Get-TransactionArguments(
         '--staging-directory', (ConvertTo-NativeArgument $StagingDirectory),
         '--rollback-directory', (ConvertTo-NativeArgument $rollback),
         '--version', (ConvertTo-NativeArgument $version),
+        '--log-path', (ConvertTo-NativeArgument $logPath),
         '--allow-user-writable-parent-for-tests'
     ) -join ' '
 }
@@ -418,6 +420,24 @@ try {
     Assert-True ([IO.File]::Exists((Join-Path $install 'SIDEY.exe'))) `
         'An incomplete staged payload changed the live install.'
     Invoke-Transaction Rollback
+
+    [IO.File]::Delete($logPath)
+    [IO.Directory]::CreateDirectory($rollback) | Out-Null
+    [IO.File]::WriteAllText((Join-Path $rollback 'marker.txt'), 'preserve')
+    $recoveryExitCode = Invoke-Transaction Recover -AllowFailure
+    Assert-True ($recoveryExitCode -eq 1) `
+        'Recovery accepted an unrecognized rollback directory.'
+    $recoveryLog = [IO.File]::ReadAllText($logPath)
+    Assert-True ($recoveryLog.Contains('operation=recover.inspect-orphan')) `
+        'A failed recovery did not identify its failed operation in the support log.'
+    Assert-True ($recoveryLog.Contains('exception=InvalidOperationException')) `
+        'A failed recovery did not identify the exception type in the support log.'
+    Assert-True (-not $recoveryLog.Contains($probeRoot)) `
+        'A recovery diagnostic exposed the local test directory.'
+    Assert-True ([IO.File]::Exists((Join-Path $rollback 'marker.txt'))) `
+        'A failed recovery removed an unrecognized rollback directory.'
+    Remove-Item -LiteralPath $rollback -Recurse -Force
+    Invoke-Transaction Recover
 
     $unsafeExitCode = Invoke-Transaction Prepare `
         -StagingDirectory (Join-Path $probeRoot 'not-a-sidey-stage') -AllowFailure

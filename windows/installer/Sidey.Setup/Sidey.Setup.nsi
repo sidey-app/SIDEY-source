@@ -246,7 +246,7 @@ Var InstallerCompletedCleanly
 
 !macro RunInstallTransaction ACTION RESULT
   ClearErrors
-  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action ${ACTION} --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --version "${APP_VERSION}"' ${RESULT}
+  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action ${ACTION} --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --version "${APP_VERSION}" --log-path "$InstallerErrorLogPath"' ${RESULT}
   ${If} ${Errors}
     StrCpy ${RESULT} 5
   ${EndIf}
@@ -902,7 +902,7 @@ Section "Uninstall"
   StrCpy $StagingDirectory "$INSTDIR.sidey-staging-$0"
   StrCpy $RollbackDirectory "$INSTDIR.sidey-rollback"
   ClearErrors
-  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action CleanupForUninstall --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --version "${APP_VERSION}"' $0
+  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action CleanupForUninstall --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --version "${APP_VERSION}" --log-path "$InstallerErrorLogPath"' $0
   ${If} ${Errors}
     StrCpy $0 5
   ${EndIf}
