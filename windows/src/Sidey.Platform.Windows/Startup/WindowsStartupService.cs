@@ -17,6 +17,7 @@ public sealed class WindowsStartupService : IWindowsStartupService
     private const string ValueName = "SIDEY";
     public const string BackgroundLaunchArgument = "--background";
     public const string UpdateShutdownArgument = "--shutdown-for-update";
+    public const string ShowAboutAfterInstallArgument = "--show-about-after-install";
 
     public bool IsEnabled()
     {
@@ -69,6 +70,9 @@ public sealed class WindowsStartupService : IWindowsStartupService
 
     public static bool IsUpdateShutdown(string? arguments) =>
         IsDedicatedArgument(arguments, UpdateShutdownArgument);
+
+    public static bool IsShowAboutAfterInstall(string? arguments) =>
+        IsDedicatedArgument(arguments, ShowAboutAfterInstallArgument);
 
     private static bool IsDedicatedArgument(string? arguments, string expected) =>
         StringComparer.OrdinalIgnoreCase.Equals(arguments?.Trim(), expected);

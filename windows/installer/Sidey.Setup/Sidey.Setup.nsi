@@ -497,7 +497,7 @@ FunctionEnd
 
 Function LaunchSideyAsDesktopUser
   ClearErrors
-  ExecWait '"$INSTDIR\Runtime\SIDEY.UninstallHelper.exe" --launch-sidey-as-desktop-user' $0
+  ExecWait '"$INSTDIR\Runtime\SIDEY.UninstallHelper.exe" --launch-sidey-as-desktop-user --show-about-after-install' $0
   ${If} ${Errors}
     StrCpy $0 5
   ${EndIf}
@@ -513,7 +513,7 @@ Function LaunchSideyAsDesktopUser
     StrCpy $InstallerErrorStage "LAUNCH"
     StrCpy $InstallerErrorSymbol "LAUNCH_FAILED"
     StrCpy $InstallerErrorTarget "SIDEY.exe"
-    StrCpy $InstallerErrorCommand "SIDEY.UninstallHelper.exe --launch-sidey-as-desktop-user"
+    StrCpy $InstallerErrorCommand "SIDEY.UninstallHelper.exe --launch-sidey-as-desktop-user --show-about-after-install"
     StrCpy $InstallerErrorMessage "$(LaunchFailed)"
     Call ShowLifecycleError
   ${EndIf}

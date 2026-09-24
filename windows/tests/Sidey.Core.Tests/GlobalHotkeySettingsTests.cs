@@ -111,4 +111,23 @@ public sealed class GlobalHotkeySettingsTests
         Assert.False(new GlobalHotkeyBinding(GlobalHotkeyModifiers.Control, 0x11).IsValid());
         Assert.True(new GlobalHotkeyBinding(GlobalHotkeyModifiers.Windows, 'A').IsValid());
     }
+
+    [Fact]
+    public void DeletedShortcutsStayDisabledAfterNormalizationAndCanBeRestored()
+    {
+        GlobalHotkeySettings settings = GlobalHotkeySettings.Default
+            .Assign(GlobalHotkeyAction.Compose, GlobalHotkeyBinding.Disabled)
+            .Assign(GlobalHotkeyAction.History, GlobalHotkeyBinding.Disabled)
+            .Normalize();
+
+        Assert.True(settings.BindingFor(GlobalHotkeyAction.Compose).IsDisabled);
+        Assert.True(settings.BindingFor(GlobalHotkeyAction.History).IsDisabled);
+        Assert.Equal(string.Empty, settings.BindingFor(GlobalHotkeyAction.Compose).ToDisplayText());
+
+        GlobalHotkeySettings restored = settings.Assign(
+            GlobalHotkeyAction.Compose,
+            GlobalHotkeySettings.Default.BindingFor(GlobalHotkeyAction.Compose));
+        Assert.False(restored.BindingFor(GlobalHotkeyAction.Compose).IsDisabled);
+        Assert.True(restored.BindingFor(GlobalHotkeyAction.History).IsDisabled);
+    }
 }

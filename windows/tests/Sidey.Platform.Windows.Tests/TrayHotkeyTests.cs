@@ -113,6 +113,21 @@ public sealed class TrayHotkeyTests
         Assert.Equal("Ctrl+Shift+Win+F5", TrayHotkeys.Shortcut(TrayCommand.ToggleOverlay, settings));
     }
 
+    [Fact]
+    public void DeletedShortcutIsNotRegisteredOrShownInTheTrayMenu()
+    {
+        var native = new FakeHotkeyNative();
+        GlobalHotkeySettings settings = GlobalHotkeySettings.Default.Assign(
+            GlobalHotkeyAction.Compose, GlobalHotkeyBinding.Disabled);
+
+        using var hotkeys = new TrayHotkeys(42, settings, native);
+
+        Assert.DoesNotContain(native.Registrations, binding => binding.Id == (int)TrayCommand.Compose);
+        Assert.False(hotkeys.TryGetCommand((int)TrayCommand.Compose, out _));
+        Assert.Equal("Compose", TrayHotkeys.MenuLabel(TrayCommand.Compose, "Compose", settings));
+        Assert.Empty(hotkeys.Failures);
+    }
+
     private static void AssertBinding(
         (nint Window, int Id, uint Modifiers, uint Key) binding,
         TrayCommand command,

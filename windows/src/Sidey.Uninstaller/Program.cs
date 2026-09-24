@@ -30,6 +30,8 @@ namespace Sidey.Uninstaller
             "--cleanup-startup-as-desktop-user";
         private const string LaunchSideyAsDesktopUserArgument =
             "--launch-sidey-as-desktop-user";
+        private const string ShowAboutAfterInstallArgument =
+            "--show-about-after-install";
         private const string CompleteInstallAsDesktopUserArgument =
             "--complete-install-as-desktop-user";
         private const string CompleteInstallArgument = "--complete-install";
@@ -99,10 +101,14 @@ namespace Sidey.Uninstaller
                     return 1;
                 }
             }
-            if (arguments.Length == 1
+            if (arguments.Length == 2
                 && string.Equals(
                     arguments[0],
                     LaunchSideyAsDesktopUserArgument,
+                    StringComparison.OrdinalIgnoreCase)
+                && string.Equals(
+                    arguments[1],
+                    ShowAboutAfterInstallArgument,
                     StringComparison.OrdinalIgnoreCase))
             {
                 return LaunchSideyAsDesktopUser();
@@ -289,7 +295,7 @@ namespace Sidey.Uninstaller
 
                 return DesktopUserProcess.Start(
                     launcherPath,
-                    string.Empty,
+                    ShowAboutAfterInstallArgument,
                     installDirectory,
                     waitForExit: false);
             }
@@ -362,10 +368,14 @@ namespace Sidey.Uninstaller
                 }
             }
             string pendingPath = Path.Combine(userDirectory, "pending-installed-update.txt");
+            string pendingAboutPath = Path.Combine(userDirectory, "pending-postinstall-about.txt");
             File.Delete(pendingPath);
-            // Record completion before the optional notification. A crash may
-            // omit a notification, but recovery never re-enables startup or
-            // reposts an already consumed notification.
+            // Persist the first-launch About request before committing this ID.
+            // A retry must not recreate the request after the app consumes it.
+            File.WriteAllText(pendingAboutPath, marker[2]);
+            // Record completion before the optional update notification. A crash
+            // may omit that notification, but recovery never re-enables startup
+            // or reposts an already consumed notification.
             File.WriteAllText(completionPath, marker[2]);
             if (marker[0] == "upgrade" || marker[0] == "relocate")
             {

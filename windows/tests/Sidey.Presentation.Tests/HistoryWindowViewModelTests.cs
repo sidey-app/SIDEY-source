@@ -9,7 +9,7 @@ namespace Sidey.Presentation.Tests;
 public sealed class HistoryWindowViewModelTests
 {
     [Fact]
-    public async Task ActivationLoadsNewestFirstAndFormatsSystemLocalTime()
+    public async Task ActivationLoadsOldestFirstAndFormatsSystemLocalTime()
     {
         var roomId = Guid.NewGuid();
         var userId = Guid.NewGuid();
@@ -41,11 +41,11 @@ public sealed class HistoryWindowViewModelTests
         await viewModel.ActivateAsync();
 
         Assert.Equal("최근 기록", viewModel.Title);
-        Assert.Equal(["최신", "이전"], viewModel.Items.Select(item => item.Body));
+        Assert.Equal(["이전", "최신"], viewModel.Items.Select(item => item.Body));
         Assert.Equal(
             newerTime.ToLocalTime().ToString("g", CultureInfo.CurrentCulture),
-            viewModel.Items[0].LocalTimeText);
-        Assert.True(viewModel.Items[0].IsCurrentUser);
+            viewModel.Items[1].LocalTimeText);
+        Assert.True(viewModel.Items[1].IsCurrentUser);
         Assert.False(viewModel.IsEmptyStateVisible);
     }
 
@@ -104,6 +104,28 @@ public sealed class HistoryWindowViewModelTests
         HistoryEntryViewModel failed = Assert.Single(viewModel.Items);
         Assert.False(failed.IsPending);
         Assert.True(failed.IsFailed);
+    }
+
+    [Fact]
+    public async Task LocalPendingMessageStaysBelowConfirmedHistoryWhenDeviceClockIsBehind()
+    {
+        var roomId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        DateTimeOffset confirmedAt = DateTimeOffset.UtcNow.AddMinutes(-1);
+        var pending = new MessageLedgerEntry(
+            Guid.NewGuid(), roomId, userId, "보내는 중", confirmedAt.AddMinutes(-2),
+            MessageDeliveryState.Pending);
+        var coordinator = new FakeSideyCoordinator
+        {
+            State = StateWithRooms(roomId, null, userId) with { Messages = [pending] },
+            MessagePage = [new ChatMessage(Guid.NewGuid(), roomId, userId, "확정", confirmedAt)],
+        };
+        var viewModel = new HistoryWindowViewModel(coordinator);
+
+        await viewModel.ActivateAsync();
+
+        Assert.Equal(["확정", "보내는 중"], viewModel.Items.Select(item => item.Body));
+        Assert.True(viewModel.Items[^1].IsPending);
     }
 
     [Fact]
@@ -185,7 +207,7 @@ public sealed class HistoryWindowViewModelTests
 
         await viewModel.LoadMoreCommand.ExecuteAsync(null);
         Assert.Equal(nextCursor, requestedCursor);
-        Assert.Equal(["첫 페이지", "이전 페이지"], viewModel.Items.Select(item => item.Body));
+        Assert.Equal(["이전 페이지", "첫 페이지"], viewModel.Items.Select(item => item.Body));
         Assert.True(viewModel.IsExhaustedVisible);
     }
 
@@ -258,7 +280,7 @@ public sealed class HistoryWindowViewModelTests
 
         await viewModel.RetryLoadMoreCommand.ExecuteAsync(null);
         Assert.False(viewModel.IsLoadMoreFailureVisible);
-        Assert.Equal(["첫 페이지", "이전 페이지"], viewModel.Items.Select(item => item.Body));
+        Assert.Equal(["이전 페이지", "첫 페이지"], viewModel.Items.Select(item => item.Body));
         Assert.True(viewModel.IsExhaustedVisible);
     }
 

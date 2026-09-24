@@ -632,7 +632,10 @@ public sealed class DistributionSourceTests
 
         Assert.Contains("MUI_FINISHPAGE_RUN_FUNCTION LaunchSideyAsDesktopUser", setup, StringComparison.Ordinal);
         Assert.DoesNotContain("MUI_FINISHPAGE_RUN \"$INSTDIR\\SIDEY.exe\"", setup, StringComparison.Ordinal);
-        Assert.Contains("--launch-sidey-as-desktop-user", setup, StringComparison.Ordinal);
+        Assert.Contains(
+            "--launch-sidey-as-desktop-user --show-about-after-install' $0",
+            setup,
+            StringComparison.Ordinal);
         Assert.Contains("--request-shutdown-as-desktop-user", setup, StringComparison.Ordinal);
         Assert.Contains("--complete-install-as-desktop-user", helper, StringComparison.Ordinal);
         Assert.Contains("--cleanup-startup-as-desktop-user", setup, StringComparison.Ordinal);

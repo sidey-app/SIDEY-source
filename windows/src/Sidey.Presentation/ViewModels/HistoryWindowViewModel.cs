@@ -322,8 +322,9 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
         }
 
         HistoryEntryViewModel[] desired = [.. entriesById.Values
-            .OrderByDescending(entry => entry.CreatedAt)
-            .ThenByDescending(entry => entry.Id.ToString("D"), StringComparer.Ordinal)
+            .OrderBy(entry => entry.State == MessageDeliveryState.Confirmed ? 0 : 1)
+            .ThenBy(entry => entry.CreatedAt)
+            .ThenBy(entry => entry.Id.ToString("D"), StringComparer.Ordinal)
             .Select(ToViewModel)];
         ReplaceItems(desired);
         UpdateEmptyState();

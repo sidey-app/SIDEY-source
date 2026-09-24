@@ -32,6 +32,8 @@ internal sealed class TrayHotkeys : IDisposable
         foreach (TrayCommand command in Commands)
         {
             GlobalHotkeyBinding binding = Settings.BindingFor(Action(command));
+            if (binding.IsDisabled)
+                continue;
             int error = _native.Register(
                 window,
                 (int)command,

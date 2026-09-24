@@ -112,15 +112,27 @@ $relocationWriter = [Func[int]]{
     return [int]$relocationProbe.Result
 }
 function Invoke-CompletionProbe([string]$Kind, [string]$Id, [string]$Directory) {
-    return [int]$completion.Invoke($null, [object[]]@(
-        [string[]]@($Kind, '9.8.7', $Id), $Directory, $startupWriter, $relocationWriter))
+    $arguments = [object[]]::new(4)
+    $arguments[0] = [string[]]@($Kind, '9.8.7', $Id)
+    $arguments[1] = $Directory
+    $arguments[2] = $startupWriter
+    $arguments[3] = $relocationWriter
+    return [int]$completion.Invoke($null, $arguments)
 }
 $freshData = Join-Path $probeRoot 'fresh user data'
 if ((Invoke-CompletionProbe 'fresh' 'fresh-1' $freshData) -ne 0 -or $startupProbe.Calls -ne 1) {
     throw 'Fresh setup did not enable startup once.'
 }
+$pendingAbout = Join-Path $freshData 'pending-postinstall-about.txt'
+if ([IO.File]::ReadAllText($pendingAbout) -cne 'fresh-1') {
+    throw 'Fresh setup did not request the next-launch About page.'
+}
+[IO.File]::Delete($pendingAbout)
 if ((Invoke-CompletionProbe 'fresh' 'fresh-1' $freshData) -ne 0 -or $startupProbe.Calls -ne 1) {
     throw 'Committed recovery repeated startup registration.'
+}
+if (Test-Path -LiteralPath $pendingAbout) {
+    throw 'Committed recovery recreated a consumed About request.'
 }
 $pendingUpdate = Join-Path $freshData 'pending-installed-update.txt'
 if (Test-Path -LiteralPath $pendingUpdate) { throw 'Fresh setup reported an update.' }
@@ -130,19 +142,27 @@ if ((Invoke-CompletionProbe 'upgrade' 'upgrade-1' $freshData) -ne 0 -or $startup
 if ([IO.File]::ReadAllText($pendingUpdate) -cne '9.8.7') {
     throw 'Upgrade did not record the installed version.'
 }
+if ([IO.File]::ReadAllText($pendingAbout) -cne 'upgrade-1') {
+    throw 'Upgrade did not request the next-launch About page.'
+}
+[IO.File]::Delete($pendingAbout)
 [IO.File]::Delete($pendingUpdate)
 if ((Invoke-CompletionProbe 'upgrade' 'upgrade-1' $freshData) -ne 0 -or
-    (Test-Path -LiteralPath $pendingUpdate)) {
-    throw 'Recovery reposted a consumed update notification.'
+    (Test-Path -LiteralPath $pendingUpdate) -or (Test-Path -LiteralPath $pendingAbout)) {
+    throw 'Recovery reposted a consumed update notification or About request.'
 }
 if ((Invoke-CompletionProbe 'repair' 'repair-1' $freshData) -ne 0 -or $startupProbe.Calls -ne 1 -or
     (Test-Path -LiteralPath $pendingUpdate)) {
     throw 'Repair changed startup or reported an update.'
 }
+if ([IO.File]::ReadAllText($pendingAbout) -cne 'repair-1') {
+    throw 'Repair did not request the next-launch About page.'
+}
 $relocationData = Join-Path $probeRoot 'relocated user data'
 $relocationProbe.Result = 5
 if ((Invoke-CompletionProbe 'relocate' 'relocate-1' $relocationData) -ne 5 -or
-    (Test-Path -LiteralPath (Join-Path $relocationData 'last-completed-install.txt'))) {
+    (Test-Path -LiteralPath (Join-Path $relocationData 'last-completed-install.txt')) -or
+    (Test-Path -LiteralPath (Join-Path $relocationData 'pending-postinstall-about.txt'))) {
     throw 'Failed relocation startup refresh was marked complete.'
 }
 $relocationProbe.Result = 0
@@ -153,19 +173,28 @@ if ((Invoke-CompletionProbe 'relocate' 'relocate-1' $relocationData) -ne 0 -or
 if ([IO.File]::ReadAllText((Join-Path $relocationData 'pending-installed-update.txt')) -cne '9.8.7') {
     throw 'Relocation did not report the installed update.'
 }
+$relocationAbout = Join-Path $relocationData 'pending-postinstall-about.txt'
+if ([IO.File]::ReadAllText($relocationAbout) -cne 'relocate-1') {
+    throw 'Relocation did not request the next-launch About page.'
+}
+[IO.File]::Delete($relocationAbout)
 if ((Invoke-CompletionProbe 'relocate' 'relocate-1' $relocationData) -ne 0 -or
-    $relocationProbe.Calls -ne 2) {
-    throw 'Recovery repeated the relocation startup refresh.'
+    $relocationProbe.Calls -ne 2 -or (Test-Path -LiteralPath $relocationAbout)) {
+    throw 'Recovery repeated the relocation startup refresh or About request.'
 }
 $retryData = Join-Path $probeRoot 'retry user data'
 $startupProbe.Result = 5
 if ((Invoke-CompletionProbe 'fresh' 'retry-1' $retryData) -ne 5 -or
-    (Test-Path -LiteralPath (Join-Path $retryData 'last-completed-install.txt'))) {
+    (Test-Path -LiteralPath (Join-Path $retryData 'last-completed-install.txt')) -or
+    (Test-Path -LiteralPath (Join-Path $retryData 'pending-postinstall-about.txt'))) {
     throw 'A failed startup registration was marked complete.'
 }
 $startupProbe.Result = 0
 if ((Invoke-CompletionProbe 'fresh' 'retry-1' $retryData) -ne 0 -or $startupProbe.Calls -ne 3) {
     throw 'Recovery did not retry failed startup registration.'
+}
+if ([IO.File]::ReadAllText((Join-Path $retryData 'pending-postinstall-about.txt')) -cne 'retry-1') {
+    throw 'Successful retry did not request the next-launch About page.'
 }
 
 # The legacy cleanup deletes only verified payload files after a committed

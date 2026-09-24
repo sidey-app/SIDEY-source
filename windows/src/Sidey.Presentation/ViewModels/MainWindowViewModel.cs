@@ -290,6 +290,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public string QuietModeHotkeyText => HotkeyText(GlobalHotkeyAction.ToggleQuietMode);
     public string ComposerHotkeyText => HotkeyText(GlobalHotkeyAction.Compose);
     public string HistoryHotkeyText => HotkeyText(GlobalHotkeyAction.History);
+    public IReadOnlyList<string> OverlayHotkeyKeys => HotkeyKeys(GlobalHotkeyAction.ToggleOverlay);
+    public IReadOnlyList<string> QuietModeHotkeyKeys => HotkeyKeys(GlobalHotkeyAction.ToggleQuietMode);
+    public IReadOnlyList<string> ComposerHotkeyKeys => HotkeyKeys(GlobalHotkeyAction.Compose);
+    public IReadOnlyList<string> HistoryHotkeyKeys => HotkeyKeys(GlobalHotkeyAction.History);
     public string OverlayHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyOverlay", OverlayHotkeyText);
     public string QuietModeHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyQuietMode", QuietModeHotkeyText);
     public string ComposerHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyComposer", ComposerHotkeyText);
@@ -887,6 +891,16 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public bool IsHotkeyRecording(GlobalHotkeyAction action) => _recordingHotkeyAction == action;
 
+    public GlobalHotkeyBinding HotkeyBindingFor(GlobalHotkeyAction action) =>
+        _displayedGlobalHotkeys.BindingFor(action);
+
+    public GlobalHotkeyAction? ConflictingHotkeyAction(
+        GlobalHotkeyAction action, GlobalHotkeyBinding binding) =>
+        binding == GlobalHotkeyBinding.Disabled ? null : Enum.GetValues<GlobalHotkeyAction>()
+            .Cast<GlobalHotkeyAction?>()
+            .FirstOrDefault(other => other != action
+                && _displayedGlobalHotkeys.BindingFor(other!.Value) == binding);
+
     public void PreviewHotkeyModifiers(GlobalHotkeyAction action, GlobalHotkeyModifiers modifiers)
     {
         if (_recordingHotkeyAction != action)
@@ -915,7 +929,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public void AssignGlobalHotkey(GlobalHotkeyAction action, GlobalHotkeyBinding binding)
     {
-        if (_recordingHotkeyAction != action || !IsHotkeySelectionEnabled || !binding.IsValid())
+        if (_recordingHotkeyAction != action || !IsHotkeySelectionEnabled
+            || (!binding.IsValid() && binding != GlobalHotkeyBinding.Disabled))
             return;
 
         GlobalHotkeySettings settings = _displayedGlobalHotkeys.Assign(action, binding);
@@ -967,10 +982,18 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     private string HotkeyText(GlobalHotkeyAction action) => _recordingHotkeyAction == action
         ? _hotkeyRecordingText ?? I18n.Get("settings.hotkeyRecording")
-        : _displayedGlobalHotkeys.BindingFor(action).ToDisplayText();
+        : HotkeyBindingText(_displayedGlobalHotkeys.BindingFor(action));
+
+    private IReadOnlyList<string> HotkeyKeys(GlobalHotkeyAction action) =>
+        HotkeyBindingText(_displayedGlobalHotkeys.BindingFor(action)).Split(" + ");
+
+    public static string HotkeyBindingText(GlobalHotkeyBinding binding) =>
+        binding == GlobalHotkeyBinding.Disabled
+            ? "—"
+            : binding.ToDisplayText();
 
     private static string HotkeyAccessibleName(string actionKey, string shortcut) =>
-        $"{I18n.Get(actionKey)}: {shortcut}";
+        $"{I18n.Get(actionKey)}: {(shortcut == "—" ? I18n.Get("common.delete") : shortcut)}";
 
     private void EndHotkeyRecording()
     {
@@ -985,6 +1008,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(QuietModeHotkeyText));
         OnPropertyChanged(nameof(ComposerHotkeyText));
         OnPropertyChanged(nameof(HistoryHotkeyText));
+        OnPropertyChanged(nameof(OverlayHotkeyKeys));
+        OnPropertyChanged(nameof(QuietModeHotkeyKeys));
+        OnPropertyChanged(nameof(ComposerHotkeyKeys));
+        OnPropertyChanged(nameof(HistoryHotkeyKeys));
         OnPropertyChanged(nameof(OverlayHotkeyAccessibleName));
         OnPropertyChanged(nameof(QuietModeHotkeyAccessibleName));
         OnPropertyChanged(nameof(ComposerHotkeyAccessibleName));
