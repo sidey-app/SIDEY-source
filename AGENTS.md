@@ -30,7 +30,7 @@ values in documentation.
 - Before changing `macos/**`, `scripts/macos/**`, or macOS-specific workflows, read [the macOS instructions](macos/AGENTS.md).
 - Before changing `windows/**`, `scripts/windows/**`, or Windows-specific workflows, read [the Windows instructions](windows/AGENTS.md). Changes under `windows/docs/**` also follow [the Windows developer-document instructions](windows/docs/AGENTS.md).
 - Before changing `website/**`, read [the public website instructions](website/AGENTS.md). Use [.agents/skills/web-verification/SKILL.md](.agents/skills/web-verification/SKILL.md) when a public-site change needs claim, build, or rendered-layout evidence.
-- Before changing the root README, translated README files, `docs/releases/**`, or public release copy, read [the documentation and release instructions](docs/AGENTS.md). Use [.agents/skills/release-notes/SKILL.md](.agents/skills/release-notes/SKILL.md) only for a specific macOS or Windows release note or GitHub Release body.
+- Before changing `docs/releases/**` or public release copy, read [the documentation and release instructions](docs/AGENTS.md). Use [.agents/skills/release-notes/SKILL.md](.agents/skills/release-notes/SKILL.md) only for a specific macOS or Windows release note or GitHub Release body.
 - Nested `AGENTS.md` files add rules for their path. A root-started Codex session does not load a nested file automatically, so follow the routing above before touching that path.
 
 ## Backend ownership
@@ -82,6 +82,7 @@ Codex-assisted new commits must include `Co-authored-by: codex <codex@openai.com
 - A `macos/*` branch must not edit, move, delete, format, generate, build, test, or release Windows implementation files. This includes `windows/**` and Windows-specific workflows, installers, assets, and documentation.
 - A `windows/*` branch must not edit, move, delete, format, generate, build, test, or release macOS implementation files. This includes `macos/**` and macOS-specific scripts, workflows, packages, assets, and documentation.
 - Shared changes belong on `shared/*`. Do not mix new shared-file edits into a platform implementation commit. Land the shared change independently, then merge or cherry-pick that reviewed commit into the platform branch that needs it.
+- Exception for a macOS build counter only: a `macos/*` branch may update `release/version.json` together with its generated `release/macos.json` and `macos/Config/Version.xcconfig` mirrors. Its `productVersion`, `windowsRevision`, schema and keys must stay unchanged, and `macBuild` must increase. The workflow and CI compare the exact source against the branch base before accepting this exception.
 - If a platform task reveals work needed on the other platform, record a follow-up instead of implementing it on the current branch.
 - Do not switch or clean a dirty worktree owned by another task or agent. Create an isolated worktree on the correctly prefixed branch.
 - macOS remains the reference implementation. Windows follows through its own branch without rewriting or opportunistically modifying macOS code.

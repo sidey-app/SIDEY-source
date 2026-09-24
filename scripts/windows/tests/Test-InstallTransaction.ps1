@@ -18,7 +18,9 @@ else {
 $install = Join-Path $probeRoot 'SIDEY'
 $staging = $install + '.sidey-staging-1234'
 $rollback = $install + '.sidey-rollback'
-$version = '9.8.7'
+$logPath = Join-Path $probeRoot 'install-transaction.log'
+$productVersion = '9.8.7'
+$updateVersion = '9.8.7000'
 $assertions = 0
 
 function Assert-True([bool]$Condition, [string]$Message) {
@@ -53,16 +55,23 @@ function Invoke-Helper([string]$Arguments) {
 
 function Get-TransactionArguments(
     [string]$Action,
-    [string]$StagingDirectory = $staging
+    [string]$StagingDirectory = $staging,
+    [switch]$UseRealParentPolicy,
+    [string]$InstallDirectory = $install
 ) {
-    return @(
+    $arguments = @(
         '--action', (ConvertTo-NativeArgument $Action),
-        '--install-directory', (ConvertTo-NativeArgument $install),
+        '--install-directory', (ConvertTo-NativeArgument $InstallDirectory),
         '--staging-directory', (ConvertTo-NativeArgument $StagingDirectory),
-        '--rollback-directory', (ConvertTo-NativeArgument $rollback),
-        '--version', (ConvertTo-NativeArgument $version),
-        '--allow-user-writable-parent-for-tests'
-    ) -join ' '
+        '--rollback-directory', (ConvertTo-NativeArgument ($InstallDirectory + '.sidey-rollback')),
+        '--product-version', (ConvertTo-NativeArgument $productVersion),
+        '--update-version', (ConvertTo-NativeArgument $updateVersion),
+        '--log-path', (ConvertTo-NativeArgument $logPath)
+    )
+    if (-not $UseRealParentPolicy) {
+        $arguments += '--allow-user-writable-parent-for-tests'
+    }
+    return $arguments -join ' '
 }
 
 function Start-TransactionProcess([string]$Action) {
@@ -147,7 +156,7 @@ try {
     if ([string]::IsNullOrWhiteSpace($HelperPath)) {
         & (Join-Path $root 'scripts/windows/New-SideyHelperExecutable.ps1') `
             -SourcePath (Join-Path $root 'windows/installer/Sidey.Setup/InstallTransaction.cs') `
-            -OutputPath $transactionExecutable -Version $version -FileVersion "$version.0" `
+            -OutputPath $transactionExecutable -Version $productVersion -FileVersion "$updateVersion.0" `
             -Title 'SIDEY Install Transaction' `
             -Description 'SIDEY atomic install transaction helper' `
             -IconPath (Join-Path $root 'windows/src/Sidey.App/Assets/Icons/SideyAppIcon.ico')
@@ -158,8 +167,72 @@ try {
     [IO.Directory]::CreateDirectory($install) | Out-Null
     [IO.File]::WriteAllText((Join-Path $install 'marker.txt'), 'old')
 
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 79) `
+        'A clean legacy install under a user-writable parent was not eligible for relocation.'
+    Assert-True ([IO.File]::Exists((Join-Path $install 'marker.txt'))) `
+        'Legacy inspection changed the previous installation.'
+    $statePath = $install + '.sidey-transaction.json'
+    [IO.File]::WriteAllText($statePath, 'not-json')
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 1) `
+        'Legacy inspection ignored a pending transaction state.'
+    Assert-True ([IO.File]::Exists($statePath)) `
+        'Legacy inspection removed a pending transaction state.'
+    [IO.File]::Delete($statePath)
+    [IO.File]::WriteAllText($statePath + '.tmp', 'incomplete')
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 1) `
+        'Legacy inspection ignored an unpublished transaction state.'
+    [IO.File]::Delete($statePath + '.tmp')
+    [IO.Directory]::CreateDirectory($rollback) | Out-Null
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 1) `
+        'Legacy inspection ignored a rollback directory.'
+    Assert-True ([IO.Directory]::Exists($rollback)) `
+        'Legacy inspection removed a rollback directory.'
+    Remove-Item -LiteralPath $rollback -Recurse -Force
+    [IO.Directory]::CreateDirectory($staging) | Out-Null
+    $legacyInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectLegacyLocation' -UseRealParentPolicy)
+    Assert-True ($legacyInspection.ExitCode -eq 1) `
+        'Legacy inspection ignored a staging directory.'
+    Assert-True ([IO.Directory]::Exists($staging)) `
+        'Legacy inspection removed a staging directory.'
+    Remove-Item -LiteralPath $staging -Recurse -Force
+    $relocationTargetInspection = Invoke-Helper (Get-TransactionArguments `
+        'InspectRelocationTarget')
+    Assert-True ($relocationTargetInspection.ExitCode -eq 1) `
+        'Relocation target inspection accepted an existing installation.'
+    $relocationTarget = Join-Path $probeRoot 'relocation-target'
+    $targetArguments = Get-TransactionArguments 'InspectRelocationTarget' `
+        ($relocationTarget + '.sidey-staging-1234') -InstallDirectory $relocationTarget
+    $unsafeTargetArguments = Get-TransactionArguments 'InspectRelocationTarget' `
+        ($relocationTarget + '.sidey-staging-1234') -InstallDirectory $relocationTarget `
+        -UseRealParentPolicy
+    $relocationTargetInspection = Invoke-Helper $unsafeTargetArguments
+    Assert-True ($relocationTargetInspection.ExitCode -eq 1) `
+        'Relocation target inspection accepted a user-writable parent.'
+    $relocationTargetInspection = Invoke-Helper $targetArguments
+    Assert-True ($relocationTargetInspection.ExitCode -eq 0) `
+        'Relocation target inspection rejected an empty test target.'
+    [IO.File]::WriteAllText($relocationTarget + '.sidey-transaction.json', 'pending')
+    $relocationTargetInspection = Invoke-Helper $targetArguments
+    Assert-True ($relocationTargetInspection.ExitCode -eq 1) `
+        'Relocation target inspection accepted a pending transaction.'
+    [IO.File]::Delete($relocationTarget + '.sidey-transaction.json')
+
     Invoke-Transaction Prepare
     $initialState = Get-Content -LiteralPath ($install + '.sidey-transaction.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    Assert-True ($initialState.schemaVersion -eq 2) 'Prepare did not write the split-version transaction schema.'
+    Assert-True ($initialState.productVersion -ceq $productVersion) `
+        'Transaction state did not preserve the display Product Version.'
+    Assert-True ($initialState.updateVersion -ceq $updateVersion) `
+        'Transaction state did not preserve the internal Windows update version.'
     $initialCompletionId = [Guid]::ParseExact($initialState.completionId, 'N')
     Assert-True ($initialCompletionId -ne [Guid]::Empty) 'Prepare did not assign an installation identity.'
     New-Payload 'new'
@@ -272,7 +345,7 @@ try {
     $rolledBackState = [ordered]@{
         schemaVersion = 1
         phase = 'rolled-back'
-        version = $version
+        version = $productVersion
         installDirectory = $install
         stagingDirectory = $staging
         rollbackDirectory = $rollback
@@ -418,6 +491,46 @@ try {
     Assert-True ([IO.File]::Exists((Join-Path $install 'SIDEY.exe'))) `
         'An incomplete staged payload changed the live install.'
     Invoke-Transaction Rollback
+
+    [IO.File]::Delete($logPath)
+    [IO.Directory]::CreateDirectory($rollback) | Out-Null
+    [IO.File]::WriteAllText((Join-Path $rollback 'marker.txt'), 'preserve')
+    $recoveryExitCode = Invoke-Transaction Recover -AllowFailure
+    Assert-True ($recoveryExitCode -eq 72) `
+        'Recovery did not report the rollback-conflict exit code.'
+    $recoveryLog = [IO.File]::ReadAllText($logPath)
+    Assert-True ($recoveryLog.Contains('operation=recover.inspect-orphan')) `
+        'A failed recovery did not identify its failed operation in the support log.'
+    Assert-True ($recoveryLog.Contains('exception=InvalidOperationException')) `
+        'A failed recovery did not identify the exception type in the support log.'
+    Assert-True (-not $recoveryLog.Contains($probeRoot)) `
+        'A recovery diagnostic exposed the local test directory.'
+    Assert-True ([IO.File]::Exists((Join-Path $rollback 'marker.txt'))) `
+        'A failed recovery removed an unrecognized rollback directory.'
+    Remove-Item -LiteralPath $rollback -Recurse -Force
+    Invoke-Transaction Recover
+
+    $statePath = $install + '.sidey-transaction.json'
+    [IO.File]::WriteAllText($statePath, 'not-json')
+    $invalidStateExitCode = Invoke-Transaction Recover -AllowFailure
+    Assert-True ($invalidStateExitCode -eq 71) `
+        'Recovery did not report the invalid-state exit code.'
+    Assert-True ([IO.File]::Exists($statePath)) `
+        'Recovery discarded an invalid state file needed for diagnosis.'
+    [IO.File]::Delete($statePath)
+
+    [IO.File]::WriteAllText($statePath, '{}')
+    $lockedState = [IO.File]::Open(
+        $statePath, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::None)
+    try {
+        $stateIoExitCode = Invoke-Transaction Recover -AllowFailure
+        Assert-True ($stateIoExitCode -eq 77) `
+            'Recovery did not report the filesystem-I/O exit code.'
+    }
+    finally {
+        $lockedState.Dispose()
+    }
+    [IO.File]::Delete($statePath)
 
     $unsafeExitCode = Invoke-Transaction Prepare `
         -StagingDirectory (Join-Path $probeRoot 'not-a-sidey-stage') -AllowFailure

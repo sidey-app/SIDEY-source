@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using Sidey.Core.Localization;
 using Sidey.Core.Storage;
 using Sidey.Platform.Windows;
@@ -18,17 +19,30 @@ internal sealed class WindowsUpdateServiceAdapter : IUpdateService
 
     public WindowsUpdateServiceAdapter()
     {
-        string artifactVersion = typeof(App).Assembly.GetName().Version?.ToString(3)
-            ?? WindowsUpdateService.CurrentVersion;
-        _service = new WindowsUpdateService(currentVersion: artifactVersion);
+        Assembly assembly = typeof(App).Assembly;
+        string productVersion = assembly.GetName().Version?.ToString(3)
+            ?? throw new InvalidOperationException("SIDEY assembly version metadata is missing.");
+        string? fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
+        if (!Version.TryParse(fileVersion, out Version? parsedFileVersion)
+            || parsedFileVersion.Build < 0
+            || parsedFileVersion.Revision != 0)
+        {
+            throw new InvalidOperationException("SIDEY file version metadata is missing or invalid.");
+        }
+        _service = new WindowsUpdateService(
+            currentProductVersion: productVersion,
+            currentUpdateVersion: parsedFileVersion.ToString(3));
         LastCheckedAt = ReadLastCheckedAt();
     }
 
-    public string CurrentVersion => _service.EffectiveCurrentVersion;
+    public string CurrentVersion => _service.EffectiveCurrentProductVersion;
+
+    public string CurrentUpdateVersion => _service.EffectiveCurrentUpdateVersion;
 
     public DateTimeOffset? LastCheckedAt { get; private set; }
 
-    public Uri CurrentReleaseNotesUri => ReleaseNotesUri(CurrentVersion);
+    public Uri CurrentReleaseNotesUri => ReleaseNotesUri(
+        $"windows-v{_service.EffectiveCurrentReleaseVersion}");
 
     public async Task CleanupInstalledUpdatesAsync()
     {
@@ -56,10 +70,12 @@ internal sealed class WindowsUpdateServiceAdapter : IUpdateService
             return manifest is null
                 ? null
                 : new AvailableUpdate(
-                    manifest.Version,
+                    manifest.ProductVersion,
                     manifest.InstallerUri,
                     manifest.Sha256,
-                    ReleaseNotesUri(manifest.Version));
+                    ReleaseNotesUri(manifest.UpdateTag),
+                    manifest.UpdateVersion,
+                    manifest.UpdateTag);
         }
         catch (Exception exception)
         {
@@ -74,7 +90,10 @@ internal sealed class WindowsUpdateServiceAdapter : IUpdateService
         IProgress<int>? progress = null)
     {
         ArgumentNullException.ThrowIfNull(update);
-        if (update.InstallerUri is null || string.IsNullOrWhiteSpace(update.Sha256))
+        if (update.InstallerUri is null
+            || string.IsNullOrWhiteSpace(update.Sha256)
+            || string.IsNullOrWhiteSpace(update.UpdateVersion)
+            || string.IsNullOrWhiteSpace(update.UpdateTag))
         {
             throw new InvalidDataException(I18n.Get("update.missingInstaller"));
         }
@@ -82,7 +101,8 @@ internal sealed class WindowsUpdateServiceAdapter : IUpdateService
         var manifest = new WindowsUpdateManifest(
             "production",
             update.Version,
-            $"windows-v{update.Version}",
+            update.UpdateVersion,
+            update.UpdateTag,
             update.InstallerUri,
             update.Sha256);
         try
@@ -125,8 +145,8 @@ internal sealed class WindowsUpdateServiceAdapter : IUpdateService
         return Task.CompletedTask;
     }
 
-    private static Uri ReleaseNotesUri(string version) => new(
-        $"https://github.com/sidey-app/SIDEY/releases/tag/windows-v{version}");
+    private static Uri ReleaseNotesUri(string tag) => new(
+        $"https://github.com/sidey-app/SIDEY/releases/tag/{tag}");
 
     private static DateTimeOffset? ReadLastCheckedAt()
     {

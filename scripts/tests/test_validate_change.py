@@ -1,3 +1,4 @@
+import json
 import subprocess
 import sys
 import unittest
@@ -120,6 +121,96 @@ class GateTests(unittest.TestCase):
                         f"{platform}/release",
                         ["release/app-store-localizations.json"],
                     )
+
+    def test_macos_build_counter_requires_both_mirrors_and_exact_base_diff(self):
+        paths = [
+            "release/version.json",
+            "release/macos.json",
+            "macos/Config/Version.xcconfig",
+        ]
+        before = {
+            "schema": 1,
+            "productVersion": "2.0.0",
+            "windowsRevision": 0,
+            "macBuild": 35,
+        }
+        after = {**before, "macBuild": 36}
+        root = Path(".")
+
+        def check(candidate):
+            with patch(
+                "sidey_tools.repository.git",
+                side_effect=[json.dumps(before), json.dumps(candidate)],
+            ) as git:
+                result = validate_paths(
+                    "macos/release", paths, root=root, base="base", revision="head",
+                )
+            self.assertEqual(
+                git.call_args_list,
+                [
+                    call(root, "show", "base:release/version.json"),
+                    call(root, "show", "head:release/version.json"),
+                ],
+            )
+            return result
+
+        self.assertEqual(check(after), "macos")
+        for candidate in (
+            {**after, "productVersion": "2.0.1"},
+            {**after, "windowsRevision": 1},
+            {**after, "schema": 2},
+            {**after, "schema": True},
+            {**after, "other": 1},
+            {**before, "macBuild": 35},
+            {**before, "macBuild": 34},
+            {**before, "macBuild": True},
+        ):
+            with self.subTest(candidate=candidate):
+                with self.assertRaisesRegex(WorkflowError, "only increase macBuild"):
+                    check(candidate)
+        with self.assertRaisesRegex(WorkflowError, "both generated macOS mirrors"):
+            validate_paths(
+                "macos/release", paths[:-1], root=root, base="base", revision="head",
+            )
+        with self.assertRaisesRegex(WorkflowError, "explicit root and base"):
+            validate_paths("macos/release", paths)
+        with self.assertRaisesRegex(WorkflowError, "platform boundary"):
+            validate_paths("windows/release", paths, root=root, base="base")
+
+    def test_ci_pr_scope_checks_macos_counter_against_pr_base_and_head(self):
+        paths = [
+            "release/version.json",
+            "release/macos.json",
+            "macos/Config/Version.xcconfig",
+        ]
+        event = {
+            "action": "synchronize",
+            "pull_request": {
+                "base": {"sha": "base"},
+                "head": {"sha": "head", "ref": "macos/release"},
+                "title": "build(AppStore): 빌드 번호 갱신",
+                "body": "body",
+            },
+        }
+        before = {
+            "schema": 1, "productVersion": "2.0.0",
+            "windowsRevision": 0, "macBuild": 35,
+        }
+        with (
+            patch("validate_change.changed_paths", return_value=paths),
+            patch("validate_change.commit_messages", return_value=[]),
+            patch("validate_change.verify_commit_contract"),
+            patch("validate_change.verify_pr_contract"),
+            patch(
+                "sidey_tools.repository.git",
+                side_effect=[
+                    json.dumps(before),
+                    json.dumps({**before, "windowsRevision": 1, "macBuild": 36}),
+                ],
+            ),
+        ):
+            with self.assertRaisesRegex(WorkflowError, "only increase macBuild"):
+                resolve_change(Path("."), event)
 
     def test_commit_messages_preserve_bodies_and_remove_record_newlines(self):
         output = (
@@ -253,7 +344,10 @@ class GateTests(unittest.TestCase):
             "body",
             ["docs/guide.md"],
         )
-        paths.assert_called_once_with("shared/task", ["docs/guide.md"])
+        paths.assert_called_once_with(
+            "shared/task", ["docs/guide.md"],
+            root=Path("."), base="base", revision="head",
+        )
         scopes.assert_not_called()
 
     def test_normal_pr_emits_resolved_scopes(self):

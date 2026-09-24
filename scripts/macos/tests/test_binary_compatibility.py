@@ -18,7 +18,7 @@ Load command 1
       cmd LC_BUILD_VERSION
   cmdsize 32
  platform 1
-    minos 15.0
+    minos 26.0
       sdk 26.4
    ntools 1
      tool 3
@@ -41,7 +41,7 @@ class BinaryCompatibilityTests(unittest.TestCase):
         self.main_binary = self.app / "Contents/MacOS/SIDEY"
         self.main_binary.parent.mkdir(parents=True)
         self.main_binary.write_bytes(bytes.fromhex("cafebabe") + b"fixture")
-        self.info = {"CFBundleExecutable": "SIDEY", "LSMinimumSystemVersion": "15.0"}
+        self.info = {"CFBundleExecutable": "SIDEY", "LSMinimumSystemVersion": "26.0"}
         self.write_info()
         self.outputs = {}
         self.commands = []
@@ -56,7 +56,7 @@ class BinaryCompatibilityTests(unittest.TestCase):
         self.commands.append(command)
         path = Path(command[-1])
         if command[0] == "/usr/bin/lipo":
-            return self.outputs.get((path, "architectures"), "x86_64 arm64\n")
+            return self.outputs.get((path, "architectures"), "arm64\n")
         architecture = command[2]
         return self.outputs.get((path, architecture), BUILD_VERSION)
 
@@ -69,14 +69,13 @@ class BinaryCompatibilityTests(unittest.TestCase):
         (framework / "Fixture").symlink_to("Versions/Current/Fixture")
         return binary
 
-    def test_universal_app_and_framework_aliases_are_verified_once_per_binary(self):
+    def test_arm_app_and_framework_aliases_are_verified_once_per_binary(self):
         binary = self.add_framework()
-        self.outputs[(binary, "x86_64")] = LEGACY_VERSION
         self.assertEqual(compatibility.verify_app(self.app), 2)
         lipo_calls = [call for call in self.commands if call[0] == "/usr/bin/lipo"]
         self.assertEqual({Path(call[-1]) for call in lipo_calls}, {binary, self.main_binary})
         self.assertEqual(len(lipo_calls), 2)
-        self.assertEqual(len(self.commands), 6)
+        self.assertEqual(len(self.commands), 4)
 
     def test_main_executable_must_exist_and_be_mach_o(self):
         self.main_binary.unlink()
@@ -87,28 +86,31 @@ class BinaryCompatibilityTests(unittest.TestCase):
             compatibility.verify_app(self.app)
 
     def test_root_minimum_os_must_match_supported_contract(self):
-        for minimum in (None, "14.0", "15.1", "26.0"):
+        for minimum in (None, "15.0", "26.1", "27.0"):
             with self.subTest(minimum=minimum):
                 self.info["LSMinimumSystemVersion"] = minimum or ""
                 self.write_info()
                 with self.assertRaisesRegex(ValueError, "LSMinimumSystemVersion"):
                     compatibility.verify_app(self.app)
 
-    def test_missing_intel_slice_is_rejected_in_main_or_embedded_framework(self):
+    def test_intel_slice_is_rejected_in_main_or_embedded_framework(self):
         binary = self.add_framework()
         for target in (self.main_binary, binary):
             with self.subTest(binary=target):
-                self.outputs = {(target, "architectures"): "arm64"}
-                with self.assertRaisesRegex(ValueError, "expected arm64 and x86_64"):
+                self.outputs = {(target, "architectures"): "x86_64 arm64"}
+                with self.assertRaisesRegex(ValueError, "expected arm64 only"):
                     compatibility.verify_app(self.app)
 
-    def test_newer_minimum_os_in_either_embedded_slice_is_rejected(self):
+    def test_missing_arm_slice_is_rejected(self):
+        self.outputs = {(self.main_binary, "architectures"): "x86_64"}
+        with self.assertRaisesRegex(ValueError, "expected arm64 only"):
+            compatibility.verify_app(self.app)
+
+    def test_newer_minimum_os_in_embedded_binary_is_rejected(self):
         binary = self.add_framework()
-        for architecture in ("arm64", "x86_64"):
-            with self.subTest(architecture=architecture):
-                self.outputs = {(binary, architecture): BUILD_VERSION.replace("minos 15.0", "minos 15.1")}
-                with self.assertRaisesRegex(ValueError, rf"{architecture}.*above 15.0"):
-                    compatibility.verify_app(self.app)
+        self.outputs = {(binary, "arm64"): BUILD_VERSION.replace("minos 26.0", "minos 26.1")}
+        with self.assertRaisesRegex(ValueError, r"arm64.*above 26.0"):
+            compatibility.verify_app(self.app)
 
     def test_external_bundle_link_is_rejected(self):
         external = self.app.parent / "external"
@@ -118,14 +120,14 @@ class BinaryCompatibilityTests(unittest.TestCase):
             compatibility.verify_app(self.app)
 
     def test_load_command_parser_reads_minimum_instead_of_sdk_or_tool_version(self):
-        self.assertEqual(compatibility.parse_minimum_os(BUILD_VERSION), (15, 0, 0))
+        self.assertEqual(compatibility.parse_minimum_os(BUILD_VERSION), (26, 0, 0))
         self.assertEqual(compatibility.parse_minimum_os(LEGACY_VERSION), (10, 15, 0))
-        self.assertEqual(compatibility.parse_minimum_os(BUILD_VERSION.replace("platform 1", "platform MACOS")), (15, 0, 0))
+        self.assertEqual(compatibility.parse_minimum_os(BUILD_VERSION.replace("platform 1", "platform MACOS")), (26, 0, 0))
 
     def test_missing_malformed_or_non_macos_load_commands_are_rejected(self):
         for output in ("", BUILD_VERSION + LEGACY_VERSION,
-                       BUILD_VERSION.replace("minos 15.0", "minos invalid"),
-                       BUILD_VERSION.replace("minos 15.0", ""),
+                       BUILD_VERSION.replace("minos 26.0", "minos invalid"),
+                       BUILD_VERSION.replace("minos 26.0", ""),
                        BUILD_VERSION.replace("platform 1", "platform 2")):
             with self.subTest(output=output), self.assertRaises(ValueError):
                 compatibility.parse_minimum_os(output)

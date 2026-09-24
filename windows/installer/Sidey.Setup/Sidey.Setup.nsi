@@ -3,6 +3,9 @@ Unicode true
 !ifndef APP_VERSION
   !error "APP_VERSION is required."
 !endif
+!ifndef APP_UPDATE_VERSION
+  !error "APP_UPDATE_VERSION is required."
+!endif
 !ifndef APP_FILE_VERSION
   !error "APP_FILE_VERSION is required."
 !endif
@@ -151,6 +154,10 @@ LangString CloseAction ${LANG_KOREAN} "닫기"
 LangString DowngradeBlocked ${LANG_ENGLISH} "A newer version of SIDEY is already installed, so Setup made no changes. To install ${APP_VERSION}, uninstall the current SIDEY from Windows Settings > Apps, then run this Setup again."
 LangString DowngradeBlocked ${LANG_KOREAN} "더 새로운 버전의 SIDEY가 이미 설치되어 있어 아무것도 변경하지 않았습니다. ${APP_VERSION} 버전을 설치하려면 Windows 설정 > 앱에서 현재 SIDEY를 제거한 뒤 이 설치 프로그램을 다시 실행하세요."
 LangString LegacyMigrationManual ${LANG_ENGLISH} "A previous SIDEY MSI is installed, so Setup made no changes. Uninstall it from Windows Settings > Apps, then run this Setup again. Do not delete SIDEY installation files manually."
+LangString LegacyRelocationBlocked ${LANG_ENGLISH} "The previous SIDEY location cannot be updated safely, and the Program Files destination is unavailable. Setup made no changes. If the problem continues, include this diagnostic data in a GitHub issue."
+LangString LegacyRelocationBlocked ${LANG_KOREAN} "기존 SIDEY 위치를 안전하게 업데이트할 수 없고 Program Files의 새 위치도 사용할 수 없습니다. 설치 상태는 변경되지 않았습니다. 문제가 계속되면 진단 데이터를 GitHub 이슈에 첨부해 주세요."
+LangString LegacyRelocationNotice ${LANG_ENGLISH} "SIDEY was installed in Program Files, but Setup could not remove all files from the previous location shown below. After confirming that the new SIDEY opens, close SIDEY and delete the old SIDEY program files in File Explorer. Leave any unrelated files in place. Do not run the old uninstaller. Your settings and sign-in data are stored separately."
+LangString LegacyRelocationNotice ${LANG_KOREAN} "SIDEY를 Program Files에 설치했지만 아래 이전 위치의 파일을 모두 정리하지 못했습니다. 새 SIDEY가 실행되는 것을 확인한 뒤 앱을 닫고, 파일 탐색기에서 이전 SIDEY 프로그램 파일을 삭제하세요. 관련 없는 파일은 남겨 두세요. 이전 제거 프로그램은 실행하지 마세요. 설정과 로그인 데이터는 별도 위치에 보관됩니다."
 LangString LegacyMigrationManual ${LANG_KOREAN} "이전 SIDEY MSI가 설치되어 있어 아무것도 변경하지 않았습니다. Windows 설정 > 앱에서 제거한 뒤 이 설치 프로그램을 다시 실행하세요. SIDEY 설치 파일을 직접 삭제하지 마세요."
 LangString ExistingRemovalFailed ${LANG_ENGLISH} "The existing SIDEY installation could not be removed. Required installation files may be missing or in use.$\r$\n$\r$\nRun this Setup again and complete Repair, then run it again and choose Uninstall. If Repair fails, restart Windows and try once more.$\r$\n$\r$\nIf the problem continues, open a GitHub issue and include a screenshot of this window and the diagnostic data.$\r$\nDo not delete SIDEY installation files manually."
 LangString ExistingRemovalFailed ${LANG_KOREAN} "기존 프로그램을 제거할 수 없습니다. 필요한 설치 파일이 없거나 사용 중일 수 있습니다.$\r$\n$\r$\n이 설치 프로그램을 다시 실행해 복구를 완료한 뒤, 다시 실행하여 삭제를 선택하세요. 복구에 실패하면 Windows를 다시 시작하고 한 번 더 시도하세요.$\r$\n$\r$\n문제가 계속되면 이 창의 스크린샷과 진단 데이터를 첨부하여 GitHub 이슈를 남겨주세요.$\r$\n설치 파일을 직접 삭제하지 마세요."
@@ -219,6 +226,9 @@ Var StagingDirectory
 Var RollbackDirectory
 Var SetupMutexHandle
 Var InstallerCompletedCleanly
+Var LegacyRelocation
+Var LegacyInstallDirectory
+Var PendingInstallLocation
 
 !macro AcquireSetupMutex HANDLE ACTIVATE_FUNCTION
   System::Call 'kernel32::CreateMutexW(p0, i0, w "${SETUP_MUTEX_NAME}") p.r0 ?e'
@@ -246,7 +256,7 @@ Var InstallerCompletedCleanly
 
 !macro RunInstallTransaction ACTION RESULT
   ClearErrors
-  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action ${ACTION} --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --version "${APP_VERSION}"' ${RESULT}
+  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action ${ACTION} --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --product-version "${APP_VERSION}" --update-version "${APP_UPDATE_VERSION}" --log-path "$InstallerErrorLogPath"' ${RESULT}
   ${If} ${Errors}
     StrCpy ${RESULT} 5
   ${EndIf}
@@ -256,6 +266,7 @@ Function .onInit
   SetRegView 64
   SetShellVarContext all
   StrCpy $InstallerCompletedCleanly 0
+  StrCpy $LegacyRelocation 0
   ReadRegStr $LANGUAGE HKLM "${PRODUCT_REGISTRY_KEY}" "Language"
   ${If} $LANGUAGE == ""
     StrCpy $LANGUAGE ${LANG_ENGLISH}
@@ -266,7 +277,8 @@ Function .onInit
   Call InitializeInstallerErrorHandling
 
   StrCpy $InstallState "fresh"
-  ReadRegStr $0 HKLM "${PRODUCT_TRANSACTION_KEY}" "InstallLocation"
+  ReadRegStr $PendingInstallLocation HKLM "${PRODUCT_TRANSACTION_KEY}" "InstallLocation"
+  StrCpy $0 $PendingInstallLocation
   ${If} $0 == ""
     ReadRegStr $0 HKLM "${PRODUCT_REGISTRY_KEY}" "InstallLocation"
   ${EndIf}
@@ -278,6 +290,36 @@ Function .onInit
   ; after writing the new version but before committing its payload.
   Call InitializeInstallTransaction
   Call PrepareInstallerHelpers
+  ReadRegStr $InstalledVersion HKLM "${PRODUCT_REGISTRY_KEY}" "InstalledVersion"
+  ${If} $PendingInstallLocation == ""
+  ${AndIf} $InstalledVersion != ""
+    ${VersionCompare} $InstalledVersion "2.0.0" $VersionResult
+    ${If} $VersionResult == 2
+      !insertmacro RunInstallTransaction "InspectLegacyLocation" $0
+      ${If} $0 == 79
+        StrCpy $LegacyInstallDirectory $INSTDIR
+        StrCpy $INSTDIR "$PROGRAMFILES64\SIDEY"
+        Call InitializeInstallTransaction
+        !insertmacro RunInstallTransaction "InspectRelocationTarget" $0
+        ${If} $0 != 0
+          StrCpy $1 $0
+          Call ResetInstallerError
+          StrCpy $InstallerErrorNativeCode $1
+          StrCpy $InstallerErrorExitCode $1
+          StrCpy $InstallerErrorSource "TRANSACTION"
+          StrCpy $InstallerErrorStage "RELOCATION"
+          StrCpy $InstallerErrorSymbol "LEGACY_RELOCATION_TARGET_UNAVAILABLE"
+          StrCpy $InstallerErrorTarget "$(InstallerComponentInstallationState)"
+          StrCpy $InstallerErrorCommand "Sidey.InstallTransaction.exe --action InspectRelocationTarget"
+          StrCpy $InstallerErrorMessage "$(LegacyRelocationBlocked)"
+          Call ShowLifecycleError
+          SetErrorLevel 1
+          Abort
+        ${EndIf}
+        StrCpy $LegacyRelocation 1
+      ${EndIf}
+    ${EndIf}
+  ${EndIf}
   !insertmacro RunInstallTransaction "Recover" $0
   ${If} $0 != 0
     StrCpy $1 $0
@@ -287,7 +329,7 @@ Function .onInit
     StrCpy $InstallerErrorExitCode $1
     StrCpy $InstallerErrorSource "TRANSACTION"
     StrCpy $InstallerErrorStage "RECOVER"
-    StrCpy $InstallerErrorSymbol "TRANSACTION_RECOVERY_FAILED"
+    !insertmacro ResolveRecoveryErrorSymbol
     StrCpy $InstallerErrorTarget "$(InstallerComponentInstallationState)"
     StrCpy $InstallerErrorCommand "Sidey.InstallTransaction.exe --action Recover"
     StrCpy $InstallerErrorMessage "$(TransactionRecoveryFailed)"
@@ -297,13 +339,15 @@ Function .onInit
   ${EndIf}
 
   ReadRegStr $InstalledVersion HKLM "${PRODUCT_REGISTRY_KEY}" "InstalledVersion"
-  ReadRegStr $0 HKLM "${PRODUCT_REGISTRY_KEY}" "InstallLocation"
-  ${If} $0 != ""
-    StrCpy $INSTDIR $0
+  ${If} $LegacyRelocation != 1
+    ReadRegStr $0 HKLM "${PRODUCT_REGISTRY_KEY}" "InstallLocation"
+    ${If} $0 != ""
+      StrCpy $INSTDIR $0
+    ${EndIf}
   ${EndIf}
 
   ${If} $InstalledVersion != ""
-    ${VersionCompare} $InstalledVersion "${APP_VERSION}" $VersionResult
+    ${VersionCompare} $InstalledVersion "${APP_UPDATE_VERSION}" $VersionResult
     ${If} $VersionResult == 1
       MessageBox MB_OK|MB_ICONSTOP "$(DowngradeBlocked)"
       Quit
@@ -646,7 +690,7 @@ Section "SIDEY" MainSection
   WriteRegDWORD HKLM "${PRODUCT_UNINSTALL_KEY}" "NoModify" 1
   WriteRegDWORD HKLM "${PRODUCT_UNINSTALL_KEY}" "NoRepair" 1
   WriteRegStr HKLM "${PRODUCT_UNINSTALL_KEY}" "DisplayVersion" "${APP_VERSION}"
-  WriteRegStr HKLM "${PRODUCT_REGISTRY_KEY}" "InstalledVersion" "${APP_VERSION}"
+  WriteRegStr HKLM "${PRODUCT_REGISTRY_KEY}" "InstalledVersion" "${APP_UPDATE_VERSION}"
   IfErrors registration_failed
 
   !insertmacro RunInstallTransaction "Commit" $0
@@ -769,6 +813,15 @@ Section "SIDEY" MainSection
     Abort
 
   install_complete:
+    ${If} $LegacyRelocation == 1
+      StrCpy $0 1
+      ${If} $InstallerCompletedCleanly == 1
+        ExecWait '"$INSTDIR\Runtime\SIDEY.UninstallHelper.exe" --cleanup-legacy-install-as-desktop-user "$LegacyInstallDirectory"' $0
+      ${EndIf}
+      ${If} $0 != 0
+        MessageBox MB_OK|MB_ICONINFORMATION "$(LegacyRelocationNotice)$\r$\n$\r$\n$LegacyInstallDirectory" /SD IDOK
+      ${EndIf}
+    ${EndIf}
 SectionEnd
 
 Function .onInstFailed
@@ -902,7 +955,7 @@ Section "Uninstall"
   StrCpy $StagingDirectory "$INSTDIR.sidey-staging-$0"
   StrCpy $RollbackDirectory "$INSTDIR.sidey-rollback"
   ClearErrors
-  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action CleanupForUninstall --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --version "${APP_VERSION}"' $0
+  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action CleanupForUninstall --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --product-version "${APP_VERSION}" --update-version "${APP_UPDATE_VERSION}" --log-path "$InstallerErrorLogPath"' $0
   ${If} ${Errors}
     StrCpy $0 5
   ${EndIf}

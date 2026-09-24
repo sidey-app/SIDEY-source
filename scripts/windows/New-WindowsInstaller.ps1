@@ -9,7 +9,10 @@ param(
     [string]$OutputDirectory,
 
     [Parameter(Mandatory = $true)]
-    [string]$Version,
+    [string]$ProductVersion,
+
+    [Parameter(Mandatory = $true)]
+    [string]$ReleaseVersion,
 
     [string]$MakensisPath
 )
@@ -201,19 +204,36 @@ foreach ($throwableDirectory in @(Get-ChildItem -LiteralPath $throwableAssetDire
     }
 }
 
-if ($Version -notmatch '^\d+\.\d+\.\d+$') {
-    throw "Windows 정식 버전은 숫자 세 부분이어야 함: $Version"
+if ($ProductVersion -notmatch '^\d+\.\d+\.\d+$') {
+    throw "Windows Product Version must contain three numeric parts: $ProductVersion"
+}
+if ($ReleaseVersion -notmatch '^\d+\.\d+\.\d+$') {
+    throw "Windows Release Version must contain three numeric parts: $ReleaseVersion"
 }
 $publishedVersionInfo = (Get-Item -LiteralPath $hostExecutablePath).VersionInfo
-if (-not $publishedVersionInfo.ProductVersion.StartsWith(
-    $Version,
-    [StringComparison]::OrdinalIgnoreCase)) {
-    throw "Published SIDEY.Host.exe version does not match: $($publishedVersionInfo.ProductVersion) / $Version"
+$publishedProductVersion = [string]$publishedVersionInfo.ProductVersion
+$publishedFileVersion = [string]$publishedVersionInfo.FileVersion
+$versionPropertiesPath = Join-Path $repositoryRootPath 'windows/Version.props'
+$versionProperties = [xml](Get-Content -LiteralPath $versionPropertiesPath -Raw -Encoding UTF8)
+$expectedProductVersion = [string]$versionProperties.Project.PropertyGroup.SideyProductVersion
+$expectedUpdateVersion = [string]$versionProperties.Project.PropertyGroup.SideyWindowsUpdateVersion
+$expectedReleaseVersion = [string]$versionProperties.Project.PropertyGroup.SideyWindowsReleaseVersion
+$expectedFileVersion = [string]$versionProperties.Project.PropertyGroup.SideyMsixVersion
+if ([string]::IsNullOrWhiteSpace($expectedUpdateVersion) -or
+    $expectedFileVersion -cne ($expectedUpdateVersion + '.0')) {
+    throw 'windows/Version.props contains inconsistent Windows update and MSIX versions.'
 }
-if (-not $publishedVersionInfo.FileVersion.StartsWith(
-    "$Version.",
-    [StringComparison]::OrdinalIgnoreCase)) {
-    throw "Published SIDEY.Host.exe file version does not match: $($publishedVersionInfo.FileVersion) / $Version"
+if ($ProductVersion -cne $expectedProductVersion) {
+    throw "Product Version does not match windows/Version.props: $ProductVersion / $expectedProductVersion"
+}
+if ($ReleaseVersion -cne $expectedReleaseVersion) {
+    throw "Release Version does not match windows/Version.props: $ReleaseVersion / $expectedReleaseVersion"
+}
+if ($publishedProductVersion -cne $ProductVersion) {
+    throw "Published SIDEY.Host.exe ProductVersion does not match: $publishedProductVersion / $ProductVersion"
+}
+if ($publishedFileVersion -cne $expectedFileVersion) {
+    throw "Published SIDEY.Host.exe FileVersion does not match: $publishedFileVersion / $expectedFileVersion"
 }
 
 [IO.Directory]::CreateDirectory($outputDirectoryPath) | Out-Null
@@ -287,8 +307,8 @@ Invoke-SideyNativeCommand `
         '-ExecutionPolicy', 'Bypass',
         '-File', (Join-Path $PSScriptRoot 'New-InstallerLanguageSelector.ps1'),
         '-OutputPath', $languageSelectorPath,
-        '-Version', $Version,
-        '-FileVersion', "$Version.0",
+        '-Version', $ProductVersion,
+        '-FileVersion', $publishedFileVersion,
         '-NsisDirectory', (Split-Path -Parent $resolvedMakensisPath)
     ) `
     -Description 'Installer language selector build'
@@ -298,21 +318,21 @@ $helperIconPath = Join-Path $repositoryRootPath 'windows/src/Sidey.App/Assets/Ic
 & $helperBuilderPath `
     -SourcePath (Join-Path $repositoryRootPath 'windows/installer/Sidey.Setup/InstallTransaction.cs') `
     -OutputPath $installTransactionExecutablePath `
-    -Version $Version -FileVersion "$Version.0" `
+    -Version $ProductVersion -FileVersion $publishedFileVersion `
     -Title 'SIDEY Install Transaction' `
     -Description 'SIDEY atomic install transaction helper' `
     -IconPath $helperIconPath
 & $helperBuilderPath `
     -SourcePath (Join-Path $repositoryRootPath 'windows/installer/Sidey.Setup/InstallerErrorNormalizer.cs') `
     -OutputPath $installerErrorHelperExecutablePath `
-    -Version $Version -FileVersion "$Version.0" `
+    -Version $ProductVersion -FileVersion $publishedFileVersion `
     -Title 'SIDEY Installer Error Helper' `
     -Description 'SIDEY installer error normalization helper' `
     -IconPath $helperIconPath
 
 & (Join-Path $PSScriptRoot 'tests/Test-HelperExecutables.ps1') `
     -PublishDirectory $publishDirectoryPath -SelectorExecutablePath $languageSelectorPath `
-    -Version $Version -FileVersion "$Version.0" `
+    -Version $ProductVersion -FileVersion $publishedFileVersion `
     -NsisDirectory (Split-Path -Parent $resolvedMakensisPath)
 & (Join-Path $PSScriptRoot 'tests/Test-InstallTransaction.ps1') `
     -HelperPath $installTransactionExecutablePath
@@ -428,8 +448,9 @@ Invoke-SideyNativeCommand `
     -FilePath $resolvedMakensisPath `
     -ArgumentList @(
         '/INPUTCHARSET', 'UTF8',
-        "/DAPP_VERSION=$Version",
-        "/DAPP_FILE_VERSION=$Version.0",
+        "/DAPP_VERSION=$ProductVersion",
+        "/DAPP_UPDATE_VERSION=$expectedUpdateVersion",
+        "/DAPP_FILE_VERSION=$publishedFileVersion",
         "/DOUTPUT_DIR=$installerBuildDirectory",
         "/DPUBLISH_DIR=$publishDirectoryPath",
         "/DPAYLOAD_INSTALL_INCLUDE=$installInclude",
@@ -448,7 +469,7 @@ if ($builtSetupFiles.Count -ne 1) {
     throw 'NSIS must produce exactly one Setup EXE.'
 }
 
-$setupName = "SIDEY-Windows-x64-v${Version}-Setup.exe"
+$setupName = "SIDEY-Windows-x64-v${ReleaseVersion}-Setup.exe"
 $setupFilePath = Join-Path $outputDirectoryPath $setupName
 Copy-Item -LiteralPath $builtSetupFiles[0].FullName -Destination $setupFilePath -Force
 $hash = (Get-FileHash -LiteralPath $setupFilePath -Algorithm SHA256).Hash.ToLowerInvariant()

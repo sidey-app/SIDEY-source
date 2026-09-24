@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -18,24 +19,113 @@ namespace Sidey.Installer
     {
         private const int InvalidArguments = 64;
         private const int RetryableCleanupFailure = 10;
+        // Recover exit codes are a contract with Sidey.Setup.nsi. Keep 1 as the
+        // unclassified/legacy failure and reserve 5 for an ExecWait launch error.
+        private const int RecoveryParentFailure = 70;
+        private const int RecoveryStateFailure = 71;
+        private const int RecoveryRollbackFailure = 72;
+        private const int RecoveryStagingFailure = 73;
+        private const int RecoveryCommittedFailure = 74;
+        private const int RecoveryRegistryFailure = 75;
+        private const int RecoveryAccessDenied = 76;
+        private const int RecoveryIoFailure = 77;
+        private const int RecoveryInitializationFailure = 78;
+        private const int LegacyRelocationEligible = 79;
+
+        private sealed class InsecureTransactionParentException : InvalidOperationException
+        {
+            public InsecureTransactionParentException(string message) : base(message) { }
+        }
 
         [STAThread]
         private static int Main(string[] arguments)
         {
+            TransactionOptions options = null;
+            InstallTransaction transaction = null;
             try
             {
-                TransactionOptions options = TransactionOptions.Parse(arguments);
-                return new InstallTransaction(options).Run();
+                options = TransactionOptions.Parse(arguments);
+                transaction = new InstallTransaction(options);
+                return transaction.Run();
             }
-            catch (ArgumentException exception)
+            catch (ArgumentException exception) when (options == null)
             {
+                WriteFailureDiagnostic(options, transaction, exception);
                 Console.Error.WriteLine(exception.Message);
                 return InvalidArguments;
             }
             catch (Exception exception)
             {
+                WriteFailureDiagnostic(options, transaction, exception);
                 Console.Error.WriteLine(exception.Message);
+                return FailureExitCode(options, transaction, exception);
+            }
+        }
+
+        private static int FailureExitCode(
+            TransactionOptions options,
+            InstallTransaction transaction,
+            Exception exception)
+        {
+            if (options == null || !string.Equals(
+                options.Action, "Recover", StringComparison.OrdinalIgnoreCase))
+            {
                 return 1;
+            }
+
+            if (exception is UnauthorizedAccessException || exception is SecurityException)
+            {
+                return RecoveryAccessDenied;
+            }
+            if (exception is IOException)
+            {
+                return RecoveryIoFailure;
+            }
+            if (transaction == null)
+            {
+                return RecoveryInitializationFailure;
+            }
+
+            switch (transaction.Operation)
+            {
+                case "recover.parent-security": return RecoveryParentFailure;
+                case "recover.read-state": return RecoveryStateFailure;
+                case "recover.inspect-orphan":
+                case "recover.rollback": return RecoveryRollbackFailure;
+                case "recover.remove-staging": return RecoveryStagingFailure;
+                case "recover.complete-committed": return RecoveryCommittedFailure;
+                case "recover.pending-location": return RecoveryRegistryFailure;
+                default: return 1;
+            }
+        }
+
+        private static void WriteFailureDiagnostic(
+            TransactionOptions options,
+            InstallTransaction transaction,
+            Exception exception)
+        {
+            if (options == null || string.IsNullOrWhiteSpace(options.LogPath))
+            {
+                return;
+            }
+
+            try
+            {
+                // Keep support logs useful without copying paths or account data from
+                // exception messages into a file that users may attach to an issue.
+                File.AppendAllText(options.LogPath,
+                    "[InstallTransaction]" + Environment.NewLine
+                    + "action=" + options.Action + Environment.NewLine
+                    + "operation=" + (transaction == null ? "initialize" : transaction.Operation)
+                    + Environment.NewLine
+                    + "exception=" + exception.GetType().Name + Environment.NewLine
+                    + "hresult=0x" + exception.HResult.ToString("X8", CultureInfo.InvariantCulture)
+                    + Environment.NewLine + Environment.NewLine,
+                    Encoding.ASCII);
+            }
+            catch
+            {
+                // Reporting must never replace the original transaction failure.
             }
         }
 
@@ -45,7 +135,9 @@ namespace Sidey.Installer
             public string InstallDirectory;
             public string StagingDirectory;
             public string RollbackDirectory;
-            public string Version;
+            public string ProductVersion;
+            public string UpdateVersion;
+            public string LogPath;
             public bool AllowUserWritableParentForTests;
 
             public static TransactionOptions Parse(string[] arguments)
@@ -84,10 +176,14 @@ namespace Sidey.Installer
                     InstallDirectory = Required(values, "--install-directory"),
                     StagingDirectory = Required(values, "--staging-directory"),
                     RollbackDirectory = Required(values, "--rollback-directory"),
-                    Version = Required(values, "--version"),
+                    ProductVersion = Required(values, "--product-version"),
+                    UpdateVersion = Required(values, "--update-version"),
+                    LogPath = values.ContainsKey("--log-path") ? values["--log-path"] : null,
                     AllowUserWritableParentForTests = allowTests,
                 };
-                if (values.Count != 5 || !InstallTransaction.IsKnownAction(result.Action))
+                if (values.Count != (result.LogPath == null ? 6 : 7)
+                    || (result.LogPath != null && string.IsNullOrWhiteSpace(result.LogPath))
+                    || !InstallTransaction.IsKnownAction(result.Action))
                 {
                     throw new ArgumentException("Invalid SIDEY install transaction arguments.");
                 }
@@ -109,7 +205,8 @@ namespace Sidey.Installer
         {
             public bool Managed;
             public bool Existed;
-            public string Version = string.Empty;
+            public string ProductVersion = string.Empty;
+            public string UpdateVersion = string.Empty;
             public string Language = string.Empty;
             public string Location = string.Empty;
         }
@@ -119,7 +216,8 @@ namespace Sidey.Installer
             public int SchemaVersion;
             public string Phase;
             public string CompletionId;
-            public string Version;
+            public string ProductVersion;
+            public string UpdateVersion;
             public string InstallDirectory;
             public string StagingDirectory;
             public string RollbackDirectory;
@@ -144,7 +242,8 @@ namespace Sidey.Installer
             private readonly string installPath;
             private readonly string stagingPath;
             private readonly string rollbackPath;
-            private readonly string version;
+            private readonly string productVersion;
+            private readonly string updateVersion;
             private readonly string parentPath;
             private readonly string expectedStagingPrefix;
             private readonly string statePath;
@@ -154,13 +253,16 @@ namespace Sidey.Installer
             private string transactionStagingPath;
             private string completionId;
 
+            public string Operation { get; private set; }
+
             public InstallTransaction(TransactionOptions options)
             {
                 action = options.Action;
                 installPath = Normalize(options.InstallDirectory);
                 stagingPath = Normalize(options.StagingDirectory);
                 rollbackPath = Normalize(options.RollbackDirectory);
-                version = options.Version;
+                productVersion = options.ProductVersion;
+                updateVersion = options.UpdateVersion;
                 allowUserWritableParentForTests = options.AllowUserWritableParentForTests;
 
                 DirectoryInfo parent = Directory.GetParent(installPath);
@@ -176,6 +278,7 @@ namespace Sidey.Installer
                 previousRegistration = null;
                 previousInstallExisted = false;
                 transactionStagingPath = stagingPath;
+                Operation = "run";
 
                 ValidateSiblingPath(stagingPath, expectedStagingPrefix, false,
                     "The SIDEY staging directory must be a reserved sibling of the install directory.");
@@ -185,7 +288,9 @@ namespace Sidey.Installer
 
             public static bool IsKnownAction(string value)
             {
-                return string.Equals(value, "Recover", StringComparison.OrdinalIgnoreCase)
+                return string.Equals(value, "InspectLegacyLocation", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(value, "InspectRelocationTarget", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(value, "Recover", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(value, "Prepare", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(value, "Activate", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(value, "BeginRegistration", StringComparison.OrdinalIgnoreCase)
@@ -197,10 +302,45 @@ namespace Sidey.Installer
 
             public int Run()
             {
+                if (EqualsAction("InspectLegacyLocation"))
+                {
+                    Operation = "inspect-legacy.parent-security";
+                    try
+                    {
+                        AssertSecureTransactionParent();
+                        return 0;
+                    }
+                    catch (InsecureTransactionParentException)
+                    {
+                        Operation = "inspect-legacy.transaction-artifacts";
+                        if (HasTransactionArtifacts())
+                        {
+                            throw new InvalidOperationException(
+                                "A SIDEY transaction must be recovered at its original location.");
+                        }
+                        return LegacyRelocationEligible;
+                    }
+                }
+                if (EqualsAction("InspectRelocationTarget"))
+                {
+                    Operation = "inspect-relocation.parent-security";
+                    AssertSecureTransactionParent();
+                    Operation = "inspect-relocation.target";
+                    if (Directory.Exists(installPath) || File.Exists(installPath)
+                        || HasTransactionArtifacts())
+                    {
+                        throw new InvalidOperationException(
+                            "The SIDEY relocation target is already in use.");
+                    }
+                    return 0;
+                }
                 if (EqualsAction("Recover"))
                 {
+                    Operation = "recover.parent-security";
                     AssertSecureTransactionParent();
+                    Operation = "recover.read-state";
                     RecoverInterruptedTransaction();
+                    Operation = "recover.pending-location";
                     ClearPendingInstallLocation();
                     return 0;
                 }
@@ -410,17 +550,20 @@ namespace Sidey.Installer
                 TransactionState state = ReadState();
                 if (state == null)
                 {
+                    Operation = "recover.inspect-orphan";
                     if (Directory.Exists(rollbackPath))
                     {
                         throw new InvalidOperationException(
                             "An unrecognized SIDEY rollback directory already exists.");
                     }
+                    Operation = "recover.remove-staging";
                     RemoveTransactionDirectory(stagingPath);
                     return;
                 }
 
                 if (PhaseEquals(state, "committed"))
                 {
+                    Operation = "recover.complete-committed";
                     string recordedStaging = AssertStagingDirectoryPath(state.StagingDirectory);
                     if (!Directory.Exists(installPath))
                     {
@@ -433,6 +576,7 @@ namespace Sidey.Installer
                     RemoveState();
                     return;
                 }
+                Operation = "recover.rollback";
                 UndoTransaction(state);
             }
 
@@ -449,16 +593,17 @@ namespace Sidey.Installer
                     && (state.PreviousRegistration == null || !state.PreviousRegistration.Existed);
                 Version prior;
                 Version current;
-                bool upgrade = state.PreviousInstallExisted
-                    && state.PreviousRegistration != null
-                    && Version.TryParse(state.PreviousRegistration.Version, out prior)
-                    && Version.TryParse(state.Version, out current)
+                bool upgrade = state.PreviousRegistration != null
+                    && state.PreviousRegistration.Existed
+                    && Version.TryParse(state.PreviousRegistration.UpdateVersion, out prior)
+                    && Version.TryParse(state.UpdateVersion, out current)
                     && current > prior;
+                bool relocated = upgrade && !state.PreviousInstallExisted;
                 string markerPath = Path.Combine(installPath, "install-completion.txt");
                 File.WriteAllLines(markerPath, new[]
                 {
-                    fresh ? "fresh" : (upgrade ? "upgrade" : "repair"),
-                    state.Version,
+                    fresh ? "fresh" : (relocated ? "relocate" : (upgrade ? "upgrade" : "repair")),
+                    state.UpdateVersion,
                     state.CompletionId,
                 });
                 using (Process helper = Process.Start(new ProcessStartInfo
@@ -672,7 +817,7 @@ namespace Sidey.Installer
                     as SecurityIdentifier;
                 if (owner == null || !privileged.Contains(owner.Value))
                 {
-                    throw new InvalidOperationException(
+                    throw new InsecureTransactionParentException(
                         "The SIDEY install directory parent must be owned by Administrators, SYSTEM, or TrustedInstaller.");
                 }
 
@@ -700,11 +845,28 @@ namespace Sidey.Installer
                         && (((rule.FileSystemRights & writeRights) != 0) || hasGenericWrite)
                         && !privileged.Contains(identity))
                     {
-                        throw new InvalidOperationException(
+                        throw new InsecureTransactionParentException(
                             "The SIDEY install directory parent is writable by an unprivileged identity: "
                             + identity);
                     }
                 }
+            }
+
+            private bool HasTransactionArtifacts()
+            {
+                if (File.Exists(statePath) || Directory.Exists(statePath)
+                    || File.Exists(statePath + ".tmp") || Directory.Exists(statePath + ".tmp")
+                    || File.Exists(rollbackPath) || Directory.Exists(rollbackPath))
+                {
+                    return true;
+                }
+
+                string stagingPattern = Path.GetFileName(installPath) + ".sidey-staging-*";
+                foreach (string entry in Directory.EnumerateFileSystemEntries(parentPath, stagingPattern))
+                {
+                    return true;
+                }
+                return false;
             }
 
             private void ProtectStagingDirectory()
@@ -844,22 +1006,32 @@ namespace Sidey.Installer
                 using (RegistryKey machine = RegistryKey.OpenBaseKey(
                     RegistryHive.LocalMachine,
                     RegistryView.Registry64))
-                using (RegistryKey key = machine.OpenSubKey(InstallerRegistryPath))
+                using (RegistryKey installer = machine.OpenSubKey(InstallerRegistryPath))
+                using (RegistryKey uninstall = machine.OpenSubKey(UninstallRegistryPath))
                 {
-                    object previousVersion = key == null
+                    object previousUpdateVersion = installer == null
                         ? null
-                        : key.GetValue("InstalledVersion", null);
+                        : installer.GetValue("InstalledVersion", null);
+                    string updateVersion = Convert.ToString(
+                        previousUpdateVersion,
+                        CultureInfo.InvariantCulture);
+                    string displayVersion = uninstall == null
+                        ? updateVersion
+                        : Convert.ToString(
+                            uninstall.GetValue("DisplayVersion", updateVersion),
+                            CultureInfo.InvariantCulture);
                     return new PreviousRegistration
                     {
                         Managed = true,
-                        Existed = previousVersion != null,
-                        Version = Convert.ToString(previousVersion, CultureInfo.InvariantCulture),
-                        Language = key == null
+                        Existed = previousUpdateVersion != null,
+                        ProductVersion = displayVersion,
+                        UpdateVersion = updateVersion,
+                        Language = installer == null
                             ? string.Empty
-                            : Convert.ToString(key.GetValue("Language", string.Empty), CultureInfo.InvariantCulture),
-                        Location = key == null
+                            : Convert.ToString(installer.GetValue("Language", string.Empty), CultureInfo.InvariantCulture),
+                        Location = installer == null
                             ? installPath
-                            : Convert.ToString(key.GetValue("InstallLocation", installPath), CultureInfo.InvariantCulture),
+                            : Convert.ToString(installer.GetValue("InstallLocation", installPath), CultureInfo.InvariantCulture),
                     };
                 }
             }
@@ -889,7 +1061,8 @@ namespace Sidey.Installer
                     }
 
                     string location = previousRegistration.Location;
-                    string priorVersion = previousRegistration.Version;
+                    string priorProductVersion = previousRegistration.ProductVersion;
+                    string priorUpdateVersion = previousRegistration.UpdateVersion;
                     using (RegistryKey installer = machine.CreateSubKey(InstallerRegistryPath))
                     using (RegistryKey uninstall = machine.CreateSubKey(UninstallRegistryPath))
                     using (RegistryKey protocol = machine.CreateSubKey(ProtocolRegistryPath))
@@ -902,7 +1075,7 @@ namespace Sidey.Installer
                                 RegistryValueKind.String);
                         }
                         installer.SetValue("InstallLocation", location, RegistryValueKind.String);
-                        installer.SetValue("InstalledVersion", priorVersion, RegistryValueKind.String);
+                        installer.SetValue("InstalledVersion", priorUpdateVersion, RegistryValueKind.String);
                         uninstall.SetValue("DisplayName", "SIDEY", RegistryValueKind.String);
                         uninstall.SetValue("Publisher", "SIDEY", RegistryValueKind.String);
                         uninstall.SetValue("InstallLocation", location, RegistryValueKind.String);
@@ -920,7 +1093,7 @@ namespace Sidey.Installer
                             RegistryValueKind.String);
                         uninstall.SetValue("NoModify", 1, RegistryValueKind.DWord);
                         uninstall.SetValue("NoRepair", 1, RegistryValueKind.DWord);
-                        uninstall.SetValue("DisplayVersion", priorVersion, RegistryValueKind.String);
+                        uninstall.SetValue("DisplayVersion", priorProductVersion, RegistryValueKind.String);
                         protocol.SetValue(
                             string.Empty,
                             "URL:SIDEY authentication callback",
@@ -979,10 +1152,11 @@ namespace Sidey.Installer
                 AssertOrdinaryStateFile(temporaryPath);
                 var state = new TransactionState
                 {
-                    SchemaVersion = 1,
+                    SchemaVersion = 2,
                     Phase = phase,
                     CompletionId = completionId,
-                    Version = version,
+                    ProductVersion = productVersion,
+                    UpdateVersion = updateVersion,
                     InstallDirectory = installPath,
                     StagingDirectory = transactionStagingPath,
                     RollbackDirectory = rollbackPath,
@@ -1010,7 +1184,7 @@ namespace Sidey.Installer
                 AssertOrdinaryStateFile(statePath);
                 TransactionState state = StateJson.Deserialize(
                     File.ReadAllText(statePath, Encoding.UTF8));
-                if (state.SchemaVersion != 1
+                if ((state.SchemaVersion != 1 && state.SchemaVersion != 2)
                     || !PathComparer.Equals(Normalize(state.InstallDirectory), installPath)
                     || !PathComparer.Equals(Normalize(state.RollbackDirectory), rollbackPath))
                 {
@@ -1066,7 +1240,8 @@ namespace Sidey.Installer
                 Property(builder, "schemaVersion", state.SchemaVersion.ToString(CultureInfo.InvariantCulture), false);
                 Property(builder, "phase", String(state.Phase), true);
                 Property(builder, "completionId", String(state.CompletionId), true);
-                Property(builder, "version", String(state.Version), true);
+                Property(builder, "productVersion", String(state.ProductVersion), true);
+                Property(builder, "updateVersion", String(state.UpdateVersion), true);
                 Property(builder, "installDirectory", String(state.InstallDirectory), true);
                 Property(builder, "stagingDirectory", String(state.StagingDirectory), true);
                 Property(builder, "rollbackDirectory", String(state.RollbackDirectory), true);
@@ -1082,7 +1257,8 @@ namespace Sidey.Installer
                     builder.Append('{');
                     Property(builder, "managed", registration.Managed ? "true" : "false", false);
                     Property(builder, "existed", registration.Existed ? "true" : "false", true);
-                    Property(builder, "version", String(registration.Version), true);
+                    Property(builder, "productVersion", String(registration.ProductVersion), true);
+                    Property(builder, "updateVersion", String(registration.UpdateVersion), true);
                     Property(builder, "language", String(registration.Language), true);
                     Property(builder, "location", String(registration.Location), true);
                     builder.Append('}');
@@ -1098,12 +1274,19 @@ namespace Sidey.Installer
                 {
                     throw new InvalidOperationException("The SIDEY install transaction state is invalid.");
                 }
+                int schemaVersion = Integer(root, "schemaVersion");
+                string legacyVersion = schemaVersion == 1 ? Text(root, "version") : null;
                 var state = new TransactionState
                 {
-                    SchemaVersion = Integer(root, "schemaVersion"),
+                    SchemaVersion = schemaVersion,
                     Phase = Text(root, "phase"),
                     CompletionId = OptionalText(root, "completionId"),
-                    Version = Text(root, "version"),
+                    ProductVersion = schemaVersion == 1
+                        ? legacyVersion
+                        : Text(root, "productVersion"),
+                    UpdateVersion = schemaVersion == 1
+                        ? legacyVersion
+                        : Text(root, "updateVersion"),
                     InstallDirectory = Text(root, "installDirectory"),
                     StagingDirectory = Text(root, "stagingDirectory"),
                     RollbackDirectory = Text(root, "rollbackDirectory"),
@@ -1120,11 +1303,19 @@ namespace Sidey.Installer
                         throw new InvalidOperationException(
                             "The SIDEY install transaction state is invalid.");
                     }
+                    string legacyRegistrationVersion = schemaVersion == 1
+                        ? OptionalText(registration, "version")
+                        : null;
                     state.PreviousRegistration = new PreviousRegistration
                     {
                         Managed = Boolean(registration, "managed", false),
                         Existed = Boolean(registration, "existed", false),
-                        Version = OptionalText(registration, "version"),
+                        ProductVersion = schemaVersion == 1
+                            ? legacyRegistrationVersion
+                            : OptionalText(registration, "productVersion"),
+                        UpdateVersion = schemaVersion == 1
+                            ? legacyRegistrationVersion
+                            : OptionalText(registration, "updateVersion"),
                         Language = OptionalText(registration, "language"),
                         Location = OptionalText(registration, "location"),
                     };

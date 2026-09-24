@@ -36,18 +36,10 @@ Git 이력은 보존한다. App Store 설치가 기존 직접 배포판의 Keych
 
 App Store archive 생성, submission, review와 게시 완료는 별도 단계다.
 
-App Store client는 macOS 15 이상에서 Intel과 Apple Silicon을 지원하며 하나의
-Universal app으로 빌드한다. 최소 OS와 CPU architecture의 실행 가능한 계약은
-[`Xcode project`](../../macos/SIDEY.xcodeproj/project.pbxproj)가 소유한다. macOS 26
-이상에서는 Liquid Glass 표현을 유지하고 이전 지원 OS에서는 기본 material과 button
-style을 사용한다. 표현의 차이로 메시징·overlay 기능을 제한하지 않는다. 독립적인
-recording tool의 실행 환경은 App Store client의 지원 환경과 별개다.
-
-Universal binary의 architecture·minimum OS 검사, 각 OS·CPU 환경에서 실행하는 자동
-테스트, 실제 사용자 환경의 동작 검증은 별도 증거다. 빌드 성공만으로 Intel의 overlay,
-입력 포커스·한글 조합, Spaces·다중 모니터, 절전 복귀와 장시간 성능 검증을 대신하지
-않는다. 지원 환경을 넓힌 source나 심사 후보가 있다는 이유로 공개 README·website에
-설치 가능하다고 안내하지 않으며, App Store의 실제 제공 상태를 확인한 뒤 반영한다.
+App Store client의 지원 환경은 Apple Silicon Mac의 macOS 26 이상이다. 최소 OS와
+CPU architecture의 실행 가능한 계약은
+[`Xcode project`](../../macos/SIDEY.xcodeproj/project.pbxproj)가 소유한다. 실제 설치
+가능 여부는 App Store의 제공 상태에 따른다.
 
 App Store listing은 한국어를 primary language로 유지하고 영어권 storefront용 영어,
 일본어와 번체 중국어 localization을 함께 관리한다. Binary의 미지원 언어 영어 fallback과
@@ -64,6 +56,13 @@ shared runtime을 prerequisite로 내려받거나 설치·등록하지 않는다
 payload를 검증하고 staging한 뒤 기존 설치를 보존할 수 있는 transaction boundary에서
 교체한다. 실패하면 기존 설치를 유지하거나 복원하고 최종 상태를 확인할 수 없는 경우를
 별도로 구분한다.
+
+구버전이 사용자 쓰기 가능 위치에 설치되어 있고 진행 중인 설치 transaction이 없으면,
+Installer는 Program Files의 `SIDEY` 폴더에 설치한다. 새 설치와 등록이
+완료된 뒤에만 이전 위치에서 알려진 구버전 배포 파일과 내용이 일치하는 파일을 자동으로 삭제한다.
+수정된 파일이나 관련 없는 파일은 남겨 두며, 모두 정리하지 못하면 이전 경로와 수동 삭제
+방법을 설치 화면에 안내한다. 이때 구버전 제거 프로그램은 실행하지 않는다. 설정과 로그인
+데이터는 프로그램 설치 위치와 별도로 보관한다.
 
 현재 self-contained 경로는 payload 준비, 실행 중인 process 종료, payload 적용과 Windows
 등록 실패를 구분한다. Installer source에는 향후 framework-dependent 배포로 전환할 때

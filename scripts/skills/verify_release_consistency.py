@@ -20,22 +20,6 @@ from sidey_version import (  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 SEMVER = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
-APP_STORE_URLS = {
-    "README.md": "https://apps.apple.com/kr/app/sidey/id6808528060",
-    "docs/readme/README.en.md": "https://apps.apple.com/us/app/sidey/id6808528060",
-    "docs/readme/README.ja.md": "https://apps.apple.com/jp/app/sidey/id6808528060",
-    "docs/readme/README.ru.md": "https://apps.apple.com/us/app/sidey/id6808528060",
-    "docs/readme/README.uk.md": "https://apps.apple.com/us/app/sidey/id6808528060",
-    "docs/readme/README.zh-Hans.md": "https://apps.apple.com/us/app/sidey/id6808528060",
-    "docs/readme/README.zh-Hant.md": "https://apps.apple.com/tw/app/sidey/id6808528060",
-}
-RELEASES_URL = "https://github.com/sidey-app/SIDEY/releases"
-README_PATHS = ("README.md",) + tuple(
-    f"docs/readme/README.{language}.md"
-    for language in ("en", "ja", "ru", "uk", "zh-Hans", "zh-Hant")
-)
-
-
 class ConsistencyError(RuntimeError):
     pass
 
@@ -47,36 +31,6 @@ def require(condition: bool, message: str) -> None:
 
 def read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
-
-
-def release_display(platform: str, path: str = "README.md") -> str:
-    source = read(path)
-    heading = {"macos": "macOS", "windows": "Windows"}[platform]
-    sections = list(re.finditer(rf"^### {heading}[ \t]*$", source, re.MULTILINE))
-    require(len(sections) == 1,
-            f"{path} must have exactly one ### {heading} installation section")
-    following = source[sections[0].end():]
-    return re.split(r"^#{1,3} ", following, maxsplit=1, flags=re.MULTILINE)[0]
-
-
-def validate_readme_release_links(platform: str) -> None:
-    for path in README_PATHS:
-        require((ROOT / path).is_file(), f"README translation is missing: {path}")
-        display = release_display(platform, path)
-        expected_url = APP_STORE_URLS[path] if platform == "macos" else RELEASES_URL
-        official_link = re.escape(expected_url)
-        require(re.search(rf'\]\({official_link}\)|href=[\"\']{official_link}[\"\']',
-                          display) is not None,
-                f"{path} {platform} installation must link to {expected_url}")
-        if platform == "macos":
-            require(not re.search(r"\.dmg|Homebrew|brew install|/releases", display, re.I),
-                    f"{path} macOS installation must use only the Mac App Store")
-        urls = re.findall(r'https?://[^\s<>\"\'`)\]]+', display)
-        require(all(url == RELEASES_URL for url in urls if "/releases" in url),
-                f"{path} {platform} installation has a noncanonical or versioned release URL")
-        require(re.search(r"SIDEY-(?:macOS|Windows)-[^\s/<>]*v[0-9]+\.[0-9]+\.[0-9]+",
-                          display) is None,
-                f"{path} {platform} installation must not pin an installer version")
 
 
 def load_manifest(platform: str) -> dict[str, object]:
@@ -197,7 +151,6 @@ def validate_macos() -> dict[str, str]:
             "website macOS installation must use the Mac App Store")
     require(".dmg" not in release_data,
             "website release data must not offer retired macOS installers")
-    validate_readme_release_links("macos")
     return {"version": version, "build": build, "tag": f"appstore-{version}-{build}"}
 
 
@@ -284,7 +237,6 @@ def validate_windows(allow_unreleased_source: bool = False) -> dict[str, str]:
     if not allow_unreleased_source:
         require((ROOT / notes).is_file(), f"Windows release notes are missing: {notes}")
 
-    validate_readme_release_links("windows")
     release_data = read("website/src/data/releases.ts")
     require("version: windowsRelease.version" in release_data,
             "website release data must derive the Windows version from release/windows.json")

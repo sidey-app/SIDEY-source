@@ -35,9 +35,9 @@ public sealed class DistributionSourceTests
         Assert.Equal("true", Value(project, "EnableMsixTooling"));
         Assert.Equal("false", Value(project, "IncludeAllContentForSelfExtract"));
         Assert.Equal("false", Value(project, "PublishTrimmed"));
-        Assert.Equal("2.0.0", Value(project, "Version"));
-        Assert.Equal("2.0.0.0", Value(project, "FileVersion"));
-        Assert.Equal("2.0.0.0", Value(project, "AssemblyVersion"));
+        Assert.Empty(project.Descendants("Version"));
+        Assert.Empty(project.Descendants("FileVersion"));
+        Assert.Empty(project.Descendants("AssemblyVersion"));
         Assert.Equal("SIDEY.Host", Value(project, "AssemblyName"));
         Assert.Equal("SIDEY", Value(project, "AssemblyTitle"));
         Assert.Equal("SIDEY", Value(project, "Product"));
@@ -83,6 +83,85 @@ public sealed class DistributionSourceTests
         Assert.Contains(
             "ConvertTo-PublishLayout.ps1",
             organize.Descendants("Exec").Single().Attribute("Command")?.Value,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GeneratedVersionPropertiesSeparateProductAndWindowsUpdateVersions()
+    {
+        var properties = XDocument.Load(RepositoryPath("windows", "Version.props"));
+        XElement propertyGroup = properties.Descendants("PropertyGroup").Single();
+        string productVersion = Value(properties, "SideyProductVersion");
+        int windowsRevision = int.Parse(Value(properties, "SideyWindowsRevision"));
+        string updateVersion = Value(properties, "SideyWindowsUpdateVersion");
+        string releaseVersion = Value(properties, "SideyWindowsReleaseVersion");
+        string msixVersion = Value(properties, "SideyMsixVersion");
+        int[] productParts = [.. productVersion.Split('.').Select(int.Parse)];
+
+        Assert.Equal(3, productParts.Length);
+        Assert.InRange(windowsRevision, 0, 999);
+        Assert.Equal(
+            $"{productParts[0]}.{productParts[1]}.{productParts[2] * 1000 + windowsRevision}.0",
+            msixVersion);
+        Assert.Equal(msixVersion[..msixVersion.LastIndexOf('.')], updateVersion);
+        Assert.Equal(windowsRevision == 0 ? productVersion : updateVersion, releaseVersion);
+        Assert.Equal(productVersion, Value(properties, "Version"));
+        Assert.Equal(productVersion, Value(properties, "VersionPrefix"));
+        Assert.Equal(productVersion, Value(properties, "InformationalVersion"));
+        Assert.Equal($"{productVersion}.0", Value(properties, "AssemblyVersion"));
+        Assert.Equal(msixVersion, Value(properties, "FileVersion"));
+        Assert.Equal("false", Value(properties, "IncludeSourceRevisionInInformationalVersion"));
+        Assert.All(
+            propertyGroup.Elements(),
+            property => Assert.False(string.IsNullOrWhiteSpace(property.Value)));
+
+        var directoryProperties = XDocument.Load(RepositoryPath("windows", "Directory.Build.props"));
+        XElement import = directoryProperties.Descendants("Import").Single(element =>
+            ((string?)element.Attribute("Project"))?.EndsWith("Version.props", StringComparison.Ordinal) == true);
+        Assert.Equal("$(MSBuildThisFileDirectory)Version.props", (string?)import.Attribute("Project"));
+        XElement validation = directoryProperties.Descendants("Target").Single(element =>
+            (string?)element.Attribute("Name") == "ValidateSideyVersionMetadata");
+        Assert.Equal("BeforeBuild", (string?)validation.Attribute("BeforeTargets"));
+        Assert.Contains(
+            "scripts/sidey_version.py --check windows",
+            validation.Descendants("Exec").Single().Attribute("Command")?.Value,
+            StringComparison.Ordinal);
+
+        string installer = File.ReadAllText(RepositoryPath(
+            "scripts", "windows", "New-WindowsInstaller.ps1"));
+        Assert.Contains("-FileVersion $publishedFileVersion", installer, StringComparison.Ordinal);
+        Assert.Contains("/DAPP_UPDATE_VERSION=$expectedUpdateVersion", installer, StringComparison.Ordinal);
+        Assert.Contains("/DAPP_FILE_VERSION=$publishedFileVersion", installer, StringComparison.Ordinal);
+        Assert.DoesNotContain("-FileVersion \"$Version.0\"", installer, StringComparison.Ordinal);
+        Assert.Contains("[string]$ProductVersion", installer, StringComparison.Ordinal);
+        Assert.Contains("[string]$ReleaseVersion", installer, StringComparison.Ordinal);
+        Assert.Contains("v${ReleaseVersion}-Setup.exe", installer, StringComparison.Ordinal);
+
+        string powerShellSupport = File.ReadAllText(RepositoryPath(
+            "scripts", "windows", "tests", "Test-PowerShellSupport.ps1"));
+        Assert.Contains("SideyProductVersion", powerShellSupport, StringComparison.Ordinal);
+        Assert.Contains("SideyMsixVersion", powerShellSupport, StringComparison.Ordinal);
+        Assert.DoesNotContain("$fileVersion = \"$version.0\"", powerShellSupport, StringComparison.Ordinal);
+
+        string smoke = File.ReadAllText(RepositoryPath(
+            "scripts", "windows", "tests", "Test-WindowsBuild.ps1"));
+        Assert.DoesNotContain("-p:Version=", smoke, StringComparison.Ordinal);
+        Assert.DoesNotContain("-p:FileVersion=", smoke, StringComparison.Ordinal);
+        Assert.DoesNotContain("-p:AssemblyVersion=", smoke, StringComparison.Ordinal);
+
+        string windowsWorkflow = File.ReadAllText(RepositoryPath(
+            ".github", "workflows", "windows-build-and-tests.yml"));
+        Assert.Contains(
+            "scripts/sidey_version.py --get productVersion",
+            windowsWorkflow,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "scripts/sidey_version.py --get windowsReleaseVersion",
+            windowsWorkflow,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "Sidey.App.csproj -Raw",
+            windowsWorkflow,
             StringComparison.Ordinal);
     }
 
@@ -295,7 +374,12 @@ public sealed class DistributionSourceTests
         Assert.Contains("--detect-legacy-msi", setup, StringComparison.Ordinal);
         Assert.DoesNotContain("--uninstall-legacy-msi", setup, StringComparison.Ordinal);
         Assert.Contains("Sidey.SetupSupport.exe", setup, StringComparison.Ordinal);
-        Assert.DoesNotContain("--cleanup", setup[..setup.IndexOf("Section \"Uninstall\"", StringComparison.Ordinal)], StringComparison.Ordinal);
+        Assert.Contains("--cleanup-legacy-install-as-desktop-user", setup, StringComparison.Ordinal);
+        Assert.Contains(
+            "ExecWait '\"$INSTDIR\\Runtime\\SIDEY.UninstallHelper.exe\" --cleanup-legacy-install-as-desktop-user",
+            setup,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("--cleanup-legacy-msi", setup, StringComparison.Ordinal);
         Assert.Contains("$(LegacyMigrationManual)", setup, StringComparison.Ordinal);
     }
 
@@ -332,7 +416,7 @@ public sealed class DistributionSourceTests
         Assert.Contains("$throwableDirectory.Name -eq 'throwable_toy_cannon'", package, StringComparison.Ordinal);
         Assert.Contains("@('emitter.bgra', 'emitter.png', 'preview.png')", package, StringComparison.Ordinal);
         Assert.Contains("Compare-Object $expectedFileNames $fileNames", package, StringComparison.Ordinal);
-        Assert.Contains("SIDEY-Windows-x64-v${Version}-Setup.exe", package, StringComparison.Ordinal);
+        Assert.Contains("SIDEY-Windows-x64-v${ReleaseVersion}-Setup.exe", package, StringComparison.Ordinal);
         Assert.Contains("NSIS 3.12", package, StringComparison.Ordinal);
         Assert.Contains("makensis.exe", package, StringComparison.Ordinal);
         Assert.Contains("/VERSION", package, StringComparison.Ordinal);
@@ -427,16 +511,56 @@ public sealed class DistributionSourceTests
 
         int onInitStart = setup.IndexOf("Function .onInit", StringComparison.Ordinal);
         string onInit = setup[onInitStart..setup.IndexOf("FunctionEnd", onInitStart, StringComparison.Ordinal)];
+        Assert.Contains("$PendingInstallLocation == \"\"", onInit, StringComparison.Ordinal);
+        Assert.Contains("RunInstallTransaction \"InspectLegacyLocation\"", onInit, StringComparison.Ordinal);
+        Assert.Contains("RunInstallTransaction \"InspectRelocationTarget\"", onInit, StringComparison.Ordinal);
         Assert.True(
             onInit.IndexOf("RunInstallTransaction \"Recover\"", StringComparison.Ordinal)
-                < onInit.IndexOf("\"InstalledVersion\"", StringComparison.Ordinal),
-            "Interrupted installation recovery must precede version classification.");
+                < onInit.LastIndexOf("ReadRegStr $InstalledVersion", StringComparison.Ordinal),
+            "Interrupted installation recovery must precede final version classification.");
 
         Assert.Contains("UndoTransaction", transaction, StringComparison.Ordinal);
         Assert.Contains("FileAttributes.ReparsePoint", transaction, StringComparison.Ordinal);
         Assert.Contains("AssertSecureTransactionParent", transaction, StringComparison.Ordinal);
         Assert.Contains("ProtectStagingDirectory", transaction, StringComparison.Ordinal);
         Assert.Contains("previousRegistration", transaction, StringComparison.Ordinal);
+        Assert.Contains("--product-version \"${APP_VERSION}\"", setup, StringComparison.Ordinal);
+        Assert.Contains("--update-version \"${APP_UPDATE_VERSION}\"", setup, StringComparison.Ordinal);
+        Assert.Contains(
+            "${VersionCompare} $InstalledVersion \"${APP_UPDATE_VERSION}\"",
+            setup,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "\"InstalledVersion\" \"${APP_UPDATE_VERSION}\"",
+            setup,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "\"DisplayVersion\" \"${APP_VERSION}\"",
+            setup,
+            StringComparison.Ordinal);
+        Assert.Contains("state.PreviousRegistration.UpdateVersion", transaction, StringComparison.Ordinal);
+        Assert.Contains("state.UpdateVersion", transaction, StringComparison.Ordinal);
+        Assert.Contains("previousRegistration.ProductVersion", transaction, StringComparison.Ordinal);
+        Assert.Contains("previousRegistration.UpdateVersion", transaction, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void InstalledUpdateCompletionMatchesInternalVersionButDisplaysProductVersion()
+    {
+        string app = File.ReadAllText(RepositoryPath("windows", "src", "Sidey.App", "App.xaml.cs"));
+
+        Assert.Contains(
+            "PendingNotificationVersion(\r\n            _updateService.CurrentUpdateVersion)",
+            app,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "_tray.NotifyUpdateInstalled(_updateService.CurrentVersion)",
+            app,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "TryMarkLaunched(_updateService.CurrentUpdateVersion)",
+            app,
+            StringComparison.Ordinal);
     }
 
     [Fact]

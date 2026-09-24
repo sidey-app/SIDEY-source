@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm_version:
-        description: 'release/windows.json의 버전을 정확히 입력하세요.'
+        description: 'release/windows.json의 releaseVersion을 정확히 입력하세요.'
         required: true
         type: string
       public_repository:
@@ -31,10 +31,11 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 25
     outputs:
-      version: ${{ steps.metadata.outputs.version }}
-      tag: ${{ steps.metadata.outputs.tag }}
-      installer_name: ${{ steps.metadata.outputs.installer_name }}
-      release_notes: ${{ steps.metadata.outputs.release_notes }}
+      product_version: ${{ steps.versions.outputs.product_version }}
+      release_version: ${{ steps.versions.outputs.release_version }}
+      tag: ${{ steps.versions.outputs.tag }}
+      installer_name: ${{ steps.versions.outputs.installer_name }}
+      release_notes: ${{ steps.versions.outputs.release_notes }}
       commit: ${{ steps.commit.outputs.sha }}
     defaults:
       run:
@@ -56,10 +57,27 @@ jobs:
             --github-output $env:GITHUB_OUTPUT
 
           $manifest = Get-Content ./release/windows.json -Raw | ConvertFrom-Json
-          $version = [string]$manifest.version
-          if ($env:CONFIRM_VERSION -cne $version) {
-            throw "Version confirmation must exactly match release/windows.json: $version"
+          $releaseVersion = [string]$manifest.releaseVersion
+          if ($env:CONFIRM_VERSION -cne $releaseVersion) {
+            throw "Version confirmation must exactly match release/windows.json releaseVersion: $releaseVersion"
           }
+
+      - name: Resolve Product and Windows release versions
+        id: versions
+        run: |
+          $productVersion = python -X utf8 ./scripts/sidey_version.py --get productVersion
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unable to resolve the SIDEY Product Version: exit code $LASTEXITCODE"
+          }
+          $releaseVersion = python -X utf8 ./scripts/sidey_version.py --get windowsReleaseVersion
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unable to resolve the SIDEY Windows Release Version: exit code $LASTEXITCODE"
+          }
+          "product_version=$productVersion" >> $env:GITHUB_OUTPUT
+          "release_version=$releaseVersion" >> $env:GITHUB_OUTPUT
+          "tag=windows-v$releaseVersion" >> $env:GITHUB_OUTPUT
+          "installer_name=SIDEY-Windows-x64-v$releaseVersion-Setup.exe" >> $env:GITHUB_OUTPUT
+          "release_notes=docs/releases/windows-v$releaseVersion.md" >> $env:GITHUB_OUTPUT
 
       - name: Record release commit
         id: commit
@@ -93,7 +111,7 @@ jobs:
         if: ${{ always() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure') }}
         uses: actions/upload-artifact@v5
         with:
-          name: windows-release-code-coverage-${{ steps.metadata.outputs.version }}
+          name: windows-release-code-coverage-${{ steps.versions.outputs.product_version }}
           path: artifacts/coverage/**/coverage.cobertura.xml
           if-no-files-found: error
 
@@ -127,14 +145,15 @@ jobs:
           ./scripts/windows/New-WindowsInstaller.ps1 `
             -PublishDirectory ./build/windows/publish `
             -OutputDirectory ./build/windows/artifacts `
-            -Version '${{ steps.metadata.outputs.version }}' `
+            -ProductVersion '${{ steps.versions.outputs.product_version }}' `
+            -ReleaseVersion '${{ steps.versions.outputs.release_version }}' `
             -MakensisPath '${{ steps.nsis.outputs.makensis_path }}'
 
       - name: Upload Windows candidate
         uses: actions/upload-artifact@v5
         with:
-          name: windows-release-candidate-${{ steps.metadata.outputs.version }}
-          path: build/windows/artifacts/${{ steps.metadata.outputs.installer_name }}
+          name: windows-release-candidate-${{ steps.versions.outputs.release_version }}
+          path: build/windows/artifacts/${{ steps.versions.outputs.installer_name }}
           if-no-files-found: error
           retention-days: 7
 
@@ -158,7 +177,7 @@ jobs:
       - name: Download Windows candidate
         uses: actions/download-artifact@v5
         with:
-          name: windows-release-candidate-${{ needs.validate.outputs.version }}
+          name: windows-release-candidate-${{ needs.validate.outputs.release_version }}
           path: release-assets
 
       - name: Resolve public repository
@@ -205,7 +224,7 @@ jobs:
 
           gh release create $tag $candidate `
             --target main `
-            --title "SIDEY Windows v${{ needs.validate.outputs.version }}" `
+            --title "SIDEY Windows v${{ needs.validate.outputs.product_version }}" `
             --notes-file '${{ needs.validate.outputs.release_notes }}' `
             --draft
 

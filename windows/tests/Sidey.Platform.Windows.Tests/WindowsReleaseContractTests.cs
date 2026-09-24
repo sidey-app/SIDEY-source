@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Sidey.Platform.Windows;
+using System.Xml.Linq;
 
 namespace Sidey.Platform.Windows.Tests;
 
@@ -15,9 +15,22 @@ public sealed class WindowsReleaseContractTests
         Assert.Equal(1, manifest.GetProperty("schema").GetInt32());
         Assert.Equal("windows", manifest.GetProperty("platform").GetString());
         Assert.Equal("production", manifest.GetProperty("channel").GetString());
-        var publicVersion = Version.Parse(manifest.GetProperty("version").GetString()!);
-        var sourceVersion = Version.Parse(WindowsUpdateService.CurrentVersion);
-        Assert.True(publicVersion <= sourceVersion);
+        string publicVersion = manifest.GetProperty("version").GetString()!;
+        var versionProperties = XDocument.Load(RepositoryPath("windows", "Version.props"));
+        string sourceVersion = versionProperties.Descendants("SideyProductVersion").Single().Value;
+        Assert.Equal(publicVersion, sourceVersion);
+        Assert.Equal(
+            int.Parse(versionProperties.Descendants("SideyWindowsRevision").Single().Value),
+            manifest.GetProperty("windowsRevision").GetInt32());
+        Assert.Equal(
+            versionProperties.Descendants("SideyWindowsUpdateVersion").Single().Value,
+            manifest.GetProperty("updateVersion").GetString());
+        Assert.Equal(
+            versionProperties.Descendants("SideyWindowsReleaseVersion").Single().Value,
+            manifest.GetProperty("releaseVersion").GetString());
+        Assert.Equal(
+            versionProperties.Descendants("SideyMsixVersion").Single().Value,
+            manifest.GetProperty("msixVersion").GetString());
         Assert.False(File.Exists(RepositoryPath("website", "windows-latest.json")));
         Assert.False(File.Exists(RepositoryPath("website", "windows", "update.json")));
     }
@@ -27,13 +40,13 @@ public sealed class WindowsReleaseContractTests
     {
         string validationWorkflow = Read(".github", "workflows", "windows-build-and-tests.yml");
         string releaseWorkflow = Read(".github", "workflows", "windows-release.yml");
-        string metadataVerifier = Read("scripts", "skills", "verify_release_consistency.py");
         string releaseVerifier = Read("scripts", "windows", "tests", "Test-WindowsRelease.ps1");
 
         Assert.DoesNotContain("tags:", validationWorkflow, StringComparison.Ordinal);
         Assert.DoesNotContain("tags:", releaseWorkflow, StringComparison.Ordinal);
-        Assert.Contains("tag = f\"windows-v{version}\"", metadataVerifier, StringComparison.Ordinal);
-        Assert.Contains("$tag = \"windows-v$Version\"", releaseVerifier, StringComparison.Ordinal);
+        Assert.Contains("tag=windows-v$releaseVersion", releaseWorkflow, StringComparison.Ordinal);
+        Assert.Contains("$tag = \"windows-v$ReleaseVersion\"", releaseVerifier, StringComparison.Ordinal);
+        Assert.Contains("--get windowsReleaseVersion", releaseWorkflow, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -47,6 +60,8 @@ public sealed class WindowsReleaseContractTests
         Assert.DoesNotContain("  pull_request:", validationWorkflow, StringComparison.Ordinal);
         Assert.Contains("workflow_dispatch:", releaseWorkflow, StringComparison.Ordinal);
         Assert.Contains("confirm_version:", releaseWorkflow, StringComparison.Ordinal);
+        Assert.Contains("$manifest.releaseVersion", releaseWorkflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("$version = [string]$manifest.version", releaseWorkflow, StringComparison.Ordinal);
         Assert.Contains("validate:", releaseWorkflow, StringComparison.Ordinal);
         Assert.Contains("--draft", releaseWorkflow, StringComparison.Ordinal);
         Assert.Contains("Get-FileHash", releaseWorkflow, StringComparison.Ordinal);

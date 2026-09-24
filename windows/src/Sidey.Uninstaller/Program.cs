@@ -2,7 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -16,6 +18,10 @@ namespace Sidey.Uninstaller
         private const string CleanupCredentialsArgument = "--cleanup-credentials";
         private const string CleanupLocalDataArgument = "--cleanup-local-data";
         private const string CleanupStartupArgument = "--cleanup-startup";
+        private const string CleanupLegacyInstallArgument = "--cleanup-legacy-install";
+        private const string CleanupLegacyInstallAsDesktopUserArgument =
+            "--cleanup-legacy-install-as-desktop-user";
+        private const string LegacyOwnedFilesResource = "SIDEY.LegacyV131OwnedFiles.txt";
         private const string CleanupCredentialsAsDesktopUserArgument =
             "--cleanup-credentials-as-desktop-user";
         private const string CleanupLocalDataAsDesktopUserArgument =
@@ -64,6 +70,35 @@ namespace Sidey.Uninstaller
         [STAThread]
         public static int Main(string[] arguments)
         {
+            if (arguments.Length == 2
+                && string.Equals(arguments[0], CleanupLegacyInstallAsDesktopUserArgument,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return RunThisHelperAsDesktopUser(CleanupLegacyInstallArgument, arguments[1]);
+            }
+            if (arguments.Length == 2
+                && string.Equals(arguments[0], CleanupLegacyInstallArgument,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                if (!DesktopUserProcess.IsCurrentDesktopUser())
+                {
+                    return ErrorAccessDenied;
+                }
+                try
+                {
+                    string currentDirectory;
+                    string launcherPath;
+                    if (!TryGetDeploymentPaths(out currentDirectory, out launcherPath))
+                    {
+                        return 2;
+                    }
+                    return CleanupLegacyInstall(arguments[1], currentDirectory);
+                }
+                catch
+                {
+                    return 1;
+                }
+            }
             if (arguments.Length == 1
                 && string.Equals(
                     arguments[0],
@@ -277,7 +312,11 @@ namespace Sidey.Uninstaller
                 string[] marker = File.ReadAllLines(Path.Combine(installDirectory, "install-completion.txt"));
                 string userDirectory = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SIDEY");
-                return ApplyInstallationCompletion(marker, userDirectory, EnableCurrentUserStartupRegistration);
+                return ApplyInstallationCompletion(
+                    marker,
+                    userDirectory,
+                    EnableCurrentUserStartupRegistration,
+                    RefreshCurrentUserStartupRegistrationIfEnabled);
             }
             catch
             {
@@ -286,12 +325,16 @@ namespace Sidey.Uninstaller
         }
 
         private static int ApplyInstallationCompletion(
-            string[] marker, string userDirectory, Func<int> enableStartup)
+            string[] marker,
+            string userDirectory,
+            Func<int> enableStartup,
+            Func<int> refreshStartup)
         {
             Version parsedVersion;
             if (marker.Length != 3 || !Version.TryParse(marker[1], out parsedVersion)
                 || string.IsNullOrWhiteSpace(marker[2])
-                || (marker[0] != "fresh" && marker[0] != "upgrade" && marker[0] != "repair"))
+                || (marker[0] != "fresh" && marker[0] != "upgrade"
+                    && marker[0] != "relocate" && marker[0] != "repair"))
             {
                 return 64;
             }
@@ -310,17 +353,54 @@ namespace Sidey.Uninstaller
                     return result;
                 }
             }
+            else if (marker[0] == "relocate")
+            {
+                int result = refreshStartup();
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
             string pendingPath = Path.Combine(userDirectory, "pending-installed-update.txt");
             File.Delete(pendingPath);
             // Record completion before the optional notification. A crash may
             // omit a notification, but recovery never re-enables startup or
             // reposts an already consumed notification.
             File.WriteAllText(completionPath, marker[2]);
-            if (marker[0] == "upgrade")
+            if (marker[0] == "upgrade" || marker[0] == "relocate")
             {
                 File.WriteAllText(pendingPath, marker[1]);
             }
             return 0;
+        }
+
+        private static int RefreshCurrentUserStartupRegistrationIfEnabled()
+        {
+            try
+            {
+                string installDirectory;
+                string launcherPath;
+                if (!TryGetDeploymentPaths(out installDirectory, out launcherPath))
+                {
+                    return 2;
+                }
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
+                    StartupRegistryPath, writable: true))
+                {
+                    if (key != null && key.GetValue(StartupValueName) != null)
+                    {
+                        key.SetValue(
+                            StartupValueName,
+                            "\"" + launcherPath + "\" " + BackgroundLaunchArgument,
+                            RegistryValueKind.String);
+                    }
+                }
+                return 0;
+            }
+            catch
+            {
+                return 1;
+            }
         }
 
         private static int EnableCurrentUserStartupRegistration()
@@ -460,6 +540,162 @@ namespace Sidey.Uninstaller
             {
                 return GetDesktopUserRunnerErrorCode(exception);
             }
+        }
+
+        private static int RunThisHelperAsDesktopUser(string argument, string path)
+        {
+            try
+            {
+                string helperPath = Process.GetCurrentProcess().MainModule.FileName;
+                string normalizedPath = Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar);
+                return DesktopUserProcess.Start(
+                    helperPath,
+                    QuoteArgument(argument) + " " + QuoteArgument(normalizedPath),
+                    Path.GetDirectoryName(helperPath),
+                    waitForExit: true);
+            }
+            catch (Exception exception)
+            {
+                return GetDesktopUserRunnerErrorCode(exception);
+            }
+        }
+
+        private static int CleanupLegacyInstall(string legacyPath, string currentPath)
+        {
+            var ownedFiles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            using (Stream manifest = typeof(Program).Assembly.GetManifestResourceStream(LegacyOwnedFilesResource))
+            {
+                if (manifest == null)
+                {
+                    return 1;
+                }
+                using (var reader = new StreamReader(manifest, Encoding.UTF8))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (line.Length == 0 || line[0] == '#')
+                        {
+                            continue;
+                        }
+                        string[] fields = line.Split('\t');
+                        if (fields.Length != 2 || fields[1].Length != 64
+                            || Path.IsPathRooted(fields[0]) || fields[0].Contains("..")
+                            || fields[0].IndexOfAny(Path.GetInvalidPathChars()) >= 0
+                            || ownedFiles.ContainsKey(fields[0]))
+                        {
+                            return 1;
+                        }
+                        ownedFiles.Add(fields[0], fields[1]);
+                    }
+                }
+            }
+
+            return CleanupLegacyInstallFiles(legacyPath, currentPath, ownedFiles);
+        }
+
+        private static int CleanupLegacyInstallFiles(
+            string legacyPath,
+            string currentPath,
+            IDictionary<string, string> ownedFiles)
+        {
+            string legacyRoot = Path.GetFullPath(legacyPath).TrimEnd(Path.DirectorySeparatorChar);
+            string currentRoot = Path.GetFullPath(currentPath).TrimEnd(Path.DirectorySeparatorChar);
+            if (string.IsNullOrEmpty(legacyRoot)
+                || string.Equals(legacyRoot, Path.GetPathRoot(legacyRoot).TrimEnd(Path.DirectorySeparatorChar),
+                    StringComparison.OrdinalIgnoreCase)
+                || string.Equals(legacyRoot, currentRoot, StringComparison.OrdinalIgnoreCase)
+                || currentRoot.StartsWith(legacyRoot + Path.DirectorySeparatorChar,
+                    StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(Path.GetFileName(legacyRoot), "SIDEY",
+                    StringComparison.OrdinalIgnoreCase)
+                || !Directory.Exists(legacyRoot)
+                || HasReparsePointInAncestors(legacyRoot)
+                || File.Exists(legacyRoot + ".sidey-transaction.json")
+                || File.Exists(legacyRoot + ".sidey-transaction.json.tmp")
+                || Directory.Exists(legacyRoot + ".sidey-rollback")
+                || Directory.GetDirectories(Path.GetDirectoryName(legacyRoot),
+                    Path.GetFileName(legacyRoot) + ".sidey-staging-*").Length != 0)
+            {
+                return 1;
+            }
+
+            string launcherHash;
+            if (!ownedFiles.TryGetValue("SIDEY.exe", out launcherHash)
+                || !MatchesOwnedFile(Path.Combine(legacyRoot, "SIDEY.exe"), launcherHash))
+            {
+                return 1;
+            }
+
+            var directories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<string, string> entry in ownedFiles)
+            {
+                string fullPath = Path.GetFullPath(Path.Combine(legacyRoot, entry.Key));
+                if (!fullPath.StartsWith(legacyRoot + Path.DirectorySeparatorChar,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return 1;
+                }
+                string directory = Path.GetDirectoryName(fullPath);
+                while (!string.Equals(directory, legacyRoot, StringComparison.OrdinalIgnoreCase))
+                {
+                    directories.Add(directory);
+                    directory = Path.GetDirectoryName(directory);
+                }
+                if (MatchesOwnedFile(fullPath, entry.Value))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+            var orderedDirectories = new List<string>(directories);
+            orderedDirectories.Sort((left, right) => right.Length.CompareTo(left.Length));
+            foreach (string directory in orderedDirectories)
+            {
+                if (Directory.Exists(directory) && !HasReparsePointInAncestors(directory)
+                    && Directory.GetFileSystemEntries(directory).Length == 0)
+                {
+                    Directory.Delete(directory);
+                }
+            }
+            if (Directory.GetFileSystemEntries(legacyRoot).Length == 0)
+            {
+                Directory.Delete(legacyRoot);
+                return 0;
+            }
+            return 1;
+        }
+
+        private static bool MatchesOwnedFile(string filePath, string expectedHash)
+        {
+            if (!File.Exists(filePath) || HasReparsePointInAncestors(filePath))
+            {
+                return false;
+            }
+            using (var sha256 = SHA256.Create())
+            using (var file = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                string actualHash = BitConverter.ToString(sha256.ComputeHash(file)).Replace("-", "");
+                return string.Equals(actualHash, expectedHash, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        private static bool HasReparsePointInAncestors(string path)
+        {
+            string current = path;
+            while (!string.IsNullOrEmpty(current))
+            {
+                if ((File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
+                {
+                    return true;
+                }
+                string parent = Path.GetDirectoryName(current);
+                if (string.Equals(parent, current, StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+                current = parent;
+            }
+            return false;
         }
 
         private static int GetDesktopUserRunnerErrorCode(Exception exception)

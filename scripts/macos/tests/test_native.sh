@@ -3,6 +3,9 @@ set -eu
 
 SIDEY_REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../.." && /bin/pwd -P)
 python3 "$SIDEY_REPO_ROOT/scripts/macos/verify_content_assets.py"
+python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --check macos
+SIDEY_EXPECTED_PRODUCT_VERSION=$(python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --get productVersion)
+SIDEY_EXPECTED_MAC_BUILD=$(python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --get macBuild)
 SIDEY_CREATED_TEST_DIR=false
 
 python3 -m unittest discover -s "$SIDEY_REPO_ROOT/scripts/macos/tests"
@@ -21,33 +24,23 @@ cleanup() {
 }
 trap cleanup EXIT HUP INT TERM
 
-# Run each host architecture natively; an explicit override also permits Rosetta checks.
-SIDEY_TEST_ARCH=${SIDEY_TEST_ARCH:-$(uname -m)}
-case "$SIDEY_TEST_ARCH" in
-    arm64|x86_64) ;;
-    *) echo "Unsupported macOS test architecture: $SIDEY_TEST_ARCH" >&2; exit 64 ;;
-esac
-
 # The App Store host owns all common XCTest coverage.
 xcodebuild \
     -project "$SIDEY_REPO_ROOT/macos/SIDEY.xcodeproj" \
     -scheme SIDEY \
-    -destination "platform=macOS,arch=$SIDEY_TEST_ARCH" \
+    -destination 'platform=macOS,arch=arm64' \
     -derivedDataPath "$SIDEY_TEST_DIR/app-store" \
     -disableAutomaticPackageResolution \
     CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS= \
-    "ARCHS=$SIDEY_TEST_ARCH" ONLY_ACTIVE_ARCH=YES \
     SIDEY_RUN_BACKEND_INTEGRATION="${SIDEY_RUN_BACKEND_INTEGRATION:-0}" \
     SIDEY_SUPABASE_URL="${SIDEY_SUPABASE_URL:-}" \
     SIDEY_SUPABASE_PUBLISHABLE_KEY="${SIDEY_SUPABASE_PUBLISHABLE_KEY:-}" \
     test \
     "$@"
 
-# The independent recording test route requires macOS 26 on Apple Silicon.
-# The macOS 26 ARM CI job continues to cover it.
-SIDEY_HOST_MAJOR=$(sw_vers -productVersion | cut -d. -f1)
-if [ "$SIDEY_HOST_MAJOR" -ge 26 ] && [ "$(uname -m)" = arm64 ]; then
-    "$SIDEY_REPO_ROOT/scripts/macos/tests/test_recording.sh"
-else
-    echo "Recording tests are not applicable on macOS $SIDEY_HOST_MAJOR / $(uname -m) (route requires 26+ / arm64)."
-fi
+python3 "$SIDEY_REPO_ROOT/scripts/macos/verify_app_version.py" \
+	--app "$SIDEY_TEST_DIR/app-store/Build/Products/Debug/SIDEY.app" \
+	--product-version "$SIDEY_EXPECTED_PRODUCT_VERSION" \
+	--build "$SIDEY_EXPECTED_MAC_BUILD"
+
+"$SIDEY_REPO_ROOT/scripts/macos/tests/test_recording.sh"
