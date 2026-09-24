@@ -330,7 +330,8 @@ protocol GlobalShortcutRegistering: AnyObject {
 
 @MainActor
 final class GlobalShortcutController {
-    private let registrar: any GlobalShortcutRegistering
+    private let registrarLifetime: MainActorResourceLifetime<any GlobalShortcutRegistering>
+    private var registrar: any GlobalShortcutRegistering { registrarLifetime.resource }
     private let onAction: (GlobalShortcutAction) -> Void
     private let onStatusChanged: ([GlobalShortcutAction: GlobalShortcutStatus]) -> Void
     private var configuration: GlobalShortcutConfiguration
@@ -347,14 +348,13 @@ final class GlobalShortcutController {
         onStatusChanged: @escaping ([GlobalShortcutAction: GlobalShortcutStatus]) -> Void = { _ in }
     ) {
         self.configuration = configuration.normalized()
-        self.registrar = registrar
+        self.registrarLifetime = MainActorResourceLifetime(registrar) { $0.unregisterAll() }
         self.onAction = onAction
         self.onStatusChanged = onStatusChanged
     }
 
-    isolated deinit {
-        registrar.unregisterAll()
-    }
+    // The lifetime object performs cleanup without the older isolated-deinit runtime path.
+    nonisolated deinit {}
 
     func install() {
         guard !installed else { return }
@@ -445,23 +445,49 @@ final class CarbonGlobalShortcutRegistrar: GlobalShortcutRegistering {
         let reference: EventHotKeyRef
     }
 
-    private static let signature: OSType = 0x53445948 // SDYH
-    private var handler: ((GlobalShortcutAction, Bool) -> Void)?
-    private var eventHandler: EventHandlerRef?
-    private var registrations: [GlobalShortcutAction: Registration] = [:]
-    private var actionsByIdentifier: [UInt32: GlobalShortcutAction] = [:]
-    private var nextIdentifier: UInt32 = 1
+    private final class Resources {
+        var handler: ((GlobalShortcutAction, Bool) -> Void)?
+        var eventHandler: EventHandlerRef?
+        var registrations: [GlobalShortcutAction: Registration] = [:]
+        var actionsByIdentifier: [UInt32: GlobalShortcutAction] = [:]
 
-    isolated deinit {
-        for registration in registrations.values {
-            UnregisterEventHotKey(registration.reference)
+        @MainActor
+        func unregisterAll() {
+            for registration in registrations.values {
+                UnregisterEventHotKey(registration.reference)
+            }
+            registrations.removeAll()
+            actionsByIdentifier.removeAll()
+            if let eventHandler { RemoveEventHandler(eventHandler) }
+            eventHandler = nil
+            handler = nil
         }
-        if let eventHandler { RemoveEventHandler(eventHandler) }
+
+        @MainActor
+        func handle(_ event: EventRef) -> OSStatus {
+            var identifier = EventHotKeyID()
+            let result = GetEventParameter(
+                event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID),
+                nil, MemoryLayout<EventHotKeyID>.size, nil, &identifier
+            )
+            guard result == noErr, identifier.signature == CarbonGlobalShortcutRegistrar.signature,
+                  let action = actionsByIdentifier[identifier.id]
+            else { return OSStatus(eventNotHandledErr) }
+            handler?(action, GetEventKind(event) == UInt32(kEventHotKeyPressed))
+            return noErr
+        }
     }
 
+    private static let signature: OSType = 0x53445948 // SDYH
+    private let resourceLifetime = MainActorResourceLifetime(Resources()) { $0.unregisterAll() }
+    private var resources: Resources { resourceLifetime.resource }
+    private var nextIdentifier: UInt32 = 1
+
+    nonisolated deinit {}
+
     func installHandler(_ handler: @escaping (GlobalShortcutAction, Bool) -> Void) -> OSStatus {
-        guard eventHandler == nil else { return noErr }
-        self.handler = handler
+        guard resources.eventHandler == nil else { return noErr }
+        resources.handler = handler
         var types = [
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased))
@@ -472,19 +498,20 @@ final class CarbonGlobalShortcutRegistrar: GlobalShortcutRegistering {
                 guard let event, let context else { return OSStatus(eventNotHandledErr) }
                 // The handler is installed on the application's main event target from the main actor.
                 return MainActor.assumeIsolated {
-                    let registrar = Unmanaged<CarbonGlobalShortcutRegistrar>.fromOpaque(context).takeUnretainedValue()
-                    return registrar.handle(event)
+                    let resources = Unmanaged<Resources>.fromOpaque(context).takeUnretainedValue()
+                    return resources.handle(event)
                 }
             },
             types.count, &types,
-            Unmanaged.passUnretained(self).toOpaque(), &eventHandler
+            // Cleanup retains this context until its native handler is removed on MainActor.
+            Unmanaged.passUnretained(resources).toOpaque(), &resources.eventHandler
         )
-        if result != noErr { self.handler = nil }
+        if result != noErr { resources.handler = nil }
         return result
     }
 
     func register(_ action: GlobalShortcutAction, binding: GlobalShortcutBinding) -> OSStatus {
-        guard registrations[action] == nil else { return OSStatus(eventHotKeyExistsErr) }
+        guard resources.registrations[action] == nil else { return OSStatus(eventHotKeyExistsErr) }
         let (status, registration) = makeRegistration(binding: binding)
         if let registration { store(registration, for: action) }
         return status
@@ -494,27 +521,20 @@ final class CarbonGlobalShortcutRegistrar: GlobalShortcutRegistering {
         let (status, replacement) = makeRegistration(binding: binding)
         guard status == noErr, let replacement else { return status }
 
-        if let current = registrations[action] {
+        if let current = resources.registrations[action] {
             let unregisterStatus = UnregisterEventHotKey(current.reference)
             guard unregisterStatus == noErr else {
                 UnregisterEventHotKey(replacement.reference)
                 return unregisterStatus
             }
-            actionsByIdentifier[current.identifier] = nil
+            resources.actionsByIdentifier[current.identifier] = nil
         }
         store(replacement, for: action)
         return noErr
     }
 
     func unregisterAll() {
-        for registration in registrations.values {
-            UnregisterEventHotKey(registration.reference)
-        }
-        registrations.removeAll()
-        actionsByIdentifier.removeAll()
-        if let eventHandler { RemoveEventHandler(eventHandler) }
-        eventHandler = nil
-        handler = nil
+        resources.unregisterAll()
     }
 
     private func makeRegistration(binding: GlobalShortcutBinding) -> (OSStatus, Registration?) {
@@ -531,20 +551,7 @@ final class CarbonGlobalShortcutRegistrar: GlobalShortcutRegistering {
     }
 
     private func store(_ registration: Registration, for action: GlobalShortcutAction) {
-        registrations[action] = registration
-        actionsByIdentifier[registration.identifier] = action
-    }
-
-    private func handle(_ event: EventRef) -> OSStatus {
-        var identifier = EventHotKeyID()
-        let result = GetEventParameter(
-            event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID),
-            nil, MemoryLayout<EventHotKeyID>.size, nil, &identifier
-        )
-        guard result == noErr, identifier.signature == Self.signature,
-              let action = actionsByIdentifier[identifier.id]
-        else { return OSStatus(eventNotHandledErr) }
-        handler?(action, GetEventKind(event) == UInt32(kEventHotKeyPressed))
-        return noErr
+        resources.registrations[action] = registration
+        resources.actionsByIdentifier[registration.identifier] = action
     }
 }

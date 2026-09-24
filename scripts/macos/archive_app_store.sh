@@ -5,27 +5,9 @@ SIDEY_REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && /bin/pwd -P)
 python3 "$SIDEY_REPO_ROOT/scripts/macos/verify_content_assets.py"
 SIDEY_APP_STORE_VERIFIER_URL=${SIDEY_APP_STORE_VERIFIER_URL:-}
 SIDEY_DEVELOPMENT_TEAM=${SIDEY_DEVELOPMENT_TEAM:-}
-SIDEY_SOURCE_VERSIONS=$(python3 - "$SIDEY_REPO_ROOT/macos/SIDEY.xcodeproj/project.pbxproj" <<'PYVERSIONS'
-import re
-import sys
-from pathlib import Path
-source = Path(sys.argv[1]).read_text()
-versions = set()
-for settings in re.findall(r"buildSettings = \{(.*?)\n\s*\};", source, re.S):
-    if "PRODUCT_BUNDLE_IDENTIFIER = app.sidey.desktop.appstore;" not in settings:
-        continue
-    version = re.search(r"MARKETING_VERSION = ([0-9.]+);", settings)
-    build = re.search(r"CURRENT_PROJECT_VERSION = ([0-9]+);", settings)
-    if not version or not build:
-        raise SystemExit("App Store source version is missing")
-    versions.add((version.group(1), build.group(1)))
-if len(versions) != 1:
-    raise SystemExit("App Store Debug and Release source versions must match")
-print(*next(iter(versions)))
-PYVERSIONS
-)
-SIDEY_EXPECTED_MARKETING_VERSION=${SIDEY_EXPECTED_MARKETING_VERSION:-${SIDEY_SOURCE_VERSIONS% *}}
-SIDEY_EXPECTED_BUILD_VERSION=${SIDEY_EXPECTED_BUILD_VERSION:-${SIDEY_SOURCE_VERSIONS##* }}
+python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --check macos
+SIDEY_EXPECTED_MARKETING_VERSION=$(python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --get productVersion)
+SIDEY_EXPECTED_BUILD_VERSION=$(python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --get macBuild)
 SIDEY_ARCHIVE_PATH=${1:-$SIDEY_REPO_ROOT/build/app-store/SIDEY.xcarchive}
 SIDEY_DERIVED_DATA=${SIDEY_DERIVED_DATA:-$SIDEY_REPO_ROOT/build/app-store-derived}
 
@@ -66,6 +48,7 @@ xcodebuild \
 	-scheme SIDEY \
 	-configuration Release \
 	-destination 'generic/platform=macOS' \
+	ONLY_ACTIVE_ARCH=NO \
 	-derivedDataPath "$SIDEY_DERIVED_DATA" \
 	-archivePath "$SIDEY_ARCHIVE_PATH" \
 	-disableAutomaticPackageResolution \
@@ -91,6 +74,8 @@ for SIDEY_REQUIRED_PATH in \
 		exit 1
 	fi
 done
+
+python3 "$SIDEY_REPO_ROOT/scripts/macos/verify_binary_compatibility.py" "$SIDEY_APP"
 
 SIDEY_EXECUTABLE_UUIDS=$(xcrun dwarfdump --uuid "$SIDEY_EXECUTABLE" | awk '{print $2}' | sort)
 SIDEY_DSYM_UUIDS=$(xcrun dwarfdump --uuid "$SIDEY_DSYM_DWARF" | awk '{print $2}' | sort)

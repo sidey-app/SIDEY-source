@@ -21,6 +21,50 @@ public sealed class WindowsShellSurfacePolicyTests
     }
 
     [Fact]
+    public void PopupAboveTaskbarYieldsBehindTaskbar()
+    {
+        nint taskbar = 101;
+        nint popup = 202;
+
+        Assert.Equal(taskbar, WindowsShellSurfacePolicy.BackmostSurface(
+            taskbar, popup, [popup, taskbar]));
+    }
+
+    [Fact]
+    public void TaskbarClickWhilePopupRemainsVisibleYieldsBehindPopup()
+    {
+        nint taskbar = 101;
+        nint popup = 202;
+        nint overlay = 303;
+
+        Assert.Equal(popup, WindowsShellSurfacePolicy.BackmostSurface(
+            taskbar, popup, [taskbar, overlay, popup]));
+        Assert.True(WindowsShellSurfacePolicy.IsWindowAbove(
+            overlay, popup, [taskbar, overlay, popup]));
+        Assert.False(WindowsShellSurfacePolicy.IsWindowAbove(
+            overlay, popup, [taskbar, popup, overlay]));
+    }
+
+    [Fact]
+    public void DisappearedSurfaceYieldsBehindRemainingSurface()
+    {
+        nint taskbar = 101;
+        nint popup = 202;
+
+        Assert.Equal(taskbar, WindowsShellSurfacePolicy.BackmostSurface(
+            taskbar, popup, [taskbar]));
+        Assert.Equal(popup, WindowsShellSurfacePolicy.BackmostSurface(
+            taskbar, popup, [popup]));
+    }
+
+    [Fact]
+    public void MissingSurfacesDoNotYieldOverlay()
+    {
+        Assert.Equal(nint.Zero, WindowsShellSurfacePolicy.BackmostSurface(
+            taskbarWindow: 101, shellWindow: 202, windowsInZOrder: [303]));
+    }
+
+    [Fact]
     public void VisibleTaskbarDoesNotOverrideNormalFullscreenForeground()
     {
         nint popupStyle = new(unchecked((long)0x80000000));

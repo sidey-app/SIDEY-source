@@ -4,6 +4,8 @@ using System.Text;
 
 namespace Sidey.Platform.Windows.Shell;
 
+public readonly record struct WindowsShellYieldSurface(nint Window, bool OverlayAboveWindow);
+
 public static class WindowsShellSurfaceDetector
 {
     private static readonly WindowsShellSurfaceResolver s_resolver = new(
@@ -20,6 +22,46 @@ public static class WindowsShellSurfaceDetector
         }
 
         return s_resolver.ForegroundSurface(monitorBounds);
+    }
+
+    public static WindowsShellYieldSurface YieldSurface(
+        NativePixelRect monitorBounds,
+        nint revealedAutoHideTaskbar,
+        nint overlayWindow)
+    {
+        nint shellSurface = ForegroundSurface(monitorBounds);
+        if (revealedAutoHideTaskbar == nint.Zero && shellSurface == nint.Zero)
+        {
+            return default;
+        }
+
+        int expectedWindowCount = 1
+            + (revealedAutoHideTaskbar != nint.Zero ? 1 : 0)
+            + (shellSurface != nint.Zero && shellSurface != revealedAutoHideTaskbar ? 1 : 0);
+        var windowsInZOrder = new List<nint>(expectedWindowCount);
+        _ = NativeMethods.EnumWindows((window, _) =>
+        {
+            if ((window == revealedAutoHideTaskbar
+                    || window == shellSurface
+                    || window == overlayWindow)
+                && NativeMethods.IsWindowVisible(window))
+            {
+                windowsInZOrder.Add(window);
+            }
+
+            return windowsInZOrder.Count < expectedWindowCount;
+        }, nint.Zero);
+
+        nint yieldBehind = WindowsShellSurfacePolicy.BackmostSurface(
+            revealedAutoHideTaskbar,
+            shellSurface,
+            windowsInZOrder);
+        return new WindowsShellYieldSurface(
+            yieldBehind,
+            WindowsShellSurfacePolicy.IsWindowAbove(
+                overlayWindow,
+                yieldBehind,
+                windowsInZOrder));
     }
 
     private static nint VisibleSurface(NativePixelRect monitorBounds)
@@ -251,6 +293,50 @@ public static class WindowsShellSurfacePolicy
         "WidgetsBoard",
         "WidgetService",
     };
+
+    internal static nint BackmostSurface(
+        nint taskbarWindow,
+        nint shellWindow,
+        IReadOnlyList<nint> windowsInZOrder)
+    {
+        nint backmost = nint.Zero;
+        foreach (nint window in windowsInZOrder)
+        {
+            if (window == taskbarWindow || window == shellWindow)
+            {
+                backmost = window;
+            }
+        }
+
+        return backmost;
+    }
+
+    internal static bool IsWindowAbove(
+        nint overlayWindow,
+        nint surfaceWindow,
+        IReadOnlyList<nint> windowsInZOrder)
+    {
+        if (overlayWindow == nint.Zero || surfaceWindow == nint.Zero)
+        {
+            return false;
+        }
+
+        bool overlaySeen = false;
+        foreach (nint window in windowsInZOrder)
+        {
+            if (window == surfaceWindow)
+            {
+                return overlaySeen;
+            }
+
+            if (window == overlayWindow)
+            {
+                overlaySeen = true;
+            }
+        }
+
+        return false;
+    }
 
     public static bool ShouldYield(string? processName, string? windowClass)
     {
