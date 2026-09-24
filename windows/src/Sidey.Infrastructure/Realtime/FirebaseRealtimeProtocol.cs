@@ -50,7 +50,7 @@ internal sealed class FirebaseRealtimeRoomEvent(
         $"FirebaseRealtimeRoomEvent {{ MessageId = {MessageId:D}, SenderId = {SenderId:D}, Body = <redacted>, Timestamp = {Timestamp}, Sequence = {Sequence}, BubbleWireCode = {BubbleWireCode ?? "<none>"} }}";
 }
 
-internal sealed record FirebaseRealtimeInboxRoom(string Revision, long ChatSequence);
+internal sealed record FirebaseRealtimeInboxRoom(string? Revision, long? ChatSequence);
 
 internal sealed class FirebaseRealtimeRoomPayload(
     IReadOnlyDictionary<Guid, IReadOnlyDictionary<Guid, long>> typing,
@@ -68,10 +68,10 @@ internal sealed class FirebaseRealtimeRoomPayload(
 }
 
 internal sealed class FirebaseRealtimeInboxPayload(
-    string accessRevision,
+    string? accessRevision,
     IReadOnlyDictionary<Guid, FirebaseRealtimeInboxRoom> rooms)
 {
-    public string AccessRevision { get; } = accessRevision;
+    public string? AccessRevision { get; } = accessRevision;
     public IReadOnlyDictionary<Guid, FirebaseRealtimeInboxRoom> Rooms { get; } = rooms;
 }
 
@@ -82,6 +82,7 @@ internal static class FirebaseRealtimeProtocol
     private const long MaxSafeInteger = 9_007_199_254_740_991;
     private const int MaxPayloadBytes = 256 * 1024;
     private const long MaximumRolloutLeaseMilliseconds = 300_000;
+    private const long ServerDatePrecisionMilliseconds = 1_000;
     private const long RefreshLeadMilliseconds = 30_000;
     private static readonly Uri s_databaseUrl =
         new("https://sidey.asia-southeast1.firebasedatabase.app");
@@ -91,12 +92,6 @@ internal static class FirebaseRealtimeProtocol
         "firebaseApiKey", "permissionSync", "protocolVersion", "refreshAfter",
         "rolloutLeaseExpiresAt", "rooms", "wireItems",
     ];
-    private static readonly HashSet<string> s_roomProperties = ["t", "c", "x", "e"];
-    private static readonly HashSet<string> s_eventProperties = ["i", "s", "b", "t", "n", "k"];
-    private static readonly HashSet<string> s_eventRequiredProperties = ["i", "s", "b", "t", "n"];
-    private static readonly HashSet<string> s_inboxProperties = ["a", "r"];
-    private static readonly HashSet<string> s_inboxRoomProperties = ["v", "n"];
-
     public static byte[] CreateBootstrapRequestBody(string? minimumAccessRevision = null)
     {
         if (minimumAccessRevision is null)
@@ -148,6 +143,7 @@ internal static class FirebaseRealtimeProtocol
         if (rolloutLeaseExpiresAt <= receivedAtUnixMilliseconds
             || rolloutLeaseExpiresAt > receivedAtUnixMilliseconds
                 + MaximumRolloutLeaseMilliseconds
+                + ServerDatePrecisionMilliseconds
             || refreshAfter > rolloutLeaseExpiresAt
             || refreshAfter < rolloutLeaseExpiresAt - RefreshLeadMilliseconds)
         {
@@ -176,7 +172,7 @@ internal static class FirebaseRealtimeProtocol
 
         JsonElement wireItemsValue = GetRequiredProperty(root, "wireItems");
         if (wireItemsValue.ValueKind != JsonValueKind.Array
-            || wireItemsValue.GetArrayLength() != 1)
+            || wireItemsValue.GetArrayLength() > 256)
         {
             throw InvalidPayload();
         }
@@ -212,19 +208,43 @@ internal static class FirebaseRealtimeProtocol
         }
 
         JsonElement root = RequireObject(document.RootElement);
-        ValidateProperties(root, s_roomProperties, new HashSet<string>());
+        Dictionary<Guid, IReadOnlyDictionary<Guid, long>> typing = root.TryGetProperty("t", out JsonElement typingValue)
+            ? ParseTyping(typingValue)
+            : [];
+        Dictionary<Guid, long> pulses = root.TryGetProperty("c", out JsonElement pulseValue)
+            ? ParseTimestamps(pulseValue)
+            : [];
+        Dictionary<Guid, FirebaseRealtimeThrow> throws = root.TryGetProperty("x", out JsonElement throwValue)
+            ? ParseThrows(throwValue)
+            : [];
         FirebaseRealtimeRoomEvent? serverEvent = root.TryGetProperty("e", out JsonElement eventValue) ? ParseRoomEvent(eventValue) : null;
-        return CreateRoomPayload([], [], [], serverEvent);
+        return CreateRoomPayload(typing, pulses, throws, serverEvent);
     }
 
     public static FirebaseRealtimeInboxPayload ParseInboxPayload(ReadOnlyMemory<byte> utf8Json)
     {
         using JsonDocument document = ParseDocument(utf8Json);
+        if (document.RootElement.ValueKind == JsonValueKind.Null)
+        {
+            return new FirebaseRealtimeInboxPayload(
+                accessRevision: null,
+                new ReadOnlyDictionary<Guid, FirebaseRealtimeInboxRoom>(
+                    new Dictionary<Guid, FirebaseRealtimeInboxRoom>()));
+        }
+
         JsonElement root = RequireObject(document.RootElement);
-        ValidateProperties(root, s_inboxProperties, s_inboxProperties);
-        string accessRevision = GetRevision(root, "a");
-        JsonElement roomsValue = RequireObject(GetRequiredProperty(root, "r"));
+        string? accessRevision = root.TryGetProperty("a", out JsonElement accessRevisionValue)
+            ? GetRevision(accessRevisionValue)
+            : null;
         Dictionary<Guid, FirebaseRealtimeInboxRoom> rooms = [];
+        if (!root.TryGetProperty("r", out JsonElement roomsProperty))
+        {
+            return new FirebaseRealtimeInboxPayload(
+                accessRevision,
+                new ReadOnlyDictionary<Guid, FirebaseRealtimeInboxRoom>(rooms));
+        }
+
+        JsonElement roomsValue = RequireObject(roomsProperty);
         HashSet<string> names = [];
         foreach (JsonProperty property in roomsValue.EnumerateObject())
         {
@@ -232,12 +252,18 @@ internal static class FirebaseRealtimeProtocol
             {
                 throw InvalidPayload();
             }
-            Guid roomId = ParseGuid(property.Name);
+            if (!TryParseGuid(property.Name, out Guid roomId))
+            {
+                continue;
+            }
             JsonElement roomValue = RequireObject(property.Value);
-            ValidateProperties(roomValue, s_inboxRoomProperties, s_inboxRoomProperties);
             var room = new FirebaseRealtimeInboxRoom(
-                GetRevision(roomValue, "v"),
-                GetPositiveSafeInteger(roomValue, "n"));
+                roomValue.TryGetProperty("v", out JsonElement revisionValue)
+                    ? GetRevision(revisionValue)
+                    : null,
+                roomValue.TryGetProperty("n", out JsonElement sequenceValue)
+                    ? GetPositiveSafeInteger(sequenceValue)
+                    : null);
             if (!rooms.TryAdd(roomId, room))
             {
                 throw InvalidPayload();
@@ -251,17 +277,103 @@ internal static class FirebaseRealtimeProtocol
     public static string RoomPath(Guid roomId) => $"v2/l/{RequireId(roomId, nameof(roomId)):D}";
     public static string InboxPath(Guid userId) => $"v2/n/{RequireId(userId, nameof(userId)):D}";
     public static string TypingPath(Guid roomId, Guid userId, Guid sessionId) =>
-        throw ReservedTransientEvent();
+        $"{RoomPath(roomId)}/t/{RequireId(userId, nameof(userId)):D}/{RequireId(sessionId, nameof(sessionId)):D}";
     public static string CharacterPulsePath(Guid roomId, Guid userId) =>
-        throw ReservedTransientEvent();
+        $"{RoomPath(roomId)}/c/{RequireId(userId, nameof(userId)):D}";
     public static string CharacterThrowPath(Guid roomId, Guid userId) =>
-        throw ReservedTransientEvent();
+        $"{RoomPath(roomId)}/x/{RequireId(userId, nameof(userId)):D}";
     public static string ServerEventPath(Guid roomId) => $"{RoomPath(roomId)}/e";
 
-    public static byte[] CreateServerTimestampBody() => throw ReservedTransientEvent();
+    public static byte[] CreateServerTimestampBody() => "{\".sv\":\"timestamp\"}"u8.ToArray();
 
-    public static byte[] CreateCharacterThrowBody(Guid targetUserId, string wireCode) =>
-        throw ReservedTransientEvent();
+    public static byte[] CreateCharacterThrowBody(Guid targetUserId, string wireCode)
+    {
+        RequireId(targetUserId, nameof(targetUserId));
+        if (!IsWireCode(wireCode, allowZero: true))
+        {
+            throw new ArgumentException("Wire code must be canonical decimal text.", nameof(wireCode));
+        }
+        return JsonSerializer.SerializeToUtf8Bytes(new Dictionary<string, object>
+        {
+            ["u"] = targetUserId.ToString("D"),
+            ["k"] = wireCode,
+            ["t"] = new Dictionary<string, string> { [".sv"] = "timestamp" },
+        });
+    }
+
+    private static Dictionary<Guid, IReadOnlyDictionary<Guid, long>> ParseTyping(JsonElement value)
+    {
+        JsonElement users = RequireObject(value);
+        Dictionary<Guid, IReadOnlyDictionary<Guid, long>> result = [];
+        foreach (JsonProperty userProperty in users.EnumerateObject())
+        {
+            if (!TryParseGuid(userProperty.Name, out Guid userId))
+            {
+                continue;
+            }
+            JsonElement sessions = RequireObject(userProperty.Value);
+            Dictionary<Guid, long> decodedSessions = [];
+            foreach (JsonProperty sessionProperty in sessions.EnumerateObject())
+            {
+                if (!TryParseGuid(sessionProperty.Name, out Guid sessionId))
+                {
+                    continue;
+                }
+                if (!decodedSessions.TryAdd(sessionId, GetPositiveSafeInteger(sessionProperty.Value)))
+                {
+                    throw InvalidPayload();
+                }
+            }
+            if (decodedSessions.Count > 0
+                && !result.TryAdd(userId, new ReadOnlyDictionary<Guid, long>(decodedSessions)))
+            {
+                throw InvalidPayload();
+            }
+        }
+        return result;
+    }
+
+    private static Dictionary<Guid, long> ParseTimestamps(JsonElement value)
+    {
+        JsonElement entries = RequireObject(value);
+        Dictionary<Guid, long> result = [];
+        foreach (JsonProperty property in entries.EnumerateObject())
+        {
+            if (!TryParseGuid(property.Name, out Guid id))
+            {
+                continue;
+            }
+            if (!result.TryAdd(id, GetPositiveSafeInteger(property.Value)))
+            {
+                throw InvalidPayload();
+            }
+        }
+        return result;
+    }
+
+    private static Dictionary<Guid, FirebaseRealtimeThrow> ParseThrows(JsonElement value)
+    {
+        JsonElement entries = RequireObject(value);
+        Dictionary<Guid, FirebaseRealtimeThrow> result = [];
+        foreach (JsonProperty property in entries.EnumerateObject())
+        {
+            if (!TryParseGuid(property.Name, out Guid actorUserId))
+            {
+                continue;
+            }
+            JsonElement payload = RequireObject(property.Value);
+            string wireCode = GetString(payload, "k", 6);
+            if (!IsWireCode(wireCode, allowZero: true)
+                || !result.TryAdd(actorUserId, new FirebaseRealtimeThrow(
+                    GetGuid(payload, "u"),
+                    wireCode,
+                    GetPositiveSafeInteger(payload, "t"))))
+            {
+                throw InvalidPayload();
+            }
+        }
+        return result;
+    }
 
     private static FirebaseRealtimeRoomPayload CreateRoomPayload(
         Dictionary<Guid, IReadOnlyDictionary<Guid, long>> typing,
@@ -276,7 +388,6 @@ internal static class FirebaseRealtimeProtocol
     private static FirebaseRealtimeRoomEvent ParseRoomEvent(JsonElement value)
     {
         JsonElement eventValue = RequireObject(value);
-        ValidateProperties(eventValue, s_eventProperties, s_eventRequiredProperties);
         string? bubbleCode = null;
         if (eventValue.TryGetProperty("k", out JsonElement bubbleValue))
         {
@@ -367,12 +478,15 @@ internal static class FirebaseRealtimeProtocol
 
     private static Guid ParseGuid(string? value)
     {
-        if (!Guid.TryParseExact(value, "D", out Guid result) || result == Guid.Empty)
+        if (!TryParseGuid(value, out Guid result))
         {
             throw InvalidPayload();
         }
         return result;
     }
+
+    private static bool TryParseGuid(string? value, out Guid result) =>
+        Guid.TryParseExact(value, "D", out result) && result != Guid.Empty;
 
     private static string GetSecret(JsonElement value, string propertyName, int maximumLength)
     {
@@ -388,6 +502,16 @@ internal static class FirebaseRealtimeProtocol
     {
         string revision = GetString(value, propertyName, 20);
         if (revision.Length != 20 || revision.Any(character => character is < '0' or > '9'))
+        {
+            throw InvalidPayload();
+        }
+        return revision;
+    }
+
+    private static string GetRevision(JsonElement value)
+    {
+        string revision = GetString(value, 20);
+        if (!IsRevision(revision))
         {
             throw InvalidPayload();
         }
@@ -463,6 +587,4 @@ internal static class FirebaseRealtimeProtocol
     private static InvalidDataException InvalidPayload() =>
         new("Firebase realtime protocol payload is invalid.");
 
-    private static NotSupportedException ReservedTransientEvent() =>
-        new("Compact Firebase transient events are reserved and disabled for clients.");
 }

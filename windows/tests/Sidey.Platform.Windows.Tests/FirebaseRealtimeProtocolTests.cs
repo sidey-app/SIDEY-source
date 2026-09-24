@@ -50,6 +50,20 @@ public sealed class FirebaseRealtimeProtocolTests
         Assert.Equal(s_receivedAt + 30_000, result.RolloutLeaseExpiresAt);
     }
 
+    [Fact]
+    public void BootstrapLeaseAllowsHttpDateSecondPrecisionWindow()
+    {
+        FirebaseRealtimeBootstrapConfiguration result = ParseBootstrap(
+            CreateBootstrapJson(root =>
+            {
+                root["refreshAfter"] = s_receivedAt + 271_000;
+                root["rolloutLeaseExpiresAt"] = s_receivedAt + 301_000;
+            }));
+
+        Assert.Equal(s_receivedAt + 271_000, result.RefreshAfter);
+        Assert.Equal(s_receivedAt + 301_000, result.RolloutLeaseExpiresAt);
+    }
+
     [Theory]
     [InlineData("protocolVersion", 1)]
     [InlineData("databaseURL", "https://sidey.asia-southeast1.firebasedatabase.app/")]
@@ -67,7 +81,7 @@ public sealed class FirebaseRealtimeProtocolTests
     }
 
     [Theory]
-    [InlineData(300_001, 270_001)]
+    [InlineData(301_001, 271_001)]
     [InlineData(300_000, 269_999)]
     [InlineData(300_000, 300_001)]
     public void BootstrapLeaseAndRefreshWindowAreBounded(long leaseOffset, long refreshOffset)
@@ -122,14 +136,16 @@ public sealed class FirebaseRealtimeProtocolTests
             Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
         string unknown = CreateBootstrapJson(root => root["sessionId"] = s_sessionId.ToString("D"));
         string badWireCode = CreateBootstrapJson(root => root["wireItems"] = new JsonArray("01"));
-        string missingWireCode = CreateBootstrapJson(root => root["wireItems"] = new JsonArray());
+        string duplicateWireCode = CreateBootstrapJson(root => root["wireItems"] = new JsonArray("7", "7"));
 
         Assert.Throws<InvalidDataException>(() => ParseBootstrap(duplicate));
         Assert.Throws<InvalidDataException>(() => ParseBootstrap(malformed));
         Assert.Throws<InvalidDataException>(() => ParseBootstrap(tooMany));
         Assert.Throws<InvalidDataException>(() => ParseBootstrap(unknown));
         Assert.Throws<InvalidDataException>(() => ParseBootstrap(badWireCode));
-        Assert.Throws<InvalidDataException>(() => ParseBootstrap(missingWireCode));
+        Assert.Throws<InvalidDataException>(() => ParseBootstrap(duplicateWireCode));
+        Assert.Empty(ParseBootstrap(
+            CreateBootstrapJson(root => root["wireItems"] = new JsonArray())).WireItems);
     }
 
     [Fact]
@@ -147,22 +163,29 @@ public sealed class FirebaseRealtimeProtocolTests
     }
 
     [Fact]
-    public void ReservedCompactTransientPathsAndWritesAreDisabled()
+    public void CompactTransientPathsAndWritesMatchFirebaseContract()
     {
         Assert.Equal($"v2/l/{s_roomId:D}", FirebaseRealtimeProtocol.RoomPath(s_roomId));
         Assert.Equal($"v2/n/{s_userId:D}", FirebaseRealtimeProtocol.InboxPath(s_userId));
         Assert.Equal($"v2/l/{s_roomId:D}/e", FirebaseRealtimeProtocol.ServerEventPath(s_roomId));
 
-        Assert.Throws<NotSupportedException>(() =>
+        Assert.Equal(
+            $"v2/l/{s_roomId:D}/t/{s_userId:D}/{s_sessionId:D}",
             FirebaseRealtimeProtocol.TypingPath(s_roomId, s_userId, s_sessionId));
-        Assert.Throws<NotSupportedException>(() =>
+        Assert.Equal(
+            $"v2/l/{s_roomId:D}/c/{s_userId:D}",
             FirebaseRealtimeProtocol.CharacterPulsePath(s_roomId, s_userId));
-        Assert.Throws<NotSupportedException>(() =>
+        Assert.Equal(
+            $"v2/l/{s_roomId:D}/x/{s_userId:D}",
             FirebaseRealtimeProtocol.CharacterThrowPath(s_roomId, s_userId));
-        Assert.Throws<NotSupportedException>(() =>
-            FirebaseRealtimeProtocol.CreateServerTimestampBody());
-        Assert.Throws<NotSupportedException>(() =>
-            FirebaseRealtimeProtocol.CreateCharacterThrowBody(s_userId, "0"));
+        Assert.Equal(
+            "{\".sv\":\"timestamp\"}",
+            Encoding.UTF8.GetString(FirebaseRealtimeProtocol.CreateServerTimestampBody()));
+        JsonNode throwBody = JsonNode.Parse(
+            FirebaseRealtimeProtocol.CreateCharacterThrowBody(s_userId, "0"))!;
+        Assert.Equal(s_userId.ToString("D"), throwBody["u"]!.GetValue<string>());
+        Assert.Equal("0", throwBody["k"]!.GetValue<string>());
+        Assert.Equal("timestamp", throwBody["t"]![".sv"]!.GetValue<string>());
     }
 
     [Fact]
@@ -173,9 +196,12 @@ public sealed class FirebaseRealtimeProtocolTests
 
         FirebaseRealtimeRoomPayload payload = ParseRoom(json);
 
-        Assert.Empty(payload.Typing);
-        Assert.Empty(payload.CharacterPulses);
-        Assert.Empty(payload.CharacterThrows);
+        Assert.Equal(1_800_000_000_000, payload.Typing[s_userId][s_sessionId]);
+        Assert.Equal(1_800_000_000_001, payload.CharacterPulses[s_userId]);
+        FirebaseRealtimeThrow characterThrow = payload.CharacterThrows[s_userId];
+        Assert.Equal(s_userId, characterThrow.TargetUserId);
+        Assert.Equal("123456", characterThrow.WireCode);
+        Assert.Equal(1_800_000_000_002, characterThrow.Timestamp);
         FirebaseRealtimeRoomEvent roomEvent = Assert.IsType<FirebaseRealtimeRoomEvent>(payload.ServerEvent);
         Assert.Equal(messageId, roomEvent.MessageId);
         Assert.Equal("secret message", roomEvent.Body);
@@ -184,7 +210,6 @@ public sealed class FirebaseRealtimeProtocolTests
     }
 
     [Theory]
-    [InlineData("{\"z\":{}}")]
     [InlineData("{\"e\":{\"i\":\"7d3bb557-56b2-4409-a0bb-daf9046cc555\",\"s\":\"88557669-c870-4903-b545-e42228922306\",\"b\":\"body\",\"t\":1,\"n\":1,\"k\":\"0\"}}")]
     [InlineData("{\"e\":{\"i\":\"7d3bb557-56b2-4409-a0bb-daf9046cc555\",\"s\":\"88557669-c870-4903-b545-e42228922306\",\"b\":\"body\",\"t\":1,\"n\":9007199254740992}}")]
     public void MalformedRoomShapesFailClosed(string json)
@@ -193,15 +218,10 @@ public sealed class FirebaseRealtimeProtocolTests
     }
 
     [Fact]
-    public void ReservedCompactTransientPayloadsAreIgnoredWithoutConsumption()
+    public void MalformedCompactTransientPayloadsFailClosed()
     {
-        FirebaseRealtimeRoomPayload payload = ParseRoom(
-            "{\"t\":false,\"c\":\"reserved\",\"x\":[1,2,3]}");
-
-        Assert.Empty(payload.Typing);
-        Assert.Empty(payload.CharacterPulses);
-        Assert.Empty(payload.CharacterThrows);
-        Assert.Null(payload.ServerEvent);
+        Assert.Throws<InvalidDataException>(() => ParseRoom(
+            "{\"t\":false,\"c\":\"reserved\",\"x\":[1,2,3]}"));
     }
 
     [Fact]
@@ -217,12 +237,78 @@ public sealed class FirebaseRealtimeProtocolTests
         Assert.Equal(9, inbox.Rooms[s_roomId].ChatSequence);
     }
 
+    [Fact]
+    public void NullInboxIsEmptyLikeFirebaseSdkSnapshotSerialization()
+    {
+        FirebaseRealtimeInboxPayload inbox = ParseInbox("null");
+
+        Assert.Null(inbox.AccessRevision);
+        Assert.Empty(inbox.Rooms);
+    }
+
+    [Fact]
+    public void SnapshotDecodersMatchMacExtensionAndInvalidUuidHandling()
+    {
+        FirebaseRealtimeRoomPayload room = ParseRoom(
+            $$"""
+            {
+              "future": true,
+              "c": {
+                "not-a-user": 1800000000000,
+                "{{s_userId:D}}": 1800000000001
+              },
+              "x": {
+                "also-not-a-user": { "u": "{{s_userId:D}}", "k": "0", "t": 1800000000002 },
+                "{{s_userId:D}}": { "u": "{{s_userId:D}}", "k": "0", "t": 1800000000003, "future": true }
+              }
+            }
+            """);
+        Assert.Equal(1_800_000_000_001, room.CharacterPulses[s_userId]);
+        Assert.Equal(1_800_000_000_003, room.CharacterThrows[s_userId].Timestamp);
+
+        FirebaseRealtimeInboxPayload inbox = ParseInbox(
+            $$"""
+            {
+              "future": true,
+              "r": {
+                "not-a-room": { "v": "00000000000000000999" },
+                "{{s_roomId:D}}": { "n": 9, "future": true }
+              }
+            }
+            """);
+        FirebaseRealtimeInboxRoom hint = Assert.Single(inbox.Rooms).Value;
+        Assert.Null(hint.Revision);
+        Assert.Equal(9, hint.ChatSequence);
+    }
+
+    [Fact]
+    public void InboxAcceptsProductionPartialHintShapes()
+    {
+        FirebaseRealtimeInboxPayload accessOnly = ParseInbox(
+            "{\"a\":\"00000000000000000042\"}");
+        Assert.Equal("00000000000000000042", accessOnly.AccessRevision);
+        Assert.Empty(accessOnly.Rooms);
+
+        FirebaseRealtimeInboxPayload partialRooms = ParseInbox(
+            $$"""
+            {
+              "r": {
+                "{{s_roomId:D}}": { "v": "00000000000000000123" },
+                "8e0f24a2-7e1b-4fdb-b8bd-7fe85efc40fb": { "n": 9 }
+              }
+            }
+            """);
+        Assert.Null(partialRooms.AccessRevision);
+        Assert.Equal("00000000000000000123", partialRooms.Rooms[s_roomId].Revision);
+        Assert.Null(partialRooms.Rooms[s_roomId].ChatSequence);
+        Assert.Null(partialRooms.Rooms[Guid.Parse("8e0f24a2-7e1b-4fdb-b8bd-7fe85efc40fb")].Revision);
+        Assert.Equal(9, partialRooms.Rooms[Guid.Parse("8e0f24a2-7e1b-4fdb-b8bd-7fe85efc40fb")].ChatSequence);
+    }
+
     [Theory]
     [InlineData("{\"a\":42,\"r\":{}}")]
     [InlineData("{\"a\":\"0000000000000000042\",\"r\":{}}")]
-    [InlineData("{\"a\":\"00000000000000000042\",\"r\":{},\"extra\":true}")]
     [InlineData("{\"a\":\"00000000000000000042\",\"r\":{\"73527218-54b9-4a6b-9541-8a19072579f3\":{\"v\":\"00000000000000000123\",\"n\":0}}}")]
-    [InlineData("{\"a\":\"00000000000000000042\",\"r\":{\"73527218-54b9-4a6b-9541-8a19072579f3\":{\"v\":\"00000000000000000123\",\"n\":1,\"x\":1}}}")]
     public void MalformedInboxShapesFailClosed(string json)
     {
         Assert.Throws<InvalidDataException>(() => ParseInbox(json));
