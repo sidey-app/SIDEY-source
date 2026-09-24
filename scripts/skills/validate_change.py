@@ -61,8 +61,10 @@ def verify_pr_contract(root, body, paths):
         raise WorkflowError(message) from error
 
 
-def validate_pr_paths(branch, paths):
-    return validate_paths(branch, paths)
+def validate_pr_paths(branch, paths, *, root=None, base=None, revision="HEAD"):
+    return validate_paths(
+        branch, paths, root=root, base=base, revision=revision,
+    )
 
 
 def commit_messages(root, base, revision):
@@ -91,7 +93,9 @@ def resolve_change(root, event):
             pr.get("title"),
         )
         verify_pr_contract(root, pr.get("body"), paths)
-        validate_pr_paths(pr["head"]["ref"], paths)
+        validate_pr_paths(
+            pr["head"]["ref"], paths, root=root, base=base, revision=revision,
+        )
     else:
         verify_commit_contract(commit_messages(root, base, revision))
     # Revalidate edited PR metadata without repeating expensive source
