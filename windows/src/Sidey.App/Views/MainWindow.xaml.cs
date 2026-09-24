@@ -196,13 +196,17 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
 
         capture.PreviewKeyDown += (_, keyArgs) =>
         {
+            GlobalHotkeyModifiers modifiers = CurrentHotkeyModifiers();
+            if (keyArgs.Key == VirtualKey.Tab
+                && (modifiers & ~GlobalHotkeyModifiers.Shift) == GlobalHotkeyModifiers.None)
+                return;
+
             keyArgs.Handled = true;
             if (keyArgs.Key == VirtualKey.Escape)
             {
                 dialog.Hide();
                 return;
             }
-            GlobalHotkeyModifiers modifiers = CurrentHotkeyModifiers();
             uint virtualKey = (uint)keyArgs.Key;
             if (GlobalHotkeyBinding.IsModifierKey(virtualKey))
             {
