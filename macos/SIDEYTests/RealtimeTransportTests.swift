@@ -389,6 +389,267 @@ final class RealtimeTransportTests: XCTestCase {
         XCTAssertEqual(diagnostics.lastSuccessfulProtocol, .firebaseV2)
     }
 
+    func testPresenceDetectedBeforeBootstrapIsPublishedAfterSynchronization() async throws {
+        let firebase = FakeRealtimeTransport(kind: .firebaseV2)
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeFirebaseV2: { firebase }
+        )
+
+        try await router.setLocalPresence(.away)
+        let beforeBootstrap = await firebase.publishedPresence
+        XCTAssertTrue(beforeBootstrap.isEmpty)
+
+        _ = try await router.synchronize(rooms: [], activeRoomID: nil)
+
+        let afterBootstrap = await firebase.publishedPresence
+        XCTAssertEqual(afterBootstrap, [.away])
+        await router.shutdown()
+    }
+
+    func testInitialPresenceFailureDoesNotBlockReconciliationAndRetriesTheSeededState() async throws {
+        let retryScheduled = expectation(description: "initial presence retry scheduled")
+        let awayPublished = expectation(description: "seeded away retried successfully")
+        let retryClock = PresenceRetryClock(onSleep: { retryScheduled.fulfill() })
+        let firebase = FakeRealtimeTransport(
+            kind: .firebaseV2,
+            presenceFailureCount: 1,
+            onPresencePublished: { _ in awayPublished.fulfill() }
+        )
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeFirebaseV2: { firebase },
+            presenceRetrySleep: { try await retryClock.sleep($0) }
+        )
+        let roomID = UUID()
+        let rooms = [
+            Room(id: roomID, name: "친구", ownerID: UUID(), members: [], inviteCodeHint: "TEST"),
+        ]
+        try await router.setLocalPresence(.away)
+
+        let reconciliation = try await router.synchronize(rooms: rooms, activeRoomID: roomID)
+
+        XCTAssertEqual(reconciliation.snapshot.rooms.map(\.id), [roomID])
+        XCTAssertEqual(reconciliation.activeRoomID, roomID)
+        await fulfillment(of: [retryScheduled], timeout: 2)
+        let beforeRetry = await firebase.publishedPresence
+        XCTAssertTrue(beforeRetry.isEmpty)
+        await retryClock.advance()
+        await fulfillment(of: [awayPublished], timeout: 2)
+
+        let attempts = await firebase.presenceAttempts
+        let published = await firebase.publishedPresence
+        XCTAssertEqual(attempts, [.away, .away])
+        XCTAssertEqual(published, [.away])
+        await router.shutdown()
+    }
+
+    func testWakeDuringFirebaseRecoveryPublishesLatestPresenceWithoutMoreActivity() async throws {
+        let expired = FakeRealtimeTransport(kind: .firebaseV2)
+        let replacement = FakeRealtimeTransport(kind: .firebaseV2)
+        let factoryEntered = expectation(description: "replacement creation started")
+        let factoryGate = PresenceTestGate()
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeFirebaseV2: { expired },
+            makeFirebaseV2ForRecovery: {
+                factoryEntered.fulfill()
+                await factoryGate.wait()
+                return replacement
+            }
+        )
+        _ = try await router.synchronize(rooms: [], activeRoomID: nil)
+        try await router.setLocalPresence(.away)
+
+        let recovery = Task { try await router.refreshRolloutLease() }
+        await fulfillment(of: [factoryEntered], timeout: 2)
+        try await router.setLocalPresence(.online)
+        try await router.setLocalPresence(.away)
+        try await router.setLocalPresence(.online)
+        await factoryGate.open()
+        try await recovery.value
+
+        let expiredPresence = await expired.publishedPresence
+        let replacementPresence = await replacement.publishedPresence
+        XCTAssertEqual(expiredPresence, [.away])
+        XCTAssertEqual(replacementPresence, [.online])
+        let selection = try await router.currentSelection()
+        XCTAssertEqual(selection.active, .firebaseV2)
+        await router.shutdown()
+    }
+
+    func testLatePresenceCompletionFromRetiredTransportCannotClearNewerIntent() async throws {
+        let expired = FakeRealtimeTransport(kind: .firebaseV2)
+        let replacement = FakeRealtimeTransport(kind: .firebaseV2)
+        let publicationEntered = expectation(description: "old online publication suspended")
+        let publicationGate = PresenceTestGate()
+        let factoryEntered = expectation(description: "replacement creation started")
+        let factoryGate = PresenceTestGate()
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeFirebaseV2: { expired },
+            makeFirebaseV2ForRecovery: {
+                factoryEntered.fulfill()
+                await factoryGate.wait()
+                return replacement
+            }
+        )
+        _ = try await router.synchronize(rooms: [], activeRoomID: nil)
+        try await router.setLocalPresence(.away)
+        await expired.pauseNextPresencePublication(at: publicationGate) {
+            publicationEntered.fulfill()
+        }
+        let oldPublication = Task { try await router.setLocalPresence(.online) }
+        await fulfillment(of: [publicationEntered], timeout: 2)
+
+        let recovery = Task { try await router.refreshRolloutLease() }
+        await fulfillment(of: [factoryEntered], timeout: 2)
+        try await router.setLocalPresence(.away)
+        // The server completion deliberately ignores retirement/cancellation.
+        await publicationGate.open()
+        try await oldPublication.value
+        await factoryGate.open()
+        try await recovery.value
+
+        let oldPublished = await expired.publishedPresence
+        let replacementPublished = await replacement.publishedPresence
+        XCTAssertEqual(oldPublished, [.away, .online])
+        XCTAssertEqual(replacementPublished, [.away])
+        await router.shutdown()
+    }
+
+    func testFailedPresencePublicationRetriesWithoutAnotherActivityChange() async throws {
+        let retryScheduled = expectation(description: "presence retry scheduled")
+        let onlinePublished = expectation(description: "online retried successfully")
+        let retryClock = PresenceRetryClock(onSleep: { retryScheduled.fulfill() })
+        let legacyFactory = FakeTransportFactory(kind: .legacySupabase)
+        let firebase = FakeRealtimeTransport(
+            kind: .firebaseV2,
+            presenceFailureCount: 1,
+            onPresencePublished: { _ in onlinePublished.fulfill() }
+        )
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeLegacy: { legacyFactory.make() },
+            makeFirebaseV2: { firebase },
+            makeLegacyForSwitch: { legacyFactory.make() },
+            presenceRetrySleep: { try await retryClock.sleep($0) }
+        )
+        _ = try await router.synchronize(rooms: [], activeRoomID: nil)
+
+        try await router.setLocalPresence(.online)
+        await fulfillment(of: [retryScheduled], timeout: 2)
+        let beforeRetry = await firebase.publishedPresence
+        XCTAssertTrue(beforeRetry.isEmpty)
+        await retryClock.advance()
+        await fulfillment(of: [onlinePublished], timeout: 2)
+
+        let attempts = await firebase.presenceAttempts
+        let published = await firebase.publishedPresence
+        XCTAssertEqual(attempts, [.online, .online])
+        XCTAssertEqual(published, [.online])
+        XCTAssertEqual(legacyFactory.creationCount, 0)
+        await router.shutdown()
+    }
+
+    func testClosedGrantRetainsPresenceUntilConvergenceWithoutLegacyFallback() async throws {
+        let retryScheduled = expectation(description: "closed grant defers presence")
+        let retryClock = PresenceRetryClock(onSleep: { retryScheduled.fulfill() })
+        let legacy = FakeRealtimeTransport(kind: .legacySupabase)
+        let firebase = FakeRealtimeTransport(kind: .firebaseV2, presenceGrantClosed: true)
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeLegacy: { legacy },
+            makeFirebaseV2: { firebase },
+            presenceRetrySleep: { try await retryClock.sleep($0) }
+        )
+        _ = try await router.synchronize(rooms: [], activeRoomID: nil)
+
+        try await router.setLocalPresence(.online)
+        await fulfillment(of: [retryScheduled], timeout: 2)
+        let beforeConvergence = await firebase.publishedPresence
+        XCTAssertTrue(beforeConvergence.isEmpty)
+        try await router.convergeAccessGrant(
+            revision: XCTUnwrap(RealtimeRevision(rawValue: "00000000000000000042")),
+            requiresEntitlement: false
+        )
+
+        let afterConvergence = await firebase.publishedPresence
+        let legacyOperations = await legacy.operationCount
+        XCTAssertEqual(afterConvergence, [.online])
+        XCTAssertEqual(legacyOperations, 0)
+        await router.shutdown()
+    }
+
+    func testShutdownCancelsPendingPresenceRetryAndRejectsLaterUpdates() async throws {
+        let retryScheduled = expectation(description: "presence retry scheduled")
+        let retryCancelled = expectation(description: "presence retry cancelled")
+        let retryClock = PresenceRetryClock(
+            onSleep: { retryScheduled.fulfill() },
+            onCancel: { retryCancelled.fulfill() }
+        )
+        let firebase = FakeRealtimeTransport(kind: .firebaseV2, presenceFailureCount: 1)
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeFirebaseV2: { firebase },
+            presenceRetrySleep: { try await retryClock.sleep($0) }
+        )
+        _ = try await router.synchronize(rooms: [], activeRoomID: nil)
+        try await router.setLocalPresence(.online)
+        await fulfillment(of: [retryScheduled], timeout: 2)
+
+        await router.shutdown()
+        await fulfillment(of: [retryCancelled], timeout: 2)
+        await retryClock.advance()
+        do {
+            try await router.setLocalPresence(.away)
+            XCTFail("Presence updates after shutdown must be rejected")
+        } catch is CancellationError {
+            // The session no longer accepts desired presence.
+        }
+
+        let attempts = await firebase.presenceAttempts
+        XCTAssertEqual(attempts, [.online])
+    }
+
+    func testShutdownDuringReplacementCreationCannotPublishOrReviveTheRouter() async throws {
+        let expired = FakeRealtimeTransport(kind: .firebaseV2)
+        let replacement = FakeRealtimeTransport(kind: .firebaseV2)
+        let factoryEntered = expectation(description: "replacement creation started")
+        let factoryGate = PresenceTestGate()
+        let router = try RoomMessagingTransportRouter(
+            selection: .resolve(requested: .firebaseV2, firebaseV2Allowed: true),
+            makeFirebaseV2: { expired },
+            makeFirebaseV2ForRecovery: {
+                factoryEntered.fulfill()
+                await factoryGate.wait()
+                return replacement
+            }
+        )
+        _ = try await router.synchronize(rooms: [], activeRoomID: nil)
+        try await router.setLocalPresence(.away)
+        let recovery = Task { try await router.refreshRolloutLease() }
+        await fulfillment(of: [factoryEntered], timeout: 2)
+        try await router.setLocalPresence(.online)
+
+        await router.shutdown()
+        await factoryGate.open()
+        do {
+            try await recovery.value
+            XCTFail("A replacement created after shutdown must not become ready")
+        } catch {
+            // Cancellation or an unavailable topology both keep the session closed.
+        }
+
+        let replacementPresence = await replacement.publishedPresence
+        let replacementRetirements = await replacement.retirementCount
+        XCTAssertTrue(replacementPresence.isEmpty)
+        XCTAssertEqual(replacementRetirements, 1)
+        await assertThrowsAsync(RoomMessagingTransportRouterError.transportTopologyUnavailable) {
+            _ = try await router.currentSelection()
+        }
+    }
+
     @MainActor
     func testLegacySelectionNeverRebuildsFirebase() async throws {
         let legacy = FakeRealtimeTransport(kind: .legacySupabase)
@@ -637,17 +898,29 @@ private actor FakeRealtimeTransport: RoomMessagingTransport {
     private(set) var shutdownCount = 0
     private(set) var retirementCount = 0
     private(set) var grantRequests: [FakeGrantRequest] = []
+    private(set) var presenceAttempts: [PresenceState] = []
+    private(set) var publishedPresence: [PresenceState] = []
+    private var presenceFailureCount: Int
+    private var presenceGrantClosed: Bool
+    private let onPresencePublished: (@Sendable (PresenceState) -> Void)?
+    private var beforeNextPresencePublication: (@Sendable () async -> Void)?
 
     init(
         kind: RealtimeTransportKind,
         failure: (any Error)? = nil,
         failureCount: Int = .max,
-        chatOutcome: RealtimeChatOutcome? = nil
+        chatOutcome: RealtimeChatOutcome? = nil,
+        presenceFailureCount: Int = 0,
+        presenceGrantClosed: Bool = false,
+        onPresencePublished: (@Sendable (PresenceState) -> Void)? = nil
     ) {
         self.kind = kind
         self.failure = failure
         self.remainingFailureCount = failure == nil ? 0 : failureCount
         self.chatOutcome = chatOutcome
+        self.presenceFailureCount = presenceFailureCount
+        self.presenceGrantClosed = presenceGrantClosed
+        self.onPresencePublished = onPresencePublished
         let pair = AsyncStream<BackendEvent>.makeStream(bufferingPolicy: .bufferingNewest(8))
         self.events = pair.stream
         self.eventContinuation = pair.continuation
@@ -663,7 +936,32 @@ private actor FakeRealtimeTransport: RoomMessagingTransport {
     }
 
     func setActiveRoom(_ roomID: UUID?) async throws { try recordOperation() }
-    func setLocalPresence(_ state: PresenceState) async throws { try recordOperation() }
+    func setLocalPresence(_ state: PresenceState) async throws {
+        presenceAttempts.append(state)
+        try recordOperation()
+        guard !presenceGrantClosed else { throw FakeTransportError.permissionDenied }
+        if presenceFailureCount > 0 {
+            presenceFailureCount -= 1
+            throw FakeTransportError.permissionDenied
+        }
+        if let beforePublication = beforeNextPresencePublication {
+            beforeNextPresencePublication = nil
+            await beforePublication()
+        }
+        publishedPresence.append(state)
+        onPresencePublished?(state)
+    }
+
+    func pauseNextPresencePublication(
+        at gate: PresenceTestGate,
+        onEnter: @escaping @Sendable () -> Void
+    ) {
+        beforeNextPresencePublication = {
+            onEnter()
+            await gate.wait()
+        }
+    }
+
     func publishTyping(roomID: UUID, event: String) async throws { try recordOperation() }
     func publishCharacterPulse(roomID: UUID, eventID: UUID) async throws { try recordOperation() }
     func publishCharacterThrow(roomID: UUID, eventID: UUID, targetUserID: UUID) async throws {
@@ -674,6 +972,7 @@ private actor FakeRealtimeTransport: RoomMessagingTransport {
         requiresEntitlement: Bool
     ) async throws {
         try recordOperation()
+        presenceGrantClosed = false
         grantRequests.append(FakeGrantRequest(
             revision: revision,
             requiresEntitlement: requiresEntitlement
@@ -713,5 +1012,58 @@ private actor FakeRealtimeTransport: RoomMessagingTransport {
             remainingFailureCount -= 1
             throw failure
         }
+    }
+}
+
+private actor PresenceTestGate {
+    private var isOpen = false
+    private var continuation: CheckedContinuation<Void, Never>?
+
+    func wait() async {
+        guard !isOpen else { return }
+        await withCheckedContinuation { continuation = $0 }
+    }
+
+    func open() {
+        isOpen = true
+        continuation?.resume()
+        continuation = nil
+    }
+}
+
+private actor PresenceRetryClock {
+    private let onSleep: @Sendable () -> Void
+    private let onCancel: @Sendable () -> Void
+    private var continuation: CheckedContinuation<Void, any Error>?
+
+    init(
+        onSleep: @escaping @Sendable () -> Void,
+        onCancel: @escaping @Sendable () -> Void = {}
+    ) {
+        self.onSleep = onSleep
+        self.onCancel = onCancel
+    }
+
+    func sleep(_ duration: Duration) async throws {
+        try Task.checkCancellation()
+        try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                self.continuation = continuation
+                onSleep()
+            }
+        } onCancel: {
+            Task { await self.cancel() }
+        }
+    }
+
+    func advance() {
+        continuation?.resume()
+        continuation = nil
+    }
+
+    private func cancel() {
+        continuation?.resume(throwing: CancellationError())
+        continuation = nil
+        onCancel()
     }
 }

@@ -3,6 +3,9 @@ Unicode true
 !ifndef APP_VERSION
   !error "APP_VERSION is required."
 !endif
+!ifndef APP_UPDATE_VERSION
+  !error "APP_UPDATE_VERSION is required."
+!endif
 !ifndef APP_FILE_VERSION
   !error "APP_FILE_VERSION is required."
 !endif
@@ -246,7 +249,7 @@ Var InstallerCompletedCleanly
 
 !macro RunInstallTransaction ACTION RESULT
   ClearErrors
-  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action ${ACTION} --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --version "${APP_VERSION}"' ${RESULT}
+  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action ${ACTION} --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --product-version "${APP_VERSION}" --update-version "${APP_UPDATE_VERSION}"' ${RESULT}
   ${If} ${Errors}
     StrCpy ${RESULT} 5
   ${EndIf}
@@ -303,7 +306,7 @@ Function .onInit
   ${EndIf}
 
   ${If} $InstalledVersion != ""
-    ${VersionCompare} $InstalledVersion "${APP_VERSION}" $VersionResult
+    ${VersionCompare} $InstalledVersion "${APP_UPDATE_VERSION}" $VersionResult
     ${If} $VersionResult == 1
       MessageBox MB_OK|MB_ICONSTOP "$(DowngradeBlocked)"
       Quit
@@ -646,7 +649,7 @@ Section "SIDEY" MainSection
   WriteRegDWORD HKLM "${PRODUCT_UNINSTALL_KEY}" "NoModify" 1
   WriteRegDWORD HKLM "${PRODUCT_UNINSTALL_KEY}" "NoRepair" 1
   WriteRegStr HKLM "${PRODUCT_UNINSTALL_KEY}" "DisplayVersion" "${APP_VERSION}"
-  WriteRegStr HKLM "${PRODUCT_REGISTRY_KEY}" "InstalledVersion" "${APP_VERSION}"
+  WriteRegStr HKLM "${PRODUCT_REGISTRY_KEY}" "InstalledVersion" "${APP_UPDATE_VERSION}"
   IfErrors registration_failed
 
   !insertmacro RunInstallTransaction "Commit" $0
@@ -902,7 +905,7 @@ Section "Uninstall"
   StrCpy $StagingDirectory "$INSTDIR.sidey-staging-$0"
   StrCpy $RollbackDirectory "$INSTDIR.sidey-rollback"
   ClearErrors
-  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action CleanupForUninstall --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --version "${APP_VERSION}"' $0
+  ExecWait '"$PLUGINSDIR\Sidey.InstallTransaction.exe" --action CleanupForUninstall --install-directory "$INSTDIR" --staging-directory "$StagingDirectory" --rollback-directory "$RollbackDirectory" --product-version "${APP_VERSION}" --update-version "${APP_UPDATE_VERSION}"' $0
   ${If} ${Errors}
     StrCpy $0 5
   ${EndIf}

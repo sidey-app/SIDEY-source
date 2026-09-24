@@ -15,11 +15,15 @@ public sealed record AvailableUpdate(
     string Version,
     Uri? InstallerUri = null,
     string? Sha256 = null,
-    Uri? ReleaseNotesUri = null);
+    Uri? ReleaseNotesUri = null,
+    string? UpdateVersion = null,
+    string? UpdateTag = null);
 
 public interface IUpdateService
 {
     public string CurrentVersion { get; }
+
+    public string CurrentUpdateVersion { get; }
 
     public DateTimeOffset? LastCheckedAt { get; }
 

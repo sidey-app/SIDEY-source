@@ -1065,18 +1065,21 @@ actor SideyBackend {
     }
 
     private func performPresencePublication(_ intent: PresencePublicationIntent) async throws {
-        guard !connectionTracker.desiredRoomIDs.isEmpty else { return }
+        let desiredRoomIDs = connectionTracker.desiredRoomIDs
+        guard !desiredRoomIDs.isEmpty else { return }
         guard let userID = client.auth.currentUser?.id else {
             throw SideyBackendError.realtimeUnavailable
         }
         guard client.realtimeV2.status == .connected else {
             throw SideyBackendError.realtimeUnavailable
         }
+        let generation = realtimeGeneration
+        let publicationChannels = channels
 
         // A publication is a complete desired-room batch. Missing or
         // unsubscribed channels are errors instead of silently producing a
         // partial Presence state that can make two rooms look active.
-        for roomID in connectionTracker.desiredRoomIDs.sorted(by: {
+        for roomID in desiredRoomIDs.sorted(by: {
             $0.uuidString < $1.uuidString
         }) {
             guard let roomChannels = channels[roomID],
@@ -1096,6 +1099,29 @@ actor SideyBackend {
                 state: state,
                 onlineAt: ISO8601DateFormatter().string(from: .now)
             ))
+            // track does not expose the server acknowledgement. At least reject
+            // a batch whose connection or channels changed while it suspended,
+            // including replacements that reuse the same realtime generation.
+            guard !isShuttingDown,
+                  !Task.isCancelled,
+                  generation == realtimeGeneration,
+                  client.auth.currentUser?.id == userID,
+                  client.realtimeV2.status == .connected,
+                  connectionTracker.desiredRoomIDs == desiredRoomIDs,
+                  desiredRoomIDs.allSatisfy({ roomID in
+                      guard let original = publicationChannels[roomID],
+                            let current = channels[roomID]
+                      else { return false }
+                      return current.generation == generation
+                          && current.database === original.database
+                          && current.ephemeral === original.ephemeral
+                          && current.database.status == .subscribed
+                          && current.ephemeral.status == .subscribed
+                          && desiredTopology.epoch(for: roomID) == current.epoch
+                  })
+            else {
+                throw SideyBackendError.realtimeUnavailable
+            }
         }
     }
 

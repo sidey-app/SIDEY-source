@@ -10,6 +10,13 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from sidey_version import (  # noqa: E402
+    VersionError,
+    check_platform,
+    load_version,
+)
+
 
 ROOT = Path(__file__).resolve().parents[2]
 SEMVER = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
@@ -30,8 +37,16 @@ def load_manifest(platform: str) -> dict[str, object]:
     path = ROOT / "release" / f"{platform}.json"
     data = json.loads(path.read_text(encoding="utf-8"))
     required = {"schema", "platform", "channel", "version"}
+    windows_generated = (ROOT / "windows" / "Version.props").is_file()
     if platform == "macos":
         required.add("build")
+    elif windows_generated:
+        required.update({
+            "windowsRevision",
+            "updateVersion",
+            "releaseVersion",
+            "msixVersion",
+        })
     require(set(data) == required, f"{path} must contain exactly {sorted(required)}")
     require(data["schema"] == 1, f"{path} has an unsupported schema")
     require(data["platform"] == platform, f"{path} has the wrong platform")
@@ -47,6 +62,36 @@ def load_manifest(platform: str) -> dict[str, object]:
             isinstance(data["build"], int) and data["build"] > 0,
             f"{path} must contain a positive numeric build",
         )
+    elif windows_generated:
+        require(
+            isinstance(data["windowsRevision"], int)
+            and 0 <= data["windowsRevision"] <= 999,
+            f"{path} must contain a Windows revision from 0 through 999",
+        )
+        for key in ("updateVersion", "releaseVersion"):
+            require(
+                isinstance(data[key], str) and SEMVER.fullmatch(data[key]),
+                f"{path} must contain a stable {key}",
+            )
+    source = load_version(ROOT)
+    require(
+        data["version"] == source.product_version,
+        f"{path} product version does not match release/version.json",
+    )
+    if platform == "macos":
+        require(
+            data["build"] == source.mac_build,
+            f"{path} build does not match release/version.json",
+        )
+    elif windows_generated:
+        require(data["windowsRevision"] == source.windows_revision,
+                f"{path} revision does not match release/version.json")
+        require(data["updateVersion"] == source.windows_update_version,
+                f"{path} update version does not match release/version.json")
+        require(data["releaseVersion"] == source.windows_release_version,
+                f"{path} release version does not match release/version.json")
+        require(data["msixVersion"] == source.msix_version,
+                f"{path} MSIX version does not match release/version.json")
     return data
 
 
@@ -88,10 +133,19 @@ def validate_macos() -> dict[str, str]:
     build = str(manifest["build"])
     project = read("macos/SIDEY.xcodeproj/project.pbxproj")
     bundle = "app.sidey.desktop.appstore"
-    require(project_value_for_bundle_identifier(project, bundle, "MARKETING_VERSION") == version,
-            "Mac App Store project version does not match release/macos.json")
-    require(project_value_for_bundle_identifier(project, bundle, "CURRENT_PROJECT_VERSION") == build,
-            "Mac App Store project build does not match release/macos.json")
+    if (ROOT / "macos" / "Config" / "Version.xcconfig").is_file():
+        check_platform("macos", ROOT)
+        require("MARKETING_VERSION =" not in project,
+                "Mac App Store project must not duplicate the Product Version")
+        require("CURRENT_PROJECT_VERSION =" not in project,
+                "Mac App Store project must not duplicate the macOS build number")
+        require(project.count("/* Version.xcconfig */") >= 3,
+                "Mac App Store Debug and Release must use Version.xcconfig")
+    else:
+        require(project_value_for_bundle_identifier(project, bundle, "MARKETING_VERSION") == version,
+                "Mac App Store project version does not match release/macos.json")
+        require(project_value_for_bundle_identifier(project, bundle, "CURRENT_PROJECT_VERSION") == build,
+                "Mac App Store project build does not match release/macos.json")
     release_data = read("website/src/data/releases.ts")
     require("appStoreURLForLocale" in release_data,
             "website macOS installation must use the Mac App Store")
@@ -100,19 +154,42 @@ def validate_macos() -> dict[str, str]:
     return {"version": version, "build": build, "tag": f"appstore-{version}-{build}"}
 
 
+def windows_release_tag(version: str) -> str:
+    tag = f"windows-v{version}"
+    return tag
+
+
 def validate_windows(allow_unreleased_source: bool = False) -> dict[str, str]:
     manifest = load_manifest("windows")
     version = str(manifest["version"])
-    tag = f"windows-v{version}"
-    installer_name = f"SIDEY-Windows-x64-v{version}-Setup.exe"
+    generated_path = ROOT / "windows" / "Version.props"
+    generated_versions = generated_path.is_file()
+    update_version = str(manifest.get("updateVersion", version))
+    release_version = str(manifest.get("releaseVersion", version))
+    tag = windows_release_tag(release_version)
+    installer_name = f"SIDEY-Windows-x64-v{release_version}-Setup.exe"
     installer_url = (
         f"https://github.com/sidey-app/SIDEY/releases/download/{tag}/{installer_name}"
     )
     notes = f"docs/releases/{tag}.md"
 
     project = ET.parse(ROOT / "windows" / "src" / "Sidey.App" / "Sidey.App.csproj")
-    values = {element.tag: (element.text or "") for element in project.getroot().iter()}
-    source_version = values.get("Version", "")
+    project_values = {
+        element.tag: (element.text or "") for element in project.getroot().iter()
+    }
+    if generated_versions:
+        check_platform("windows", ROOT)
+        require(
+            all(name not in project_values for name in
+                ("Version", "FileVersion", "AssemblyVersion", "InformationalVersion")),
+            "Windows app project must not duplicate generated version properties",
+        )
+        generated = ET.parse(generated_path)
+        values = {element.tag: (element.text or "") for element in generated.getroot().iter()}
+        source_version = values.get("SideyProductVersion", "")
+    else:
+        values = project_values
+        source_version = values.get("Version", "")
     require(SEMVER.fullmatch(source_version) is not None,
             "Windows project must contain a stable semantic version")
     if source_version != version:
@@ -122,10 +199,25 @@ def validate_windows(allow_unreleased_source: bool = False) -> dict[str, str]:
             tuple(map(int, source_version.split(".")))
             > tuple(map(int, version.split("."))),
                 "unreleased Windows source version must be newer than the public release")
-    require(values.get("FileVersion") == f"{source_version}.0",
-            "Windows file version does not match the project version")
-    require(values.get("AssemblyVersion") == f"{source_version}.0",
-            "Windows assembly version does not match the project version")
+    if generated_versions:
+        resolved = load_version(ROOT)
+        require(values.get("FileVersion") == resolved.msix_version,
+                "Windows file version does not match the MSIX-compatible version")
+        require(values.get("SideyMsixVersion") == resolved.msix_version,
+                "Windows MSIX version property does not match release/version.json")
+        require(values.get("SideyWindowsUpdateVersion") == resolved.windows_update_version,
+                "Windows update version property does not match release/version.json")
+        require(values.get("SideyWindowsReleaseVersion") == resolved.windows_release_version,
+                "Windows release version property does not match release/version.json")
+        require(values.get("AssemblyVersion") == resolved.assembly_version,
+                "Windows assembly version does not match the Product Version")
+        require(values.get("InformationalVersion") == source_version,
+                "Windows informational version does not match the Product Version")
+    else:
+        require(values.get("FileVersion") == f"{source_version}.0",
+                "Windows file version does not match the project version")
+        require(values.get("AssemblyVersion") == f"{source_version}.0",
+                "Windows assembly version does not match the project version")
     update_source_paths = sorted(
         (ROOT / "windows" / "src" / "Sidey.Platform.Windows").rglob(
             "WindowsUpdateService.cs"
@@ -136,20 +228,28 @@ def validate_windows(allow_unreleased_source: bool = False) -> dict[str, str]:
         "Windows updater source must resolve to exactly one WindowsUpdateService.cs",
     )
     update_source = update_source_paths[0].read_text(encoding="utf-8")
-    require(f'CurrentVersion = "{source_version}"' in update_source,
-            "Windows updater version does not match the project version")
-    require((ROOT / notes).is_file(), f"Windows release notes are missing: {notes}")
+    if generated_versions:
+        require(re.search(r"\bconst\s+string\s+CurrentVersion\s*=", update_source) is None,
+                "Windows updater must derive its current version from the app assembly")
+    else:
+        require(f'CurrentVersion = "{source_version}"' in update_source,
+                "Windows updater version does not match the project version")
+    if not allow_unreleased_source:
+        require((ROOT / notes).is_file(), f"Windows release notes are missing: {notes}")
 
     release_data = read("website/src/data/releases.ts")
     require("version: windowsRelease.version" in release_data,
             "website release data must derive the Windows version from release/windows.json")
-    require("SIDEY-Windows-x64-v${windowsRelease.version}-Setup.exe" in release_data,
+    require("SIDEY-Windows-x64-v${windowsReleaseVersion}-Setup.exe" in release_data,
             "website release data has the wrong Windows installer URL template")
-    require("releases/tag/windows-v${windowsRelease.version}" in release_data,
+    require("releases/tag/windows-v${windowsReleaseVersion}" in release_data,
             "website release data has the wrong Windows release URL template")
 
     return {
         "version": version,
+        "product_version": version,
+        "update_version": update_version,
+        "release_version": release_version,
         "tag": tag,
         "installer_name": installer_name,
         "installer_url": installer_url,
@@ -192,7 +292,7 @@ def main() -> int:
         if args.platform in ("all", "windows"):
             windows = validate_windows(args.allow_unreleased_source)
             outputs = windows if args.platform == "windows" else outputs
-    except (ConsistencyError, ET.ParseError, json.JSONDecodeError) as error:
+    except (ConsistencyError, VersionError, ET.ParseError, json.JSONDecodeError) as error:
         print(f"release consistency error: {error}", file=sys.stderr)
         return 1
 

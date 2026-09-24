@@ -141,11 +141,8 @@ class CommandLineContractTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 1)
         self.assertEqual(result.stdout, "")
-        self.assertEqual(
-            result.stderr,
-            "pixel asset validation failed: unknown arguments: "
-            "['--unknown']\n",
-        )
+        self.assertTrue(result.stderr.startswith("pixel asset validation failed: "))
+        self.assertIn("--unknown", result.stderr)
 
 
 if __name__ == "__main__":

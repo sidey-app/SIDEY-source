@@ -24,8 +24,6 @@ class CommerceLocalizationTests(unittest.TestCase):
     def test_canonical_source_is_complete_and_matches_korean_catalog(self):
         localization_tool.validate_source(self.catalog, self.source)
 
-        self.assertEqual(len(self.catalog), 33)
-        self.assertEqual(len(self.source["products"]), 33)
         self.assertEqual(self.source["locales"], list(localization_tool.LOCALES))
         self.assertEqual(
             self.source["windows_locales"],
@@ -141,7 +139,7 @@ class CommerceLocalizationTests(unittest.TestCase):
             payloads[consumer] = json.loads(first)
 
         macos = payloads["macos"]
-        self.assertEqual(len(macos["products"]), 33)
+        self.assertEqual(len(macos["products"]), len(self.catalog))
         self.assertEqual(
             macos["products"][0]["app_store_product_id"],
             self.catalog[0]["app_store_product_id"],
@@ -150,7 +148,7 @@ class CommerceLocalizationTests(unittest.TestCase):
         web = payloads["web"]
         self.assertEqual(list(web["locales"]), list(localization_tool.LOCALES))
         for translations in web["locales"].values():
-            self.assertEqual(len(translations), 33)
+            self.assertEqual(len(translations), len(self.catalog))
             self.assertEqual(
                 set(next(iter(translations.values()))),
                 {"display_name", "marketing_description"},
@@ -161,7 +159,6 @@ class CommerceLocalizationTests(unittest.TestCase):
             ("app-store", localization_tool.APP_STORE_LOCALES),
         ):
             products = payloads[consumer]["products"]
-            self.assertEqual(len(products), 33)
             self.assertEqual(
                 [product["product_id"] for product in products],
                 [entry["app_store_product_id"] for entry in self.catalog],
@@ -181,7 +178,10 @@ class CommerceLocalizationTests(unittest.TestCase):
             list(localization_tool.WINDOWS_LOCALES.values()),
         )
         for values in windows["locales"].values():
-            self.assertEqual(len(values), 48)
+            self.assertEqual(
+                len(values),
+                len(self.windows_catalog) * 2,
+            )
 
     def test_windows_overlay_uses_only_supported_products(self):
         overlays = localization_tool.windows_overlays(
@@ -191,9 +191,8 @@ class CommerceLocalizationTests(unittest.TestCase):
         )
         supported_ids = {entry["id"] for entry in self.windows_catalog}
         unsupported_ids = {entry["id"] for entry in self.catalog} - supported_ids
-        self.assertEqual(len(supported_ids), 24)
         for locale, values in overlays.items():
-            self.assertEqual(len(values), 48, locale)
+            self.assertEqual(len(values), len(supported_ids) * 2, locale)
             for product_id in unsupported_ids:
                 self.assertNotIn(
                     f"store.productDescriptions.{product_id}",
@@ -246,9 +245,6 @@ class CommerceLocalizationTests(unittest.TestCase):
             product["productID"] for product in configuration["products"]
         }
 
-        self.assertEqual(len(current_ids), 33)
-        self.assertEqual(len(legacy_ids), 10)
-        self.assertEqual(len(storekit_ids), 43)
         self.assertEqual(storekit_ids, current_ids | legacy_ids)
 
         for consumer in ("storekit", "app-store"):

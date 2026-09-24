@@ -94,7 +94,9 @@ def required_scopes(paths):
         )
         if asset_change or path == 'scripts/validate_pixel_assets.py':
             result.update(('macos', 'windows', 'web'))
-        if path == 'release/macos.json':
+        if path == 'release/version.json':
+            result.update(('macos', 'windows', 'web'))
+        elif path == 'release/macos.json':
             result.add('macos')
         elif path == 'release/windows.json':
             result.add('windows')

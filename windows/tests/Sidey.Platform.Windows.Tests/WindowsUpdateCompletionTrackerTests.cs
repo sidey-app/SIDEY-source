@@ -14,8 +14,8 @@ public sealed class WindowsUpdateCompletionTrackerTests : IDisposable
         File.WriteAllText(Path.Combine(_directory, "last-launched-version.txt"), "1.0.0");
         var tracker = new WindowsUpdateCompletionTracker(StatePath());
 
-        Assert.Null(tracker.PendingNotificationVersion("1.4.0"));
-        Assert.True(tracker.TryMarkLaunched("1.4.0"));
+        Assert.Null(tracker.PendingNotificationVersion("1.4.1000"));
+        Assert.True(tracker.TryMarkLaunched("1.4.1000"));
         Assert.False(File.Exists(StatePath()));
     }
 
@@ -23,17 +23,17 @@ public sealed class WindowsUpdateCompletionTrackerTests : IDisposable
     public void InstallerUpgradeMarkerIsConsumedOnce()
     {
         Directory.CreateDirectory(_directory);
-        File.WriteAllText(StatePath(), "1.4.0");
+        File.WriteAllText(StatePath(), "1.4.1000");
         var tracker = new WindowsUpdateCompletionTracker(StatePath());
 
-        Assert.Equal("1.4.0", tracker.PendingNotificationVersion("1.4.0"));
-        Assert.True(tracker.TryMarkLaunched("1.4.0"));
-        Assert.Null(tracker.PendingNotificationVersion("1.4.0"));
+        Assert.Equal("1.4.1000", tracker.PendingNotificationVersion("1.4.1000"));
+        Assert.True(tracker.TryMarkLaunched("1.4.1000"));
+        Assert.Null(tracker.PendingNotificationVersion("1.4.1000"));
     }
 
     [Theory]
-    [InlineData("1.3.2")]
-    [InlineData("1.5.0")]
+    [InlineData("1.4.999")]
+    [InlineData("1.4.1001")]
     [InlineData("invalid")]
     public void StaleOrInvalidMarkerDoesNotReportDifferentUpdate(string marker)
     {
@@ -41,8 +41,8 @@ public sealed class WindowsUpdateCompletionTrackerTests : IDisposable
         File.WriteAllText(StatePath(), marker);
         var tracker = new WindowsUpdateCompletionTracker(StatePath());
 
-        Assert.Null(tracker.PendingNotificationVersion("1.4.0"));
-        Assert.True(tracker.TryMarkLaunched("1.4.0"));
+        Assert.Null(tracker.PendingNotificationVersion("1.4.1000"));
+        Assert.True(tracker.TryMarkLaunched("1.4.1000"));
         Assert.False(File.Exists(StatePath()));
     }
 

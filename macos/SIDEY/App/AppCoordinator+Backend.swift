@@ -60,6 +60,9 @@ extension AppCoordinator {
                         throw error
                     }
                 }
+                // The activity monitor can have changed before the router
+                // existed. Seed it before the first channel synchronization.
+                try await messagingTransport.setLocalPresence(model.presence)
                 startBackendEventHandling(messagingTransport.events)
                 applyBackendSnapshot(snapshot, currentUserID: userID)
                 if releaseChannel.requiresAppleAuthentication, userID != nil {
@@ -816,13 +819,11 @@ extension AppCoordinator {
     func localPresenceChanged(_ state: PresenceState) {
         model.presence = state
         guard let messagingTransport else { return }
-        Task {
-            do { try await messagingTransport.setLocalPresence(state) }
-            catch {
-                model.connectionState = .failed(
-                    error.localizedDescription
-                )
-            }
+        Task { [weak self] in
+            // Read current state when the task runs; an older queued callback
+            // must not overwrite a newer activity edge or a new login session.
+            guard let self, self.messagingTransport === messagingTransport else { return }
+            try? await messagingTransport.setLocalPresence(model.presence)
         }
     }
 
