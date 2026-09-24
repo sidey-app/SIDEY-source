@@ -7,7 +7,7 @@
   },
   "release": {
     "version": "2.0.0",
-    "build": 35
+    "build": 36
   },
   "target_territories": [
     "KOR",
