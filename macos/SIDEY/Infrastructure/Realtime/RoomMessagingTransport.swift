@@ -207,6 +207,26 @@ actor RoomMessagingTransportRouter {
     private var operationalState: OperationalState = .running
     private var blockedLegacyTransport: (any RoomMessagingTransport)?
 
+    private struct PresencePublication: Sendable {
+        let state: PresenceState
+        let generation: UInt64
+        let transport: any RoomMessagingTransport
+    }
+
+    // Activity is desired session state, not a transient event. Retain it even
+    // while an adapter's credential/topology gate rejects publications.
+    private var desiredPresence: PresenceState?
+    private var presenceRevision: UInt64 = 0
+    private var publishedPresenceRevision: UInt64?
+    private var presenceGeneration: UInt64 = 0
+    private var presenceRetryTask: Task<Void, Never>?
+    private let presenceRetrySleep: @Sendable (Duration) async throws -> Void
+    private lazy var presencePublications = PresencePublicationQueue<PresencePublication> {
+        [weak self] publication in
+        guard let self else { throw CancellationError() }
+        try await self.performPresencePublication(publication)
+    }
+
     init(
         selection: RealtimeTransportSelection,
         makeLegacy: (@Sendable () throws -> any RoomMessagingTransport)? = nil,
@@ -214,7 +234,10 @@ actor RoomMessagingTransportRouter {
         makeFirebaseV2ForRecovery:
             (@MainActor @Sendable () async throws -> any RoomMessagingTransport)? = nil,
         makeLegacyForSwitch: (@Sendable () async throws -> any RoomMessagingTransport)? = nil,
-        shutdownShared: (@Sendable () async -> Void)? = nil
+        shutdownShared: (@Sendable () async -> Void)? = nil,
+        presenceRetrySleep: @escaping @Sendable (Duration) async throws -> Void = {
+            try await Task.sleep(for: $0)
+        }
     ) throws {
         self.selection = selection
         let selectedTransport: any RoomMessagingTransport
@@ -239,6 +262,7 @@ actor RoomMessagingTransportRouter {
         self.makeFirebaseV2ForRecovery = makeFirebaseV2ForRecovery
         self.makeLegacyForSwitch = makeLegacyForSwitch
         self.shutdownShared = shutdownShared
+        self.presenceRetrySleep = presenceRetrySleep
         let pair = AsyncStream<BackendEvent>.makeStream(
             bufferingPolicy: .bufferingNewest(256)
         )
@@ -265,6 +289,7 @@ actor RoomMessagingTransportRouter {
     }
 
     func synchronize(rooms: [Room], activeRoomID: UUID?) async throws -> BackendReconciliation {
+        guard !isShutDown else { throw CancellationError() }
         if operationalState == .blocked, let blockedLegacyTransport {
             return try await finishLegacySwitch(
                 blockedLegacyTransport,
@@ -280,6 +305,7 @@ actor RoomMessagingTransportRouter {
         )
         synchronizedRooms = reconciliation.snapshot.rooms
         synchronizedActiveRoomID = reconciliation.activeRoomID
+        try await restorePresence(on: transport)
         recordSuccess(operation: "synchronize")
         return reconciliation
     }
@@ -289,14 +315,125 @@ actor RoomMessagingTransportRouter {
         startEventForwardingIfNeeded()
         try await transport.setActiveRoom(roomID)
         synchronizedActiveRoomID = roomID
+        try await restorePresence(on: transport)
         recordSuccess(operation: "set-active-room")
     }
 
+    /// Accepts the latest intent. Temporary publication failures are retried
+    /// here; they must not turn a local activity update into an app-wide error.
     func setLocalPresence(_ state: PresenceState) async throws {
-        try requireRunning()
-        startEventForwardingIfNeeded()
-        try await transport.setLocalPresence(state)
-        recordSuccess(operation: "presence")
+        guard !isShutDown else { throw CancellationError() }
+        desiredPresence = state == .away ? .away : .online
+        presenceRevision &+= 1
+        guard operationalState == .running, synchronizedRooms != nil else { return }
+        do {
+            try await replayPresence(on: transport)
+        } catch {
+            schedulePresenceRetry()
+        }
+    }
+
+    private func restorePresence(on target: any RoomMessagingTransport) async throws {
+        let generation = presenceGeneration
+        do {
+            try await replayPresence(on: target)
+        } catch {
+            guard !isShutDown, generation == presenceGeneration else {
+                throw CancellationError()
+            }
+            // Bootstrap/lease monitoring must still complete after an isolated
+            // Presence failure. The latest intent stays dirty until retried.
+            schedulePresenceRetry()
+        }
+    }
+
+    private func performPresencePublication(_ publication: PresencePublication) async throws {
+        guard !isShutDown, publication.generation == presenceGeneration else {
+            throw CancellationError()
+        }
+        try Task.checkCancellation()
+        try await publication.transport.setLocalPresence(publication.state)
+        guard !isShutDown, publication.generation == presenceGeneration else {
+            throw CancellationError()
+        }
+        try Task.checkCancellation()
+    }
+
+    /// Also used with a synchronized replacement before it becomes the active
+    /// adapter. Its own access/lease fence still owns permission to publish.
+    private func replayPresence(on target: any RoomMessagingTransport) async throws {
+        let generation = presenceGeneration
+        publishedPresenceRevision = nil
+        while let state = desiredPresence {
+            guard !isShutDown, generation == presenceGeneration else {
+                throw CancellationError()
+            }
+            let revision = presenceRevision
+            do {
+                try await presencePublications.submit(PresencePublication(
+                    state: state,
+                    generation: generation,
+                    transport: target
+                ))
+            } catch {
+                schedulePresenceRetry()
+                throw error
+            }
+            guard !isShutDown, generation == presenceGeneration else {
+                throw CancellationError()
+            }
+            // A coalesced request can complete for a newer value. Never mark
+            // a revision clean until the latest intent has been published.
+            guard revision == presenceRevision else { continue }
+            publishedPresenceRevision = revision
+            presenceRetryTask?.cancel()
+            presenceRetryTask = nil
+            recordSuccess(operation: "presence")
+            return
+        }
+        guard !isShutDown else { throw CancellationError() }
+    }
+
+    private func schedulePresenceRetry() {
+        guard presenceRetryTask == nil, !isShutDown,
+              operationalState == .running, synchronizedRooms != nil,
+              desiredPresence != nil,
+              publishedPresenceRevision != presenceRevision else { return }
+        let generation = presenceGeneration
+        presenceRetryTask = Task { [weak self, presenceRetrySleep] in
+            var attempt = 1
+            while !Task.isCancelled {
+                do {
+                    try await presenceRetrySleep(.seconds(
+                        RealtimeRecoveryPolicy.delay(forAttempt: attempt)
+                    ))
+                    guard !Task.isCancelled, let self else { return }
+                    guard await self.retryPresence(generation: generation) else { return }
+                    attempt = min(attempt + 1, 6)
+                } catch { return }
+            }
+        }
+    }
+
+    /// Returns whether the same pending intent still needs a delayed retry.
+    private func retryPresence(generation: UInt64) async -> Bool {
+        guard !isShutDown, generation == presenceGeneration,
+              operationalState == .running,
+              publishedPresenceRevision != presenceRevision else { return false }
+        do {
+            try await replayPresence(on: transport)
+            return false
+        } catch {
+            return !isShutDown && generation == presenceGeneration
+                && operationalState == .running && !Task.isCancelled
+        }
+    }
+
+    private func invalidatePresencePublication() {
+        presenceGeneration &+= 1
+        publishedPresenceRevision = nil
+        presenceRetryTask?.cancel()
+        presenceRetryTask = nil
     }
 
     func publishTyping(roomID: UUID, event: String) async throws {
@@ -334,6 +471,7 @@ actor RoomMessagingTransportRouter {
             revision: revision,
             requiresEntitlement: requiresEntitlement
         )
+        try await restorePresence(on: transport)
         recordSuccess(operation: "grant")
     }
 
@@ -350,6 +488,7 @@ actor RoomMessagingTransportRouter {
             return
         }
         try await transport.refreshRolloutLease()
+        try await restorePresence(on: transport)
         recordSuccess(operation: "rollout-lease-refresh")
     }
 
@@ -357,6 +496,7 @@ actor RoomMessagingTransportRouter {
     /// credential and listener. The router and shared Supabase backend stay
     /// alive so the app event stream does not need an application restart.
     private func recoverFirebaseV2() async throws {
+        try requireRunning()
         guard selection.active == .firebaseV2,
               let makeFirebaseV2ForRecovery else {
             throw RoomMessagingTransportRouterError.selectedAdapterUnavailable
@@ -366,12 +506,18 @@ actor RoomMessagingTransportRouter {
         }
 
         operationalState = .switching
+        invalidatePresencePublication()
         stopEventForwarding()
         await transport.retireForTransportSwitch()
+        guard !isShutDown else { throw CancellationError() }
 
         let replacement: any RoomMessagingTransport
         do {
             replacement = try await makeFirebaseV2ForRecovery()
+            guard !isShutDown else {
+                await replacement.retireForTransportSwitch()
+                throw CancellationError()
+            }
         } catch {
             operationalState = .running
             throw error
@@ -390,10 +536,12 @@ actor RoomMessagingTransportRouter {
                 rooms: rooms,
                 activeRoomID: synchronizedActiveRoomID
             )
+            try await restorePresence(on: replacement)
             transport = replacement
             synchronizedRooms = reconciliation.snapshot.rooms
             synchronizedActiveRoomID = reconciliation.activeRoomID
             operationalState = .running
+            schedulePresenceRetry()
             startEventForwardingIfNeeded()
             recordSuccess(operation: "rollout-lease-recovery")
             eventContinuation.yield(.reconciliation(reconciliation))
@@ -408,6 +556,7 @@ actor RoomMessagingTransportRouter {
 
     func failClosedForRolloutLease() async {
         guard !isShutDown, selection.active == .firebaseV2 else { return }
+        invalidatePresencePublication()
         await transport.failClosedForRolloutLease()
     }
 
@@ -438,12 +587,20 @@ actor RoomMessagingTransportRouter {
             throw RoomMessagingTransportRouterError.transportTopologyUnavailable
         }
 
+        guard !isShutDown, operationalState != .switching else {
+            throw RoomMessagingTransportRouterError.transportTopologyUnavailable
+        }
         operationalState = .switching
+        invalidatePresencePublication()
         await transport.retireForTransportSwitch()
         stopEventForwarding()
         let legacyTransport: any RoomMessagingTransport
         do {
             legacyTransport = try await makeLegacyForSwitch()
+            guard !isShutDown else {
+                await legacyTransport.retireForTransportSwitch()
+                throw CancellationError()
+            }
         } catch {
             operationalState = .blocked
             eventContinuation.yield(.technicalError(
@@ -483,6 +640,7 @@ actor RoomMessagingTransportRouter {
             rooms: rooms,
             activeRoomID: activeRoomID
         )
+        try await restorePresence(on: legacyTransport)
         transport = legacyTransport
         selection = RealtimeTransportSelection.resolve(
             requested: .legacySupabase,
@@ -492,6 +650,7 @@ actor RoomMessagingTransportRouter {
         synchronizedActiveRoomID = reconciliation.activeRoomID
         blockedLegacyTransport = nil
         operationalState = .running
+        schedulePresenceRetry()
         startEventForwardingIfNeeded()
         recordSuccess(operation: "kill-switch-to-legacy")
         eventContinuation.yield(.reconciliation(reconciliation))
@@ -501,6 +660,9 @@ actor RoomMessagingTransportRouter {
     func shutdown() async {
         guard !isShutDown else { return }
         isShutDown = true
+        invalidatePresencePublication()
+        desiredPresence = nil
+        await presencePublications.cancel()
         stopEventForwarding()
         await transport.retireForTransportSwitch()
         if let shutdownShared {
@@ -532,6 +694,12 @@ actor RoomMessagingTransportRouter {
 
     private func forward(_ event: BackendEvent, generation: UInt64) {
         guard generation == eventGeneration, !isShutDown else { return }
+        if case .connection(let status) = event, status.isReady {
+            // Channel recovery may have replayed the backend's older state.
+            // Wake the retained intent without requiring another input edge.
+            publishedPresenceRevision = nil
+            schedulePresenceRetry()
+        }
         eventContinuation.yield(event)
     }
 
