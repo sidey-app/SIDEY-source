@@ -25,6 +25,11 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
     private readonly bool _ownsHttpClient;
     private readonly IRealtimeTransport _realtime;
     private readonly SemaphoreSlim _firebaseWireCodeGate = new(1, 1);
+    private readonly CancellationTokenSource _firebaseWireCodeRefreshCancellation = new();
+    private readonly Lock _firebaseWireCodeRefreshGate = new();
+    private Task? _firebaseWireCodeRefreshTask;
+    private int _firebaseWireCodesConfigured;
+    private int _disposed;
     private IReadOnlyDictionary<Guid, long> _roomEpochs = new Dictionary<Guid, long>();
     private Guid? _activeRoomId;
     private IReadOnlyDictionary<string, string>? _firebaseThrowableWireCodes;
@@ -680,25 +685,9 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
             cancellationToken).ConfigureAwait(false);
         _roomEpochs = roomEpochs.ToDictionary(pair => pair.Key, pair => pair.Value);
         _activeRoomId = activeRoomId is { } id && roomEpochs.ContainsKey(id) ? id : null;
-        if (_realtime.RequiresThrowableWireCodes
-            && Volatile.Read(ref _firebaseThrowableWireCodes) is null)
+        if (_realtime.RequiresThrowableWireCodes)
         {
-            using var wireCodeTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            wireCodeTimeout.CancelAfter(TimeSpan.FromSeconds(3));
-            try
-            {
-                _realtime.ConfigureThrowableWireCodes(
-                    await LoadFirebaseThrowableWireCodesAsync(wireCodeTimeout.Token).ConfigureAwait(false));
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                System.Diagnostics.Trace.TraceWarning(
-                    $"Firebase throwable wire catalog unavailable: {FailureDiagnostic(exception)}");
-            }
+            EnsureFirebaseWireCodesRefresh();
         }
     }
 
@@ -735,7 +724,22 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+        _firebaseWireCodeRefreshCancellation.Cancel();
+        Task? wireCodeRefresh;
+        lock (_firebaseWireCodeRefreshGate)
+        {
+            wireCodeRefresh = _firebaseWireCodeRefreshTask;
+        }
+        if (wireCodeRefresh is not null)
+        {
+            await wireCodeRefresh.ConfigureAwait(false);
+        }
         await _realtime.DisposeAsync().ConfigureAwait(false);
+        _firebaseWireCodeRefreshCancellation.Dispose();
         _firebaseWireCodeGate.Dispose();
         if (_ownsHttpClient)
         {
@@ -1108,6 +1112,68 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
             .ConfigureAwait(false);
         using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         return await ReadRequiredAsync<T>(response, cancellationToken).ConfigureAwait(false);
+    }
+
+    private void EnsureFirebaseWireCodesRefresh()
+    {
+        if (Volatile.Read(ref _firebaseWireCodesConfigured) != 0
+            || _firebaseWireCodeRefreshCancellation.IsCancellationRequested)
+        {
+            return;
+        }
+        lock (_firebaseWireCodeRefreshGate)
+        {
+            if (Volatile.Read(ref _disposed) != 0
+                || _firebaseWireCodeRefreshCancellation.IsCancellationRequested)
+            {
+                return;
+            }
+            if (_firebaseWireCodeRefreshTask is null || _firebaseWireCodeRefreshTask.IsCompleted)
+            {
+                CancellationToken token = _firebaseWireCodeRefreshCancellation.Token;
+                _firebaseWireCodeRefreshTask = Task.Run(() =>
+                    RefreshFirebaseWireCodesUntilReadyAsync(token));
+            }
+        }
+    }
+
+    private async Task RefreshFirebaseWireCodesUntilReadyAsync(CancellationToken cancellationToken)
+    {
+        int failures = 0;
+        while (!cancellationToken.IsCancellationRequested
+            && Volatile.Read(ref _firebaseWireCodesConfigured) == 0)
+        {
+            using var attempt = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            attempt.CancelAfter(TimeSpan.FromSeconds(3));
+            try
+            {
+                IReadOnlyDictionary<string, string> wireCodes =
+                    await LoadFirebaseThrowableWireCodesAsync(attempt.Token).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
+                _realtime.ConfigureThrowableWireCodes(wireCodes);
+                Volatile.Write(ref _firebaseWireCodesConfigured, 1);
+                return;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Trace.TraceWarning(
+                    $"Firebase throwable wire catalog unavailable: {FailureDiagnostic(exception)}");
+            }
+
+            var retryDelay = TimeSpan.FromSeconds(1 << Math.Min(failures++, 8));
+            try
+            {
+                await Task.Delay(retryDelay, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+        }
     }
 
     private async Task<IReadOnlyDictionary<string, string>> LoadFirebaseThrowableWireCodesAsync(

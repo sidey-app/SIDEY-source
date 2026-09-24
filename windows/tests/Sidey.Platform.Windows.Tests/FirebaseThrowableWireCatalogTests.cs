@@ -66,7 +66,7 @@ public sealed class FirebaseThrowableWireCatalogTests
     public async Task WireCatalogFailureDoesNotBlockLegacyRealtimeSynchronization()
     {
         var realtime = new LegacySelectionTransport();
-        var handler = new FailingWireCatalogHandler(realtime);
+        var handler = new WireCatalogHandler(realtime, recover: false);
         using var httpClient = new HttpClient(handler);
         var configuration = new SupabaseRuntimeConfiguration(
             new Uri("https://wire-catalog.example.invalid"), "test-key");
@@ -79,14 +79,39 @@ public sealed class FirebaseThrowableWireCatalogTests
             new Dictionary<Guid, long>(), null, PresenceState.Online);
 
         Assert.True(realtime.Synchronized);
+        await handler.FirstRequest.WaitAsync(TimeSpan.FromSeconds(5));
         Assert.False(realtime.WireCodesConfigured);
-        Assert.Equal(1, handler.RequestCount);
+        Assert.True(handler.RequestCount >= 1);
+    }
+
+    [Fact]
+    public async Task WireCatalogRecoversWithoutAnotherRoomSynchronization()
+    {
+        var realtime = new LegacySelectionTransport();
+        var handler = new WireCatalogHandler(realtime, recover: true);
+        using var httpClient = new HttpClient(handler);
+        var configuration = new SupabaseRuntimeConfiguration(
+            new Uri("https://wire-catalog.example.invalid"), "test-key");
+        ICredentialStore credentials = DispatchProxy.Create<ICredentialStore, SessionCredentials>();
+        using var auth = new SupabaseAnonymousAuthService(configuration, credentials, httpClient);
+        await using var gateway = new SupabaseBackendGateway(
+            configuration, auth, credentials, httpClient, realtime);
+
+        await gateway.SynchronizeRealtimeRoomsAsync(
+            new Dictionary<Guid, long>(), null, PresenceState.Online);
+        await realtime.Configured.WaitAsync(TimeSpan.FromSeconds(10));
+
+        Assert.True(realtime.Synchronized);
+        Assert.Equal(2, handler.RequestCount);
     }
 
     private sealed class LegacySelectionTransport : IRealtimeTransport
     {
+        private readonly TaskCompletionSource _configured = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
         public bool Synchronized { get; private set; }
         public bool WireCodesConfigured { get; private set; }
+        public Task Configured => _configured.Task;
         public RealtimeConnectionStatus ConnectionStatus => new(true, true, true);
         public bool IsRecoveryPaused => false;
         public bool RequiresThrowableWireCodes => true;
@@ -108,8 +133,11 @@ public sealed class FirebaseThrowableWireCatalogTests
             return Task.CompletedTask;
         }
 
-        public void ConfigureThrowableWireCodes(IReadOnlyDictionary<string, string> wireCodesByCatalogItemId) =>
+        public void ConfigureThrowableWireCodes(IReadOnlyDictionary<string, string> wireCodesByCatalogItemId)
+        {
             WireCodesConfigured = true;
+            _configured.TrySetResult();
+        }
 
         public Task PublishPresenceAsync(
             Guid roomId, PresenceState state, CancellationToken cancellationToken) => Task.CompletedTask;
@@ -128,17 +156,31 @@ public sealed class FirebaseThrowableWireCatalogTests
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 
-    private sealed class FailingWireCatalogHandler(LegacySelectionTransport realtime) : HttpMessageHandler
+    private sealed class WireCatalogHandler(LegacySelectionTransport realtime, bool recover) : HttpMessageHandler
     {
-        public int RequestCount { get; private set; }
+        private readonly TaskCompletionSource _firstRequest = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private int _requestCount;
+
+        public int RequestCount => Volatile.Read(ref _requestCount);
+        public Task FirstRequest => _firstRequest.Task;
 
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Assert.True(realtime.Synchronized);
             Assert.Equal("/rest/v1/rpc/get_store_state_v2", request.RequestUri?.AbsolutePath);
-            RequestCount++;
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
+            int requestCount = Interlocked.Increment(ref _requestCount);
+            if (requestCount == 1)
+            {
+                _firstRequest.TrySetResult();
+            }
+            HttpStatusCode status = recover && requestCount > 1
+                ? HttpStatusCode.OK
+                : HttpStatusCode.ServiceUnavailable;
+            return Task.FromResult(new HttpResponseMessage(status)
+            {
+                Content = new StringContent("[]"),
+            });
         }
     }
 
