@@ -5,6 +5,47 @@ import XCTest
 
 @MainActor
 final class SettingsInteractionTests: XCTestCase {
+    func testConnectionBorderMovesWithoutAnActiveSwiftUIScene() async throws {
+        let frames = try await connectionBorderFrames(reduceMotion: false)
+        XCTAssertGreaterThan(Set(frames.suffix(6)).count, 2,
+            "An AppKit-hosted connecting border must animate without an active SwiftUI Scene")
+    }
+
+    func testConnectionBorderRemainsStillWhenReduceMotionIsEnabled() async throws {
+        let frames = try await connectionBorderFrames(reduceMotion: true)
+        XCTAssertEqual(Set(frames.suffix(6)).count, 1)
+    }
+
+    private func connectionBorderFrames(reduceMotion: Bool) async throws -> [Data] {
+        let root = ConnectionProgressBorder(reduceMotion: reduceMotion)
+            .environment(\.scenePhase, .background)
+            .frame(width: 220, height: 34)
+            .padding(4)
+            .background(Color.black)
+        let hostingView = NSHostingView(rootView: root)
+        hostingView.frame = CGRect(x: 0, y: 0, width: 228, height: 42)
+        let window = NSWindow(contentRect: hostingView.frame,
+            styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView = hostingView
+        window.orderFrontRegardless()
+        defer { window.close() }
+
+        var frames: [Data] = []
+        // Sample a full 1.6-second rotation, including time for initial layout.
+        // The paused implementation must yield identical rendered frames.
+        for _ in 0..<10 {
+            try await Task.sleep(for: .milliseconds(180))
+            hostingView.layoutSubtreeIfNeeded()
+            hostingView.displayIfNeeded()
+            let bitmap = try XCTUnwrap(
+                hostingView.bitmapImageRepForCachingDisplay(in: hostingView.bounds))
+            hostingView.cacheDisplay(in: hostingView.bounds, to: bitmap)
+            frames.append(try XCTUnwrap(bitmap.representation(using: .png, properties: [:])))
+        }
+        return frames
+    }
+
     func testLegalLinksUseCanonicalPublicWebsiteRoutes() {
         XCTAssertEqual(
             AppSettingsLegalLinks.localizedURL(

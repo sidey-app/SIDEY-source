@@ -147,9 +147,14 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
           $manifest = Get-Content ./release/windows.json -Raw | ConvertFrom-Json
-          $version = [string]$manifest.version
-          $tag = "windows-v$version"
-          $installerName = "SIDEY-Windows-x64-v${version}-Setup.exe"
+          $productVersion = [string]$manifest.version
+          $releaseVersion = if ($manifest.PSObject.Properties.Name -contains 'releaseVersion') {
+            [string]$manifest.releaseVersion
+          } else {
+            $productVersion
+          }
+          $tag = "windows-v$releaseVersion"
+          $installerName = "SIDEY-Windows-x64-v${releaseVersion}-Setup.exe"
 
           $release = gh release view $tag --json isDraft,isPrerelease,assets |
             ConvertFrom-Json
@@ -183,12 +188,40 @@ jobs:
             --dir ./build/windows-pages-release `
             --clobber
 
-          python3 ./scripts/pages/prepare_release_metadata.py `
-            --website-dir ./website/dist `
-            --output-dir ./build/pages-site `
-            --windows-release-manifest ./release/windows.json `
-            --windows-release-installer "./build/windows-pages-release/$installerName" `
-            --public-repository $env:PUBLIC_REPOSITORY
+          $metadataArguments = @(
+            './scripts/pages/prepare_release_metadata.py',
+            '--website-dir', './website/dist',
+            '--output-dir', './build/pages-site',
+            '--windows-release-manifest', './release/windows.json',
+            '--windows-release-installer', "./build/windows-pages-release/$installerName",
+            '--public-repository', $env:PUBLIC_REPOSITORY
+          )
+          if ($releaseVersion -cne $productVersion) {
+            $legacyTag = "windows-v$productVersion"
+            $legacyInstallerName = "SIDEY-Windows-x64-v${productVersion}-Setup.exe"
+            $legacyRelease = gh release view $legacyTag --json isDraft,isPrerelease,assets |
+              ConvertFrom-Json
+            if ($legacyRelease.isDraft -or $legacyRelease.isPrerelease) {
+              throw "Windows bridge release must be a published regular release: $legacyTag"
+            }
+            $legacyAssetNames = @(
+              $legacyRelease.assets | ForEach-Object { [string]$_.name }
+            )
+            if ($legacyAssetNames -cnotcontains $legacyInstallerName) {
+              throw "Windows bridge release installer is missing: $legacyTag/$legacyInstallerName"
+            }
+            New-Item -ItemType Directory -Path ./build/windows-pages-legacy -Force |
+              Out-Null
+            gh release download $legacyTag `
+              --pattern $legacyInstallerName `
+              --dir ./build/windows-pages-legacy `
+              --clobber
+            $metadataArguments += @(
+              '--windows-legacy-installer',
+              "./build/windows-pages-legacy/$legacyInstallerName"
+            )
+          }
+          python3 @metadataArguments
 
       - name: Reject private files from public artifact
         run: >-

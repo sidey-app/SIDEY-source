@@ -14,13 +14,14 @@ Establish the target platform and commit, the intended artifact or distribution,
 the request is advisory or asks to apply metadata changes. Record any user-selected version
 class, but do not accept one below the evidence-based minimum.
 
-Start with `release/macos.json` or `release/windows.json`. For macOS, obtain App Store
+Start with `release/version.json` and the generated `release/macos.json` or
+`release/windows.json` mirror. For macOS, obtain App Store
 Connect publication/build evidence and the exact source provenance of the last shipped
 App Store artifact; the manifest describes the target build, not publication status. Do not
 use an archived Developer ID tag as proof of an App Store release. The maintained macOS
 Xcode scheme and app product are both named `SIDEY`; legacy Xcode identifiers are not
 current target evidence. For Windows, confirm the matching
-`windows-v<version>` tag is a
+`windows-v<releaseVersion>` tag is a
 published regular release. If a target is intentionally staged ahead of publication, identify
 the previous shipped platform artifact as the comparison baseline. If baseline, target,
 artifact impact or provenance cannot be established, return `BLOCKED` with the missing evidence.

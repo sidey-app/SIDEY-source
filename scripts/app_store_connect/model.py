@@ -114,19 +114,22 @@ def validate_manifest(manifest: Any) -> dict[str, Any]:
         raise ValidationError("App Store localization manifest schema must be 1")
     app = manifest.get("app")
     release = manifest.get("release")
-    if not isinstance(app, dict) or not isinstance(release, dict):
-        raise ValidationError("Manifest requires app and release objects")
+    if not isinstance(app, dict):
+        raise ValidationError("Manifest requires an app object")
     _require_string(app.get("bundle_id"), "app.bundle_id")
     if app.get("platform") != "MAC_OS":
         raise ValidationError("app.platform must be MAC_OS")
     if app.get("primary_locale") != "ko":
         raise ValidationError("The App Store primary locale must remain ko")
-    version = _require_string(release.get("version"), "release.version")
-    if re.fullmatch(r"\d+\.\d+\.\d+", version) is None:
-        raise ValidationError("release.version must use major.minor.patch")
-    build = release.get("build")
-    if type(build) is not int or build <= 0:
-        raise ValidationError("release.build must be a positive integer")
+    if release is not None:
+        if not isinstance(release, dict):
+            raise ValidationError("release must be an object")
+        version = _require_string(release.get("version"), "release.version")
+        if re.fullmatch(r"\d+\.\d+\.\d+", version) is None:
+            raise ValidationError("release.version must use major.minor.patch")
+        build = release.get("build")
+        if type(build) is not int or build <= 0:
+            raise ValidationError("release.build must be a positive integer")
 
     locales = manifest.get("app_localizations")
     if not isinstance(locales, dict) or set(locales) != set(APP_STORE_LOCALES):
@@ -237,7 +240,18 @@ def validate_products(
 
 
 def load_desired_state(manifest_path: Path, commerce_path: Path, catalog_path: Path) -> DesiredState:
-    manifest = validate_manifest(read_json(manifest_path))
+    manifest_source = read_json(manifest_path)
+    if isinstance(manifest_source, dict) and "release" not in manifest_source:
+        version_path = manifest_path.with_name("version.json")
+        version_source = read_json(version_path)
+        if not isinstance(version_source, dict):
+            raise ValidationError(f"Version source must be an object: {version_path}")
+        manifest_source = dict(manifest_source)
+        manifest_source["release"] = {
+            "version": version_source.get("productVersion"),
+            "build": version_source.get("macBuild"),
+        }
+    manifest = validate_manifest(manifest_source)
     release_path = manifest_path.with_name("macos.json")
     if release_path.is_file():
         release = read_json(release_path)

@@ -48,6 +48,7 @@ xcodebuild \
 	-scheme SIDEY \
 	-configuration Release \
 	-destination 'generic/platform=macOS' \
+	ONLY_ACTIVE_ARCH=NO \
 	-derivedDataPath "$SIDEY_DERIVED_DATA" \
 	-archivePath "$SIDEY_ARCHIVE_PATH" \
 	-disableAutomaticPackageResolution \
@@ -73,6 +74,8 @@ for SIDEY_REQUIRED_PATH in \
 		exit 1
 	fi
 done
+
+python3 "$SIDEY_REPO_ROOT/scripts/macos/verify_binary_compatibility.py" "$SIDEY_APP"
 
 SIDEY_EXECUTABLE_UUIDS=$(xcrun dwarfdump --uuid "$SIDEY_EXECUTABLE" | awk '{print $2}' | sort)
 SIDEY_DSYM_UUIDS=$(xcrun dwarfdump --uuid "$SIDEY_DSYM_DWARF" | awk '{print $2}' | sort)
