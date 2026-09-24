@@ -5,6 +5,10 @@
     "platform": "MAC_OS",
     "primary_locale": "ko"
   },
+  "release": {
+    "version": "2.0.0",
+    "build": 35
+  },
   "target_territories": [
     "KOR",
     "USA",
