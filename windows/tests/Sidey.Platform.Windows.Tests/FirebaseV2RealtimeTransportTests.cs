@@ -38,6 +38,51 @@ public sealed class FirebaseV2RealtimeTransportTests
     }
 
     [Fact]
+    public async Task FailureFallbackRepeatedSynchronizationsDoNotReemitConnection()
+    {
+        var legacy = new FakeLegacyTransport
+        {
+            ConnectionStatus = new RealtimeConnectionStatus(true, true, false),
+        };
+        var listener = new FakeFirebaseListener();
+        await using var transport = new FirebaseV2RealtimeTransport(
+            legacy,
+            new FakeSelector(enabled: false)
+            {
+                Source = FirebaseRealtimeRolloutSelectionSource.FailureFallback,
+            },
+            new FakeChatClient(),
+            new FakeCredentialProvider(),
+            sink => listener.WithSink(sink));
+        var epochs = new Dictionary<Guid, long> { [s_roomId] = 1 };
+
+        for (int index = 0; index < 6; index++)
+        {
+            await transport.SynchronizeAsync(epochs, s_roomId, PresenceState.Online, CancellationToken.None);
+        }
+
+        BackendEvent.Diagnostic sentinel = new("fallback-synchronization-complete");
+        listener.Publish(sentinel);
+        List<BackendEvent> received = [];
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        await foreach (BackendEvent backendEvent in transport.ReadEventsAsync(timeout.Token))
+        {
+            if (ReferenceEquals(backendEvent, sentinel))
+            {
+                break;
+            }
+            received.Add(backendEvent);
+        }
+
+        Assert.Equal(6, legacy.SynchronizeCount);
+        BackendEvent.ConnectionChanged connection = Assert.Single(
+            received.OfType<BackendEvent.ConnectionChanged>());
+        Assert.True(connection.Status.ActiveRoomTransportConnected);
+        Assert.DoesNotContain(received, item => item is BackendEvent.ReconciliationRequired);
+        Assert.Equal(0, listener.StartCount);
+    }
+
+    [Fact]
     public async Task EnabledServerSelectionOpensFirebaseAndUsesCallableChat()
     {
         var legacy = new FakeLegacyTransport();
@@ -587,6 +632,8 @@ public sealed class FirebaseV2RealtimeTransportTests
     private sealed class FakeSelector(bool enabled) : IFirebaseRealtimeRolloutSelector
     {
         public TimeSpan CacheTtl { get; init; } = TimeSpan.FromMinutes(5);
+        public FirebaseRealtimeRolloutSelectionSource Source { get; init; } =
+            FirebaseRealtimeRolloutSelectionSource.Server;
         public Exception? RefreshFailure { get; init; }
         public TaskCompletionSource RefreshAttempted { get; } =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -601,7 +648,7 @@ public sealed class FirebaseV2RealtimeTransportTests
                     : FirebaseRealtimeSelectedTransport.LegacySupabase,
                 killSwitch: !enabled,
                 CacheTtl,
-                FirebaseRealtimeRolloutSelectionSource.Server));
+                Source));
         }
 
         public ValueTask<FirebaseRealtimeRolloutSelection> RefreshAsync(
