@@ -22,9 +22,6 @@
     <AssemblyName>SIDEY.Host</AssemblyName>
     <AssemblyTitle>SIDEY</AssemblyTitle>
     <Product>SIDEY</Product>
-    <Version>2.0.0</Version>
-    <FileVersion>2.0.0.0</FileVersion>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
     <ApplicationIcon>Assets\Icons\SideyAppIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>

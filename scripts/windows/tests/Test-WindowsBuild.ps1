@@ -1,22 +1,12 @@
 #requires -Version 5.1
 
 [CmdletBinding()]
-param(
-    [string]$Version
-)
+param()
 
 Set-StrictMode -Version 3.0
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot '../Sidey.PowerShell.psm1') -Force
 $repositoryRootPath = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
-$releaseManifestPath = Join-Path $repositoryRootPath 'release/windows.json'
-if ([string]::IsNullOrWhiteSpace($Version)) {
-    $Version = [string](Get-Content -LiteralPath $releaseManifestPath -Raw -Encoding UTF8 |
-        ConvertFrom-Json).version
-}
-if ($Version -notmatch '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$') {
-    throw "Windows build version must contain three numeric parts: $Version"
-}
 $solutionPath = Join-Path $repositoryRootPath 'windows/SIDEY.Windows.slnx'
 $publishDirectory = Join-Path $repositoryRootPath 'build/windows/publish-smoke'
 
@@ -48,9 +38,6 @@ try {
             '--runtime', 'win-x64',
             '--self-contained', 'true',
             '--no-restore',
-            "-p:Version=$Version",
-            "-p:FileVersion=$Version.0",
-            "-p:AssemblyVersion=$Version.0",
             '-p:PublishSingleFile=false',
             '--output', $publishDirectory
         ) `
