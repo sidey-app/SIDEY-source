@@ -37,7 +37,7 @@ struct OverlayComposerView: View {
         .padding(.horizontal, 14)
         .frame(width: 390, height: 46)
         .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .sideyGlassSurface(in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .glassEffect(in: RoundedRectangle(cornerRadius: 15, style: .continuous))
         .padding(5)
         .background(Color.clear)
     }

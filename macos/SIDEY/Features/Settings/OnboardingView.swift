@@ -40,7 +40,7 @@ struct OnboardingView: View {
                     .padding(26)
                     .frame(width: 620, alignment: .leading)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .sideyGlassSurface(in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .glassEffect(in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
                     ConnectionBadge(state: model.connectionState)
                         .frame(width: 260)
@@ -96,7 +96,7 @@ struct OnboardingView: View {
                 Button("common.next") {
                     PendingTextInputCommitter.commitThen(actions.onSaveProfile)
                 }
-                    .sideyProminentButtonStyle()
+                    .buttonStyle(.glassProminent)
                     .disabled(model.isWorking || !validNickname)
             }
         }
@@ -123,7 +123,7 @@ struct OnboardingView: View {
                             showsProgress: model.groupOperation == .creating
                         )
                     }
-                        .sideyProminentButtonStyle()
+                        .buttonStyle(.glassProminent)
                         .disabled(model.groupMutationsDisabled || !validRoomName)
                 }
             } else {
@@ -146,7 +146,7 @@ struct OnboardingView: View {
                             showsProgress: model.groupOperation == .joining
                         )
                     }
-                        .sideyProminentButtonStyle()
+                        .buttonStyle(.glassProminent)
                         .disabled(model.groupMutationsDisabled || model.inviteCode.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
