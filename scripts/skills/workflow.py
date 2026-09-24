@@ -351,7 +351,18 @@ def snapshot(root):
 def owned_task(root, task_id):
     task = read_state(root).get(task_id)
     wrong_worktree = task and task['worktree'] != str(root.resolve())
-    wrong_branch = task and task['branch'] != branch(root)
+    try:
+        current_branch = branch(root)
+    except WorkflowError:
+        current_branch = None
+    detached_after_merge = (
+        task and current_branch is None
+        and task.get('status') in ('integrated', 'main-updated', 'complete')
+        and (task.get('checked') or {}).get('head') == head(root)
+    )
+    wrong_branch = task and not (
+        task['branch'] == current_branch or detached_after_merge
+    )
     if not task or wrong_worktree or wrong_branch:
         raise WorkflowError(
             'Task does not own this worktree and branch; use start in an '
@@ -480,15 +491,13 @@ def update_main(root, remote, already_locked=False):
     return primary
 
 
-def cleanup_merged_worktrees(root, platform, remote, *, now=None):
-    """Remove old, completed native task worktrees after main is updated.
+def cleanup_merged_worktrees(root, remote, *, now=None):
+    """Remove old, completed task worktrees after main is updated.
 
     Only sibling worktrees registered by this workflow are considered. A task
     with an open PR, local content, a newer head, or unverified integration is
-    left alone. Branches and task records are retained.
+    left alone. Task records are retained.
     """
-    if platform not in ('macos', 'windows'):
-        return []
     cutoff = (time.time() if now is None else now) - 2 * 24 * 60 * 60
     current = root.resolve()
     primary = primary_root(root)
@@ -502,8 +511,7 @@ def cleanup_merged_worktrees(root, platform, remote, *, now=None):
         for task_id, task in read_state(root).items():
             path = Path(task['worktree']).resolve()
             if (
-                task.get('platform') != platform
-                or task.get('status') != 'complete'
+                task.get('status') != 'complete'
                 or path in (current, primary)
                 or path.parent != current.parent
                 or not path.is_dir()
@@ -515,7 +523,10 @@ def cleanup_merged_worktrees(root, platform, remote, *, now=None):
             if (
                 not entry
                 or 'locked' in entry
-                or entry.get('branch') != f"refs/heads/{task.get('branch')}"
+                or not (
+                    entry.get('branch') == f"refs/heads/{task.get('branch')}"
+                    or entry.get('detached') is True
+                )
                 or not checked.get('head')
                 or entry.get('HEAD') != checked['head']
                 or not merge
@@ -545,8 +556,83 @@ def cleanup_merged_worktrees(root, platform, remote, *, now=None):
             if head(path) != checked['head']:
                 continue
             git(root, 'worktree', 'remove', str(path))
+            if entry.get('branch') and git(
+                root, 'rev-parse', f"refs/heads/{task['branch']}",
+            ) == checked['head']:
+                git(root, 'branch', '-D', task['branch'])
             removed.append({'task': task_id, 'worktree': str(path)})
     return removed
+
+
+def cleanup_merged_pr_branch(root, task, remote):
+    """Delete the exact merged PR branch, retaining its recent worktree."""
+    checked_head = (task.get('checked') or {}).get('head')
+    merge = task.get('merge')
+    published = task.get('published') or {}
+    push_remote = published.get('push_remote')
+    head_ref = published.get('head_ref')
+    owner, separator, branch_name = (head_ref or '').partition(':')
+    if (
+        task.get('status') not in ('integrated', 'main-updated', 'complete')
+        or not checked_head or head(root) != checked_head or dirty_paths(root)
+        or not merge or not is_ancestor(root, merge, remote)
+        or not same_tree(root, checked_head, merge)
+        or not task.get('pr') or not push_remote
+        or not separator or branch_name != task.get('branch')
+        or github_repository_from_remote(root, push_remote).split('/')[0].casefold()
+        != owner.casefold()
+    ):
+        raise WorkflowError('Merged PR branch lacks exact task provenance')
+    repository = source_repository(root)
+    info = json.loads(run(
+        root, 'gh', 'pr', 'view', str(task['pr']), '--repo', repository,
+        '--json', 'state,headRefOid,mergeCommit',
+    ))
+    if (
+        info.get('state') != 'MERGED'
+        or info.get('headRefOid') != checked_head
+        or (info.get('mergeCommit') or {}).get('oid') != merge
+        or open_task_prs(root, head_ref, repository=repository, base=None)
+    ):
+        raise WorkflowError('Merged PR branch is still in use or has changed')
+    remote_ref = f"refs/heads/{task['branch']}"
+    remote_tip = git(root, 'ls-remote', '--heads', push_remote, remote_ref)
+    local_ref = f"refs/heads/{task['branch']}"
+    local_refs = git(
+        root, 'for-each-ref', '--format=%(refname)%09%(objectname)', local_ref,
+    )
+    local_tip = next((
+        line.split('\t', 1)[1] for line in local_refs.splitlines()
+        if line.split('\t', 1)[0] == local_ref
+    ), '')
+    if local_tip and local_tip != checked_head:
+        raise WorkflowError('Merged PR branch local head changed')
+    if any(
+        entry.get('branch') == local_ref
+        and Path(entry['worktree']).resolve() != root.resolve()
+        for entry in worktrees(root)
+    ):
+        raise WorkflowError('Merged PR branch is checked out elsewhere')
+    remote_deleted = False
+    if remote_tip:
+        if remote_tip != f'{checked_head}\t{remote_ref}':
+            raise WorkflowError('Merged PR branch remote head changed')
+        git(
+            root, 'push', f'--force-with-lease={remote_ref}:{checked_head}',
+            push_remote, f':{remote_ref}',
+        )
+        remote_deleted = True
+    local_deleted = False
+    if local_tip:
+        try:
+            active_branch = branch(root)
+        except WorkflowError:
+            active_branch = None
+        if active_branch == task['branch']:
+            git(root, 'switch', '--detach', checked_head)
+        git(root, 'branch', '-D', task['branch'])
+        local_deleted = True
+    return {'remote_deleted': remote_deleted, 'local_deleted': local_deleted}
 
 
 WINDOWS_SETUP_NAME = re.compile(
@@ -950,7 +1036,7 @@ def task_pr_head(root, task):
 
     canonical_owner, _ = GITHUB_REPOSITORY.split('/', 1)
     published = task.get('published', {})
-    return published.get('head_ref') or f'{canonical_owner}:{branch(root)}'
+    return published.get('head_ref') or f"{canonical_owner}:{task['branch']}"
 
 
 def pull_request_record(pull, repository):
@@ -1143,8 +1229,9 @@ def finish(root, args):
         primary = update_main(root, remote)
         result = {
             'status': 'complete', 'main': str(primary), 'sha': remote,
+            'branch_cleanup': cleanup_merged_pr_branch(root, task, remote),
             'removed_worktrees': cleanup_merged_worktrees(
-                root, task['platform'], remote,
+                root, remote,
             ),
         }
         installer = completed_windows_installer(task, primary, remote)
@@ -1188,8 +1275,9 @@ def finish(root, args):
         update_task(root, args.task, task)
         result = {
             'status': task['status'], 'main': str(primary), 'sha': remote,
+            'branch_cleanup': cleanup_merged_pr_branch(root, task, remote),
             'removed_worktrees': cleanup_merged_worktrees(
-                root, task['platform'], remote,
+                root, remote,
             ),
         }
         installer = completed_windows_installer(task, primary, remote)
@@ -1329,8 +1417,9 @@ def finish(root, args):
         'pr': number,
         'main': str(primary),
         'sha': remote,
+        'branch_cleanup': cleanup_merged_pr_branch(root, task, remote),
         'removed_worktrees': cleanup_merged_worktrees(
-            root, task['platform'], remote,
+            root, remote,
         ),
     }
     if needs_app_review:

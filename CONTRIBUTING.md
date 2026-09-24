@@ -139,6 +139,13 @@ head; an amended or rebuilt equivalent does not inherit the prior review or
 check result. The [$create-pr skill](.agents/skills/create-pr/SKILL.md)
 describes agent preparation and publication.
 
+After `finish` verifies the exact merged commit and updates primary `main`, it
+deletes that PR's remote branch at the checked head. It detaches the retained
+task worktree at that head and deletes the local branch. An open PR or a
+changed branch head blocks deletion. On later completed tasks, `finish` also
+removes clean, verified-merged worktrees with no activity in the last 48 hours;
+recent, dirty, locked, and open-PR worktrees stay in place.
+
 After a Windows implementation has a clean checked head, create a local Setup
 for manual testing before integration:
 
