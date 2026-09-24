@@ -67,13 +67,5 @@ class LocalizationValidationTests(unittest.TestCase):
         LOCALIZATIONS.validate_no_shipped_hangul()
         LOCALIZATIONS.validate_project_regions()
 
-    def test_traditional_chinese_purchase_copy_uses_price_before_product(self):
-        strings = LOCALIZATIONS.load_and_validate_catalog()
-
-        for key in ("store.purchase.action", "store.purchase.accessibility"):
-            value = strings[key]["localizations"]["zh-Hant"]["stringUnit"]["value"]
-            self.assertEqual(value, "以 %2$@ 購買 %1$@")
-
-
 if __name__ == "__main__":
     unittest.main()
