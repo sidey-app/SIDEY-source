@@ -270,6 +270,16 @@ class ForkRemoteTests(unittest.TestCase):
 
 
 class ForkPullRequestTests(unittest.TestCase):
+    def test_cleanup_pr_lookup_includes_other_base_branches(self):
+        with patch.object(workflow, 'run', return_value='[]') as run:
+            workflow.open_task_prs(
+                ROOT, 'sidey-app:windows/old',
+                repository='sidey-app/SIDEY-source', base=None,
+            )
+        command = run.call_args.args[1:]
+        self.assertIn('head=sidey-app:windows/old', command)
+        self.assertFalse(any(arg.startswith('base=') for arg in command))
+
     def test_task_prs_uses_owner_qualified_api_filter(self):
         pulls = [
             {
