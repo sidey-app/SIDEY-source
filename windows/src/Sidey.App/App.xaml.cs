@@ -26,6 +26,7 @@ public partial class App : Application
     private ComposerWindow? _composer;
     private ComposerViewModel? _historyComposer;
     private readonly ComposerTypingOwner _typingOwner = new();
+    private readonly CharacterClickComposerState _characterClickComposerState = new();
     private Task _pendingComposerPlacementSave = Task.CompletedTask;
     private AppCoordinator? _coordinator;
     private SingleInstanceGuard? _singleInstance;
@@ -42,6 +43,7 @@ public partial class App : Application
     private DispatcherQueueTimer? _displayTopologyRefreshTimer;
     private string? _pendingUpdateNotificationVersion;
     private Timer? _uiResponsivenessTimer;
+    private bool _handlingCharacterClick;
     private bool _shuttingDown;
     private bool _launchPresentationReady;
     private bool _showAboutAfterOnboarding;
@@ -170,6 +172,7 @@ public partial class App : Application
         string? completedUpdateVersion = _updateCompletionTracker.PendingNotificationVersion(
             _updateService.CurrentUpdateVersion);
         coordinator.ComposerRequested += RequestComposer;
+        coordinator.CharacterClicked += RequestCharacterClick;
         coordinator.PulseRequested += RequestPulse;
         coordinator.TreeMovementToggleRequested += RequestTreeMovementToggle;
         coordinator.CharacterThrowRequested += RequestCharacterThrow;
@@ -475,7 +478,49 @@ public partial class App : Application
         {
             if (!_shuttingDown)
             {
+                _characterClickComposerState.Reset();
                 ShowComposer();
+            }
+        });
+    }
+
+    private void RequestCharacterClick(int clickCount)
+    {
+        if (_shuttingDown)
+        {
+            return;
+        }
+
+        _dispatcherQueue.TryEnqueue(() =>
+        {
+            if (_shuttingDown)
+            {
+                return;
+            }
+
+            _handlingCharacterClick = true;
+            try
+            {
+                bool isVisible = _composer?.IsVisible == true;
+                ComposerVisibilityAction action = _characterClickComposerState.HandleClick(clickCount, isVisible);
+                switch (action)
+                {
+                    case ComposerVisibilityAction.Show:
+                        ShowComposer();
+                        break;
+                    case ComposerVisibilityAction.Hide:
+                        _composer?.HideComposer();
+                        break;
+                }
+
+                if (clickCount == 1)
+                {
+                    _characterClickComposerState.CompleteSingleClick(_composer?.IsVisible == true);
+                }
+            }
+            finally
+            {
+                _handlingCharacterClick = false;
             }
         });
     }
@@ -495,6 +540,7 @@ public partial class App : Application
                 StartupDiagnostics.Stage("composer-window-create-started");
                 _composer = new ComposerWindow(viewModel);
                 _composer.PlacementChanged += OnComposerPlacementChanged;
+                _composer.ComposerVisibilityChanged += OnComposerVisibilityChanged;
                 _composer.ApplyTheme(_coordinator.State.Preferences.Theme);
                 StartupDiagnostics.Stage("composer-window-created");
             }
@@ -541,6 +587,15 @@ public partial class App : Application
     {
         if (_coordinator is { } coordinator && !_shuttingDown)
             _pendingComposerPlacementSave = RunCoordinatorCommandAsync(() => coordinator.SetComposerPlacementAsync(placement));
+    }
+
+    private void OnComposerVisibilityChanged(bool isVisible)
+    {
+        _ = isVisible;
+        if (!_handlingCharacterClick)
+        {
+            _characterClickComposerState.Reset();
+        }
     }
 
     private void RequestPulse()
@@ -935,6 +990,7 @@ public partial class App : Application
                 if (_composer is not null)
                 {
                     _composer.PlacementChanged -= OnComposerPlacementChanged;
+                    _composer.ComposerVisibilityChanged -= OnComposerVisibilityChanged;
                     _composer.CloseForExit();
                     _composer = null;
                 }
@@ -1134,7 +1190,7 @@ public partial class App : Application
                         !_coordinator.State.Preferences.OverlayVisible));
                 break;
             case TrayCommand.Compose:
-                if (_composer?.IsComposerVisible == true)
+                if (_composer?.IsVisible == true)
                     _composer.HideComposer();
                 else
                     ShowComposer();
@@ -1395,6 +1451,7 @@ public partial class App : Application
         if (_composer is not null)
         {
             _composer.PlacementChanged -= OnComposerPlacementChanged;
+            _composer.ComposerVisibilityChanged -= OnComposerVisibilityChanged;
             _composer.CloseForExit();
             _composer = null;
         }
@@ -1417,6 +1474,7 @@ public partial class App : Application
             catch (Exception exception) { StartupDiagnostics.NonFatal("shutdown-settings-save", exception); }
             await _pendingComposerPlacementSave;
             _coordinator.ComposerRequested -= RequestComposer;
+            _coordinator.CharacterClicked -= RequestCharacterClick;
             _coordinator.PulseRequested -= RequestPulse;
             _coordinator.TreeMovementToggleRequested -= RequestTreeMovementToggle;
             _coordinator.CharacterThrowRequested -= RequestCharacterThrow;

@@ -22,6 +22,15 @@ internal interface IFirebaseRealtimeCredentialProvider
     public ValueTask ResetAsync(CancellationToken cancellationToken = default);
 }
 
+internal sealed class FirebaseRealtimeCredentialStageException(
+    string stage,
+    InvalidDataException innerException) : Exception(
+        "Firebase realtime credential payload is invalid.",
+        innerException)
+{
+    public string Stage { get; } = stage;
+}
+
 internal sealed class FirebaseRealtimeCredential
 {
     public FirebaseRealtimeCredential(
@@ -30,7 +39,10 @@ internal sealed class FirebaseRealtimeCredential
         string idToken,
         Uri databaseUrl,
         long generation,
-        CancellationToken lifetimeToken = default)
+        CancellationToken lifetimeToken = default,
+        IReadOnlyList<string>? wireItems = null,
+        TimeSpan? refreshAfter = null,
+        TimeSpan? expiresAfter = null)
     {
         UserId = userId;
         SessionId = sessionId;
@@ -38,6 +50,9 @@ internal sealed class FirebaseRealtimeCredential
         DatabaseUrl = databaseUrl;
         Generation = generation;
         LifetimeToken = lifetimeToken;
+        WireItems = wireItems ?? [];
+        RefreshAfter = refreshAfter ?? TimeSpan.FromSeconds(275);
+        ExpiresAfter = expiresAfter ?? TimeSpan.FromSeconds(300);
     }
 
     public Guid UserId { get; }
@@ -46,6 +61,9 @@ internal sealed class FirebaseRealtimeCredential
     public Uri DatabaseUrl { get; }
     public long Generation { get; }
     public CancellationToken LifetimeToken { get; }
+    public IReadOnlyList<string> WireItems { get; }
+    public TimeSpan RefreshAfter { get; }
+    public TimeSpan ExpiresAfter { get; }
 
     public override string ToString() =>
         $"FirebaseRealtimeCredential(UserId={UserId:D}, SessionId={SessionId:D}, Generation={Generation})";
@@ -53,7 +71,6 @@ internal sealed class FirebaseRealtimeCredential
 
 internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCredentialProvider
 {
-    private const int ProtocolVersion = 2;
     private const int MaximumTokenCharacters = 32 * 1024;
     private const int MaximumApiKeyCharacters = 200;
     private const int MaximumResponseBytes = 256 * 1024;
@@ -112,7 +129,9 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         StoredSupabaseSession supabaseSession =
             await _sessions.GetStoredSessionAsync(cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException("An authenticated Supabase session is required.");
-        SessionKey key = ParseSupabaseSessionKey(supabaseSession);
+        SessionKey key = ValidateAtStage(
+            "supabase-session",
+            () => ParseSupabaseSessionKey(supabaseSession));
         Task<FirebaseRealtimeCredential> operation;
         PersistedSession? persistedSession = null;
 
@@ -135,7 +154,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                         minimumAccessRevision) < 0;
                 if (!requiresRebootstrap && tokenAge < state.RefreshAfter)
                 {
-                    return state.CreateCredential();
+                    return state.CreateCredential(_timeProvider);
                 }
             }
 
@@ -189,7 +208,9 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             await _sessions.GetStoredSessionAsync(cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException("An authenticated Supabase session is required.");
         EnsureCurrentGeneration(requestGeneration, generationToken);
-        SessionKey key = ParseSupabaseSessionKey(session);
+        SessionKey key = ValidateAtStage(
+            "supabase-session",
+            () => ParseSupabaseSessionKey(session));
         Task<FirebaseRealtimeCredential>? existingOperation = null;
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -200,7 +221,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                     state.Bootstrap.AccessRevision,
                     minimumAccessRevision) >= 0)
             {
-                return state.CreateCredential();
+                return state.CreateCredential(_timeProvider);
             }
 
             if (_minimumAccessRevisions.TryGetValue(key, out string? existingMinimum)
@@ -328,6 +349,10 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                     }
                     catch (Exception exception) when (
                         exception is InvalidDataException
+                        || exception is FirebaseRealtimeCredentialStageException
+                        {
+                            Stage: "firebase-token",
+                        }
                         || exception is HttpRequestException httpException
                             && IsRejectedRefresh(httpException.StatusCode))
                     {
@@ -391,22 +416,26 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         request.Content = new ByteArrayContent(
             FirebaseRealtimeProtocol.CreateBootstrapRequestBody(minimumAccessRevision));
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        byte[] responseBody = await SendAndReadBytesAsync(
+        BoundedHttpResponse bootstrapResponse = await SendAndReadBytesAsync(
             request,
             "Realtime bootstrap request failed.",
             cancellationToken).ConfigureAwait(false);
         long receivedTimestamp = _timeProvider.GetTimestamp();
         long receivedAtUnixMilliseconds = _timeProvider.GetUtcNow().ToUnixTimeMilliseconds();
-        FirebaseRealtimeBootstrapConfiguration response =
-            FirebaseRealtimeProtocol.ParseBootstrapResponse(
-                responseBody,
-                receivedAtUnixMilliseconds,
-                minimumAccessRevision);
-        ValidateCustomToken(response.CustomToken, key, response.RolloutLeaseExpiresAt);
+        long serverNowUnixMilliseconds = bootstrapResponse.ServerDateUnixMilliseconds
+            ?? receivedAtUnixMilliseconds;
+        FirebaseRealtimeBootstrapConfiguration response = ValidateAtStage(
+            "bootstrap-response",
+            () => FirebaseRealtimeProtocol.ParseBootstrapResponse(
+                bootstrapResponse.Payload,
+                serverNowUnixMilliseconds,
+                minimumAccessRevision));
         long remainingLeaseMilliseconds = checked(
-            response.RolloutLeaseExpiresAt - receivedAtUnixMilliseconds);
-        long refreshDelayMilliseconds = response.RefreshAfter > receivedAtUnixMilliseconds
-            ? response.RefreshAfter - receivedAtUnixMilliseconds
+            response.RolloutLeaseExpiresAt - serverNowUnixMilliseconds);
+        long refreshDelayMilliseconds = response.RefreshAfter > serverNowUnixMilliseconds
+            ? Math.Min(
+                response.RefreshAfter - serverNowUnixMilliseconds,
+                remainingLeaseMilliseconds - 1)
             : Math.Max(1, remainingLeaseMilliseconds / 2);
         return new BootstrapGrant(
             new ValidatedBootstrap(
@@ -417,7 +446,8 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 response.WireItems,
                 response.RolloutLeaseExpiresAt,
                 receivedTimestamp,
-                TimeSpan.FromMilliseconds(refreshDelayMilliseconds)),
+                TimeSpan.FromMilliseconds(refreshDelayMilliseconds),
+                TimeSpan.FromMilliseconds(remainingLeaseMilliseconds)),
             response.CustomToken);
     }
 
@@ -439,13 +469,14 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 request,
                 "Firebase custom-token exchange request failed.",
                 cancellationToken).ConfigureAwait(false);
-        return ValidateTokenGrant(
-            payload.IdToken,
-            payload.RefreshToken,
-            payload.ExpiresIn,
-            payload.LocalId,
-            key,
-            rolloutLeaseExpiresAt);
+        return ValidateAtStage(
+            "firebase-token",
+            () => ValidateTokenGrant(
+                payload.IdToken,
+                payload.RefreshToken,
+                payload.ExpiresIn,
+                key,
+                rolloutLeaseExpiresAt));
     }
 
     private async Task<FirebaseTokenGrant> RefreshTokenAsync(
@@ -467,16 +498,24 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             request,
             "Firebase token refresh request failed.",
             cancellationToken).ConfigureAwait(false);
-        return ValidateTokenGrant(
-            payload.IdToken,
-            payload.RefreshToken,
-            payload.ExpiresIn,
-            payload.UserId,
-            key,
-            rolloutLeaseExpiresAt);
+        return ValidateAtStage(
+            "firebase-token",
+            () =>
+            {
+                if (!Guid.TryParse(payload.UserId, out Guid userId) || userId != key.UserId)
+                {
+                    throw new InvalidDataException("Firebase refresh response identity was invalid.");
+                }
+                return ValidateTokenGrant(
+                    payload.IdToken,
+                    payload.RefreshToken,
+                    payload.ExpiresIn,
+                    key,
+                    rolloutLeaseExpiresAt);
+            });
     }
 
-    private async Task<byte[]> SendAndReadBytesAsync(
+    private async Task<BoundedHttpResponse> SendAndReadBytesAsync(
         HttpRequestMessage request,
         string failureMessage,
         CancellationToken cancellationToken)
@@ -491,7 +530,11 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             {
                 throw new HttpRequestException(failureMessage, inner: null, response.StatusCode);
             }
-            return await ReadBoundedAsync(response.Content, cancellationToken).ConfigureAwait(false);
+            byte[] payload = await ReadBoundedAsync(response.Content, cancellationToken)
+                .ConfigureAwait(false);
+            return new BoundedHttpResponse(
+                payload,
+                response.Headers.Date?.ToUnixTimeMilliseconds());
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -624,6 +667,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 generationToken,
                 grant.ReceivedTimestamp,
                 RefreshAfter(grant.ExpiresIn),
+                grant.ExpiresIn,
                 bootstrap);
             _states[key] = state;
             if (_minimumAccessRevisions.TryGetValue(key, out string? minimumAccessRevision)
@@ -634,7 +678,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
                 _minimumAccessRevisions.Remove(key);
             }
             RemoveInflightWithinGate(key, generation);
-            return state.CreateCredential();
+            return state.CreateCredential(_timeProvider);
         }
         finally
         {
@@ -735,7 +779,6 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         string? idToken,
         string? refreshToken,
         string? expiresIn,
-        string? userId,
         SessionKey key,
         long rolloutLeaseExpiresAt)
     {
@@ -743,8 +786,6 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
             || idToken.Length > MaximumTokenCharacters
             || string.IsNullOrWhiteSpace(refreshToken)
             || refreshToken.Length > MaximumTokenCharacters
-            || !Guid.TryParse(userId, out Guid parsedUserId)
-            || parsedUserId != key.UserId
             || !int.TryParse(expiresIn, NumberStyles.None, CultureInfo.InvariantCulture, out int seconds)
             || seconds is <= 0 or > 86_400)
         {
@@ -774,23 +815,6 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         return new SessionKey(session.UserId, sessionId);
     }
 
-    private static void ValidateCustomToken(
-        string customToken,
-        SessionKey key,
-        long rolloutLeaseExpiresAt)
-    {
-        using JsonDocument payload = ParseJwtPayload(customToken, "Firebase custom token");
-        JsonElement root = payload.RootElement;
-        if (!root.TryGetProperty("uid", out JsonElement uid)
-            || !Guid.TryParse(uid.GetString(), out Guid userId)
-            || userId != key.UserId
-            || !root.TryGetProperty("claims", out JsonElement claims)
-            || !HasFirebaseSessionClaims(claims, key, rolloutLeaseExpiresAt))
-        {
-            throw new InvalidDataException("Firebase custom token claims were invalid.");
-        }
-    }
-
     private static void ValidateFirebaseIdToken(
         string idToken,
         SessionKey key,
@@ -815,15 +839,28 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         JsonElement claims,
         SessionKey key,
         long rolloutLeaseExpiresAt) =>
-        claims.TryGetProperty("sideyProtocol", out JsonElement protocol)
-        && protocol.TryGetInt32(out int protocolVersion)
-        && protocolVersion == ProtocolVersion
-        && claims.TryGetProperty("sideySessionId", out JsonElement session)
+        claims.TryGetProperty("sideySessionId", out JsonElement session)
         && Guid.TryParse(session.GetString(), out Guid sessionId)
         && sessionId == key.SessionId
         && claims.TryGetProperty("sideyRolloutUntil", out JsonElement rolloutLease)
         && rolloutLease.TryGetInt64(out long tokenRolloutLeaseExpiresAt)
         && tokenRolloutLeaseExpiresAt == rolloutLeaseExpiresAt;
+
+    private static T ValidateAtStage<T>(string stage, Func<T> validation)
+    {
+        try
+        {
+            return validation();
+        }
+        catch (FirebaseRealtimeCredentialStageException)
+        {
+            throw;
+        }
+        catch (InvalidDataException exception)
+        {
+            throw new FirebaseRealtimeCredentialStageException(stage, exception);
+        }
+    }
 
     private static JsonDocument ParseJwtPayload(string token, string tokenKind)
     {
@@ -921,6 +958,10 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         public override string ToString() => nameof(FirebaseTokenGrant);
     }
 
+    private sealed record BoundedHttpResponse(
+        byte[] Payload,
+        long? ServerDateUnixMilliseconds);
+
     private sealed record ValidatedBootstrap(
         Uri DatabaseUrl,
         string FirebaseApiKey,
@@ -929,7 +970,8 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         IReadOnlyList<string> WireItems,
         long RolloutLeaseExpiresAt,
         long ReceivedTimestamp,
-        TimeSpan RefreshAfter)
+        TimeSpan RefreshAfter,
+        TimeSpan ExpiresAfter)
     {
         public override string ToString() =>
             $"{nameof(ValidatedBootstrap)}(DatabaseUrl={DatabaseUrl})";
@@ -952,15 +994,27 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
         CancellationToken LifetimeToken,
         long IssuedTimestamp,
         TimeSpan RefreshAfter,
+        TimeSpan ExpiresAfter,
         ValidatedBootstrap Bootstrap)
     {
-        public FirebaseRealtimeCredential CreateCredential() => new(
-            UserId,
-            SessionId,
-            IdToken,
-            Bootstrap.DatabaseUrl,
-            Generation,
-            LifetimeToken);
+        public FirebaseRealtimeCredential CreateCredential(TimeProvider timeProvider)
+        {
+            TimeSpan tokenAge = timeProvider.GetElapsedTime(IssuedTimestamp);
+            TimeSpan bootstrapAge = timeProvider.GetElapsedTime(Bootstrap.ReceivedTimestamp);
+            return new FirebaseRealtimeCredential(
+                UserId,
+                SessionId,
+                IdToken,
+                Bootstrap.DatabaseUrl,
+                Generation,
+                LifetimeToken,
+                Bootstrap.WireItems,
+                Remaining(RefreshAfter - tokenAge, Bootstrap.RefreshAfter - bootstrapAge),
+                Remaining(ExpiresAfter - tokenAge, Bootstrap.ExpiresAfter - bootstrapAge));
+        }
+
+        private static TimeSpan Remaining(TimeSpan token, TimeSpan bootstrap) =>
+            TimeSpan.FromTicks(Math.Max(0, Math.Min(token.Ticks, bootstrap.Ticks)));
 
         public override string ToString() =>
             $"{nameof(TokenState)}(UserId={UserId:D}, SessionId={SessionId:D})";
@@ -1015,8 +1069,7 @@ internal sealed class FirebaseRealtimeCredentialProvider : IFirebaseRealtimeCred
     private sealed record CustomTokenExchangeResponse(
         [property: JsonPropertyName("idToken")] string? IdToken,
         [property: JsonPropertyName("refreshToken")] string? RefreshToken,
-        [property: JsonPropertyName("expiresIn")] string? ExpiresIn,
-        [property: JsonPropertyName("localId")] string? LocalId)
+        [property: JsonPropertyName("expiresIn")] string? ExpiresIn)
     {
         public override string ToString() => nameof(CustomTokenExchangeResponse);
     }

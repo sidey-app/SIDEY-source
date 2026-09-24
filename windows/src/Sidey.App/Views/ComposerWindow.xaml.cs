@@ -64,9 +64,10 @@ public sealed partial class ComposerWindow : Window
 
     public ComposerViewModel ViewModel { get; }
 
-    public bool IsComposerVisible => _isVisible && !_isClosed;
+    public bool IsVisible => _isVisible && !_isClosed;
 
     public event Action<ComposerPlacement>? PlacementChanged;
+    public event Action<bool>? ComposerVisibilityChanged;
 
     public void ApplyTheme(AppThemePreference theme)
     {
@@ -87,8 +88,13 @@ public sealed partial class ComposerWindow : Window
         _monitorIdentifier = monitorIdentifier;
         _placement = placement?.Normalize();
         RestorePlacement();
+        bool visibilityChanged = !_isVisible;
         _isVisible = true;
         AppWindow.Show();
+        if (visibilityChanged)
+        {
+            ComposerVisibilityChanged?.Invoke(true);
+        }
         Activate();
         SideyWindowActivation.BringToForeground(this);
         RequestMessageInputFocus();
@@ -113,6 +119,7 @@ public sealed partial class ComposerWindow : Window
             StartupDiagnostics.Stage("composer-hide-started");
             AppWindow.Hide();
             StartupDiagnostics.Stage("composer-hidden");
+            ComposerVisibilityChanged?.Invoke(false);
         }
         finally
         {
@@ -186,8 +193,7 @@ public sealed partial class ComposerWindow : Window
         _ = sender;
         if (args.WindowActivationState == WindowActivationState.Deactivated)
         {
-            FinishDrag(restoreFocus: false);
-            if (!_focusRequested && _isVisible && !_isHiding)
+            if (!_isDragging && !_focusRequested && _isVisible && !_isHiding)
             {
                 HideComposer();
             }
@@ -313,7 +319,7 @@ public sealed partial class ComposerWindow : Window
         _focusRequested = false;
         ViewModel.OnShown();
         _isDragging = true;
-        _borderlessWindow.BeginDrag(point.Position.X, point.Position.Y);
+        _borderlessWindow.BeginDrag();
     }
 
     private void OnDragGripPointerEntered(object sender, PointerRoutedEventArgs args) =>
@@ -338,8 +344,7 @@ public sealed partial class ComposerWindow : Window
             return;
         }
 
-        _borderlessWindow.DragTo(point.Position.X, point.Position.Y,
-            ComposerRoot.XamlRoot?.RasterizationScale ?? 1);
+        _borderlessWindow.DragTo();
     }
 
     private void OnDragGripPointerReleased(object sender, PointerRoutedEventArgs args)
@@ -347,9 +352,7 @@ public sealed partial class ComposerWindow : Window
         if (_isDragging && args.Pointer.PointerId == _dragPointerId)
         {
             args.Handled = true;
-            PointerPoint point = args.GetCurrentPoint(ComposerRoot);
-            _borderlessWindow.DragTo(point.Position.X, point.Position.Y,
-                ComposerRoot.XamlRoot?.RasterizationScale ?? 1);
+            _borderlessWindow.DragTo();
             FinishDrag();
         }
     }
