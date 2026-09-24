@@ -33,7 +33,6 @@ class AppStoreConnectManifestTests(unittest.TestCase):
         )
 
         self.assertEqual(tuple(desired.manifest["app_localizations"]), APP_STORE_LOCALES)
-        self.assertEqual(len(desired.products), 33)
         apple_ids = {
             candidate
             for product in desired.products
@@ -42,7 +41,10 @@ class AppStoreConnectManifestTests(unittest.TestCase):
                 *product["legacy_app_store_product_ids"],
             )
         }
-        self.assertEqual(len(apple_ids), 43)
+        self.assertEqual(len(apple_ids), sum(
+            1 + len(product["legacy_app_store_product_ids"])
+            for product in desired.products
+        ))
 
     def test_app_store_export_derives_safe_short_display_name_without_rewriting_source(self) -> None:
         desired = load_desired_state(

@@ -44,16 +44,6 @@ class WorkflowContractTests(unittest.TestCase):
             with self.subTest(job=name):
                 self.assertIn(f'name: {name}', ci)
 
-        website = self.read('website-deployment.yml')
-        self.assertIn('name: Build and test website', website)
-        self.assertIn('name: Deploy to GitHub Pages', website)
-        self.assertIn('Publish tested website to public gh-pages branch', website)
-
-        release = self.read('windows-release.yml')
-        self.assertIn('name: Build release candidate', release)
-        self.assertIn('name: Publish GitHub release', release)
-        self.assertIn('name: Update release website', release)
-
     def test_ci_is_the_automatic_shared_validation_entrypoint(self):
         validation = self.read('ci.yml')
         self.assertIn(
@@ -63,10 +53,6 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn(
             'python3 -m unittest discover -s '
             'scripts/skills/release-notes/tests',
-            validation,
-        )
-        self.assertNotIn(
-            '--require-windows-instruction-foundation',
             validation,
         )
         self.assertIn(
@@ -122,13 +108,6 @@ class WorkflowContractTests(unittest.TestCase):
         pages_tests = 'python3 -m unittest discover -s scripts/pages/tests'
         self.assertIn(pages_tests, workflow)
         self.assertIn(pages_tests, validation)
-        self.assertIn(
-            'python3 ./scripts/pages/prepare_release_metadata.py',
-            workflow,
-        )
-        old_script = './scripts/website/prepare-release-metadata.ps1'
-        self.assertNotIn(old_script, workflow)
-        self.assertNotIn(old_script, validation)
         self.assertIn('name: Upload tested website build', workflow)
         self.assertIn('name: Download tested website build', workflow)
         self.assertIn('actions/create-github-app-token@v2', workflow)

@@ -42,7 +42,7 @@ manifest 경로에 없거나, 현재 판매 상품이 Connect snapshot에서 누
 snapshot이 불완전하면 apply를 거부한다. Legacy Apple product ID는 복원 매핑만 검증하고
 현지화나 판매 지역 변경 대상으로 만들지 않는다.
 
-Repository의 `release/macos.json` build는 App Store Connect snapshot을 읽기 전까지
+Repository의 `release/version.json`에 있는 macOS build는 App Store Connect snapshot을 읽기 전까지
 provisional이다. Snapshot은 macOS pre-release version의 전체 build upload 이력과 현재
 최댓값을 기록한다. Manifest build가 이미 사용됐거나 정확히 `max + 1`이 아니면 blocker다.
 대상 App Store version이 더 이상 수정 가능한 상태가 아니면 같은 version을 억지로
@@ -56,14 +56,17 @@ provisional이다. Snapshot은 macOS pre-release version의 전체 build upload 
 2. 승인 ID를 `SIDEY_APP_STORE_RELEASE_APPROVAL` 환경 gate로 주입한다.
 3. 같은 ID를 `--release-approval`과 함께 전달하고 `--apply`를 명시한다.
 
-현재 승인 ID는 manifest의 version/build에서 `macos-<version>-build-<build>` 형식으로
-파생한다. 예시는 다음과 같다.
+현재 승인 ID는 공통 version source의 Product Version과 macOS build에서
+`macos-<version>-build-<build>` 형식으로 파생한다.
 
 ```sh
-SIDEY_APP_STORE_RELEASE_APPROVAL=macos-1.3.0-build-32 \
+product_version=$(python3 scripts/sidey_version.py --get productVersion)
+mac_build=$(python3 scripts/sidey_version.py --get macBuild)
+approval_id="macos-${product_version}-build-${mac_build}"
+SIDEY_APP_STORE_RELEASE_APPROVAL="$approval_id" \
 python3 scripts/app_store_connect/sync.py \
   --apply \
-  --release-approval macos-1.3.0-build-32 \
+  --release-approval "$approval_id" \
   --snapshot-output /private/tmp/sidey-asc-approved-snapshot.json \
   --plan-output /private/tmp/sidey-asc-approved-plan.json
 ```
