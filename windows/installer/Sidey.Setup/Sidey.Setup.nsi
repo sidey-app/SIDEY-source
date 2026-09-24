@@ -287,7 +287,7 @@ Function .onInit
     StrCpy $InstallerErrorExitCode $1
     StrCpy $InstallerErrorSource "TRANSACTION"
     StrCpy $InstallerErrorStage "RECOVER"
-    StrCpy $InstallerErrorSymbol "TRANSACTION_RECOVERY_FAILED"
+    !insertmacro ResolveRecoveryErrorSymbol
     StrCpy $InstallerErrorTarget "$(InstallerComponentInstallationState)"
     StrCpy $InstallerErrorCommand "Sidey.InstallTransaction.exe --action Recover"
     StrCpy $InstallerErrorMessage "$(TransactionRecoveryFailed)"

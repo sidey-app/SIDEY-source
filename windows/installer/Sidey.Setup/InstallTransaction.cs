@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -18,6 +19,17 @@ namespace Sidey.Installer
     {
         private const int InvalidArguments = 64;
         private const int RetryableCleanupFailure = 10;
+        // Recover exit codes are a contract with Sidey.Setup.nsi. Keep 1 as the
+        // unclassified/legacy failure and reserve 5 for an ExecWait launch error.
+        private const int RecoveryParentFailure = 70;
+        private const int RecoveryStateFailure = 71;
+        private const int RecoveryRollbackFailure = 72;
+        private const int RecoveryStagingFailure = 73;
+        private const int RecoveryCommittedFailure = 74;
+        private const int RecoveryRegistryFailure = 75;
+        private const int RecoveryAccessDenied = 76;
+        private const int RecoveryIoFailure = 77;
+        private const int RecoveryInitializationFailure = 78;
 
         [STAThread]
         private static int Main(string[] arguments)
@@ -30,7 +42,7 @@ namespace Sidey.Installer
                 transaction = new InstallTransaction(options);
                 return transaction.Run();
             }
-            catch (ArgumentException exception)
+            catch (ArgumentException exception) when (options == null)
             {
                 WriteFailureDiagnostic(options, transaction, exception);
                 Console.Error.WriteLine(exception.Message);
@@ -40,7 +52,44 @@ namespace Sidey.Installer
             {
                 WriteFailureDiagnostic(options, transaction, exception);
                 Console.Error.WriteLine(exception.Message);
+                return FailureExitCode(options, transaction, exception);
+            }
+        }
+
+        private static int FailureExitCode(
+            TransactionOptions options,
+            InstallTransaction transaction,
+            Exception exception)
+        {
+            if (options == null || !string.Equals(
+                options.Action, "Recover", StringComparison.OrdinalIgnoreCase))
+            {
                 return 1;
+            }
+
+            if (exception is UnauthorizedAccessException || exception is SecurityException)
+            {
+                return RecoveryAccessDenied;
+            }
+            if (exception is IOException)
+            {
+                return RecoveryIoFailure;
+            }
+            if (transaction == null)
+            {
+                return RecoveryInitializationFailure;
+            }
+
+            switch (transaction.Operation)
+            {
+                case "recover.parent-security": return RecoveryParentFailure;
+                case "recover.read-state": return RecoveryStateFailure;
+                case "recover.inspect-orphan":
+                case "recover.rollback": return RecoveryRollbackFailure;
+                case "recover.remove-staging": return RecoveryStagingFailure;
+                case "recover.complete-committed": return RecoveryCommittedFailure;
+                case "recover.pending-location": return RecoveryRegistryFailure;
+                default: return 1;
             }
         }
 

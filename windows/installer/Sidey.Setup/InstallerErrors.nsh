@@ -20,10 +20,59 @@ Var InstallerErrorResultLoaded
 
 ; SIDEY-owned support codes are intentionally outside the HRESULT/Win32 namespaces.
 ; Keep native Microsoft/Windows codes in the diagnostic data only.
+!macro ResolveRecoveryErrorSymbol
+  StrCpy $InstallerErrorSymbol "TRANSACTION_RECOVERY_FAILED"
+  ${If} $InstallerErrorExitCode == 64
+    StrCpy $InstallerErrorSymbol "RECOVERY_ARGUMENTS_INVALID"
+  ${ElseIf} $InstallerErrorExitCode == 5
+    StrCpy $InstallerErrorSymbol "RECOVERY_HELPER_LAUNCH_FAILED"
+  ${ElseIf} $InstallerErrorExitCode == 70
+    StrCpy $InstallerErrorSymbol "RECOVERY_PARENT_SECURITY_FAILED"
+  ${ElseIf} $InstallerErrorExitCode == 71
+    StrCpy $InstallerErrorSymbol "RECOVERY_STATE_CHECK_FAILED"
+  ${ElseIf} $InstallerErrorExitCode == 72
+    StrCpy $InstallerErrorSymbol "RECOVERY_ROLLBACK_FAILED"
+  ${ElseIf} $InstallerErrorExitCode == 73
+    StrCpy $InstallerErrorSymbol "RECOVERY_STAGING_CLEANUP_FAILED"
+  ${ElseIf} $InstallerErrorExitCode == 74
+    StrCpy $InstallerErrorSymbol "RECOVERY_COMMITTED_COMPLETION_FAILED"
+  ${ElseIf} $InstallerErrorExitCode == 75
+    StrCpy $InstallerErrorSymbol "RECOVERY_REGISTRY_CLEANUP_FAILED"
+  ${ElseIf} $InstallerErrorExitCode == 76
+    StrCpy $InstallerErrorSymbol "RECOVERY_ACCESS_DENIED"
+  ${ElseIf} $InstallerErrorExitCode == 77
+    StrCpy $InstallerErrorSymbol "RECOVERY_FILESYSTEM_IO_FAILED"
+  ${ElseIf} $InstallerErrorExitCode == 78
+    StrCpy $InstallerErrorSymbol "RECOVERY_INITIALIZATION_FAILED"
+  ${EndIf}
+!macroend
+
 !macro ResolveSideyInstallerErrorCode
   StrCpy $InstallerErrorSideyCode "0x51DE10FF"
   ${If} $InstallerErrorSymbol == "TRANSACTION_RECOVERY_FAILED"
     StrCpy $InstallerErrorSideyCode "0x51DE2001"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_ARGUMENTS_INVALID"
+    StrCpy $InstallerErrorSideyCode "0x51DE2201"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_HELPER_LAUNCH_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE2202"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_PARENT_SECURITY_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE2203"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_STATE_CHECK_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE2204"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_ROLLBACK_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE2205"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_STAGING_CLEANUP_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE2206"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_COMMITTED_COMPLETION_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE2207"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_REGISTRY_CLEANUP_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE2208"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_ACCESS_DENIED"
+    StrCpy $InstallerErrorSideyCode "0x51DE2209"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_FILESYSTEM_IO_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE220A"
+  ${ElseIf} $InstallerErrorSymbol == "RECOVERY_INITIALIZATION_FAILED"
+    StrCpy $InstallerErrorSideyCode "0x51DE220B"
   ${ElseIf} $InstallerErrorSymbol == "EXISTING_REMOVAL_FAILED"
     StrCpy $InstallerErrorSideyCode "0x51DE2002"
   ${ElseIf} $InstallerErrorSymbol == "TRANSACTION_FAILED"

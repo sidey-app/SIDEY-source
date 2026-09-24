@@ -425,8 +425,8 @@ try {
     [IO.Directory]::CreateDirectory($rollback) | Out-Null
     [IO.File]::WriteAllText((Join-Path $rollback 'marker.txt'), 'preserve')
     $recoveryExitCode = Invoke-Transaction Recover -AllowFailure
-    Assert-True ($recoveryExitCode -eq 1) `
-        'Recovery accepted an unrecognized rollback directory.'
+    Assert-True ($recoveryExitCode -eq 72) `
+        'Recovery did not report the rollback-conflict exit code.'
     $recoveryLog = [IO.File]::ReadAllText($logPath)
     Assert-True ($recoveryLog.Contains('operation=recover.inspect-orphan')) `
         'A failed recovery did not identify its failed operation in the support log.'
@@ -438,6 +438,28 @@ try {
         'A failed recovery removed an unrecognized rollback directory.'
     Remove-Item -LiteralPath $rollback -Recurse -Force
     Invoke-Transaction Recover
+
+    $statePath = $install + '.sidey-transaction.json'
+    [IO.File]::WriteAllText($statePath, 'not-json')
+    $invalidStateExitCode = Invoke-Transaction Recover -AllowFailure
+    Assert-True ($invalidStateExitCode -eq 71) `
+        'Recovery did not report the invalid-state exit code.'
+    Assert-True ([IO.File]::Exists($statePath)) `
+        'Recovery discarded an invalid state file needed for diagnosis.'
+    [IO.File]::Delete($statePath)
+
+    [IO.File]::WriteAllText($statePath, '{}')
+    $lockedState = [IO.File]::Open(
+        $statePath, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::None)
+    try {
+        $stateIoExitCode = Invoke-Transaction Recover -AllowFailure
+        Assert-True ($stateIoExitCode -eq 77) `
+            'Recovery did not report the filesystem-I/O exit code.'
+    }
+    finally {
+        $lockedState.Dispose()
+    }
+    [IO.File]::Delete($statePath)
 
     $unsafeExitCode = Invoke-Transaction Prepare `
         -StagingDirectory (Join-Path $probeRoot 'not-a-sidey-stage') -AllowFailure
