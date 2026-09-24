@@ -25,9 +25,15 @@
       <ListView
           x:Name="HistoryList"
           ContainerContentChanging="OnHistoryContainerContentChanging"
+          Loaded="OnHistoryListLoaded"
           IsItemClickEnabled="False"
           ItemsSource="{Binding Items}"
           SelectionMode="None">
+        <ListView.ItemsPanel>
+          <ItemsPanelTemplate>
+            <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView" />
+          </ItemsPanelTemplate>
+        </ListView.ItemsPanel>
         <ListView.ItemTemplate>
           <DataTemplate>
             <Border
@@ -83,7 +89,7 @@
             </Border>
           </DataTemplate>
         </ListView.ItemTemplate>
-        <ListView.Footer>
+        <ListView.Header>
           <Grid MinHeight="42">
             <StackPanel
                 HorizontalAlignment="Center"
@@ -108,7 +114,7 @@
                 Text="{Binding Value, Source={i18n:I18n Key=history.exhausted}, Mode=OneWay}"
                 Visibility="{Binding IsExhaustedVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
           </Grid>
-        </ListView.Footer>
+        </ListView.Header>
       </ListView>
 
       <StackPanel

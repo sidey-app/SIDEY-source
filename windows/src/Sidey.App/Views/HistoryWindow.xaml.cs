@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -19,6 +20,13 @@ public sealed partial class HistoryWindow : Window
     private bool _isComposing;
     private bool _focusRequested;
     private int _focusGeneration;
+    private ScrollViewer? _historyScroller;
+    private bool _followLatest = true;
+    private bool _latestScrollQueued;
+    private int _latestScrollGeneration;
+    private readonly PointerEventHandler _historyWheelHandler;
+    private readonly PointerEventHandler _historyPressHandler;
+    private readonly KeyEventHandler _historyKeyHandler;
 
     public HistoryWindow(HistoryWindowViewModel viewModel)
     {
@@ -29,6 +37,13 @@ public sealed partial class HistoryWindow : Window
         HistoryInput.TextCompositionStarted += (_, _) => _isComposing = true;
         HistoryInput.TextCompositionEnded += (_, _) => _isComposing = false;
         HistoryInput.Loaded += OnMessageInputLoaded;
+        _historyWheelHandler = OnHistoryWheel;
+        _historyPressHandler = OnHistoryPress;
+        _historyKeyHandler = OnHistoryKey;
+        HistoryList.AddHandler(UIElement.PointerWheelChangedEvent, _historyWheelHandler, handledEventsToo: true);
+        HistoryList.AddHandler(UIElement.PointerPressedEvent, _historyPressHandler, handledEventsToo: true);
+        HistoryList.AddHandler(UIElement.KeyDownEvent, _historyKeyHandler, handledEventsToo: true);
+        ViewModel.Items.CollectionChanged += OnHistoryItemsChanged;
         Activated += OnWindowActivated;
         ApplyTheme(_initialState.Preferences.Theme);
         SideyWindowTheme.FollowTitleBarTheme(this, HistoryRoot);
@@ -158,11 +173,171 @@ public sealed partial class HistoryWindow : Window
         ContainerContentChangingEventArgs args)
     {
         _ = sender;
-        if (args.ItemIndex >= ViewModel.Items.Count - 5
+        if (!_latestScrollQueued
+            && _historyScroller is { VerticalOffset: <= 40 }
+            && args.ItemIndex <= 4
             && ViewModel.LoadMoreCommand.CanExecute(null))
         {
             ViewModel.LoadMoreCommand.Execute(null);
         }
+    }
+
+    private void OnHistoryListLoaded(object sender, RoutedEventArgs args)
+    {
+        _ = sender;
+        _ = args;
+        if (_historyScroller is not null)
+        {
+            _historyScroller.ViewChanged -= OnHistoryScrollChanged;
+        }
+
+        _historyScroller = FindScrollViewer(HistoryList);
+        if (_historyScroller is not null)
+        {
+            _historyScroller.ViewChanged += OnHistoryScrollChanged;
+        }
+
+        if (ViewModel.Items.Count > 0)
+        {
+            RequestScrollToLatest();
+        }
+    }
+
+    private void OnHistoryItemsChanged(object? sender, NotifyCollectionChangedEventArgs args)
+    {
+        _ = sender;
+        if (ViewModel.Items.Count == 0)
+        {
+            _followLatest = true;
+            return;
+        }
+
+        bool newOwnMessage = args.Action == NotifyCollectionChangedAction.Add
+            && args.NewItems is { Count: > 0 } newItems
+            && args.NewStartingIndex == ViewModel.Items.Count - newItems.Count
+            && newItems.OfType<HistoryEntryViewModel>().Any(item => item.IsCurrentUser);
+        if (_followLatest || newOwnMessage)
+        {
+            RequestScrollToLatest();
+        }
+    }
+
+    private void OnHistoryScrollChanged(object? sender, ScrollViewerViewChangedEventArgs args)
+    {
+        _ = args;
+        if (!_latestScrollQueued && sender is ScrollViewer scroller)
+        {
+            _followLatest = scroller.ScrollableHeight - scroller.VerticalOffset <= 4;
+            if (scroller.VerticalOffset <= 40 && ViewModel.LoadMoreCommand.CanExecute(null))
+            {
+                ViewModel.LoadMoreCommand.Execute(null);
+            }
+        }
+    }
+
+    private void OnHistoryWheel(object sender, PointerRoutedEventArgs args)
+    {
+        _ = sender;
+        if (args.GetCurrentPoint(HistoryList).Properties.MouseWheelDelta > 0)
+        {
+            StopFollowingLatest();
+        }
+    }
+
+    private void OnHistoryPress(object sender, PointerRoutedEventArgs args)
+    {
+        _ = sender;
+        _ = args;
+        if (_latestScrollQueued)
+        {
+            StopFollowingLatest();
+        }
+    }
+
+    private void OnHistoryKey(object sender, KeyRoutedEventArgs args)
+    {
+        _ = sender;
+        if (args.Key is VirtualKey.Up or VirtualKey.PageUp or VirtualKey.Home)
+        {
+            StopFollowingLatest();
+        }
+    }
+
+    private void StopFollowingLatest()
+    {
+        _followLatest = false;
+        _latestScrollGeneration++;
+        _latestScrollQueued = false;
+    }
+
+    private void RequestScrollToLatest()
+    {
+        if (_isClosed || _latestScrollQueued || ViewModel.Items.Count == 0)
+        {
+            return;
+        }
+
+        _followLatest = true;
+        _latestScrollQueued = true;
+        int generation = ++_latestScrollGeneration;
+        QueueLatestScroll(generation, remainingPasses: 2);
+    }
+
+    private void QueueLatestScroll(int generation, int remainingPasses)
+    {
+        if (!DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            ScrollToLatest(generation, remainingPasses)))
+        {
+            _latestScrollQueued = false;
+        }
+    }
+
+    private void ScrollToLatest(int generation, int remainingPasses)
+    {
+        if (_isClosed || generation != _latestScrollGeneration)
+        {
+            return;
+        }
+
+        if (ViewModel.Items.LastOrDefault() is { } latest)
+        {
+            HistoryList.ScrollIntoView(latest);
+            HistoryList.UpdateLayout();
+            _historyScroller ??= FindScrollViewer(HistoryList);
+            _historyScroller?.ChangeView(null, _historyScroller.ScrollableHeight, null, disableAnimation: true);
+        }
+
+        if (remainingPasses > 0)
+        {
+            QueueLatestScroll(generation, remainingPasses - 1);
+        }
+        else
+        {
+            _latestScrollQueued = false;
+            if (_historyScroller is { VerticalOffset: <= 40 }
+                && ViewModel.LoadMoreCommand.CanExecute(null))
+            {
+                ViewModel.LoadMoreCommand.Execute(null);
+            }
+        }
+    }
+
+    private static ScrollViewer? FindScrollViewer(DependencyObject root)
+    {
+        if (root is ScrollViewer scroller)
+        {
+            return scroller;
+        }
+
+        for (int index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            if (FindScrollViewer(VisualTreeHelper.GetChild(root, index)) is { } child)
+            {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     private void OnAppWindowClosing(
@@ -182,6 +357,16 @@ public sealed partial class HistoryWindow : Window
         }
 
         _isClosed = true;
+        _latestScrollGeneration++;
+        ViewModel.Items.CollectionChanged -= OnHistoryItemsChanged;
+        HistoryList.Loaded -= OnHistoryListLoaded;
+        HistoryList.RemoveHandler(UIElement.PointerWheelChangedEvent, _historyWheelHandler);
+        HistoryList.RemoveHandler(UIElement.PointerPressedEvent, _historyPressHandler);
+        HistoryList.RemoveHandler(UIElement.KeyDownEvent, _historyKeyHandler);
+        if (_historyScroller is not null)
+        {
+            _historyScroller.ViewChanged -= OnHistoryScrollChanged;
+        }
         _focusRequested = false;
         _focusGeneration++;
         HistoryInput.Loaded -= OnMessageInputLoaded;
