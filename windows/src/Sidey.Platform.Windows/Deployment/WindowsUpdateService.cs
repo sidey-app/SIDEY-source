@@ -368,8 +368,8 @@ public sealed partial class WindowsUpdateService
 
     private static string ResolveReleaseVersion(string productVersion, string updateVersion)
     {
-        ParsedVersion product = ParsedVersion.Parse(productVersion);
-        ParsedVersion update = ParsedVersion.Parse(updateVersion);
+        var product = ParsedVersion.Parse(productVersion);
+        var update = ParsedVersion.Parse(updateVersion);
         int initialUpdateBuild = checked(product.Patch * 1000);
         if (product.Prerelease.Count != 0
             || update.Prerelease.Count != 0

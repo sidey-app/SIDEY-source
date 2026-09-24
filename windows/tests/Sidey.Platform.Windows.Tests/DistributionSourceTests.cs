@@ -96,7 +96,7 @@ public sealed class DistributionSourceTests
         string updateVersion = Value(properties, "SideyWindowsUpdateVersion");
         string releaseVersion = Value(properties, "SideyWindowsReleaseVersion");
         string msixVersion = Value(properties, "SideyMsixVersion");
-        int[] productParts = productVersion.Split('.').Select(int.Parse).ToArray();
+        int[] productParts = [.. productVersion.Split('.').Select(int.Parse)];
 
         Assert.Equal(3, productParts.Length);
         Assert.InRange(windowsRevision, 0, 999);

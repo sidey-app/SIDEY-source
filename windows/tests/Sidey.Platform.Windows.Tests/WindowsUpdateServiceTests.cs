@@ -33,7 +33,7 @@ public sealed class WindowsUpdateServiceTests
     {
         using var client = new HttpClient(new StubHandler(
             new HttpResponseMessage(HttpStatusCode.NotFound)));
-        var service = CreateService(client, "1.0.10", "1.0.10");
+        WindowsUpdateService service = CreateService(client, "1.0.10", "1.0.10");
 
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => service.CheckAsync());
@@ -58,7 +58,7 @@ public sealed class WindowsUpdateServiceTests
             Content = new StringContent(Manifest, Encoding.UTF8, "application/json"),
         };
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "1.0.10", "1.0.10");
+        WindowsUpdateService service = CreateService(client, "1.0.10", "1.0.10");
 
         WindowsUpdateManifest? update = await service.CheckAsync();
 
@@ -85,7 +85,7 @@ public sealed class WindowsUpdateServiceTests
             Content = new ByteArrayContent(installerBytes),
         };
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "1.0.10", "1.0.10");
+        WindowsUpdateService service = CreateService(client, "1.0.10", "1.0.10");
         var manifest = new WindowsUpdateManifest(
             "production",
             "2.0.1",
@@ -133,7 +133,7 @@ public sealed class WindowsUpdateServiceTests
             Content = new StringContent(Manifest, Encoding.UTF8, "application/json"),
         };
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "1.0.10", "1.0.10");
+        WindowsUpdateService service = CreateService(client, "1.0.10", "1.0.10");
 
         WindowsUpdateManifest? update = await service.CheckAsync();
 
@@ -167,7 +167,7 @@ public sealed class WindowsUpdateServiceTests
             Content = new StringContent(Manifest, Encoding.UTF8, "application/json"),
         };
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "1.0.9", "1.0.9");
+        WindowsUpdateService service = CreateService(client, "1.0.9", "1.0.9");
 
         WindowsUpdateManifest? update = await service.CheckAsync();
 
@@ -193,7 +193,7 @@ public sealed class WindowsUpdateServiceTests
             Content = new StringContent(Manifest, Encoding.UTF8, "application/json"),
         };
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "1.0.10", "1.0.10");
+        WindowsUpdateService service = CreateService(client, "1.0.10", "1.0.10");
 
         await Assert.ThrowsAsync<InvalidDataException>(() => service.CheckAsync());
     }
@@ -215,7 +215,7 @@ public sealed class WindowsUpdateServiceTests
             Content = new StringContent(Manifest, Encoding.UTF8, "application/json"),
         };
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "1.0.10", "1.0.10");
+        WindowsUpdateService service = CreateService(client, "1.0.10", "1.0.10");
 
         await Assert.ThrowsAsync<InvalidDataException>(() => service.CheckAsync());
     }
@@ -237,9 +237,9 @@ public sealed class WindowsUpdateServiceTests
               "update_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
             }
             """;
-        using var response = JsonResponse(Manifest);
+        using HttpResponseMessage response = JsonResponse(Manifest);
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "2.0.0", "2.0.0");
+        WindowsUpdateService service = CreateService(client, "2.0.0", "2.0.0");
 
         WindowsUpdateManifest? update = await service.CheckAsync();
 
@@ -267,9 +267,9 @@ public sealed class WindowsUpdateServiceTests
               "update_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
             }
             """;
-        using var response = JsonResponse(Manifest);
+        using HttpResponseMessage response = JsonResponse(Manifest);
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "2.0.1", "2.0.1000");
+        WindowsUpdateService service = CreateService(client, "2.0.1", "2.0.1000");
 
         WindowsUpdateManifest? update = await service.CheckAsync();
 
@@ -296,9 +296,9 @@ public sealed class WindowsUpdateServiceTests
               "update_version": "2.0.1000"
             }
             """;
-        using var response = JsonResponse(Manifest);
+        using HttpResponseMessage response = JsonResponse(Manifest);
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "2.0.0", "2.0.0");
+        WindowsUpdateService service = CreateService(client, "2.0.0", "2.0.0");
 
         await Assert.ThrowsAsync<InvalidDataException>(() => service.CheckAsync());
     }
@@ -320,9 +320,9 @@ public sealed class WindowsUpdateServiceTests
               "update_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
             }
             """;
-        using var response = JsonResponse(Manifest);
+        using HttpResponseMessage response = JsonResponse(Manifest);
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "2.0.0", "2.0.0");
+        WindowsUpdateService service = CreateService(client, "2.0.0", "2.0.0");
 
         await Assert.ThrowsAsync<InvalidDataException>(() => service.CheckAsync());
     }
@@ -344,9 +344,9 @@ public sealed class WindowsUpdateServiceTests
               "update_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
             }
             """;
-        using var response = JsonResponse(Manifest);
+        using HttpResponseMessage response = JsonResponse(Manifest);
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "2.0.1", "2.0.1000");
+        WindowsUpdateService service = CreateService(client, "2.0.1", "2.0.1000");
 
         await Assert.ThrowsAsync<InvalidDataException>(() => service.CheckAsync());
     }
@@ -368,9 +368,9 @@ public sealed class WindowsUpdateServiceTests
               "update_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
             }
             """;
-        using var response = JsonResponse(Manifest);
+        using HttpResponseMessage response = JsonResponse(Manifest);
         using var client = new HttpClient(new StubHandler(response));
-        var service = CreateService(client, "2.0.0", "2.0.0");
+        WindowsUpdateService service = CreateService(client, "2.0.0", "2.0.0");
 
         await Assert.ThrowsAsync<InvalidDataException>(() => service.CheckAsync());
     }
