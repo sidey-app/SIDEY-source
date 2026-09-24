@@ -201,6 +201,11 @@ def validate_macos() -> dict[str, str]:
     return {"version": version, "build": build, "tag": f"appstore-{version}-{build}"}
 
 
+def windows_release_tag(version: str) -> str:
+    tag = f"windows-v{version}"
+    return tag
+
+
 def validate_windows(allow_unreleased_source: bool = False) -> dict[str, str]:
     manifest = load_manifest("windows")
     version = str(manifest["version"])
@@ -208,7 +213,7 @@ def validate_windows(allow_unreleased_source: bool = False) -> dict[str, str]:
     generated_versions = generated_path.is_file()
     update_version = str(manifest.get("updateVersion", version))
     release_version = str(manifest.get("releaseVersion", version))
-    tag = f"windows-v{release_version}"
+    tag = windows_release_tag(release_version)
     installer_name = f"SIDEY-Windows-x64-v{release_version}-Setup.exe"
     installer_url = (
         f"https://github.com/sidey-app/SIDEY/releases/download/{tag}/{installer_name}"
