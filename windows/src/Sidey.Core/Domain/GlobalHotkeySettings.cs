@@ -29,6 +29,10 @@ public readonly record struct GlobalHotkeyBinding(
     GlobalHotkeyModifiers Modifiers,
     uint VirtualKey)
 {
+    public static GlobalHotkeyBinding Disabled { get; } = new(GlobalHotkeyModifiers.None, 0);
+
+    public bool IsDisabled => this == Disabled;
+
     private const GlobalHotkeyModifiers SupportedModifiers = GlobalHotkeyModifiers.Alt
         | GlobalHotkeyModifiers.Control
         | GlobalHotkeyModifiers.Shift
@@ -41,6 +45,9 @@ public readonly record struct GlobalHotkeyBinding(
 
     public string ToDisplayText()
     {
+        if (IsDisabled)
+            return string.Empty;
+
         var parts = new List<string>(5);
         if (Modifiers.HasFlag(GlobalHotkeyModifiers.Control))
             parts.Add("Ctrl");
@@ -163,8 +170,9 @@ public sealed record GlobalHotkeySettings(
         };
         GlobalHotkeyBinding[] bindings =
             [.. Enum.GetValues<GlobalHotkeyAction>().Select(hydrated.BindingFor)];
-        return bindings.All(binding => binding.IsValid())
-            && bindings.Distinct().Count() == bindings.Length
+        GlobalHotkeyBinding[] enabled = [.. bindings.Where(binding => !binding.IsDisabled)];
+        return bindings.All(binding => binding.IsValid() || binding.IsDisabled)
+            && enabled.Distinct().Count() == enabled.Length
             ? hydrated
             : Default;
     }
@@ -192,12 +200,12 @@ public sealed record GlobalHotkeySettings(
 
     public GlobalHotkeySettings Assign(GlobalHotkeyAction action, GlobalHotkeyBinding binding)
     {
-        if (!binding.IsValid())
+        if (!binding.IsValid() && !binding.IsDisabled)
             return Normalize();
 
         GlobalHotkeySettings current = Normalize();
         GlobalHotkeyBinding previous = current.BindingFor(action);
-        GlobalHotkeyAction? occupied = Enum.GetValues<GlobalHotkeyAction>()
+        GlobalHotkeyAction? occupied = binding.IsDisabled ? null : Enum.GetValues<GlobalHotkeyAction>()
             .Cast<GlobalHotkeyAction?>()
             .FirstOrDefault(candidate => candidate != action && current.BindingFor(candidate!.Value) == binding);
         GlobalHotkeySettings assigned = current.Set(action, binding);
@@ -207,7 +215,8 @@ public sealed record GlobalHotkeySettings(
     private static GlobalHotkeyBinding ValidOrLegacy(
         GlobalHotkeyBinding? binding,
         GlobalHotkeyKey legacyKey) =>
-        binding is { } value && value.IsValid() ? value : GlobalHotkeyBinding.FromLegacy(legacyKey);
+        binding is { } value && (value.IsValid() || value.IsDisabled)
+            ? value : GlobalHotkeyBinding.FromLegacy(legacyKey);
 
     private static GlobalHotkeySettings WithLegacyBindings(GlobalHotkeySettings settings) => settings with
     {

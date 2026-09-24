@@ -1,5 +1,6 @@
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -113,59 +114,156 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
 
     public event Action<bool>? HotkeyRecordingChanged;
 
-    private void OnHotkeyRecorderClick(object sender, RoutedEventArgs args)
+    private async void OnHotkeyRecorderClick(object sender, RoutedEventArgs args)
     {
-        if (sender is not Button button || HotkeyActionFor(button) is not { } action)
+        if (sender is not Button button || HotkeyActionFor(button) is not { } action
+            || ActiveXamlRoot() is not { } xamlRoot || !ViewModel.IsHotkeySelectionEnabled)
             return;
+
         ViewModel.BeginHotkeyRecording(action);
         SetHotkeyRecordingActive(true);
-        button.Focus(FocusState.Programmatic);
-    }
+        GlobalHotkeyBinding? candidate = ViewModel.HotkeyBindingFor(action);
+        var keycaps = new ItemsControl
+        {
+            ItemTemplate = (DataTemplate)MainRoot.Resources["HotkeyKeycapTemplate"],
+            ItemsPanel = (ItemsPanelTemplate)MainRoot.Resources["HotkeyKeycapPanel"],
+        };
+        var capture = new Button
+        {
+            Content = keycaps,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+            MinHeight = 60,
+            MinWidth = 320,
+        };
+        AutomationProperties.SetName(capture, I18n.Get("settings.hotkeyRecorderHelp"));
+        var notice = new InfoBar
+        {
+            IsClosable = false,
+            IsOpen = false,
+            Severity = InfoBarSeverity.Warning,
+        };
+        var reset = new Button
+        {
+            Content = new FontIcon { Glyph = "\uE777", FontSize = 16 },
+        };
+        var delete = new Button
+        {
+            Content = I18n.Get("common.delete"),
+        };
+        GlobalHotkeyBinding defaultBinding = GlobalHotkeySettings.Default.BindingFor(action);
+        AutomationProperties.SetName(reset, $"{I18n.Get("settings.hotkeyRecorderHelp")}: {defaultBinding.ToDisplayText()}");
+        ToolTipService.SetToolTip(reset, defaultBinding.ToDisplayText());
+        var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        actions.Children.Add(reset);
+        actions.Children.Add(delete);
+        var content = new StackPanel { Spacing = 16 };
+        content.Children.Add(new TextBlock
+        {
+            Text = I18n.Get("settings.hotkeyRecorderHelp"),
+            TextWrapping = TextWrapping.Wrap,
+        });
+        content.Children.Add(capture);
+        content.Children.Add(actions);
+        content.Children.Add(notice);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = xamlRoot,
+            Title = HotkeyActionTitle(action),
+            Content = content,
+            PrimaryButtonText = I18n.Get("common.save"),
+            CloseButtonText = I18n.Get("common.cancel"),
+            DefaultButton = ContentDialogButton.None,
+        };
 
-    private void OnHotkeyRecorderPreviewKeyDown(object sender, KeyRoutedEventArgs args)
-    {
-        if (sender is not Button button || HotkeyActionFor(button) is not { } action)
-            return;
-        if (!ViewModel.IsHotkeyRecording(action))
-            return;
+        void ShowCandidate()
+        {
+            string[] labels;
+            if (candidate is { } binding)
+                labels = MainWindowViewModel.HotkeyBindingText(binding).Split(" + ");
+            else
+                labels = [I18n.Get("settings.hotkeyRecording")];
+            keycaps.ItemsSource = labels;
+            dialog.IsPrimaryButtonEnabled = candidate is { } valid
+                && (valid.IsValid() || valid == GlobalHotkeyBinding.Disabled);
+            bool conflict = candidate is { } selected
+                && ViewModel.ConflictingHotkeyAction(action, selected) is not null;
+            notice.IsOpen = conflict;
+            notice.Message = conflict ? I18n.Get("settings.hotkeysDescription") : string.Empty;
+            AutomationProperties.SetName(capture, candidate is { } selectedBinding
+                ? MainWindowViewModel.HotkeyBindingText(selectedBinding)
+                : I18n.Get("settings.hotkeyRecorderHelp"));
+        }
 
-        GlobalHotkeyModifiers modifiers = CurrentHotkeyModifiers();
-        uint virtualKey = (uint)args.Key;
-        if (args.Key == VirtualKey.Escape)
+        capture.PreviewKeyDown += (_, keyArgs) =>
+        {
+            keyArgs.Handled = true;
+            if (keyArgs.Key == VirtualKey.Escape)
+            {
+                dialog.Hide();
+                return;
+            }
+            GlobalHotkeyModifiers modifiers = CurrentHotkeyModifiers();
+            uint virtualKey = (uint)keyArgs.Key;
+            if (GlobalHotkeyBinding.IsModifierKey(virtualKey))
+            {
+                candidate = null;
+                keycaps.ItemsSource = GlobalHotkeyBinding.ModifierDisplayText(modifiers)
+                    .Split(" + ", StringSplitOptions.RemoveEmptyEntries);
+                dialog.IsPrimaryButtonEnabled = false;
+                notice.IsOpen = false;
+                return;
+            }
+
+            var binding = new GlobalHotkeyBinding(modifiers, virtualKey);
+            if (!binding.IsValid())
+            {
+                candidate = null;
+                ShowCandidate();
+                notice.Message = I18n.Get("settings.hotkeyNeedsModifier");
+                notice.IsOpen = true;
+                return;
+            }
+            candidate = binding;
+            ShowCandidate();
+        };
+        capture.Click += (_, _) => capture.Focus(FocusState.Programmatic);
+        reset.Click += (_, _) =>
+        {
+            candidate = defaultBinding;
+            ShowCandidate();
+            capture.Focus(FocusState.Programmatic);
+        };
+        delete.Click += (_, _) =>
+        {
+            candidate = GlobalHotkeyBinding.Disabled;
+            ShowCandidate();
+            capture.Focus(FocusState.Programmatic);
+        };
+        dialog.Loaded += (_, _) => capture.Focus(FocusState.Programmatic);
+        ShowCandidate();
+        try
+        {
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary && candidate is { } selected)
+                ViewModel.AssignGlobalHotkey(action, selected);
+        }
+        catch (Exception) when (_isClosed)
+        {
+        }
+        finally
         {
             ViewModel.CancelHotkeyRecording(action);
             SetHotkeyRecordingActive(false);
-            args.Handled = true;
-            return;
         }
-        if (GlobalHotkeyBinding.IsModifierKey(virtualKey))
-        {
-            ViewModel.PreviewHotkeyModifiers(action, modifiers);
-            args.Handled = true;
-            return;
-        }
-
-        var binding = new GlobalHotkeyBinding(modifiers, virtualKey);
-        if (!binding.IsValid())
-        {
-            ViewModel.RejectHotkeyRecording(action);
-            args.Handled = true;
-            return;
-        }
-
-        ViewModel.AssignGlobalHotkey(action, binding);
-        SetHotkeyRecordingActive(false);
-        args.Handled = true;
     }
 
-    private void OnHotkeyRecorderLostFocus(object sender, RoutedEventArgs args)
+    private static string HotkeyActionTitle(GlobalHotkeyAction action) => I18n.Get(action switch
     {
-        if (sender is Button button && HotkeyActionFor(button) is { } action)
-        {
-            ViewModel.CancelHotkeyRecording(action);
-            SetHotkeyRecordingActive(false);
-        }
-    }
+        GlobalHotkeyAction.ToggleOverlay => "settings.hotkeyOverlay",
+        GlobalHotkeyAction.ToggleQuietMode => "settings.hotkeyQuietMode",
+        GlobalHotkeyAction.Compose => "settings.hotkeyComposer",
+        GlobalHotkeyAction.History => "settings.hotkeyHistory",
+        _ => throw new ArgumentOutOfRangeException(nameof(action)),
+    });
 
     private void SetHotkeyRecordingActive(bool active)
     {

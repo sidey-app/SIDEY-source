@@ -515,6 +515,49 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
+    public void HotkeyEditorPreviewsIndividualKeysAndAnOccupiedShortcutBeforeSaving()
+    {
+        (FakeSideyCoordinator coordinator, _) = CreateRoomState();
+        var viewModel = new MainWindowViewModel(
+            coordinator, new FakeMainWindowDialogService(), new FakeUpdateService());
+
+        Assert.Equal(["Ctrl", "Alt", "I"], viewModel.ComposerHotkeyKeys);
+        GlobalHotkeyBinding composerBinding = viewModel.HotkeyBindingFor(GlobalHotkeyAction.Compose);
+        Assert.Equal(
+            GlobalHotkeyAction.Compose,
+            viewModel.ConflictingHotkeyAction(GlobalHotkeyAction.ToggleOverlay, composerBinding));
+        Assert.Null(viewModel.ConflictingHotkeyAction(GlobalHotkeyAction.Compose, composerBinding));
+        Assert.Equal(0, coordinator.SetGlobalHotkeysCallCount);
+
+        viewModel.BeginHotkeyRecording(GlobalHotkeyAction.ToggleOverlay);
+        viewModel.CancelHotkeyRecording(GlobalHotkeyAction.ToggleOverlay);
+
+        Assert.Equal(["Ctrl", "Alt", "H"], viewModel.OverlayHotkeyKeys);
+        Assert.Equal(0, coordinator.SetGlobalHotkeysCallCount);
+    }
+
+    [Fact]
+    public void HotkeyEditorCanDisableOneActionAndDisplayItsDisabledState()
+    {
+        (FakeSideyCoordinator coordinator, _) = CreateRoomState();
+        var viewModel = new MainWindowViewModel(
+            coordinator, new FakeMainWindowDialogService(), new FakeUpdateService());
+
+        viewModel.BeginHotkeyRecording(GlobalHotkeyAction.Compose);
+        viewModel.AssignGlobalHotkey(GlobalHotkeyAction.Compose, GlobalHotkeyBinding.Disabled);
+
+        Assert.Equal(1, coordinator.SetGlobalHotkeysCallCount);
+        Assert.Equal(
+            GlobalHotkeyBinding.Disabled,
+            coordinator.State.Preferences.GlobalHotkeys.BindingFor(GlobalHotkeyAction.Compose));
+        Assert.Equal("—", viewModel.ComposerHotkeyText);
+        Assert.Equal(["—"], viewModel.ComposerHotkeyKeys);
+        Assert.Contains(I18n.Get("common.delete"), viewModel.ComposerHotkeyAccessibleName);
+        Assert.Null(viewModel.ConflictingHotkeyAction(
+            GlobalHotkeyAction.ToggleOverlay, GlobalHotkeyBinding.Disabled));
+    }
+
+    [Fact]
     public async Task SettingsFlushWaitsForPendingHotkeySave()
     {
         (FakeSideyCoordinator coordinator, _) = CreateRoomState();
