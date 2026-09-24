@@ -84,27 +84,27 @@ class WorkflowTests(unittest.TestCase):
         current = self.start('current', platform=platform)
         return path, current, task, merge
 
-    def cleanup_native(self, current, platform, merge, now, *, open_prs=None):
+    def cleanup_old(self, current, merge, now, *, open_prs=None):
         with (
             patch.object(w, 'source_repository', return_value='sidey-app/SIDEY-source'),
             patch.object(w, 'open_task_prs', return_value=open_prs or []),
         ):
             return w.cleanup_merged_worktrees(
-                current, platform, merge, now=now,
+                current, merge, now=now,
             )
 
     def test_cleanup_removes_only_old_verified_native_worktree(self):
         old, current, task, merge = self.merged_native_worktree()
         committed_at = int(w.git(old, 'show', '-s', '--format=%ct', 'HEAD'))
-        removed = self.cleanup_native(
-            current, 'windows', merge, committed_at + 3 * 24 * 60 * 60,
+        removed = self.cleanup_old(
+            current, merge, committed_at + 3 * 24 * 60 * 60,
         )
         self.assertEqual(removed, [{'task': 'old', 'worktree': str(old.resolve())}])
         self.assertFalse(old.exists())
         self.assertTrue(current.exists())
         self.assertEqual(
-            w.git(self.primary, 'rev-parse', task['branch']),
-            task['checked']['head'],
+            self.command(self.primary, 'git', 'branch', '--list', task['branch']),
+            '',
         )
 
     def assert_cleanup_preserves(self, reason):
@@ -120,8 +120,8 @@ class WorkflowTests(unittest.TestCase):
             (old / 'new.txt').write_text('new work')
             self.commit(old, 'new work')
         open_prs = [{'number': 2}] if reason == 'open PR' else []
-        removed = self.cleanup_native(
-            current, 'windows', merge, now, open_prs=open_prs,
+        removed = self.cleanup_old(
+            current, merge, now, open_prs=open_prs,
         )
         self.assertEqual(removed, [])
         self.assertTrue(old.exists())
@@ -142,18 +142,105 @@ class WorkflowTests(unittest.TestCase):
         old, current, _, merge = self.merged_native_worktree()
         committed_at = int(w.git(old, 'show', '-s', '--format=%ct', 'HEAD'))
         w.git(self.primary, 'worktree', 'lock', str(old))
-        self.assertEqual(self.cleanup_native(
-            current, 'windows', merge, committed_at + 3 * 24 * 60 * 60,
+        self.assertEqual(self.cleanup_old(
+            current, merge, committed_at + 3 * 24 * 60 * 60,
         ), [])
         self.assertTrue(old.exists())
 
-    def test_cleanup_does_not_cross_platform_boundary(self):
-        old, current, _, merge = self.merged_native_worktree('macos')
+    def test_cleanup_removes_old_completed_shared_worktree(self):
+        old, current, task, merge = self.merged_native_worktree('shared')
         committed_at = int(w.git(old, 'show', '-s', '--format=%ct', 'HEAD'))
-        self.assertEqual(self.cleanup_native(
-            current, 'windows', merge, committed_at + 3 * 24 * 60 * 60,
-        ), [])
+        self.assertEqual(self.cleanup_old(
+            current, merge, committed_at + 3 * 24 * 60 * 60,
+        ), [{'task': 'old', 'worktree': str(old.resolve())}])
+        self.assertFalse(old.exists())
+        self.assertEqual(w.git(self.primary, 'branch', '--list', task['branch']), '')
+
+    def test_cleanup_removes_old_detached_worktree(self):
+        old, current, task, merge = self.merged_native_worktree('shared')
+        committed_at = int(w.git(old, 'show', '-s', '--format=%ct', 'HEAD'))
+        w.git(old, 'switch', '--detach', task['checked']['head'])
+        w.git(self.primary, 'branch', '-D', task['branch'])
+        self.assertEqual(self.cleanup_old(
+            current, merge, committed_at + 3 * 24 * 60 * 60,
+        ), [{'task': 'old', 'worktree': str(old.resolve())}])
+        self.assertFalse(old.exists())
+
+    def published_merged_task(self):
+        old, _, task, merge = self.merged_native_worktree('shared')
+        w.git(old, 'push', '-u', 'origin', task['branch'])
+        task['published'] = {
+            'head_ref': f"sidey-app:{task['branch']}",
+            'push_remote': 'origin',
+        }
+        w.update_task(old, 'old', task)
+        return old, task, merge
+
+    def cleanup_pr_branch(self, old, task, merge, *, open_prs=None):
+        real_run = w.run
+
+        def response(root, *args, **kwargs):
+            if args[:3] == ('gh', 'pr', 'view'):
+                return json.dumps({
+                    'state': 'MERGED',
+                    'headRefOid': task['checked']['head'],
+                    'mergeCommit': {'oid': merge},
+                })
+            return real_run(root, *args, **kwargs)
+
+        with (
+            patch.object(w, 'source_repository', return_value='sidey-app/SIDEY-source'),
+            patch.object(w, 'github_repository_from_remote', return_value='sidey-app/SIDEY-source'),
+            patch.object(w, 'open_task_prs', return_value=open_prs or []),
+            patch.object(w, 'run', side_effect=response),
+        ):
+            return w.cleanup_merged_pr_branch(old, task, merge)
+
+    def test_merged_pr_branch_deleted_from_remote_and_local_after_main_update(self):
+        old, task, merge = self.published_merged_task()
+        self.assertEqual(self.cleanup_pr_branch(old, task, merge), {
+            'remote_deleted': True, 'local_deleted': True,
+        })
+        self.assertEqual(w.git(old, 'ls-remote', '--heads', 'origin',
+                               f"refs/heads/{task['branch']}"), '')
+        self.assertEqual(w.git(old, 'branch', '--list', task['branch']), '')
+        self.assertEqual(w.git(old, 'branch', '--show-current'), '')
         self.assertTrue(old.exists())
+        self.assertEqual(w.owned_task(old, 'old')['status'], 'complete')
+        self.assertEqual(self.cleanup_pr_branch(old, task, merge), {
+            'remote_deleted': False, 'local_deleted': False,
+        })
+
+    def test_merged_pr_branch_kept_when_remote_head_changed(self):
+        old, task, merge = self.published_merged_task()
+        w.git(self.other, 'fetch', 'origin', task['branch'])
+        w.git(self.other, 'checkout', '-b', task['branch'], 'FETCH_HEAD')
+        (self.other / 'later.txt').write_text('later work\n')
+        self.commit(self.other, 'later work')
+        w.git(self.other, 'push', 'origin', task['branch'])
+        with self.assertRaisesRegex(w.WorkflowError, 'remote head changed'):
+            self.cleanup_pr_branch(old, task, merge)
+        self.assertTrue(w.git(old, 'ls-remote', '--heads', 'origin',
+                              f"refs/heads/{task['branch']}"))
+        self.assertEqual(w.git(old, 'branch', '--show-current'), task['branch'])
+
+    def test_merged_pr_branch_kept_while_another_pr_is_open(self):
+        old, task, merge = self.published_merged_task()
+        with self.assertRaisesRegex(w.WorkflowError, 'still in use'):
+            self.cleanup_pr_branch(old, task, merge, open_prs=[{'number': 99}])
+        self.assertTrue(w.git(old, 'ls-remote', '--heads', 'origin',
+                              f"refs/heads/{task['branch']}"))
+        self.assertEqual(w.git(old, 'branch', '--show-current'), task['branch'])
+
+    def test_merged_pr_branch_kept_when_checked_out_elsewhere(self):
+        old, task, merge = self.published_merged_task()
+        w.git(old, 'switch', '--detach', task['checked']['head'])
+        another = self.root / 'another-worktree'
+        w.git(self.primary, 'worktree', 'add', str(another), task['branch'])
+        with self.assertRaisesRegex(w.WorkflowError, 'checked out elsewhere'):
+            self.cleanup_pr_branch(old, task, merge)
+        self.assertTrue(w.git(old, 'ls-remote', '--heads', 'origin',
+                              f"refs/heads/{task['branch']}"))
 
     def test_finish_retries_cleanup_for_completed_native_task(self):
         old, current, _, merge = self.merged_native_worktree()
@@ -165,6 +252,9 @@ class WorkflowTests(unittest.TestCase):
         w.update_task(current, 'current', task)
         with (
             patch.object(w, 'source_repository', return_value='sidey-app/SIDEY-source'),
+            patch.object(w, 'cleanup_merged_pr_branch', return_value={
+                'remote_deleted': False, 'local_deleted': False,
+            }),
             patch.object(w, 'cleanup_merged_worktrees', return_value=[str(old)]) as cleanup,
             contextlib.redirect_stdout(io.StringIO()) as output,
         ):
@@ -172,7 +262,7 @@ class WorkflowTests(unittest.TestCase):
         result = json.loads(output.getvalue())
         self.assertEqual(result['status'], 'complete')
         self.assertEqual(result['removed_worktrees'], [str(old)])
-        cleanup.assert_called_once_with(current.resolve(), 'windows', merge)
+        cleanup.assert_called_once_with(current.resolve(), merge)
 
     def test_windows_test_installer_replaces_old_setup_after_verified_build(self):
         downloads = self.root / 'Downloads'
@@ -240,6 +330,9 @@ class WorkflowTests(unittest.TestCase):
         candidate = {'path': 'Downloads/SIDEY-Setup.exe', 'main': merge}
         with (
             patch.object(w, 'source_repository', return_value='sidey-app/SIDEY-source'),
+            patch.object(w, 'cleanup_merged_pr_branch', return_value={
+                'remote_deleted': False, 'local_deleted': False,
+            }),
             patch.object(w, 'cleanup_merged_worktrees', return_value=[]),
             patch.object(w, 'publish_windows_test_installer', return_value=candidate) as publish,
             contextlib.redirect_stdout(io.StringIO()) as output,
