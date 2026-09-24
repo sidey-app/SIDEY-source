@@ -32,6 +32,8 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
     private readonly SemaphoreSlim _sendGate = new(1, 1);
     private readonly CancellationTokenSource _shutdown = new();
     private readonly CoalescingPublicationQueue<RealtimePresenceIntent> _presenceQueue;
+    // Accessed only by the serialized presence publication queue.
+    private readonly Dictionary<string, (string JoinReference, PresenceState State)> _publishedPresence = [];
     private readonly ExpiringLeaseRegistry<(Guid RoomId, Guid UserId)> _typingExpiries;
     private readonly INetworkAvailabilityMonitor _networkMonitor;
     private readonly TimeSpan _watchdogInterval;
@@ -534,6 +536,12 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
     {
         StoredSupabaseSession session = await _sessions.GetStoredSessionAsync(cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException(I18n.Get("auth.sessionMissing"));
+        var desiredTopics = intent.RoomEpochs.Select(room => new RealtimeRoomDescriptor(
+            room.Key, room.Value, RealtimeTopicKind.Ephemeral).PhoenixTopic).ToHashSet(StringComparer.Ordinal);
+        foreach (string departedTopic in _publishedPresence.Keys.Where(topic => !desiredTopics.Contains(topic)).ToArray())
+        {
+            _publishedPresence.Remove(departedTopic);
+        }
         foreach (KeyValuePair<Guid, long> room in intent.RoomEpochs.OrderBy(pair => pair.Key))
         {
             PresenceState state = PresencePublicationPlan.StateFor(
@@ -544,6 +552,14 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
                 room.Key,
                 room.Value,
                 RealtimeTopicKind.Ephemeral);
+            string? joinReference = _joinReferences.GetValueOrDefault(topic.PhoenixTopic);
+            if (_socketSession?.Socket.State == WebSocketState.Open
+                && joinReference is not null
+                && _publishedPresence.TryGetValue(topic.PhoenixTopic, out (string JoinReference, PresenceState State) published)
+                && published == (joinReference, state))
+            {
+                continue;
+            }
             await SendAsync(
                 topic.PhoenixTopic,
                 "presence",
@@ -559,6 +575,11 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
                     },
                 },
                 cancellationToken).ConfigureAwait(false);
+            if (joinReference is not null
+                && _joinReferences.GetValueOrDefault(topic.PhoenixTopic) == joinReference)
+            {
+                _publishedPresence[topic.PhoenixTopic] = (joinReference, state);
+            }
         }
     }
 
@@ -1030,10 +1051,10 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
             return;
         }
 
-        Emit(new BackendEvent.Diagnostic(
-            $"realtime-channel-terminated kind={descriptor.Kind.ToString().ToLowerInvariant()} event={eventName}"));
-        EmitConnectionStatus(CurrentTransportStatus());
         var failure = RealtimeSubscriptionException.FromServerPayload(payload);
+        Emit(new BackendEvent.Diagnostic(
+            $"realtime-channel-terminated kind={descriptor.Kind.ToString().ToLowerInvariant()} event={eventName} failure={failure.FailureKind.ToString().ToLowerInvariant()}"));
+        EmitConnectionStatus(CurrentTransportStatus());
         if (PauseForNonRetryableFailure(failure))
         {
             return;

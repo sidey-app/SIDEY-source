@@ -75,6 +75,8 @@ public sealed class FirebaseRealtimeCredentialProviderTests
         time.Advance(TimeSpan.FromSeconds(79));
         FirebaseRealtimeCredential beforeDeadline = await provider.GetCredentialAsync();
         Assert.Equal(initial.IdToken, beforeDeadline.IdToken);
+        Assert.Equal(TimeSpan.FromSeconds(1), beforeDeadline.RefreshAfter);
+        Assert.Equal(TimeSpan.FromSeconds(21), beforeDeadline.ExpiresAfter);
         Assert.Equal(0, handler.RefreshRequests);
 
         time.SetUtcNow(time.GetUtcNow().AddDays(-60));
@@ -111,6 +113,9 @@ public sealed class FirebaseRealtimeCredentialProviderTests
         time.Advance(TimeSpan.FromSeconds(269));
         FirebaseRealtimeCredential beforeDeadline = await provider.GetCredentialAsync();
         Assert.Equal(initial.IdToken, beforeDeadline.IdToken);
+
+        Assert.Equal(TimeSpan.FromSeconds(1), beforeDeadline.RefreshAfter);
+        Assert.Equal(TimeSpan.FromSeconds(31), beforeDeadline.ExpiresAfter);
 
         time.Advance(TimeSpan.FromSeconds(1));
         time.SetUtcNow(s_initialTime.AddSeconds(270));
@@ -152,6 +157,138 @@ public sealed class FirebaseRealtimeCredentialProviderTests
         Assert.Equal(
             ["bootstrap", "exchange", "bootstrap", "exchange"],
             [.. handler.RequestKinds]);
+    }
+
+    [Fact]
+    public async Task BootstrapLeaseUsesServerDateWhenLocalClockTrailsServer()
+    {
+        var sessionId = Guid.NewGuid();
+        StoredSupabaseSession session = SupabaseSession(s_userId, sessionId, "supabase-a");
+        var time = new ManualTimeProvider();
+        time.SetUtcNow(s_initialTime.AddMilliseconds(-800));
+        var handler = new FirebaseProtocolHandler
+        {
+            BootstrapServerDate = s_initialTime,
+            RolloutLeaseExpiresAt = s_initialTime.AddMilliseconds(300_500)
+                .ToUnixTimeMilliseconds(),
+        };
+        handler.AddSession(session, "id-a-0", "refresh-a-0", expiresIn: 3_600);
+        using var client = new HttpClient(handler);
+        var provider = new FirebaseRealtimeCredentialProvider(
+            new FixedSessionAccessor(session),
+            new MemoryCredentialStore(),
+            client,
+            time);
+
+        FirebaseRealtimeCredential credential = await provider.GetCredentialAsync();
+
+        Assert.Equal(s_userId, credential.UserId);
+        Assert.Equal(sessionId, credential.SessionId);
+        Assert.Equal(["bootstrap", "exchange"], [.. handler.RequestKinds]);
+
+        time.Advance(TimeSpan.FromMilliseconds(270_499));
+        _ = await provider.GetCredentialAsync();
+        Assert.Equal(["bootstrap", "exchange"], [.. handler.RequestKinds]);
+
+        time.Advance(TimeSpan.FromMilliseconds(1));
+        _ = await provider.GetCredentialAsync();
+        Assert.Equal(
+            ["bootstrap", "exchange", "bootstrap", "exchange"],
+            [.. handler.RequestKinds]);
+    }
+
+    [Fact]
+    public async Task CustomTokenResponseWithoutLocalIdOrProtocolClaimPublishesValidatedCredential()
+    {
+        var sessionId = Guid.NewGuid();
+        StoredSupabaseSession session = SupabaseSession(s_userId, sessionId, "supabase-a");
+        var handler = new FirebaseProtocolHandler { IncludeProtocolClaim = false };
+        handler.AddSession(session, "id-a-0", "refresh-a-0", expiresIn: 3_600);
+        using var client = new HttpClient(handler);
+        var provider = new FirebaseRealtimeCredentialProvider(
+            new FixedSessionAccessor(session),
+            new MemoryCredentialStore(),
+            client,
+            new ManualTimeProvider());
+
+        FirebaseRealtimeCredential credential = await provider.GetCredentialAsync();
+
+        Assert.Equal(s_userId, credential.UserId);
+        Assert.Equal(sessionId, credential.SessionId);
+        Assert.Equal(["bootstrap", "exchange"], [.. handler.RequestKinds]);
+    }
+
+    [Fact]
+    public async Task FirebaseSessionClaimsStillRejectMismatchedSessionWithoutProtocolClaim()
+    {
+        var sessionId = Guid.NewGuid();
+        StoredSupabaseSession session = SupabaseSession(s_userId, sessionId, "supabase-a");
+        var store = new MemoryCredentialStore();
+        var handler = new FirebaseProtocolHandler
+        {
+            IncludeProtocolClaim = false,
+            MismatchNextExchangeSession = true,
+        };
+        handler.AddSession(session, "id-a-0", "refresh-a-0", expiresIn: 3_600);
+        using var client = new HttpClient(handler);
+        var provider = new FirebaseRealtimeCredentialProvider(
+            new FixedSessionAccessor(session),
+            store,
+            client,
+            new ManualTimeProvider());
+
+        FirebaseRealtimeCredentialStageException exception =
+            await Assert.ThrowsAsync<FirebaseRealtimeCredentialStageException>(
+                () => provider.GetCredentialAsync().AsTask());
+
+        Assert.Equal("firebase-token", exception.Stage);
+        Assert.Null(store.Value(CredentialKey.FirebaseRealtimeSession));
+        Assert.Equal(["bootstrap", "exchange"], [.. handler.RequestKinds]);
+    }
+
+    [Fact]
+    public async Task CustomTokenResponseWithoutLocalIdRejectsWrongIdTokenUser()
+    {
+        StoredSupabaseSession session = SupabaseSession(s_userId, Guid.NewGuid(), "supabase-a");
+        var store = new MemoryCredentialStore();
+        var handler = new FirebaseProtocolHandler { MismatchExchangeUser = true };
+        handler.AddSession(session, "id-a-0", "refresh-a-0", expiresIn: 100);
+        using var client = new HttpClient(handler);
+        var provider = new FirebaseRealtimeCredentialProvider(
+            new FixedSessionAccessor(session), store, client, new ManualTimeProvider());
+
+        FirebaseRealtimeCredentialStageException exception =
+            await Assert.ThrowsAsync<FirebaseRealtimeCredentialStageException>(
+                () => provider.GetCredentialAsync().AsTask());
+
+        Assert.Equal("firebase-token", exception.Stage);
+        Assert.Null(store.Value(CredentialKey.FirebaseRealtimeSession));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("cccccccc-cccc-4ccc-8ccc-cccccccccccc")]
+    public async Task RefreshRejectsMissingOrMismatchedResponseUserId(string? responseUserId)
+    {
+        StoredSupabaseSession session = SupabaseSession(s_userId, Guid.NewGuid(), "supabase-a");
+        var store = new MemoryCredentialStore();
+        var handler = new FirebaseProtocolHandler { RefreshResponseUserId = responseUserId };
+        handler.AddSession(session, "id-a-0", "refresh-a-0", expiresIn: 100);
+        using var client = new HttpClient(handler);
+        var time = new ManualTimeProvider();
+        var provider = new FirebaseRealtimeCredentialProvider(
+            new FixedSessionAccessor(session), store, client, time);
+        _ = await provider.GetCredentialAsync();
+        string? persistedBeforeRefresh = store.Value(CredentialKey.FirebaseRealtimeSession);
+        time.Advance(TimeSpan.FromSeconds(80));
+
+        FirebaseRealtimeCredentialStageException exception =
+            await Assert.ThrowsAsync<FirebaseRealtimeCredentialStageException>(
+                () => provider.GetCredentialAsync().AsTask());
+
+        Assert.Equal("firebase-token", exception.Stage);
+        Assert.Equal(persistedBeforeRefresh, store.Value(CredentialKey.FirebaseRealtimeSession));
+        Assert.Equal(["bootstrap", "exchange", "refresh"], [.. handler.RequestKinds]);
     }
 
     [Fact]
@@ -242,6 +379,32 @@ public sealed class FirebaseRealtimeCredentialProviderTests
             new FixedSessionAccessor(session), store, client, new ManualTimeProvider());
         _ = await firstProvider.GetCredentialAsync();
         handler.RejectNextRefresh = true;
+
+        var restartedProvider = new FirebaseRealtimeCredentialProvider(
+            new FixedSessionAccessor(session), store, client, new ManualTimeProvider());
+        FirebaseRealtimeCredential recovered = await restartedProvider.GetCredentialAsync();
+
+        Assert.Equal(handler.IdToken(sessionId, 0), recovered.IdToken);
+        Assert.Equal(
+            ["bootstrap", "exchange", "bootstrap", "refresh", "exchange"],
+            [.. handler.RequestKinds]);
+        string persisted = Assert.IsType<string>(store.Value(CredentialKey.FirebaseRealtimeSession));
+        Assert.Contains("refresh-a-0", persisted, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task InvalidPersistedRefreshClaimsAreDiscardedAndExchangedOnce()
+    {
+        var sessionId = Guid.NewGuid();
+        StoredSupabaseSession session = SupabaseSession(s_userId, sessionId, "supabase-a");
+        var store = new MemoryCredentialStore();
+        var handler = new FirebaseProtocolHandler();
+        handler.AddSession(session, "id-a-0", "refresh-a-0", expiresIn: 100);
+        using var client = new HttpClient(handler);
+        var firstProvider = new FirebaseRealtimeCredentialProvider(
+            new FixedSessionAccessor(session), store, client, new ManualTimeProvider());
+        _ = await firstProvider.GetCredentialAsync();
+        handler.MismatchNextRefreshClaims = true;
 
         var restartedProvider = new FirebaseRealtimeCredentialProvider(
             new FixedSessionAccessor(session), store, client, new ManualTimeProvider());
@@ -568,7 +731,13 @@ public sealed class FirebaseRealtimeCredentialProviderTests
 
         public bool BlockRefresh { get; init; }
         public bool BlockExchanges { get; init; }
+        public bool IncludeProtocolClaim { get; init; } = true;
         public bool RejectNextRefresh { get; set; }
+        public bool MismatchNextExchangeSession { get; set; }
+        public bool MismatchExchangeUser { get; init; }
+        public string? RefreshResponseUserId { get; init; } = s_userId.ToString("D");
+        public bool MismatchNextRefreshClaims { get; set; }
+        public DateTimeOffset? BootstrapServerDate { get; init; }
         public long RolloutLeaseExpiresAt { get; set; } =
             s_initialTime.AddMinutes(5).ToUnixTimeMilliseconds();
         public TaskCompletionSource RefreshStarted { get; } =
@@ -598,7 +767,10 @@ public sealed class FirebaseRealtimeCredentialProviderTests
         public Task ExchangeStarted(Guid sessionId) => _bySession[sessionId].ExchangeStarted.Task;
         public void ReleaseExchange(Guid sessionId) => _bySession[sessionId].AllowExchange.TrySetResult();
         public string IdToken(Guid sessionId, int generation) =>
-            _bySession[sessionId].IdToken(generation, RolloutLeaseExpiresAt);
+            _bySession[sessionId].IdToken(
+                generation,
+                RolloutLeaseExpiresAt,
+                IncludeProtocolClaim);
 
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
@@ -616,16 +788,16 @@ public sealed class FirebaseRealtimeCredentialProviderTests
                 Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
                 string accessToken = Assert.IsType<string>(request.Headers.Authorization?.Parameter);
                 SessionFixture fixture = _bySupabaseToken[accessToken];
-                string customToken = Jwt(new
+                var claims = new Dictionary<string, object>
                 {
-                    uid = fixture.UserId,
-                    claims = new
-                    {
-                        sideyProtocol = 2,
-                        sideySessionId = fixture.SessionId,
-                        sideyRolloutUntil = RolloutLeaseExpiresAt,
-                    },
-                });
+                    ["sideySessionId"] = fixture.SessionId,
+                    ["sideyRolloutUntil"] = RolloutLeaseExpiresAt,
+                };
+                if (IncludeProtocolClaim)
+                {
+                    claims["sideyProtocol"] = 2;
+                }
+                string customToken = Jwt(new { uid = fixture.UserId, claims });
                 return Json(new
                 {
                     accessRevision = "00000000000000000042",
@@ -639,7 +811,7 @@ public sealed class FirebaseRealtimeCredentialProviderTests
                     rolloutLeaseExpiresAt = RolloutLeaseExpiresAt,
                     rooms = new[] { s_roomId },
                     wireItems = new[] { "0" },
-                });
+                }, BootstrapServerDate);
             }
 
             if (request.RequestUri?.AbsolutePath == "/v1/accounts:signInWithCustomToken")
@@ -656,12 +828,21 @@ public sealed class FirebaseRealtimeCredentialProviderTests
                 {
                     await fixture.AllowExchange.Task;
                 }
+                Guid tokenSessionId = MismatchNextExchangeSession
+                    ? Guid.NewGuid()
+                    : fixture.SessionId;
+                MismatchNextExchangeSession = false;
                 return Json(new
                 {
-                    idToken = fixture.IdToken(0, RolloutLeaseExpiresAt),
+                    idToken = fixture.IdToken(
+                        0,
+                        RolloutLeaseExpiresAt,
+                        IncludeProtocolClaim,
+                        tokenSessionId,
+                        MismatchExchangeUser ? s_roomId : fixture.UserId),
                     refreshToken = fixture.RefreshToken,
                     expiresIn = fixture.ExpiresIn.ToString(),
-                    localId = fixture.UserId,
+                    isNewUser = false,
                 });
             }
 
@@ -687,23 +868,42 @@ public sealed class FirebaseRealtimeCredentialProviderTests
                 {
                     await AllowRefresh.Task.WaitAsync(cancellationToken);
                 }
-                fixture.RefreshToken = fixture.RefreshToken.Replace("-0", "-1", StringComparison.Ordinal);
+                string refreshedToken = fixture.RefreshToken.Replace("-0", "-1", StringComparison.Ordinal);
+                bool mismatchClaims = MismatchNextRefreshClaims;
+                if (!mismatchClaims)
+                {
+                    fixture.RefreshToken = refreshedToken;
+                }
+                long rolloutLeaseExpiresAt = mismatchClaims
+                    ? RolloutLeaseExpiresAt + 1
+                    : RolloutLeaseExpiresAt;
+                MismatchNextRefreshClaims = false;
                 return Json(new
                 {
-                    id_token = fixture.IdToken(1, RolloutLeaseExpiresAt),
-                    refresh_token = fixture.RefreshToken,
+                    id_token = fixture.IdToken(
+                        1,
+                        rolloutLeaseExpiresAt,
+                        IncludeProtocolClaim),
+                    refresh_token = refreshedToken,
                     expires_in = fixture.ExpiresIn.ToString(),
-                    user_id = fixture.UserId,
+                    user_id = RefreshResponseUserId,
                 });
             }
 
             return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
 
-        private static HttpResponseMessage Json(object value) => new(HttpStatusCode.OK)
+        private static HttpResponseMessage Json(
+            object value,
+            DateTimeOffset? serverDate = null)
         {
-            Content = JsonContent.Create(value),
-        };
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = JsonContent.Create(value),
+            };
+            response.Headers.Date = serverDate;
+            return response;
+        }
 
         private static string QueryApiKey(Uri uri) => uri.Query[1..]
             .Split('&')
@@ -746,15 +946,27 @@ public sealed class FirebaseRealtimeCredentialProviderTests
             public TaskCompletionSource AllowExchange { get; } =
                 new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            public string IdToken(int generation, long rolloutLeaseExpiresAt) => Jwt(new
+            public string IdToken(
+                int generation,
+                long rolloutLeaseExpiresAt,
+                bool includeProtocolClaim,
+                Guid? sessionId = null,
+                Guid? userId = null)
             {
-                user_id = UserId,
-                sub = UserId,
-                sideyProtocol = 2,
-                sideySessionId = SessionId,
-                sideyRolloutUntil = rolloutLeaseExpiresAt,
-                marker = $"{IdMarker}-{generation}",
-            });
+                var claims = new Dictionary<string, object>
+                {
+                    ["user_id"] = userId ?? UserId,
+                    ["sub"] = userId ?? UserId,
+                    ["sideySessionId"] = sessionId ?? SessionId,
+                    ["sideyRolloutUntil"] = rolloutLeaseExpiresAt,
+                    ["marker"] = $"{IdMarker}-{generation}",
+                };
+                if (includeProtocolClaim)
+                {
+                    claims["sideyProtocol"] = 2;
+                }
+                return Jwt(claims);
+            }
         }
     }
 }
