@@ -304,10 +304,12 @@ def platform_for(path):
     return repository_platform_for(path)
 
 
-def validate_paths(branch_name, paths):
+def validate_paths(branch_name, paths, *, root=None, base=None, revision='HEAD'):
     """Validate *paths* against the platform encoded in *branch_name*."""
 
-    return validate_repository_paths(branch_name, paths)
+    return validate_repository_paths(
+        branch_name, paths, root=root, base=base, revision=revision,
+    )
 
 
 def app_review_required(platform, paths):
@@ -414,7 +416,7 @@ def check_task(root, task_id):
             'checking'
         )
     paths = changed_paths(root, remote, dirty=True)
-    validate_paths(branch(root), paths)
+    validate_paths(branch(root), paths, root=root, base=remote)
     before = snapshot(root)
     checked_head = head(root)
     local_checks(root, task['platform'])
@@ -805,7 +807,7 @@ def publish(root, args):
     remote = fetch_main(root)
     attest(root, task, remote)
     paths = changed_paths(root, remote)
-    validate_paths(branch(root), paths)
+    validate_paths(branch(root), paths, root=root, base=remote)
     push_remote = getattr(args, 'push_remote', None) or 'origin'
     head_ref = publish_head(root, push_remote)
     prs = open_task_prs(root, head_ref, repository=repository)
@@ -937,7 +939,9 @@ def finish(root, args):
         update_task(root, args.task, task)
         return {'status': task['status'], 'main': str(primary), 'sha': remote}
     attest(root, task, remote)
-    validate_paths(branch(root), changed_paths(root, remote))
+    validate_paths(
+        branch(root), changed_paths(root, remote), root=root, base=remote,
+    )
     paths = changed_paths(root, remote)
     prs = open_task_prs(
         root,
@@ -1198,7 +1202,9 @@ def main(argv=None):
                 'Preserve changes in an explicit task commit before sync; '
                 'no automatic stash'
             )
-        validate_paths(branch(root), changed_paths(root, remote))
+        validate_paths(
+            branch(root), changed_paths(root, remote), root=root, base=remote,
+        )
         git(root, 'merge', '--no-edit', remote)
         task.update(base=remote, status='started')
         task.pop('checked', None)
@@ -1208,7 +1214,9 @@ def main(argv=None):
         if not args.base or not args.branch:
             raise WorkflowError('CI requires explicit --base and --branch')
         paths = changed_paths(root, args.base, args.head)
-        validate_paths(args.branch, paths)
+        validate_paths(
+            args.branch, paths, root=root, base=args.base, revision=args.head,
+        )
         result = {'paths': paths, 'scopes': required_scopes(paths)}
     elif args.command == 'check':
         result = check_task(root, args.task)
