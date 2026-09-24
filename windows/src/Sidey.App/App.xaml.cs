@@ -18,6 +18,7 @@ public partial class App : Application
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly WindowsUpdateServiceAdapter _updateService;
     private readonly WindowsUpdateCompletionTracker _updateCompletionTracker;
+    private readonly WindowsPostInstallLaunchTracker _postInstallLaunchTracker;
     private Window? _window;
     private MainWindow? _mainWindow;
     private OnboardingWindow? _onboardingWindow;
@@ -42,12 +43,15 @@ public partial class App : Application
     private string? _pendingUpdateNotificationVersion;
     private Timer? _uiResponsivenessTimer;
     private bool _shuttingDown;
+    private bool _launchPresentationReady;
+    private bool _showAboutAfterOnboarding;
 
     public App()
     {
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         _updateService = new WindowsUpdateServiceAdapter();
         _updateCompletionTracker = new WindowsUpdateCompletionTracker();
+        _postInstallLaunchTracker = new WindowsPostInstallLaunchTracker();
         StartupDiagnostics.BeginSession();
         AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
@@ -98,15 +102,21 @@ public partial class App : Application
             || WindowsStartupService.IsBackgroundLaunch(processArguments);
         bool updateShutdown = WindowsStartupService.IsUpdateShutdown(args.Arguments)
             || WindowsStartupService.IsUpdateShutdown(processArguments);
+        bool showAboutAfterInstall = WindowsStartupService.IsShowAboutAfterInstall(args.Arguments)
+            || WindowsStartupService.IsShowAboutAfterInstall(processArguments)
+            || _postInstallLaunchTracker.IsPending();
         StartupDiagnostics.Stage("launch-entered");
         StartupDiagnostics.Stage(
-            $"launch-mode background={backgroundLaunch} updateShutdown={updateShutdown}");
+            $"launch-mode background={backgroundLaunch} updateShutdown={updateShutdown} postInstall={showAboutAfterInstall}");
         _singleInstance = SingleInstanceGuard.Acquire(
             Environment.GetEnvironmentVariable(WindowsVersionGuard.StartupSmokeEnvironmentVariable) == "1"
                 ? Environment.GetEnvironmentVariable("SIDEY_STARTUP_SMOKE_DATA_ROOT") : null);
         if (!_singleInstance.IsPrimary)
         {
-            bool delivered = _singleInstance.Signal(processArguments);
+            // A second Windows Run-key launch must not raise an existing instance.
+            bool delivered = backgroundLaunch
+                ? false
+                : _singleInstance.Signal(processArguments);
             StartupDiagnostics.Stage(
                 $"secondary-instance-request request=activate delivered={delivered.ToString().ToLowerInvariant()}");
             _singleInstance.Dispose();
@@ -168,19 +178,6 @@ public partial class App : Application
         coordinator.StateChanged += OnCoordinatorStateChanged;
         coordinator.LanguageChanged += OnLanguageChanged;
         coordinator.ShowStartupOverlay();
-        if (coordinator.State.NeedsOnboarding)
-        {
-            CreateOnboardingWindow(coordinator);
-            _window = _onboardingWindow;
-            _onboardingWindow!.Activate();
-            StartupDiagnostics.Stage("onboarding-window-activated");
-        }
-        else
-        {
-            EnsureMainWindow();
-            _window = _mainWindow;
-            StartupDiagnostics.Stage("completed-launch-window-hidden");
-        }
         if (Environment.GetEnvironmentVariable(WindowsVersionGuard.StartupSmokeEnvironmentVariable) == "1")
         {
             _startupUpdateCheckStarted = true;
@@ -208,9 +205,7 @@ public partial class App : Application
         {
             StartupDiagnostics.NonFatal("tray-start", exception);
             var error = new InvalidOperationException(I18n.Get("error.trayStart"), exception);
-            if (coordinator.State.NeedsOnboarding)
-                _onboardingWindow?.ShowError(error);
-            else
+            if (!backgroundLaunch)
                 EnsureMainWindow().ShowFatalError(error);
         }
         if (completedUpdateVersion is null || _tray is not null)
@@ -248,9 +243,7 @@ public partial class App : Application
                 return;
             }
 
-            if (coordinator.State.NeedsOnboarding)
-                _onboardingWindow?.ShowError(exception);
-            else
+            if (!backgroundLaunch)
                 EnsureMainWindow().ShowFatalError(exception);
         }
 
@@ -258,6 +251,16 @@ public partial class App : Application
         {
             return;
         }
+
+        _launchPresentationReady = true;
+        if (showAboutAfterInstall)
+            ShowPostInstallWindow();
+        else if (!backgroundLaunch)
+            ShowPrimaryWindow();
+        else if (coordinator.State.NeedsOnboarding)
+            ShowPrimaryWindow();
+        else
+            EnsureMainWindow();
 
         _monitorConnectionFailures = true;
         UpdateConnectionFailureNotification(coordinator.State.Connected);
@@ -661,6 +664,12 @@ public partial class App : Application
         mainWindow.Activate();
         SideyWindowActivation.BringToForeground(mainWindow);
         onboarding.Close();
+        if (_showAboutAfterOnboarding)
+        {
+            _showAboutAfterOnboarding = false;
+            mainWindow.ShowPage("about");
+            _postInstallLaunchTracker.TryMarkShown();
+        }
         StartupDiagnostics.Stage("onboarding-completed");
     }
 
@@ -710,8 +719,18 @@ public partial class App : Application
             {
                 return;
             }
+
+            if (WindowsStartupService.IsBackgroundLaunch(activationArgument))
+                return;
             if (_shuttingDown)
             {
+                return;
+            }
+
+            if (WindowsStartupService.IsShowAboutAfterInstall(activationArgument)
+                || _postInstallLaunchTracker.IsPending())
+            {
+                ShowPostInstallWindow();
                 return;
             }
 
@@ -860,6 +879,7 @@ public partial class App : Application
 
         if (_coordinator is { State.NeedsOnboarding: true } coordinator)
         {
+            _showAboutAfterOnboarding |= _postInstallLaunchTracker.IsPending();
             if (_onboardingWindow is null)
                 CreateOnboardingWindow(coordinator);
             _onboardingWindow!.ShowAndActivate();
@@ -872,6 +892,22 @@ public partial class App : Application
         SideyWindowActivation.BringToForeground(mainWindow);
     }
 
+    private void ShowPostInstallWindow()
+    {
+        if (_coordinator is { State.NeedsOnboarding: true })
+        {
+            _showAboutAfterOnboarding = true;
+            ShowPrimaryWindow();
+            return;
+        }
+
+        _showAboutAfterOnboarding = false;
+        MainWindow mainWindow = EnsureMainWindow();
+        _window = mainWindow;
+        mainWindow.ShowPage("about");
+        _postInstallLaunchTracker.TryMarkShown();
+    }
+
     private void OnCoordinatorStateChanged(CoordinatorState state)
     {
         if (_shuttingDown)
@@ -882,14 +918,15 @@ public partial class App : Application
         AppCoordinator? coordinator = _coordinator;
         _dispatcherQueue.TryEnqueue(() =>
         {
-            if (_shuttingDown)
+            if (_shuttingDown || !ReferenceEquals(state, coordinator?.State))
             {
                 return;
             }
 
             UpdateConnectionFailureNotification(state.Connected);
             _mainWindow?.ApplyState(state);
-            if (state.NeedsOnboarding)
+            // Authentication starts in Checking. Wait for restoration before choosing a window.
+            if (_launchPresentationReady && state.NeedsOnboarding)
             {
                 if (_onboardingWindow is null && coordinator is not null)
                     CreateOnboardingWindow(coordinator);
@@ -908,7 +945,7 @@ public partial class App : Application
                 _window = _onboardingWindow;
                 _onboardingWindow?.ShowAndActivate();
             }
-            else if (_onboardingWindow is not null)
+            else if (_launchPresentationReady && _onboardingWindow is not null)
             {
                 _onboardingWindow.ApplyState(state);
                 OnOnboardingCompleted();
@@ -1097,7 +1134,10 @@ public partial class App : Application
                         !_coordinator.State.Preferences.OverlayVisible));
                 break;
             case TrayCommand.Compose:
-                _coordinator.RequestComposer();
+                if (_composer?.IsComposerVisible == true)
+                    _composer.HideComposer();
+                else
+                    ShowComposer();
                 break;
             case TrayCommand.ToggleQuietMode:
                 _ = RunCoordinatorCommandAsync(

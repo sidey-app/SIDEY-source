@@ -30,6 +30,19 @@ public sealed class WindowsStartupServiceTests
         Assert.Equal(expected, WindowsStartupService.IsUpdateShutdown(arguments));
     }
 
+    [Theory]
+    [InlineData("--show-about-after-install", true)]
+    [InlineData("  --SHOW-ABOUT-AFTER-INSTALL  ", true)]
+    [InlineData("--show-about-after-install --background", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void PostInstallLaunchRequiresTheDedicatedInstallerArgument(
+        string? arguments,
+        bool expected)
+    {
+        Assert.Equal(expected, WindowsStartupService.IsShowAboutAfterInstall(arguments));
+    }
+
     [Fact]
     public void StructuredRuntimeResolvesThePublicLauncher()
     {
