@@ -84,6 +84,48 @@ enum BackendEvent: Sendable {
     case technicalError(String)
 }
 
+/// Presence belongs to the shared Supabase channels, not to a replaceable
+/// Firebase adapter. Retain only live members and invalidate with their channel.
+struct BackendPresenceReplay: Sendable {
+    private var states: [UUID: [UUID: PresenceState]] = [:]
+
+    mutating func record(roomID: UUID, userID: UUID, state: PresenceState) {
+        if state == .offline {
+            states[roomID]?.removeValue(forKey: userID)
+        } else {
+            states[roomID, default: [:]][userID] = state
+        }
+    }
+
+    mutating func invalidate(roomID: UUID) {
+        states.removeValue(forKey: roomID)
+    }
+
+    mutating func invalidateAll() {
+        states.removeAll()
+    }
+
+    func events(subscribedRoomIDs: Set<UUID>) -> [BackendEvent] {
+        subscribedRoomIDs.sorted { $0.uuidString < $1.uuidString }.flatMap { roomID in
+            (states[roomID] ?? [:]).sorted { $0.key.uuidString < $1.key.uuidString }.map {
+                .presence(roomID: roomID, userID: $0.key, state: $0.value)
+            }
+        }
+    }
+
+    func snapshot(rooms: [Room], subscribedRoomIDs: Set<UUID>) -> [BackendEvent] {
+        rooms.filter { subscribedRoomIDs.contains($0.id) }.flatMap { room in
+            room.members.map { member in
+                .presence(
+                    roomID: room.id,
+                    userID: member.userID,
+                    state: states[room.id]?[member.userID] ?? .offline
+                )
+            }
+        }
+    }
+}
+
 struct CreatedRoom: Equatable, Sendable {
     let roomID: UUID
     let inviteCode: String

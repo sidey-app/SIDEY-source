@@ -199,6 +199,36 @@ class CommerceLocalizationTests(unittest.TestCase):
                     values,
                 )
 
+    def test_short_iap_names_use_approved_name_or_kind_suffix_without_changing_source(self):
+        korean_name = next(
+            product["localizations"]["ko"]["display_name"]
+            for product in self.source["products"]
+            if product["id"] == "character_poop"
+        )
+        self.assertEqual(korean_name, "똥")
+        self.assertEqual(
+            localization_tool.app_store_display_name(
+                "character_poop",
+                "ko",
+                korean_name,
+                "character",
+            ),
+            "똥이",
+        )
+        self.assertEqual(korean_name, "똥")
+
+        for kind, suffixes in localization_tool.IAP_NAME_SUFFIXES.items():
+            for locale, suffix in suffixes.items():
+                self.assertEqual(
+                    localization_tool.app_store_display_name(
+                        "future_product",
+                        locale,
+                        "X",
+                        kind,
+                    ),
+                    "X" + suffix,
+                )
+
     def test_storekit_has_all_current_and_restore_only_apple_ids(self):
         configuration = localization_tool.read_json(
             localization_tool.ROOT / "macos/SIDEYAppStore.storekit"

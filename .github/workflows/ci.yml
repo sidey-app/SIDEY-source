@@ -56,16 +56,33 @@ jobs:
       - run: python3 scripts/skills/verify_release_consistency.py --allow-unreleased-source
 
   macos:
-    name: macOS build and tests
+    name: macOS build and tests (${{ matrix.runner }}, ${{ matrix.arch }})
     needs: scope
     if: contains(fromJSON(needs.scope.outputs.scopes), 'macos')
-    runs-on: macos-26
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-26
+            arch: arm64
+            developer-dir: /Applications/Xcode.app/Contents/Developer
+          - runner: macos-15-intel
+            arch: x86_64
+            developer-dir: /Applications/Xcode_26.3.app/Contents/Developer
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer-dir }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Verify native runner architecture
+        env:
+          SIDEY_EXPECTED_ARCH: ${{ matrix.arch }}
+        run: test "$(uname -m)" = "$SIDEY_EXPECTED_ARCH"
 
       - name: Validate central pixel assets and mirrors
         run: python3 ./scripts/validate_pixel_assets.py
@@ -169,17 +186,25 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           winget install NSIS.NSIS --exact --version 3.12 --silent `
             --accept-package-agreements --accept-source-agreements --disable-interactivity
-          $productVersion = python ./scripts/sidey_version.py --get productVersion
-          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($productVersion)) {
-            throw 'Unable to resolve Product Version from release/version.json.'
+          if (Test-Path ./windows/Version.props) {
+            $productVersion = python ./scripts/sidey_version.py --get productVersion
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($productVersion)) {
+              throw 'Unable to resolve Product Version from release/version.json.'
+            }
+            $releaseVersion = python ./scripts/sidey_version.py --get windowsReleaseVersion
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($releaseVersion)) {
+              throw 'Unable to resolve Windows Release Version from release/version.json.'
+            }
+            ./scripts/windows/New-WindowsInstaller.ps1 `
+              -PublishDirectory ./build/windows/publish `
+              -OutputDirectory ./build/windows/artifacts `
+              -ProductVersion $productVersion -ReleaseVersion $releaseVersion
+          } else {
+            $version = ([xml](Get-Content ./windows/src/Sidey.App/Sidey.App.csproj -Raw)).Project.PropertyGroup.Version | Where-Object { $_ }
+            ./scripts/windows/New-WindowsInstaller.ps1 `
+              -PublishDirectory ./build/windows/publish `
+              -OutputDirectory ./build/windows/artifacts -Version $version
           }
-          $releaseVersion = python ./scripts/sidey_version.py --get windowsReleaseVersion
-          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($releaseVersion)) {
-            throw 'Unable to resolve Windows Release Version from release/version.json.'
-          }
-          ./scripts/windows/New-WindowsInstaller.ps1 -PublishDirectory ./build/windows/publish `
-            -OutputDirectory ./build/windows/artifacts `
-            -ProductVersion $productVersion -ReleaseVersion $releaseVersion
 
       - name: Upload coverage
         if: ${{ always() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure') }}

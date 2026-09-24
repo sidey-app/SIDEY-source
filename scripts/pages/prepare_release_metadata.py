@@ -44,10 +44,24 @@ def validate_repository(repository: str) -> str:
 def read_manifest(path: Path, platform: str) -> dict[str, object]:
     manifest = json.loads(path.read_text(encoding="utf-8"))
     version = str(manifest.get("version", ""))
-    update_version = str(manifest.get("updateVersion", ""))
-    release_version = str(manifest.get("releaseVersion", ""))
-    msix_version = str(manifest.get("msixVersion", ""))
-    windows_revision = manifest.get("windowsRevision")
+    extended_fields = {
+        "windowsRevision", "updateVersion", "releaseVersion", "msixVersion"
+    }
+    present_extended_fields = extended_fields.intersection(manifest)
+    if present_extended_fields and present_extended_fields != extended_fields:
+        raise ValueError(
+            f"release/{platform}.json must contain all Windows version fields together."
+        )
+    if present_extended_fields:
+        update_version = str(manifest.get("updateVersion", ""))
+        release_version = str(manifest.get("releaseVersion", ""))
+        msix_version = str(manifest.get("msixVersion", ""))
+        windows_revision = manifest.get("windowsRevision")
+    else:
+        update_version = version
+        release_version = version
+        msix_version = f"{version}.0"
+        windows_revision = 0
     if (
         manifest.get("schema") != 1
         or manifest.get("platform") != platform
@@ -63,6 +77,12 @@ def read_manifest(path: Path, platform: str) -> dict[str, object]:
         raise ValueError(
             f"release/{platform}.json must describe a stable production {platform} release."
         )
+    manifest.update({
+        "windowsRevision": windows_revision,
+        "updateVersion": update_version,
+        "releaseVersion": release_version,
+        "msixVersion": msix_version,
+    })
     return manifest
 
 

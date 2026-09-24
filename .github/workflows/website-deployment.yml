@@ -148,7 +148,11 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           $manifest = Get-Content ./release/windows.json -Raw | ConvertFrom-Json
           $productVersion = [string]$manifest.version
-          $releaseVersion = [string]$manifest.releaseVersion
+          $releaseVersion = if ($manifest.PSObject.Properties.Name -contains 'releaseVersion') {
+            [string]$manifest.releaseVersion
+          } else {
+            $productVersion
+          }
           $tag = "windows-v$releaseVersion"
           $installerName = "SIDEY-Windows-x64-v${releaseVersion}-Setup.exe"
 

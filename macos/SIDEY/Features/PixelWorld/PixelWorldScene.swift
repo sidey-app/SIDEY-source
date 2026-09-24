@@ -215,7 +215,13 @@ final class PixelWorldScene: SKScene {
     private var activityFrame: CGRect?
     private var composerVisible = false
     private var composerFrame: CGRect?
-    private var lifecycleObservers: [(NotificationCenter, NSObjectProtocol)] = []
+    private final class Resources {
+        var lifecycleObservers: [(NotificationCenter, NSObjectProtocol)] = []
+    }
+
+    private let resourceLifetime = MainActorResourceLifetime(Resources()) { resources in
+        for (center, token) in resources.lifecycleObservers { center.removeObserver(token) }
+    }
     private var suspendedReasons: Set<String> = []
     private var lastUpdateTime: TimeInterval?
     private var lastHotspotReportTime: TimeInterval = 0
@@ -256,13 +262,11 @@ final class PixelWorldScene: SKScene {
             let token = center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.setSuspended(suspended, reason: reason) }
             }
-            lifecycleObservers.append((center, token))
+            resourceLifetime.resource.lifecycleObservers.append((center, token))
         }
     }
 
-    isolated deinit {
-        for (center, token) in lifecycleObservers { center.removeObserver(token) }
-    }
+    nonisolated deinit {}
 
     func setSuspended(_ suspended: Bool, reason: String) {
         if suspended { suspendedReasons.insert(reason) } else { suspendedReasons.remove(reason) }
