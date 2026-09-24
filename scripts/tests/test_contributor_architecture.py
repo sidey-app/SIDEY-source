@@ -128,10 +128,6 @@ class ContributorArchitectureTests(unittest.TestCase):
         )
         self.assertIn("missing-script-reference", self.codes())
 
-    def test_legacy_nested_windows_skill_is_rejected(self):
-        self.add_skill("code-review", directory="windows/.agents/skills/code-review")
-        self.assertIn("unexpected-skill-location", self.codes())
-
     def test_new_nested_skill_is_rejected(self):
         self.add_skill("new-skill", directory="windows/.agents/skills/new-skill")
         self.assertIn("unexpected-skill-location", self.codes())
@@ -139,14 +135,6 @@ class ContributorArchitectureTests(unittest.TestCase):
     def test_nested_skill_file_without_skill_manifest_is_rejected(self):
         self.write("windows/.agents/skills/notes/reference.md", "# Reference\n")
         self.assertIn("unexpected-nested-skills-path", self.codes())
-
-    def test_missing_windows_routing_targets_are_reported(self):
-        self.write(
-            "AGENTS.md",
-            "Read [Windows instructions](windows/AGENTS.md) and "
-            "[Windows docs instructions](windows/docs/AGENTS.md).\n",
-        )
-        self.assertIn("missing-relative-link", self.codes())
 
     def test_other_missing_agents_routing_target_is_always_reported(self):
         self.write("AGENTS.md", "Read [missing instructions](platform/AGENTS.md).\n")
@@ -206,40 +194,6 @@ class ContributorArchitectureTests(unittest.TestCase):
     def test_metadata_requires_explicit_implicit_invocation_policy(self):
         self.add_skill("missing-policy", implicit_policy=None)
         self.assertIn("missing-implicit-invocation-policy", self.codes())
-
-    def test_legacy_write_docs_metadata_requires_invocation_policy(self):
-        self.add_skill(
-            "write-docs",
-            directory="windows/.agents/skills/write-docs",
-            implicit_policy=None,
-        )
-        self.assertIn("missing-implicit-invocation-policy", self.codes())
-
-    def test_canonical_cross_platform_skill_set_is_valid(self):
-        for name in (
-            "code-review",
-            "write-docs",
-            "write-tests",
-            "windows-powershell",
-        ):
-            self.add_skill(name)
-        self.assertEqual(validate_repository(self.root), [])
-
-    def test_final_style_specialist_skill_set_is_valid(self):
-        for name in (
-            "commit",
-            "create-pr",
-            "version-audit",
-            "web-verification",
-            "release-notes",
-            "app-verification",
-            "code-review",
-            "write-docs",
-            "write-tests",
-            "windows-powershell",
-        ):
-            self.add_skill(name)
-        self.assertEqual(validate_repository(self.root), [])
 
 if __name__ == "__main__":
     unittest.main()

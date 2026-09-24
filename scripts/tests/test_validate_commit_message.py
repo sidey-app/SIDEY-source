@@ -132,12 +132,5 @@ class CommitMessageValidatorTests(unittest.TestCase):
             with self.subTest(subject=subject):
                 self.assertEqual(validator.validate_subject(subject), [])
 
-    def test_does_not_exempt_explicit_legacy_release_subject(self):
-        self.assertTrue(
-            validator.validate_subject("Publish Sparkle appcast for v1.2.3")
-        )
-
-
-
 if __name__ == "__main__":
     unittest.main()

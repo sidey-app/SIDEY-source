@@ -15,8 +15,9 @@ Read only the sources relevant to the task:
 - Backend ownership and catalog handoff: [`docs/BACKEND.md`](docs/BACKEND.md)
 - Commerce metadata: [`assets/v1/commerce-catalog.json`](assets/v1/commerce-catalog.json)
 - Asset metadata and platform support: [`assets/v1/manifest.json`](assets/v1/manifest.json)
-- App Store target build and public Windows release: [`release/macos.json`](release/macos.json) and
-  [`release/windows.json`](release/windows.json)
+- Shared product version and platform build counters: [`release/version.json`](release/version.json)
+- Generated App Store target and public Windows release mirrors:
+  [`release/macos.json`](release/macos.json) and [`release/windows.json`](release/windows.json)
 
 Source code, project settings and machine-readable sources take precedence over current
 documentation. Current product and architecture documents take precedence over decision
