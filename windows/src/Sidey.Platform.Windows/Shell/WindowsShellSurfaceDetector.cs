@@ -12,7 +12,8 @@ public static class WindowsShellSurfaceDetector
         VisibleSurface,
         ForegroundRoot,
         IsShellSurface,
-        CanCoverOverlay);
+        CanCoverOverlay,
+        IsFullscreenCaptureSurface);
 
     public static nint ForegroundSurface(NativePixelRect monitorBounds)
     {
@@ -79,6 +80,13 @@ public static class WindowsShellSurfaceDetector
             string windowClass = className.ToString();
             nint style = NativeMethods.GetWindowLongPtr(window, -16);
             nint extendedStyle = NativeMethods.GetWindowLongPtr(window, -20);
+            if (IsFullscreenCaptureSurface(window, extendedStyle, monitorBounds)
+                && CanCoverOverlay(window, monitorBounds))
+            {
+                surface = window;
+                return false;
+            }
+
             if (!WindowsShellSurfacePolicy.IsTransientPopup(
                     windowClass,
                     style,
@@ -134,6 +142,40 @@ public static class WindowsShellSurfaceDetector
             (long)bounds._bottom - bounds._top)
             && WindowsShellSurfacePolicy.IntersectsMonitor(
                 bounds._left, bounds._top, bounds._right, bounds._bottom, monitorBounds);
+    }
+
+    private static bool IsFullscreenCaptureSurface(nint window, NativePixelRect monitorBounds)
+    {
+        return IsFullscreenCaptureSurface(
+            window,
+            NativeMethods.GetWindowLongPtr(window, -20),
+            monitorBounds);
+    }
+
+    private static bool IsFullscreenCaptureSurface(
+        nint window,
+        nint extendedStyle,
+        NativePixelRect monitorBounds)
+    {
+        const long TopmostStyle = 0x00000008L;
+        if ((extendedStyle.ToInt64() & TopmostStyle) == 0)
+        {
+            return false;
+        }
+
+        if (!NativeMethods.GetWindowRect(window, out NativeMethods.Rect bounds))
+        {
+            return false;
+        }
+
+        return WindowsShellSurfacePolicy.IsFullscreenCaptureSurface(
+            ProcessName(window),
+            extendedStyle,
+            bounds._left,
+            bounds._top,
+            bounds._right,
+            bounds._bottom,
+            monitorBounds);
     }
 
     private static nint ForegroundRoot()
@@ -241,7 +283,8 @@ internal sealed class WindowsShellSurfaceResolver(
     Func<NativePixelRect, nint> visibleSurface,
     Func<nint> foregroundRoot,
     Func<nint, bool> shouldYield,
-    Func<nint, NativePixelRect, bool>? canCoverOverlay = null)
+    Func<nint, NativePixelRect, bool>? canCoverOverlay = null,
+    Func<nint, NativePixelRect, bool>? isFullscreenCaptureSurface = null)
 {
     private readonly Lock _cacheGate = new();
     private nint _cachedWindow;
@@ -262,6 +305,12 @@ internal sealed class WindowsShellSurfaceResolver(
             return nint.Zero;
         }
 
+        // Window styles and bounds can change while the foreground HWND stays the same.
+        if (isFullscreenCaptureSurface?.Invoke(foreground, monitorBounds) == true)
+        {
+            return foreground;
+        }
+
         lock (_cacheGate)
         {
             if (foreground == _cachedWindow)
@@ -278,6 +327,12 @@ internal sealed class WindowsShellSurfaceResolver(
 
 public static class WindowsShellSurfacePolicy
 {
+    private static readonly HashSet<string> s_captureHosts = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "ScreenClippingHost",
+        "SnippingTool",
+    };
+
     private static readonly HashSet<string> s_shellProcesses = new(StringComparer.OrdinalIgnoreCase)
     {
         "SearchApp",
@@ -368,6 +423,40 @@ public static class WindowsShellSurfacePolicy
         long width,
         long height) =>
         isVisible && !isCloaked && width > 0 && height > 0;
+
+    internal static bool IsFullscreenTopmostSurface(
+        nint extendedStyle,
+        long left,
+        long top,
+        long right,
+        long bottom,
+        NativePixelRect monitorBounds)
+    {
+        const long TopmostStyle = 0x00000008L;
+        return (extendedStyle.ToInt64() & TopmostStyle) != 0
+            && monitorBounds.IsValid
+            && right > left
+            && bottom > top
+            && left <= monitorBounds.X
+            && top <= monitorBounds.Y
+            && right >= (long)monitorBounds.X + monitorBounds.Width
+            && bottom >= (long)monitorBounds.Y + monitorBounds.Height;
+    }
+
+    internal static bool IsCaptureHost(string? processName) =>
+        processName is not null && s_captureHosts.Contains(processName);
+
+    internal static bool IsFullscreenCaptureSurface(
+        string? processName,
+        nint extendedStyle,
+        long left,
+        long top,
+        long right,
+        long bottom,
+        NativePixelRect monitorBounds) =>
+        IsCaptureHost(processName)
+        && IsFullscreenTopmostSurface(
+            extendedStyle, left, top, right, bottom, monitorBounds);
 
     internal static bool ShouldYieldTransientSurface(
         string? processName,

@@ -921,6 +921,7 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="OverlayHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
                         AutomationProperties.Name="{Binding OverlayHotkeyAccessibleName, Mode=OneWay}"
                         AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}">
@@ -935,6 +936,7 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="QuietModeHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
                         AutomationProperties.Name="{Binding QuietModeHotkeyAccessibleName, Mode=OneWay}"
                         AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}">
@@ -949,6 +951,7 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="ComposerHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
                         AutomationProperties.Name="{Binding ComposerHotkeyAccessibleName, Mode=OneWay}"
                         AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}">
@@ -963,6 +966,7 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="HistoryHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
+                        Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
                         AutomationProperties.Name="{Binding HistoryHotkeyAccessibleName, Mode=OneWay}"
                         AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}">

@@ -101,19 +101,20 @@ internal sealed class TrayHotkeys : IDisposable
         _registered.Clear();
     }
 
-    private sealed class WindowsHotkeyNative : ITrayHotkeyNative
-    {
-        public int Register(nint window, int id, uint modifiers, uint virtualKey) =>
-            RegisterHotKey(window, id, modifiers, virtualKey) ? 0 : Marshal.GetLastPInvokeError();
+}
 
-        public void Unregister(nint window, int id) => UnregisterHotKey(window, id);
+internal sealed class WindowsHotkeyNative : ITrayHotkeyNative
+{
+    public int Register(nint window, int id, uint modifiers, uint virtualKey) =>
+        RegisterHotKey(window, id, modifiers, virtualKey) ? 0 : Marshal.GetLastPInvokeError();
 
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool RegisterHotKey(nint window, int id, uint modifiers, uint virtualKey);
+    public void Unregister(nint window, int id) => UnregisterHotKey(window, id);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool UnregisterHotKey(nint window, int id);
-    }
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool RegisterHotKey(nint window, int id, uint modifiers, uint virtualKey);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool UnregisterHotKey(nint window, int id);
 }
