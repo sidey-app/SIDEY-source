@@ -10,14 +10,14 @@ namespace Sidey.Platform.Windows.Deployment;
 
 public sealed record WindowsUpdateManifest(
     string Channel,
-    string Version,
-    string Tag,
+    string ProductVersion,
+    string UpdateVersion,
+    string UpdateTag,
     Uri InstallerUri,
     string Sha256);
 
 public sealed partial class WindowsUpdateService
 {
-    public const string CurrentVersion = "2.0.0";
     public static readonly Uri ManifestUri = new(
         "https://sidey-app.github.io/SIDEY/windows-latest.json");
     private readonly HttpClient _httpClient;
@@ -25,19 +25,31 @@ public sealed partial class WindowsUpdateService
 
     public WindowsUpdateService(
         HttpClient? httpClient = null,
-        string? currentVersion = null,
+        string? currentProductVersion = null,
+        string? currentUpdateVersion = null,
         string? updateCacheDirectory = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentProductVersion);
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentUpdateVersion);
         _httpClient = httpClient ?? new HttpClient();
         _updateCacheDirectory = Path.GetFullPath(updateCacheDirectory
             ?? Path.Combine(Path.GetTempPath(), "SIDEY", "Updates"));
-        EffectiveCurrentVersion = string.IsNullOrWhiteSpace(currentVersion)
-            ? CurrentVersion
-            : currentVersion;
-        _ = ParsedVersion.Parse(EffectiveCurrentVersion);
+        EffectiveCurrentProductVersion = currentProductVersion;
+        EffectiveCurrentUpdateVersion = currentUpdateVersion;
+        _ = ParsedVersion.Parse(EffectiveCurrentProductVersion);
+        _ = ParsedVersion.Parse(EffectiveCurrentUpdateVersion);
+        EffectiveCurrentReleaseVersion = EffectiveCurrentProductVersion == EffectiveCurrentUpdateVersion
+            ? EffectiveCurrentProductVersion
+            : ResolveReleaseVersion(
+                EffectiveCurrentProductVersion,
+                EffectiveCurrentUpdateVersion);
     }
 
-    public string EffectiveCurrentVersion { get; }
+    public string EffectiveCurrentProductVersion { get; }
+
+    public string EffectiveCurrentUpdateVersion { get; }
+
+    public string EffectiveCurrentReleaseVersion { get; }
 
     // Only remove updater-owned files after the app has started successfully.
     // Locked installers are left for the next startup; never traverse links or
@@ -63,7 +75,7 @@ public sealed partial class WindowsUpdateService
                     }
 
                     string version = Path.GetFileName(directory);
-                    if (IsNewerVersion(version, EffectiveCurrentVersion))
+                    if (IsNewerVersion(version, EffectiveCurrentUpdateVersion))
                     {
                         continue;
                     }
@@ -130,37 +142,119 @@ public sealed partial class WindowsUpdateService
                 I18n.Get("update.notPublished"),
                 exception);
         }
-        if (manifest is null
-            || manifest.Channel is not ("alpha" or "production")
-            || string.IsNullOrWhiteSpace(manifest.Version)
-            || manifest.Tag != $"windows-v{manifest.Version}")
+        if (manifest is null)
+        {
+            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+        }
+        string channel = manifest.Channel ?? string.Empty;
+        if (channel is not ("alpha" or "production"))
         {
             throw new InvalidDataException(I18n.Get("update.invalidManifest"));
         }
 
-        if (!IsNewerVersion(manifest.Version, EffectiveCurrentVersion))
+        Uri legacyInstallerUri = ValidateInstallerMetadata(
+            manifest.Version,
+            manifest.Tag,
+            manifest.InstallerUrl,
+            manifest.Sha256);
+
+        bool hasAnyUpdateField = manifest.ProductVersion is not null
+            || manifest.UpdateVersion is not null
+            || manifest.UpdateTag is not null
+            || manifest.UpdateInstallerUrl is not null
+            || manifest.UpdateSha256 is not null;
+        bool hasAllUpdateFields = manifest.ProductVersion is not null
+            && manifest.UpdateVersion is not null
+            && manifest.UpdateTag is not null
+            && manifest.UpdateInstallerUrl is not null
+            && manifest.UpdateSha256 is not null;
+        if (hasAnyUpdateField != hasAllUpdateFields)
+        {
+            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+        }
+
+        string productVersion;
+        string updateVersion;
+        string updateTag;
+        Uri installerUri;
+        string sha256;
+        if (hasAllUpdateFields)
+        {
+            productVersion = manifest.ProductVersion!;
+            updateVersion = manifest.UpdateVersion!;
+            updateTag = manifest.UpdateTag!;
+            string expectedReleaseVersion = ResolveReleaseVersion(productVersion, updateVersion);
+            if (updateTag != $"windows-v{expectedReleaseVersion}")
+            {
+                throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+            }
+            installerUri = ValidateInstallerMetadata(
+                updateVersion,
+                updateTag,
+                manifest.UpdateInstallerUrl,
+                manifest.UpdateSha256,
+                versionNamesAsset: false);
+            sha256 = manifest.UpdateSha256!.ToLowerInvariant();
+            if (productVersion != manifest.Version)
+            {
+                throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+            }
+            _ = ParsedVersion.Parse(productVersion);
+        }
+        else
+        {
+            productVersion = manifest.Version!;
+            updateVersion = manifest.Version!;
+            updateTag = manifest.Tag!;
+            installerUri = legacyInstallerUri;
+            sha256 = manifest.Sha256!.ToLowerInvariant();
+        }
+
+        if (!IsNewerVersion(updateVersion, EffectiveCurrentUpdateVersion))
         {
             return null;
         }
 
-        var expectedInstallerUri = new Uri(
-            $"https://github.com/sidey-app/SIDEY/releases/download/{manifest.Tag}/" +
-            $"SIDEY-Windows-x64-v{manifest.Version}-Setup.exe");
-        if (!Uri.TryCreate(manifest.InstallerUrl, UriKind.Absolute, out Uri? installerUri)
-            || installerUri != expectedInstallerUri
-            || string.IsNullOrWhiteSpace(manifest.Sha256)
-            || !Sha256Pattern().IsMatch(manifest.Sha256))
+        return new WindowsUpdateManifest(
+            channel,
+            productVersion,
+            updateVersion,
+            updateTag,
+            installerUri,
+            sha256);
+    }
+
+    private static Uri ValidateInstallerMetadata(
+        string? version,
+        string? tag,
+        string? installerUrl,
+        string? sha256,
+        bool versionNamesAsset = true)
+    {
+        if (string.IsNullOrWhiteSpace(version)
+            || string.IsNullOrWhiteSpace(tag)
+            || !tag.StartsWith("windows-v", StringComparison.Ordinal)
+            || !Sha256Pattern().IsMatch(sha256 ?? string.Empty))
         {
-            throw new InvalidDataException(
-                I18n.Get("update.invalidInstaller"));
+            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+        }
+        _ = ParsedVersion.Parse(version);
+        string releaseVersion = tag["windows-v".Length..];
+        _ = ParsedVersion.Parse(releaseVersion);
+        if (versionNamesAsset && tag != $"windows-v{version}")
+        {
+            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
         }
 
-        return new WindowsUpdateManifest(
-            manifest.Channel,
-            manifest.Version,
-            manifest.Tag,
-            installerUri,
-            manifest.Sha256.ToLowerInvariant());
+        var expectedInstallerUri = new Uri(
+            $"https://github.com/sidey-app/SIDEY/releases/download/{tag}/" +
+            $"SIDEY-Windows-x64-v{releaseVersion}-Setup.exe");
+        if (!Uri.TryCreate(installerUrl, UriKind.Absolute, out Uri? parsedInstallerUri)
+            || parsedInstallerUri != expectedInstallerUri)
+        {
+            throw new InvalidDataException(I18n.Get("update.invalidInstaller"));
+        }
+        return parsedInstallerUri;
     }
 
     public async Task<string> DownloadInstallerAsync(
@@ -171,11 +265,11 @@ public sealed partial class WindowsUpdateService
         ArgumentNullException.ThrowIfNull(manifest);
         string updateDirectory = Path.Combine(
             _updateCacheDirectory,
-            manifest.Version);
+            manifest.UpdateVersion);
         Directory.CreateDirectory(updateDirectory);
         string installerPath = Path.Combine(
             updateDirectory,
-            Path.GetFileName(manifest.InstallerUri.LocalPath));
+            $"SIDEY-Windows-x64-v{manifest.UpdateVersion}-Setup.exe");
         string partialPath = $"{installerPath}.download";
 
         try
@@ -272,12 +366,34 @@ public sealed partial class WindowsUpdateService
         return candidateVersion.CompareTo(currentVersion) > 0;
     }
 
+    private static string ResolveReleaseVersion(string productVersion, string updateVersion)
+    {
+        var product = ParsedVersion.Parse(productVersion);
+        var update = ParsedVersion.Parse(updateVersion);
+        int initialUpdateBuild = checked(product.Patch * 1000);
+        if (product.Prerelease.Count != 0
+            || update.Prerelease.Count != 0
+            || product.Major != update.Major
+            || product.Minor != update.Minor
+            || update.Patch < initialUpdateBuild
+            || update.Patch > initialUpdateBuild + 999)
+        {
+            throw new InvalidDataException("SIDEY Windows Product and update versions are inconsistent.");
+        }
+        return update.Patch == initialUpdateBuild ? productVersion : updateVersion;
+    }
+
     private sealed record ManifestDto(
-        [property: JsonPropertyName("channel")] string Channel,
-        [property: JsonPropertyName("version")] string Version,
-        [property: JsonPropertyName("tag")] string Tag,
+        [property: JsonPropertyName("channel")] string? Channel,
+        [property: JsonPropertyName("version")] string? Version,
+        [property: JsonPropertyName("tag")] string? Tag,
         [property: JsonPropertyName("installer_url")] string? InstallerUrl,
-        [property: JsonPropertyName("sha256")] string? Sha256);
+        [property: JsonPropertyName("sha256")] string? Sha256,
+        [property: JsonPropertyName("product_version")] string? ProductVersion,
+        [property: JsonPropertyName("update_version")] string? UpdateVersion,
+        [property: JsonPropertyName("update_tag")] string? UpdateTag,
+        [property: JsonPropertyName("update_installer_url")] string? UpdateInstallerUrl,
+        [property: JsonPropertyName("update_sha256")] string? UpdateSha256);
 
     [GeneratedRegex("^[0-9a-fA-F]{64}$", RegexOptions.CultureInvariant)]
     private static partial Regex Sha256Pattern();

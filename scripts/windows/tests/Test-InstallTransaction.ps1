@@ -19,7 +19,8 @@ $install = Join-Path $probeRoot 'SIDEY'
 $staging = $install + '.sidey-staging-1234'
 $rollback = $install + '.sidey-rollback'
 $logPath = Join-Path $probeRoot 'install-transaction.log'
-$version = '9.8.7'
+$productVersion = '9.8.7'
+$updateVersion = '9.8.7000'
 $assertions = 0
 
 function Assert-True([bool]$Condition, [string]$Message) {
@@ -63,7 +64,8 @@ function Get-TransactionArguments(
         '--install-directory', (ConvertTo-NativeArgument $InstallDirectory),
         '--staging-directory', (ConvertTo-NativeArgument $StagingDirectory),
         '--rollback-directory', (ConvertTo-NativeArgument ($InstallDirectory + '.sidey-rollback')),
-        '--version', (ConvertTo-NativeArgument $version),
+        '--product-version', (ConvertTo-NativeArgument $productVersion),
+        '--update-version', (ConvertTo-NativeArgument $updateVersion),
         '--log-path', (ConvertTo-NativeArgument $logPath)
     )
     if (-not $UseRealParentPolicy) {
@@ -154,7 +156,7 @@ try {
     if ([string]::IsNullOrWhiteSpace($HelperPath)) {
         & (Join-Path $root 'scripts/windows/New-SideyHelperExecutable.ps1') `
             -SourcePath (Join-Path $root 'windows/installer/Sidey.Setup/InstallTransaction.cs') `
-            -OutputPath $transactionExecutable -Version $version -FileVersion "$version.0" `
+            -OutputPath $transactionExecutable -Version $productVersion -FileVersion "$updateVersion.0" `
             -Title 'SIDEY Install Transaction' `
             -Description 'SIDEY atomic install transaction helper' `
             -IconPath (Join-Path $root 'windows/src/Sidey.App/Assets/Icons/SideyAppIcon.ico')
@@ -226,6 +228,11 @@ try {
 
     Invoke-Transaction Prepare
     $initialState = Get-Content -LiteralPath ($install + '.sidey-transaction.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    Assert-True ($initialState.schemaVersion -eq 2) 'Prepare did not write the split-version transaction schema.'
+    Assert-True ($initialState.productVersion -ceq $productVersion) `
+        'Transaction state did not preserve the display Product Version.'
+    Assert-True ($initialState.updateVersion -ceq $updateVersion) `
+        'Transaction state did not preserve the internal Windows update version.'
     $initialCompletionId = [Guid]::ParseExact($initialState.completionId, 'N')
     Assert-True ($initialCompletionId -ne [Guid]::Empty) 'Prepare did not assign an installation identity.'
     New-Payload 'new'
@@ -338,7 +345,7 @@ try {
     $rolledBackState = [ordered]@{
         schemaVersion = 1
         phase = 'rolled-back'
-        version = $version
+        version = $productVersion
         installDirectory = $install
         stagingDirectory = $staging
         rollbackDirectory = $rollback

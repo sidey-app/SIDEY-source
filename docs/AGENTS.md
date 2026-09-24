@@ -1,6 +1,6 @@
 # SIDEY Documentation and Release Instructions
 
-These instructions apply to `docs/**`. They also govern the root `README.md` when the repository-root routing sends a task here.
+These instructions apply to `docs/**`.
 
 ## Document boundaries
 
@@ -11,16 +11,8 @@ These instructions apply to `docs/**`. They also govern the root `README.md` whe
 - Machine-readable source and code own exact prices, IDs, versions, build numbers, asset
   hashes and platform settings. Link to those sources instead of copying their values into
   Markdown. Use Git/PR history for ordinary implementation history.
-- Public README and release writing is for users. Internal architecture, review evidence, operational history and contributor procedures may retain the technical detail needed for their audience; do not force public marketing style onto them.
+- Public release writing is for users. Internal architecture, review evidence, operational history and contributor procedures may retain the technical detail needed for their audience; do not force public marketing style onto them.
 - Windows contributor documentation under `windows/docs/**` follows `windows/docs/AGENTS.md`, not this directory's location and language layout.
-
-## Public README contract
-
-- Keep `README.md` as the Korean entry point in its established polite conversational style. Keep English, Japanese, Simplified Chinese, Traditional Chinese, Russian and Ukrainian translations at `docs/readme/README.<locale>.md`, with valid links among all seven editions.
-- Preserve the durable introduction, official website, preview, separate macOS and Windows installation sections, contribution guidance, credits and policy links.
-- macOS installation links only to the Mac App Store; Windows installation links to the official GitHub Releases page. Do not duplicate version numbers, build numbers, versioned artifact filenames, update histories or roadmaps in README files.
-- Store badges use the repository's official SVG assets. A store badge or availability statement must match a confirmed public product URL and shipped state.
-- Keep development setup, backend architecture, build instructions and internal rollout language out of the public README.
 
 ## Release documentation contract
 
@@ -33,4 +25,4 @@ These instructions apply to `docs/**`. They also govern the root `README.md` whe
 - Add installation steps, required warnings or limitations only when the user requests a separate section or verified user action or risk makes the information necessary. Keep implementation details only when users must act on them.
 - Use the official website and GitHub Releases URLs. Do not claim signing, testing, compatibility, availability or release completion without evidence from the exact target commit and artifact.
 
-Use [release notes](../.agents/skills/release-notes/SKILL.md) when researching or drafting the canonical note or GitHub Release body for a specific platform release. Use [version audit](../.agents/skills/version-audit/SKILL.md) when the release needs an evidence-based version or build decision. General README work is governed by this file without a separate Skill. Validate versions and links with `scripts/skills/verify_release_consistency.py`, resolve changed relative Markdown links, inspect translations affected by the change and run `git diff --check`. Drafting documentation does not authorize tags, uploads, publication or deployment.
+Use [release notes](../.agents/skills/release-notes/SKILL.md) when researching or drafting the canonical note or GitHub Release body for a specific platform release. Use [version audit](../.agents/skills/version-audit/SKILL.md) when the release needs an evidence-based version or build decision. Validate versions and links with `scripts/skills/verify_release_consistency.py` and run `git diff --check`. Drafting documentation does not authorize tags, uploads, publication or deployment.

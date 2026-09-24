@@ -35,13 +35,14 @@ if ($failure.Exception.Message -cne 'Expected native command test failure failed
 }
 
 $repositoryRootPath = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
-$releaseManifestPath = Join-Path $repositoryRootPath 'release/windows.json'
-$version = [string]((Get-Content -LiteralPath $releaseManifestPath -Raw -Encoding UTF8 |
-    ConvertFrom-Json).version)
+$versionPropertiesPath = Join-Path $repositoryRootPath 'windows/Version.props'
+$versionProperties = [xml](Get-Content -LiteralPath $versionPropertiesPath -Raw -Encoding UTF8)
+$version = [string]$versionProperties.Project.PropertyGroup.SideyProductVersion
+$fileVersion = [string]$versionProperties.Project.PropertyGroup.SideyMsixVersion
 if ($version -notmatch '^\d+\.\d+\.\d+$') {
     throw "Windows release version must contain three numeric parts: $version"
 }
-$fileVersion = "$version.0"
+[void][Version]::Parse($fileVersion)
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) (
     'SIDEY PowerShell process tests ' + [Guid]::NewGuid().ToString('N'))
 $resultPath = Join-Path $testRoot 'process result with spaces.ini'
