@@ -23,6 +23,8 @@ $ErrorActionPreference = 'Stop'
 $publishDirectoryPath = (Resolve-Path -LiteralPath $PublishDirectory).Path
 $launcherSourceFilePath = (Resolve-Path -LiteralPath $LauncherSourcePath).Path
 $uninstallerSourceFilePath = (Resolve-Path -LiteralPath $UninstallerSourcePath).Path
+$legacyOwnedFilesPath = (Resolve-Path -LiteralPath (
+    Join-Path $PSScriptRoot '../../windows/installer/Sidey.Setup/LegacyV131OwnedFiles.txt')).Path
 $runtimeDirectory = Join-Path $publishDirectoryPath 'Runtime'
 $assetsDirectory = Join-Path $publishDirectoryPath 'Assets'
 $languageDirectory = Join-Path $publishDirectoryPath 'Langs'
@@ -114,6 +116,7 @@ $iconPath = Join-Path $assetsDirectory 'Icons\SideyAppIcon.ico'
 & $helperBuilder `
     -SourcePath $uninstallerSourceFilePath `
     -OutputPath $uninstallerPath `
+    -ResourcePath $legacyOwnedFilesPath -ResourceName 'SIDEY.LegacyV131OwnedFiles.txt' `
     -Version $Version -FileVersion $FileVersion -IconPath $iconPath `
     -Title 'SIDEY Uninstaller' `
     -Description 'SIDEY uninstaller'
