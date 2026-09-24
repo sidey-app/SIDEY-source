@@ -66,7 +66,7 @@ struct GroupsSettingsView: View {
                             showsProgress: model.groupOperation == .creating
                         )
                     }
-                        .sideyProminentButtonStyle()
+                        .buttonStyle(.glassProminent)
                         .disabled(model.groupMutationsDisabled || !validRoomName || !validNickname)
                 }
 
@@ -108,7 +108,7 @@ struct GroupsSettingsView: View {
                             showsProgress: model.groupOperation == .joining
                         )
                     }
-                        .sideyProminentButtonStyle()
+                        .buttonStyle(.glassProminent)
                         .disabled(model.groupMutationsDisabled || model.inviteCode.trimmingCharacters(in: .whitespaces).isEmpty || !validNickname)
                 }
             }

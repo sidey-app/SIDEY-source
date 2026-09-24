@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify every Mach-O shipped inside SIDEY supports both CPUs and macOS 15."""
+"""Verify every Mach-O shipped inside SIDEY supports Apple Silicon and macOS 26."""
 
 import argparse
 import os
@@ -10,8 +10,8 @@ import subprocess
 import sys
 
 
-REQUIRED_ARCHITECTURES = frozenset({"arm64", "x86_64"})
-MAXIMUM_MINIMUM_OS = (15, 0, 0)
+REQUIRED_ARCHITECTURES = frozenset({"arm64"})
+MAXIMUM_MINIMUM_OS = (26, 0, 0)
 MACH_O_MAGICS = {
     bytes.fromhex(value) for value in (
         "feedface", "cefaedfe", "feedfacf", "cffaedfe",
@@ -79,8 +79,8 @@ def verify_app(app: Path) -> int:
     app = app.resolve()
     with (app / "Contents/Info.plist").open("rb") as source:
         info = plistlib.load(source)
-    if info.get("LSMinimumSystemVersion") != "15.0":
-        raise ValueError("App LSMinimumSystemVersion must be 15.0")
+    if info.get("LSMinimumSystemVersion") != "26.0":
+        raise ValueError("App LSMinimumSystemVersion must be 26.0")
     executable_name = info.get("CFBundleExecutable")
     if not isinstance(executable_name, str) or not executable_name or Path(executable_name).name != executable_name:
         raise ValueError("App CFBundleExecutable must name its main executable")
@@ -92,7 +92,7 @@ def verify_app(app: Path) -> int:
     for binary in binaries:
         architectures = set(run_tool(["/usr/bin/lipo", "-archs", str(binary)]).split())
         if architectures != REQUIRED_ARCHITECTURES:
-            raise ValueError(f"{binary}: expected arm64 and x86_64, found {sorted(architectures)}")
+            raise ValueError(f"{binary}: expected arm64 only, found {sorted(architectures)}")
         for architecture in sorted(architectures):
             try:
                 minimum = parse_minimum_os(run_tool([
@@ -102,7 +102,7 @@ def verify_app(app: Path) -> int:
                 raise ValueError(f"{binary} ({architecture}): {error}") from error
             if minimum > MAXIMUM_MINIMUM_OS:
                 version = ".".join(str(part) for part in minimum)
-                raise ValueError(f"{binary} ({architecture}): requires macOS {version}, above 15.0")
+                raise ValueError(f"{binary} ({architecture}): requires macOS {version}, above 26.0")
     return len(binaries)
 
 
@@ -115,7 +115,7 @@ def main() -> int:
     except (OSError, ValueError, plistlib.InvalidFileException) as error:
         print(f"Binary compatibility verification failed: {error}", file=sys.stderr)
         return 1
-    print(f"Verified {count} Mach-O binaries: arm64 + x86_64, macOS 15.0 or earlier")
+    print(f"Verified {count} Mach-O binaries: arm64 only, macOS 26.0 or earlier")
     return 0
 
 

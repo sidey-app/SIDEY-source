@@ -27,7 +27,7 @@ struct LandingView: View {
                     Circle()
                         .fill(.white.opacity(0.58))
                         .frame(width: 124, height: 124)
-                        .sideyGlassSurface(in: Capsule())
+                        .glassEffect()
                     Circle()
                         .stroke(.black.opacity(0.08), lineWidth: 1)
                         .frame(width: 96, height: 96)

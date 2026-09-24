@@ -56,33 +56,16 @@ jobs:
       - run: python3 scripts/skills/verify_release_consistency.py --allow-unreleased-source
 
   macos:
-    name: macOS build and tests (${{ matrix.runner }}, ${{ matrix.arch }})
+    name: macOS build and tests
     needs: scope
     if: contains(fromJSON(needs.scope.outputs.scopes), 'macos')
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: macos-26
-            arch: arm64
-            developer-dir: /Applications/Xcode.app/Contents/Developer
-          - runner: macos-15-intel
-            arch: x86_64
-            developer-dir: /Applications/Xcode_26.3.app/Contents/Developer
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-26
     timeout-minutes: 30
-    env:
-      DEVELOPER_DIR: ${{ matrix.developer-dir }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
-
-      - name: Verify native runner architecture
-        env:
-          SIDEY_EXPECTED_ARCH: ${{ matrix.arch }}
-        run: test "$(uname -m)" = "$SIDEY_EXPECTED_ARCH"
 
       - name: Validate central pixel assets and mirrors
         run: python3 ./scripts/validate_pixel_assets.py
