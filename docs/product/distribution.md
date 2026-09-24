@@ -65,6 +65,13 @@ payload를 검증하고 staging한 뒤 기존 설치를 보존할 수 있는 tra
 교체한다. 실패하면 기존 설치를 유지하거나 복원하고 최종 상태를 확인할 수 없는 경우를
 별도로 구분한다.
 
+구버전이 사용자 쓰기 가능 위치에 설치되어 있고 진행 중인 설치 transaction이 없으면,
+Installer는 Program Files의 `SIDEY` 폴더에 설치한다. 새 설치와 등록이
+완료된 뒤에만 이전 위치에서 알려진 구버전 배포 파일과 내용이 일치하는 파일을 자동으로 삭제한다.
+수정된 파일이나 관련 없는 파일은 남겨 두며, 모두 정리하지 못하면 이전 경로와 수동 삭제
+방법을 설치 화면에 안내한다. 이때 구버전 제거 프로그램은 실행하지 않는다. 설정과 로그인
+데이터는 프로그램 설치 위치와 별도로 보관한다.
+
 현재 self-contained 경로는 payload 준비, 실행 중인 process 종료, payload 적용과 Windows
 등록 실패를 구분한다. Installer source에는 향후 framework-dependent 배포로 전환할 때
 사용할 network·download·package·signature·shared-runtime dependency 오류 범주와 문구도
