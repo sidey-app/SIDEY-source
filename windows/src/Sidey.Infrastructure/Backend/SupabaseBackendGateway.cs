@@ -673,11 +673,6 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         PresenceState localPresence,
         CancellationToken cancellationToken = default)
     {
-        if (_realtime is FirebaseV2RealtimeTransport)
-        {
-            _realtime.ConfigureThrowableWireCodes(
-                await LoadFirebaseThrowableWireCodesAsync(cancellationToken).ConfigureAwait(false));
-        }
         await _realtime.SynchronizeAsync(
             roomEpochs,
             activeRoomId,
@@ -685,6 +680,26 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
             cancellationToken).ConfigureAwait(false);
         _roomEpochs = roomEpochs.ToDictionary(pair => pair.Key, pair => pair.Value);
         _activeRoomId = activeRoomId is { } id && roomEpochs.ContainsKey(id) ? id : null;
+        if (_realtime.RequiresThrowableWireCodes
+            && Volatile.Read(ref _firebaseThrowableWireCodes) is null)
+        {
+            using var wireCodeTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            wireCodeTimeout.CancelAfter(TimeSpan.FromSeconds(3));
+            try
+            {
+                _realtime.ConfigureThrowableWireCodes(
+                    await LoadFirebaseThrowableWireCodesAsync(wireCodeTimeout.Token).ConfigureAwait(false));
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Trace.TraceWarning(
+                    $"Firebase throwable wire catalog unavailable: {FailureDiagnostic(exception)}");
+            }
+        }
     }
 
     public async IAsyncEnumerable<BackendEvent> SubscribeAsync(

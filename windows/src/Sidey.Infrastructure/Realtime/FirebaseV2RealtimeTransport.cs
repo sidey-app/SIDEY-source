@@ -79,6 +79,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
         _legacy.IsRecoveryPaused || (UsesFirebaseChat && Volatile.Read(ref _selectorFailedClosed) != 0);
 
     public bool UsesFirebaseChat => Volatile.Read(ref _firebaseEnabled) != 0;
+    public bool RequiresThrowableWireCodes => true;
 
     public async IAsyncEnumerable<BackendEvent> ReadEventsAsync(
         [EnumeratorCancellation] CancellationToken cancellationToken)

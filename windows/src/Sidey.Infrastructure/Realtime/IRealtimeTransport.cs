@@ -8,6 +8,7 @@ internal interface IRealtimeTransport : IAsyncDisposable
     public RealtimeConnectionStatus ConnectionStatus { get; }
     public bool IsRecoveryPaused { get; }
     public bool UsesFirebaseChat => false;
+    public bool RequiresThrowableWireCodes => false;
 
     public IAsyncEnumerable<BackendEvent> ReadEventsAsync(CancellationToken cancellationToken);
 
