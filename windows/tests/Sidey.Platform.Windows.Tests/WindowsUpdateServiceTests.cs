@@ -10,7 +10,10 @@ public sealed class WindowsUpdateServiceTests
     [Fact]
     public void CurrentVersionMustComeFromTheApplicationArtifact()
     {
-        Assert.Throws<ArgumentException>(() => new WindowsUpdateService());
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
+            () => new WindowsUpdateService());
+
+        Assert.Equal("currentProductVersion", exception.ParamName);
     }
 
     [Theory]

@@ -1680,7 +1680,7 @@ public sealed class MainWindowViewModelTests
 
         AvailableUpdate? update = await viewModel.CheckForUpdatesOnStartupAsync();
 
-        Assert.Equal("0.3.0-alpha.3", update?.Version);
+        Assert.Equal("2.0.1", update?.Version);
         Assert.Equal(0, noticeCount);
         Assert.Equal(0, updates.InstallerLaunchCount);
     }
@@ -1751,7 +1751,7 @@ public sealed class MainWindowViewModelTests
 
         await viewModel.CheckForUpdatesCommand.ExecuteAsync(null);
 
-        Assert.Equal("2.0.1", dialogs.ConfirmedUpdateVersion);
+        Assert.Equal("0.3.0-alpha.3", dialogs.ConfirmedUpdateVersion);
         Assert.Equal(1, updates.InstallerLaunchCount);
     }
 
