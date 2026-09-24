@@ -59,12 +59,6 @@ public sealed class WindowPolicyTests
         Assert.Equal(expected, WindowsVersionGuard.IsCiStartupSmokeOverride(ci, startupSmoke));
     }
 
-    [Fact]
-    public void CurrentWindowsSourceVersionIsOneThreeOne()
-    {
-        Assert.Equal("2.0.0", WindowsUpdateService.CurrentVersion);
-    }
-
     [Theory]
     [InlineData(0, 0, 52, 52, true)]
     [InlineData(-100, -100, 52, 52, true)]

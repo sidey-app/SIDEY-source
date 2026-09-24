@@ -3,7 +3,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [string]$Version,
+    [string]$ReleaseVersion,
 
     [Parameter(Mandatory = $true)]
     [string]$CandidateSetupPath
@@ -12,12 +12,12 @@ param(
 Set-StrictMode -Version 3.0
 $ErrorActionPreference = 'Stop'
 $candidateSetupFilePath = (Resolve-Path -LiteralPath $CandidateSetupPath).Path
-$setupName = "SIDEY-Windows-x64-v${Version}-Setup.exe"
+$setupName = "SIDEY-Windows-x64-v${ReleaseVersion}-Setup.exe"
 if ([IO.Path]::GetFileName($candidateSetupFilePath) -ne $setupName) {
     throw "후보 파일 이름이 공개 계약과 다름: $setupName"
 }
 
-$tag = "windows-v$Version"
+$tag = "windows-v$ReleaseVersion"
 $releaseUrl = "https://github.com/sidey-app/SIDEY/releases/download/$tag/$setupName"
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) "sidey-windows-release-$([Guid]::NewGuid().ToString('N'))"
 [IO.Directory]::CreateDirectory($temporaryRoot) | Out-Null
@@ -32,7 +32,7 @@ try {
     }
 
     Write-Host 'ReleaseVerified=true'
-    Write-Host "Version=$Version"
+    Write-Host "ReleaseVersion=$ReleaseVersion"
     Write-Host "SHA256=$downloadedHash"
     Write-Host '이 확인 뒤에만 Windows CTA와 update manifest를 별도 변경하세요.'
 }
