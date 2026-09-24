@@ -3,6 +3,9 @@ set -eu
 
 SIDEY_REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../.." && /bin/pwd -P)
 python3 "$SIDEY_REPO_ROOT/scripts/macos/verify_content_assets.py"
+python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --check macos
+SIDEY_EXPECTED_PRODUCT_VERSION=$(python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --get productVersion)
+SIDEY_EXPECTED_MAC_BUILD=$(python3 "$SIDEY_REPO_ROOT/scripts/sidey_version.py" --get macBuild)
 SIDEY_CREATED_TEST_DIR=false
 
 python3 -m unittest discover -s "$SIDEY_REPO_ROOT/scripts/macos/tests"
@@ -42,6 +45,11 @@ xcodebuild \
     SIDEY_SUPABASE_PUBLISHABLE_KEY="${SIDEY_SUPABASE_PUBLISHABLE_KEY:-}" \
     test \
     "$@"
+
+python3 "$SIDEY_REPO_ROOT/scripts/macos/verify_app_version.py" \
+	--app "$SIDEY_TEST_DIR/app-store/Build/Products/Debug/SIDEY.app" \
+	--product-version "$SIDEY_EXPECTED_PRODUCT_VERSION" \
+	--build "$SIDEY_EXPECTED_MAC_BUILD"
 
 # The independent recording test route requires macOS 26 on Apple Silicon.
 # The macOS 26 ARM CI job continues to cover it.
