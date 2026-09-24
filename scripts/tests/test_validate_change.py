@@ -106,6 +106,21 @@ class GateTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual(platform_for(path), expected)
 
+    def test_app_store_metadata_stays_with_macos_release(self):
+        paths = [
+            "macos/SIDEY.xcodeproj/project.pbxproj",
+            "release/macos.json",
+            "release/app-store-localizations.json",
+        ]
+        self.assertEqual(validate_paths("macos/release", paths), "macos")
+        for platform in ("windows", "shared"):
+            with self.subTest(platform=platform):
+                with self.assertRaisesRegex(WorkflowError, "platform boundary"):
+                    validate_paths(
+                        f"{platform}/release",
+                        ["release/app-store-localizations.json"],
+                    )
+
     def test_commit_messages_preserve_bodies_and_remove_record_newlines(self):
         output = (
             'fix: 첫 번째 변경\n\n변경 이유를 설명해요.\x00\n'

@@ -14,7 +14,17 @@ final class CharacterFeedbackDebugRoom: NSWindowController, NSWindowDelegate {
     private let throwablePicker = NSPopUpButton(frame: CGRect(x: 90, y: 428, width: 215, height: 30))
     private let characterPicker = NSPopUpButton(frame: CGRect(x: 400, y: 428, width: 185, height: 30))
     private let status = NSTextField(labelWithString: "")
-    private var ticker: Timer?
+    private final class Resources {
+        var ticker: Timer?
+    }
+
+    private let resourceLifetime = MainActorResourceLifetime(Resources()) { resources in
+        resources.ticker?.invalidate()
+    }
+    private var ticker: Timer? {
+        get { resourceLifetime.resource.ticker }
+        set { resourceLifetime.resource.ticker = newValue }
+    }
     private var cooldown = CharacterThrowCooldown()
     private var requiresDoubleRightClick = false
     private var throwArmedUntil: TimeInterval = 0
@@ -104,7 +114,7 @@ final class CharacterFeedbackDebugRoom: NSWindowController, NSWindowDelegate {
         window.center()
     }
 
-    isolated deinit { ticker?.invalidate() }
+    nonisolated deinit {}
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
