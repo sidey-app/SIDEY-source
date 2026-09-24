@@ -7,6 +7,17 @@ LangString LanguageSelectionFailed ${LANG_TRADCHINESE} "無法開啟語言選擇
 LangString LanguageSelectionFailed ${LANG_RUSSIAN} "Не удалось открыть окно выбора языка.$\r$\n$\r$\nЗапустите программу установки ещё раз.$\r$\n$\r$\nКод ошибки: 0x51DE2009"
 LangString LanguageSelectionFailed ${LANG_UKRAINIAN} "Не вдалося відкрити вікно вибору мови.$\r$\n$\r$\nЗапустіть програму встановлення ще раз.$\r$\n$\r$\nКод помилки: 0x51DE2009"
 
+LangString LegacyRelocationBlocked ${LANG_JAPANESE} "以前の SIDEY の場所を安全に更新できず、Program Files の移行先も使用できません。セットアップは変更を加えていません。問題が続く場合は、診断データを GitHub Issue に添付してください。"
+LangString LegacyRelocationNotice ${LANG_JAPANESE} "SIDEY を Program Files にインストールしましたが、下記の以前の場所にファイルが残っています。新しい SIDEY の起動を確認してから終了し、エクスプローラーで古い SIDEY のプログラムファイルを削除してください。関係のないファイルは残してください。以前のアンインストーラーは実行しないでください。設定とサインイン情報は別の場所に保存されています。"
+LangString LegacyRelocationBlocked ${LANG_SIMPCHINESE} "无法安全更新 SIDEY 的原安装位置，Program Files 中的新位置也不可用。安装程序未作任何更改。如果问题持续，请在 GitHub 议题中附上诊断数据。"
+LangString LegacyRelocationNotice ${LANG_SIMPCHINESE} "SIDEY 已安装到 Program Files，但无法清除以下原位置的全部文件。确认新版 SIDEY 能启动后，关闭应用并在文件资源管理器中删除旧版 SIDEY 程序文件。保留无关文件。不要运行旧版卸载程序。设置和登录数据另存于其他位置。"
+LangString LegacyRelocationBlocked ${LANG_TRADCHINESE} "無法安全更新 SIDEY 的原安裝位置，Program Files 中的新位置也無法使用。安裝程式未進行任何變更。如果問題持續，請在 GitHub 議題附上診斷資料。"
+LangString LegacyRelocationNotice ${LANG_TRADCHINESE} "SIDEY 已安裝至 Program Files，但無法清除以下原位置的所有檔案。確認新版 SIDEY 能啟動後，關閉程式並在檔案總管中刪除舊版 SIDEY 程式檔案。請保留無關檔案。不要執行舊版解除安裝程式。設定和登入資料另存於其他位置。"
+LangString LegacyRelocationBlocked ${LANG_RUSSIAN} "Предыдущее расположение SIDEY нельзя безопасно обновить, а новое расположение в Program Files недоступно. Установщик ничего не изменил. Если проблема повторится, приложите диагностические данные к сообщению об ошибке на GitHub."
+LangString LegacyRelocationNotice ${LANG_RUSSIAN} "SIDEY установлен в Program Files, но не все файлы в прежней папке ниже удалось удалить. Убедитесь, что новая версия запускается, закройте SIDEY и удалите старые файлы программы через Проводник. Не трогайте посторонние файлы и не запускайте старую программу удаления. Настройки и данные входа хранятся отдельно."
+LangString LegacyRelocationBlocked ${LANG_UKRAINIAN} "Попереднє розташування SIDEY не можна безпечно оновити, а нове розташування в Program Files недоступне. Інсталятор нічого не змінив. Якщо проблема повториться, додайте діагностичні дані до повідомлення про помилку на GitHub."
+LangString LegacyRelocationNotice ${LANG_UKRAINIAN} "SIDEY встановлено до Program Files, але не всі файли в попередній папці нижче вдалося видалити. Переконайтеся, що нова версія запускається, закрийте SIDEY та видаліть старі файли програми в Провіднику. Не чіпайте сторонні файли й не запускайте старий засіб видалення. Налаштування та дані входу зберігаються окремо."
+
 LangString LaunchSidey ${LANG_JAPANESE} "SIDEY を起動する"
 LangString TermsTitle ${LANG_JAPANESE} "SIDEY 利用規約"
 LangString TermsSubtitle ${LANG_JAPANESE} "インストールする前に、利用規約を確認して同意してください。"

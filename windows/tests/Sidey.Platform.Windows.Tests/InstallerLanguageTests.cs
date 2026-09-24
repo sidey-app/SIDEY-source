@@ -166,7 +166,7 @@ public sealed class InstallerLanguageTests
         string initialization = Section(source, "Function .onInit", "FunctionEnd");
         Assert.Contains("$(TransactionRecoveryFailed)", initialization, StringComparison.Ordinal);
         Assert.Contains("Call ShowLifecycleError", initialization, StringComparison.Ordinal);
-        Assert.Contains("TRANSACTION_RECOVERY_FAILED", initialization, StringComparison.Ordinal);
+        Assert.Contains("!insertmacro ResolveRecoveryErrorSymbol", initialization, StringComparison.Ordinal);
         Assert.DoesNotContain("$(TransactionStateUnknown)", initialization, StringComparison.Ordinal);
 
         string maintenanceRemoval = Section(source, "Function TermsPagePre", "FunctionEnd");
@@ -527,6 +527,9 @@ public sealed class InstallerLanguageTests
             Assert.Matches("^0x51DE[0-9A-F]{4}$", mapping.Groups["code"].Value));
         Assert.Contains("nativeCode=$InstallerErrorNativeCode", errors, StringComparison.Ordinal);
         Assert.Contains("sideyCode=$InstallerErrorSideyCode", errors, StringComparison.Ordinal);
+        Assert.Contains("TRANSACTION_RECOVERY_FAILED", errors, StringComparison.Ordinal);
+        Assert.Contains("RECOVERY_STATE_CHECK_FAILED", errors, StringComparison.Ordinal);
+        Assert.Contains("RECOVERY_FILESYSTEM_IO_FAILED", errors, StringComparison.Ordinal);
         Assert.Contains("!insertmacro ResolveSideyInstallerErrorCode", errors, StringComparison.Ordinal);
         Assert.Contains("Function LogInstallerDisplayCode", errors, StringComparison.Ordinal);
         Assert.Contains("Call LogInstallerDisplayCode", Section(
