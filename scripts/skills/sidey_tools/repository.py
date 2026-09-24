@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -73,8 +74,15 @@ def platform_for(path: str) -> str:
     return "shared"
 
 
-def validate_paths(branch_name: str, paths: list[str]) -> str:
-    """Validate that changed paths belong to the branch platform."""
+def validate_paths(
+    branch_name: str,
+    paths: list[str],
+    *,
+    root: str | Path | None = None,
+    base: str | None = None,
+    revision: str = "HEAD",
+) -> str:
+    """Validate path ownership and the narrow macOS build-counter exception."""
 
     match = re.fullmatch(
         r"(shared|macos|windows)/[A-Za-z0-9][A-Za-z0-9._/-]*",
@@ -87,10 +95,49 @@ def validate_paths(branch_name: str, paths: list[str]) -> str:
         )
 
     platform = match[1]
-    invalid = [path for path in paths if platform_for(path) != platform]
+    mac_build_change = platform == "macos" and "release/version.json" in paths
+    invalid = [
+        path for path in paths
+        if platform_for(path) != platform
+        and not (mac_build_change and path == "release/version.json")
+    ]
     if invalid:
         changed = ", ".join(invalid)
         raise WorkflowError(
             f"{branch_name} crosses its platform boundary: {changed}"
         )
+    if mac_build_change:
+        mirrors = {"release/macos.json", "macos/Config/Version.xcconfig"}
+        if not mirrors.issubset(paths):
+            raise WorkflowError(
+                "macOS build counter change must include both generated macOS mirrors"
+            )
+        if root is None or base is None:
+            raise WorkflowError(
+                "macOS build counter ownership requires an explicit root and base"
+            )
+        try:
+            before = json.loads(git(root, "show", f"{base}:release/version.json"))
+            after = json.loads(git(root, "show", f"{revision}:release/version.json"))
+        except (json.JSONDecodeError, WorkflowError) as error:
+            raise WorkflowError(
+                f"Cannot compare macOS build counter to the base: {error}"
+            ) from error
+        if (
+            not isinstance(before, dict)
+            or not isinstance(after, dict)
+            or set(before) != {"schema", "productVersion", "windowsRevision", "macBuild"}
+            or set(after) != set(before)
+            or any(
+                type(after[key]) is not type(before[key])
+                or after[key] != before[key]
+                for key in before if key != "macBuild"
+            )
+            or type(after["macBuild"]) is not int
+            or type(before["macBuild"]) is not int
+            or after["macBuild"] <= before["macBuild"]
+        ):
+            raise WorkflowError(
+                "macOS branch may only increase macBuild in release/version.json"
+            )
     return platform
