@@ -24,6 +24,7 @@ $helpers = @(
        Original = (Join-Path $PublishDirectory 'SIDEY.exe') },
     @{ Name = 'Uninstall.exe'; Title = 'SIDEY Uninstaller'; Description = 'SIDEY uninstaller';
        Sources = @((Join-Path $root 'windows/src/Sidey.Uninstaller/Program.cs'));
+       Resource = (Join-Path $root 'windows/installer/Sidey.Setup/LegacyV131OwnedFiles.txt');
        Original = (Join-Path $PublishDirectory 'Uninstall.exe') },
     @{ Name = 'Sidey.SetupLanguage.exe'; Title = 'SIDEY Installer Language';
        Original = $SelectorExecutablePath }
@@ -40,9 +41,20 @@ foreach ($helper in $helpers) {
         if ($LASTEXITCODE -ne 0) { throw 'Independent language selector build failed.' }
     }
     else {
-        & $builder -SourcePath $helper.Sources -OutputPath $rebuilt `
-            -Title $helper.Title -Description $helper.Description `
-            -Version $Version -FileVersion $FileVersion -IconPath $icon
+        $buildArguments = @{
+            SourcePath = $helper.Sources
+            OutputPath = $rebuilt
+            Title = $helper.Title
+            Description = $helper.Description
+            Version = $Version
+            FileVersion = $FileVersion
+            IconPath = $icon
+        }
+        if ($helper.ContainsKey('Resource')) {
+            $buildArguments.ResourcePath = $helper.Resource
+            $buildArguments.ResourceName = 'SIDEY.LegacyV131OwnedFiles.txt'
+        }
+        & $builder @buildArguments
     }
 
     $original = (Resolve-Path -LiteralPath $helper.Original).Path
@@ -94,9 +106,14 @@ $startupWriter = [Func[int]]{
     $startupProbe.Calls++
     return [int]$startupProbe.Result
 }
+$relocationProbe = @{ Calls = 0; Result = 0 }
+$relocationWriter = [Func[int]]{
+    $relocationProbe.Calls++
+    return [int]$relocationProbe.Result
+}
 function Invoke-CompletionProbe([string]$Kind, [string]$Id, [string]$Directory) {
     return [int]$completion.Invoke($null, [object[]]@(
-        [string[]]@($Kind, '9.8.7', $Id), $Directory, $startupWriter))
+        [string[]]@($Kind, '9.8.7', $Id), $Directory, $startupWriter, $relocationWriter))
 }
 $freshData = Join-Path $probeRoot 'fresh user data'
 if ((Invoke-CompletionProbe 'fresh' 'fresh-1' $freshData) -ne 0 -or $startupProbe.Calls -ne 1) {
@@ -122,6 +139,24 @@ if ((Invoke-CompletionProbe 'repair' 'repair-1' $freshData) -ne 0 -or $startupPr
     (Test-Path -LiteralPath $pendingUpdate)) {
     throw 'Repair changed startup or reported an update.'
 }
+$relocationData = Join-Path $probeRoot 'relocated user data'
+$relocationProbe.Result = 5
+if ((Invoke-CompletionProbe 'relocate' 'relocate-1' $relocationData) -ne 5 -or
+    (Test-Path -LiteralPath (Join-Path $relocationData 'last-completed-install.txt'))) {
+    throw 'Failed relocation startup refresh was marked complete.'
+}
+$relocationProbe.Result = 0
+if ((Invoke-CompletionProbe 'relocate' 'relocate-1' $relocationData) -ne 0 -or
+    $relocationProbe.Calls -ne 2 -or $startupProbe.Calls -ne 1) {
+    throw 'Relocation did not refresh an enabled startup entry without enabling startup.'
+}
+if ([IO.File]::ReadAllText((Join-Path $relocationData 'pending-installed-update.txt')) -cne '9.8.7') {
+    throw 'Relocation did not report the installed update.'
+}
+if ((Invoke-CompletionProbe 'relocate' 'relocate-1' $relocationData) -ne 0 -or
+    $relocationProbe.Calls -ne 2) {
+    throw 'Recovery repeated the relocation startup refresh.'
+}
 $retryData = Join-Path $probeRoot 'retry user data'
 $startupProbe.Result = 5
 if ((Invoke-CompletionProbe 'fresh' 'retry-1' $retryData) -ne 5 -or
@@ -131,5 +166,57 @@ if ((Invoke-CompletionProbe 'fresh' 'retry-1' $retryData) -ne 5 -or
 $startupProbe.Result = 0
 if ((Invoke-CompletionProbe 'fresh' 'retry-1' $retryData) -ne 0 -or $startupProbe.Calls -ne 3) {
     throw 'Recovery did not retry failed startup registration.'
+}
+
+# The legacy cleanup deletes only verified payload files after a committed
+# relocation. Inject a small manifest so the test never depends on a release
+# download or touches an actual installation.
+$legacyCleanup = $uninstallerProgram.GetMethod(
+    'CleanupLegacyInstallFiles',
+    [Reflection.BindingFlags]'NonPublic,Static')
+$oldParent = Join-Path $probeRoot 'old location'
+$oldInstall = Join-Path $oldParent 'SIDEY'
+$newInstall = Join-Path $probeRoot 'new SIDEY'
+[IO.Directory]::CreateDirectory((Join-Path $oldInstall 'Assets')) | Out-Null
+[IO.Directory]::CreateDirectory($newInstall) | Out-Null
+$oldLauncher = Join-Path $oldInstall 'SIDEY.exe'
+$oldAsset = Join-Path $oldInstall 'Assets\owned.txt'
+$unknown = Join-Path $oldInstall 'unrelated.txt'
+[IO.File]::WriteAllText($oldLauncher, 'legacy launcher')
+[IO.File]::WriteAllText($oldAsset, 'owned asset')
+[IO.File]::WriteAllText($unknown, 'user file')
+$owned = [Collections.Generic.Dictionary[string,string]]::new([StringComparer]::OrdinalIgnoreCase)
+$owned.Add('SIDEY.exe', (Get-FileHash -LiteralPath $oldLauncher -Algorithm SHA256).Hash)
+$owned.Add('Assets\owned.txt', (Get-FileHash -LiteralPath $oldAsset -Algorithm SHA256).Hash)
+function Invoke-LegacyCleanup([string]$OldPath, [string]$NewPath) {
+    return [int]$legacyCleanup.Invoke($null, [object[]]@($OldPath, $NewPath, $owned))
+}
+if ((Invoke-LegacyCleanup $oldInstall (Join-Path $oldInstall 'new')) -ne 1 -or
+    -not (Test-Path -LiteralPath $oldLauncher)) {
+    throw 'Legacy cleanup accepted a path containing the new installation.'
+}
+$transaction = $oldInstall + '.sidey-transaction.json'
+[IO.File]::WriteAllText($transaction, 'pending')
+if ((Invoke-LegacyCleanup $oldInstall $newInstall) -ne 1 -or
+    -not (Test-Path -LiteralPath $oldAsset)) {
+    throw 'Legacy cleanup touched a directory with pending transaction state.'
+}
+[IO.File]::Delete($transaction)
+if ((Invoke-LegacyCleanup $oldInstall $newInstall) -ne 1 -or
+    (Test-Path -LiteralPath $oldLauncher) -or (Test-Path -LiteralPath $oldAsset) -or
+    -not (Test-Path -LiteralPath $unknown)) {
+    throw 'Legacy cleanup did not preserve an unrelated file while deleting verified payload.'
+}
+[IO.File]::WriteAllText($oldLauncher, 'modified launcher')
+if ((Invoke-LegacyCleanup $oldInstall $newInstall) -ne 1 -or
+    -not (Test-Path -LiteralPath $oldLauncher)) {
+    throw 'Legacy cleanup accepted a modified launcher.'
+}
+[IO.File]::Delete($oldLauncher)
+[IO.File]::Delete($unknown)
+[IO.File]::WriteAllText($oldLauncher, 'legacy launcher')
+if ((Invoke-LegacyCleanup $oldInstall $newInstall) -ne 0 -or
+    (Test-Path -LiteralPath $oldInstall)) {
+    throw 'Legacy cleanup did not remove an empty verified installation.'
 }
 Write-Host "Helper verification passed. Evidence directory: $probeRoot"
