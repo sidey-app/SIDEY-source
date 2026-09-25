@@ -32,6 +32,12 @@ plane 사이의 event를 전달하므로 업데이트 전후 client도 서로의
 수 있다. Client가 양쪽에 동시에 발행해서 호환성을 만들지 않으며, bridge는 동일 event의
 loop와 중복 표시를 막는다. Presence는 이 전환과 무관하게 계속 Supabase를 사용한다.
 
+macOS v2 client는 권한이 확인된 참여 방(최대 5개)의 Firebase live listener를 유지한다.
+비활성 방의 최신 snapshot은 전환 준비에만 쓰고 일시 이벤트를 화면에 재생하지 않는다.
+방 전환 시 준비된 listener를 재사용하며 Presence 변경과 Postgres 최근 메시지 조회가
+모두 성공해야 전환을 확정한다. 멤버십 또는 Firebase credential이 바뀌면 해당 listener를
+정리하거나 새 권한으로 다시 구독한다.
+
 Legacy bridge는 운영 runtime switch로 제어한다. Client rollout 뒤 최소 7일의 관찰 기간이
 지나도 자동으로 끄지 않으며, adoption·old/new 상호운용·오류와 비용을 확인한 뒤 운영자가
 명시적으로 지원 종료를 결정할 때만 비활성화한다. Bridge를 끄면 legacy client의 해당

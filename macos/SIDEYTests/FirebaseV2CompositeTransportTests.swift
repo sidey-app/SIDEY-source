@@ -116,7 +116,7 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         XCTAssertEqual(state, .online)
     }
 
-    func testRoomSwitchCancelsOldLiveListenerAndRejectsUnauthorizedRoom() async throws {
+    func testRoomSwitchReusesWarmLiveListenersAndRejectsUnauthorizedRoom() async throws {
         let secondRoomID = UUID()
         let fixture = try Fixture(additionalAuthorizedRoomID: secondRoomID)
         let secondRoom = fixture.makeRoom(id: secondRoomID)
@@ -138,7 +138,7 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
 
         let diagnostics = await fixture.transport.diagnostics()
         XCTAssertEqual(diagnostics.activeRoomID, secondRoomID)
-        XCTAssertEqual(diagnostics.liveListenerCount, 1)
+        XCTAssertEqual(diagnostics.liveListenerCount, 2)
         XCTAssertEqual(
             fixture.values.paths,
             [
@@ -162,6 +162,10 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         ) {
             try await fixture.transport.setActiveRoom(UUID())
         }
+        try await fixture.transport.setActiveRoom(fixture.room.id)
+        XCTAssertEqual(fixture.values.paths.filter {
+            $0 == FirebaseV2Path.liveRoom(fixture.room.id)
+        }.count, 1)
     }
 
     func testLatestRoomChoiceWinsWhenEarlierPresencePreparationFinishesLate() async throws {
@@ -194,7 +198,7 @@ final class FirebaseV2CompositeTransportTests: XCTestCase {
         }
         let diagnostics = await fixture.transport.diagnostics()
         XCTAssertEqual(diagnostics.activeRoomID, fixture.room.id)
-        XCTAssertEqual(diagnostics.liveListenerCount, 1)
+        XCTAssertEqual(diagnostics.liveListenerCount, 2)
     }
 
     func testRepeatedSynchronizationKeepsLiveListenerAndDeliversLaterThrow() async throws {
