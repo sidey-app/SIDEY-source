@@ -96,7 +96,7 @@
               HorizontalAlignment="Center"
               FontSize="11"
               FontWeight="Bold"
-              Foreground="White"
+              Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
               Text="!" />
         </Border>
       </Grid>

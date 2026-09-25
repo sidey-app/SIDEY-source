@@ -31,6 +31,21 @@
             ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}"
             AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}">
           <Canvas Width="24" Height="24" RenderTransformOrigin="0.5,0.5">
+            <VisualStateManager.VisualStateGroups>
+              <VisualStateGroup x:Name="KeepOnTopIconStates">
+                <VisualState x:Name="Unpinned" />
+                <VisualState x:Name="Pinned">
+                  <VisualState.StateTriggers>
+                    <StateTrigger IsActive="{Binding IsChecked, ElementName=KeepOnTopButton}" />
+                  </VisualState.StateTriggers>
+                  <VisualState.Setters>
+                    <Setter Target="KeepOnTopOutline.Stroke" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                    <Setter Target="KeepOnTopFill.Fill" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                    <Setter Target="KeepOnTopStem.Stroke" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                  </VisualState.Setters>
+                </VisualState>
+              </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
             <Canvas.RenderTransform>
               <RotateTransform Angle="45" />
             </Canvas.RenderTransform>
@@ -38,7 +53,7 @@
                 Fill="Transparent" Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="1.5" />
             <Path x:Name="KeepOnTopFill" Data="M7,3 L17,3 L16,7 L18,10 L18,12 L6,12 L6,10 L8,7 Z"
                 Fill="{ThemeResource TextFillColorPrimaryBrush}" Visibility="Collapsed" />
-            <Path Data="M12,12 L12,22" Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="1.5" />
+            <Path x:Name="KeepOnTopStem" Data="M12,12 L12,22" Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="1.5" />
           </Canvas>
         </ToggleButton>
       </Grid>

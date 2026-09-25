@@ -445,7 +445,10 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
                 {
                     for (int column = 0; column < 2; column++)
                     {
-                        var pane = new Rectangle { Fill = new SolidColorBrush(Microsoft.UI.Colors.White) };
+                        var pane = new Rectangle
+                        {
+                            Style = (Style)MainRoot.Resources["HotkeyEditorIconRectangleStyle"],
+                        };
                         Grid.SetRow(pane, row);
                         Grid.SetColumn(pane, column);
                         logo.Children.Add(pane);
@@ -459,19 +462,19 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
                 var shiftIcon = new Grid { Width = 24, Height = 24 };
                 shiftIcon.Children.Add(new Microsoft.UI.Xaml.Shapes.Polygon
                 {
+                    Style = (Style)MainRoot.Resources["HotkeyEditorIconPolygonStyle"],
                     Points =
                     [
                         new(12, 1), new(23, 12), new(18, 12), new(18, 20),
                         new(6, 20), new(6, 12), new(1, 12),
                     ],
-                    Fill = new SolidColorBrush(Microsoft.UI.Colors.White),
                     Width = 24,
                     Height = 20,
                     VerticalAlignment = VerticalAlignment.Top,
                 });
                 shiftIcon.Children.Add(new Rectangle
                 {
-                    Fill = new SolidColorBrush(Microsoft.UI.Colors.White),
+                    Style = (Style)MainRoot.Resources["HotkeyEditorIconRectangleStyle"],
                     Width = 12,
                     Height = 2,
                     VerticalAlignment = VerticalAlignment.Bottom,

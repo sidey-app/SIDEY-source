@@ -53,6 +53,12 @@
       <Setter Property="HorizontalAlignment" Value="Center" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+    <Style x:Key="HotkeyEditorIconRectangleStyle" TargetType="Rectangle">
+      <Setter Property="Fill" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+    </Style>
+    <Style x:Key="HotkeyEditorIconPolygonStyle" TargetType="Polygon">
+      <Setter Property="Fill" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+    </Style>
     <Style x:Key="HotkeyEditorInvalidLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource HotkeyEditorLabelStyle}">
       <Setter Property="Foreground" Value="{ThemeResource SystemFillColorCriticalBrush}" />
     </Style>

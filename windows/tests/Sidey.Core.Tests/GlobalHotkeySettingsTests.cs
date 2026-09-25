@@ -94,6 +94,8 @@ public sealed class GlobalHotkeySettingsTests
     [InlineData(0x74u, "Ctrl + Shift + F5")]
     [InlineData(0x31u, "Ctrl + Shift + 1")]
     [InlineData(0x25u, "Ctrl + Shift + Left")]
+    [InlineData(0x15u, "Ctrl + Shift + IME Kana/Hangul")]
+    [InlineData(0x19u, "Ctrl + Shift + IME Hanja/Kanji")]
     public void BindingFormatsCommonKeyboardKeys(uint virtualKey, string expected)
     {
         var binding = new GlobalHotkeyBinding(
