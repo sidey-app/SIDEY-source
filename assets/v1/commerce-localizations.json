@@ -966,6 +966,20 @@
           "iap_description": "已經散步回來了，但柴犬拒絕承認。",
           "marketing_description": "已經散步回來了，但柴犬拒絕承認這件事。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "柴犬",
+          "marketing_description": "明明已经散过步，柴犬却装作完全不知道。"
+        },
+        "uk": {
+          "display_name": "Сіба-іну",
+          "marketing_description": "Ми вже гуляли. Сіба вдає, що нічого про це не знає."
+        },
+        "ru": {
+          "display_name": "Сиба-ину",
+          "marketing_description": "Мы уже гуляли. Сиба делает вид, что ничего об этом не знает."
+        }
       }
     },
     {
@@ -990,6 +1004,20 @@
           "display_name": "網球",
           "iap_description": "負責丟的人選好了，撿球的人還沒。",
           "marketing_description": "負責丟的人已經選好了，負責撿回來的人還沒決定。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "网球",
+          "marketing_description": "扔球的人选好了，接球的人还在找。"
+        },
+        "uk": {
+          "display_name": "Тенісний м'яч",
+          "marketing_description": "Кому кинути м'яч, ми вже обрали. Тепер шукаємо, хто його принесе."
+        },
+        "ru": {
+          "display_name": "Теннисный мяч",
+          "marketing_description": "Кому бросить мяч, мы выбрали. Осталось найти того, кто его принесёт."
         }
       }
     },
@@ -1016,6 +1044,20 @@
           "iap_description": "很會裝傻，畢竟牠真的有一雙鴨掌。",
           "marketing_description": "牠最會裝傻推託了，畢竟牠真的有一雙鴨掌。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "鸭子",
+          "marketing_description": "躲避责任的专家。看它的鸭掌就知道了。"
+        },
+        "uk": {
+          "display_name": "Качка",
+          "marketing_description": "Майстерно ухиляється від відповідальності. Лапки це підтверджують."
+        },
+        "ru": {
+          "display_name": "Утка",
+          "marketing_description": "Мастерски уворачивается от ответственности. Лапки тому подтверждение."
+        }
       }
     },
     {
@@ -1040,6 +1082,20 @@
           "display_name": "便便",
           "iap_description": "不知道是誰叫牠，總之先出來了。",
           "marketing_description": "不知道是誰叫牠，總之牠先出來了。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "便便",
+          "marketing_description": "不知道是谁叫的，但它来了。"
+        },
+        "uk": {
+          "display_name": "Какашка",
+          "marketing_description": "Не знаємо, хто кликав, але вона вже тут."
+        },
+        "ru": {
+          "display_name": "Какашка",
+          "marketing_description": "Не знаем, кто звал, но она уже здесь."
         }
       }
     },
@@ -1066,6 +1122,20 @@
           "iap_description": "不知道是不是用過的，總之快閃！",
           "marketing_description": "不知道是不是用過的衛生紙，總之先閃開！"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "纸巾球",
+          "marketing_description": "没人知道是不是用过的纸巾。快躲开！"
+        },
+        "uk": {
+          "display_name": "Паперова кулька",
+          "marketing_description": "Ніхто не знає, чи це використаний папір. Краще ухилитися!"
+        },
+        "ru": {
+          "display_name": "Бумажный шарик",
+          "marketing_description": "Никто не знает, использовали ли эту бумагу. Лучше увернуться!"
+        }
       }
     },
     {
@@ -1090,6 +1160,20 @@
           "display_name": "辣炒年糕",
           "iap_description": "說是微辣，卻沒說是以誰的標準。",
           "marketing_description": "聽說是微辣，但沒人告訴我們這是以誰的標準。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "辣炒年糕",
+          "marketing_description": "他们说不辣，却没说是按谁的标准。"
+        },
+        "uk": {
+          "display_name": "Ттокпоккі",
+          "marketing_description": "Казали, що не гостре. Тільки не сказали, за чиїми мірками."
+        },
+        "ru": {
+          "display_name": "Ттокпокки",
+          "marketing_description": "Сказали, что неострое. Но не уточнили, по чьим меркам."
         }
       }
     },
@@ -1116,6 +1200,20 @@
           "iap_description": "是給你吃的，為什麼揮來揮去？",
           "marketing_description": "這是給你吃的，為什麼拿來揮來揮去？"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "鱼糕串",
+          "marketing_description": "这是拿来吃的。你挥舞它做什么？"
+        },
+        "uk": {
+          "display_name": "Шпажка з рибним коржем",
+          "marketing_description": "Це мало бути їжею. Навіщо ти цим розмахуєш?"
+        },
+        "ru": {
+          "display_name": "Шпажка с рыбным пирожком",
+          "marketing_description": "Это нужно было съесть. Зачем ты этим размахиваешь?"
+        }
       }
     },
     {
@@ -1141,6 +1239,20 @@
           "iap_description": "總是在笑，剛才丟葉子的也是牠。",
           "marketing_description": "牠總是在笑。剛才丟出那片葉子的也是牠。"
         }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "短尾矮袋鼠",
+          "marketing_description": "它总在微笑。对，刚才扔叶子的就是它。"
+        },
+        "uk": {
+          "display_name": "Квока",
+          "marketing_description": "Завжди усміхається. Так, це саме вона щойно кинула листок."
+        },
+        "ru": {
+          "display_name": "Квокка",
+          "marketing_description": "Всегда улыбается. Да, это она только что бросила лист."
+        }
       }
     },
     {
@@ -1165,6 +1277,20 @@
           "display_name": "葉子",
           "iap_description": "短尾矮袋鼠的便當。沒問過能不能丟。",
           "marketing_description": "這是短尾矮袋鼠的便當。我們沒問過能不能把它丟出去。"
+        }
+      },
+      "windows_localizations": {
+        "zh-Hans": {
+          "display_name": "树叶",
+          "marketing_description": "这是短尾矮袋鼠的午餐。我们没问过它能不能扔。"
+        },
+        "uk": {
+          "display_name": "Листок",
+          "marketing_description": "Це обід квоки. Ми не питали, чи можна ним кидатися."
+        },
+        "ru": {
+          "display_name": "Лист",
+          "marketing_description": "Это обед квокки. Мы не спросили, можно ли им бросаться."
         }
       }
     }

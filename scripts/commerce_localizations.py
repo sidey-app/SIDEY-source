@@ -116,6 +116,13 @@ def windows_catalog():
     return supported_catalog(catalog, manifest, "windows")
 
 
+def canonical_windows_catalog(catalog):
+    """Return products currently declared Windows-compatible by the source."""
+
+    manifest = read_json(ROOT / "assets/v1/manifest.json")
+    return supported_catalog(catalog, manifest, "windows")
+
+
 def validate_translation(translation, fields, product_id, locale):
     """Validate one product translation without platform assumptions."""
 
@@ -157,7 +164,10 @@ def validate_source(catalog, source, platform_catalog=None):
         raise ValueError("Windows-only localization locales or order differ")
 
     platform_catalog = platform_catalog or windows_catalog()
+    # Translation handoff can precede the reviewed Windows mirror's source pin.
+    # Require strings for both the staged canonical support and pinned exports.
     windows_ids = {entry["id"] for entry in platform_catalog}
+    windows_ids.update(entry["id"] for entry in canonical_windows_catalog(catalog))
 
     catalog_ids = [entry["id"] for entry in catalog]
     products = source["products"]
