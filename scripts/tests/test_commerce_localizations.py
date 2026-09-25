@@ -29,7 +29,11 @@ class CommerceLocalizationTests(unittest.TestCase):
             self.source["windows_locales"],
             list(localization_tool.WINDOWS_ONLY_LOCALES),
         )
-        windows_ids = {entry["id"] for entry in self.windows_catalog}
+        windows_ids = {
+            entry["id"]
+            for entry in localization_tool.canonical_windows_catalog(self.catalog)
+        }
+        windows_ids.update(entry["id"] for entry in self.windows_catalog)
         for catalog_entry, localized in zip(
             self.catalog,
             self.source["products"],
@@ -98,17 +102,12 @@ class CommerceLocalizationTests(unittest.TestCase):
         del missing_windows_locale["products"][0]["windows_localizations"]["uk"]
         mutations.append(missing_windows_locale)
 
-        windows_data_on_unsupported_product = copy.deepcopy(self.source)
-        unsupported = next(
-            product
-            for product in windows_data_on_unsupported_product["products"]
-            if product["id"]
-            not in {entry["id"] for entry in self.windows_catalog}
-        )
-        unsupported["windows_localizations"] = copy.deepcopy(
-            self.source["products"][0]["windows_localizations"]
-        )
-        mutations.append(windows_data_on_unsupported_product)
+        unknown_windows_field = copy.deepcopy(self.source)
+        unknown_windows_field["products"][0]["windows_localizations"]["stale"] = {
+            "display_name": "Stale",
+            "marketing_description": "Stale",
+        }
+        mutations.append(unknown_windows_field)
 
         untranslated_windows_value = copy.deepcopy(self.source)
         untranslated_windows_value["products"][0]["windows_localizations"]["ru"][
@@ -191,6 +190,13 @@ class CommerceLocalizationTests(unittest.TestCase):
         )
         supported_ids = {entry["id"] for entry in self.windows_catalog}
         unsupported_ids = {entry["id"] for entry in self.catalog} - supported_ids
+        staged_ids = {
+            entry["id"]
+            for entry in localization_tool.canonical_windows_catalog(self.catalog)
+        } - supported_ids
+        for product in self.source["products"]:
+            if product["id"] in staged_ids:
+                self.assertIn("windows_localizations", product)
         for locale, values in overlays.items():
             self.assertEqual(len(values), len(supported_ids) * 2, locale)
             for product_id in unsupported_ids:
@@ -198,6 +204,27 @@ class CommerceLocalizationTests(unittest.TestCase):
                     f"store.productDescriptions.{product_id}",
                     values,
                 )
+
+    def test_canonical_windows_translation_is_required_before_mirror_pin(self):
+        canonical = localization_tool.canonical_windows_catalog(self.catalog)
+        staged_id = canonical[0]["id"]
+        older_platform_catalog = [
+            entry for entry in canonical if entry["id"] != staged_id
+        ]
+        missing = copy.deepcopy(self.source)
+        next(
+            product for product in missing["products"] if product["id"] == staged_id
+        ).pop("windows_localizations")
+
+        with self.assertRaisesRegex(ValueError, staged_id):
+            localization_tool.validate_source(
+                self.catalog, missing, older_platform_catalog
+            )
+        overlays = localization_tool.windows_overlays(
+            self.catalog, self.source, older_platform_catalog
+        )
+        for values in overlays.values():
+            self.assertNotIn(f"store.productDescriptions.{staged_id}", values)
 
     def test_short_iap_names_use_approved_name_or_kind_suffix_without_changing_source(self):
         korean_name = next(
