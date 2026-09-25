@@ -5,34 +5,29 @@ namespace Sidey.Presentation.Tests;
 public sealed class CharacterClickComposerStateTests
 {
     [Theory]
-    [InlineData(false, ComposerVisibilityAction.Show, true, ComposerVisibilityAction.Hide)]
-    [InlineData(true, ComposerVisibilityAction.Hide, false, ComposerVisibilityAction.Show)]
-    public void DoubleClickRestoresVisibilityFromBeforeTheImmediateSingleClick(
+    [InlineData(false, ComposerVisibilityAction.Show)]
+    [InlineData(true, ComposerVisibilityAction.Hide)]
+    public void SingleClickTogglesOnlyWhenTheClickWindowExpires(
         bool initiallyVisible,
-        ComposerVisibilityAction singleAction,
-        bool visibilityAfterSingle,
-        ComposerVisibilityAction doubleAction)
+        ComposerVisibilityAction expectedAction)
     {
         var state = new CharacterClickComposerState();
 
-        Assert.Equal(singleAction, state.HandleClick(1, initiallyVisible));
-        state.CompleteSingleClick(visibilityAfterSingle);
-
-        Assert.Equal(doubleAction, state.HandleClick(2, visibilityAfterSingle));
-        Assert.Equal(ComposerVisibilityAction.None, state.HandleClick(2, initiallyVisible));
+        state.BeginSingleClick(initiallyVisible);
+        Assert.Equal(expectedAction, state.CompleteSingleClick());
+        Assert.Equal(ComposerVisibilityAction.None, state.CompleteSingleClick());
     }
 
     [Fact]
-    public void FailedSingleClickAndExplicitResetLeaveDoubleClickWithNothingToRestore()
+    public void DoubleClickOrAnotherVisibilityChangeCancelsThePendingToggle()
     {
         var state = new CharacterClickComposerState();
 
-        Assert.Equal(ComposerVisibilityAction.Show, state.HandleClick(1, isVisible: false));
-        state.CompleteSingleClick(isVisible: false);
-        Assert.Equal(ComposerVisibilityAction.None, state.HandleClick(2, isVisible: false));
-
-        Assert.Equal(ComposerVisibilityAction.Hide, state.HandleClick(1, isVisible: true));
+        state.BeginSingleClick(isVisible: false);
         state.Reset();
-        Assert.Equal(ComposerVisibilityAction.None, state.HandleClick(2, isVisible: false));
+        Assert.Equal(ComposerVisibilityAction.None, state.CompleteSingleClick());
+
+        state.BeginSingleClick(isVisible: true);
+        Assert.Equal(ComposerVisibilityAction.Hide, state.CompleteSingleClick());
     }
 }

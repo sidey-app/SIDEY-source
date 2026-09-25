@@ -9,38 +9,17 @@ public enum ComposerVisibilityAction
 
 public sealed class CharacterClickComposerState
 {
-    private bool? _visibilityBeforeClick;
+    private ComposerVisibilityAction _pendingAction;
 
-    public ComposerVisibilityAction HandleClick(int clickCount, bool isVisible)
+    public void BeginSingleClick(bool isVisible) =>
+        _pendingAction = isVisible ? ComposerVisibilityAction.Hide : ComposerVisibilityAction.Show;
+
+    public ComposerVisibilityAction CompleteSingleClick()
     {
-        switch (clickCount)
-        {
-            case 1:
-                _visibilityBeforeClick = isVisible;
-                return isVisible ? ComposerVisibilityAction.Hide : ComposerVisibilityAction.Show;
-            case 2:
-                bool? previousVisibility = _visibilityBeforeClick;
-                _visibilityBeforeClick = null;
-                if (previousVisibility is null || previousVisibility.Value == isVisible)
-                {
-                    return ComposerVisibilityAction.None;
-                }
-                return previousVisibility.Value
-                    ? ComposerVisibilityAction.Show
-                    : ComposerVisibilityAction.Hide;
-            default:
-                _visibilityBeforeClick = null;
-                return ComposerVisibilityAction.None;
-        }
+        ComposerVisibilityAction action = _pendingAction;
+        _pendingAction = ComposerVisibilityAction.None;
+        return action;
     }
 
-    public void CompleteSingleClick(bool isVisible)
-    {
-        if (_visibilityBeforeClick == isVisible)
-        {
-            _visibilityBeforeClick = null;
-        }
-    }
-
-    public void Reset() => _visibilityBeforeClick = null;
+    public void Reset() => _pendingAction = ComposerVisibilityAction.None;
 }
