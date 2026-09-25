@@ -10,6 +10,12 @@ from .errors import WorkflowError
 from .process import run
 
 
+WINDOWS_UI_LOCALIZATION_MIRRORS = {
+    f"windows/src/Sidey.App/Langs/{locale}.json"
+    for locale in ("en-US", "ja-JP", "ko-KR", "ru-RU", "uk-UA", "zh-CN", "zh-TW")
+}
+
+
 def git(root: str | Path, *args: str) -> str:
     """Run Git from *root* and return its standard output."""
 
@@ -82,7 +88,7 @@ def validate_paths(
     base: str | None = None,
     revision: str = "HEAD",
 ) -> str:
-    """Validate path ownership and the narrow macOS build-counter exception."""
+    """Validate path ownership and generated-mirror exceptions."""
 
     match = re.fullmatch(
         r"(shared|macos|windows)/[A-Za-z0-9][A-Za-z0-9._/-]*",
@@ -96,10 +102,17 @@ def validate_paths(
 
     platform = match[1]
     mac_build_change = platform == "macos" and "release/version.json" in paths
+    windows_localization_change = (
+        platform == "shared" and "assets/v1/ui-localizations.json" in paths
+    )
     invalid = [
         path for path in paths
         if platform_for(path) != platform
         and not (mac_build_change and path == "release/version.json")
+        and not (
+            windows_localization_change
+            and path in WINDOWS_UI_LOCALIZATION_MIRRORS
+        )
     ]
     if invalid:
         changed = ", ".join(invalid)
