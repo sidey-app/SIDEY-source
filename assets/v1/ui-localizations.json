@@ -17888,6 +17888,17 @@
         "ru": "Выберите поле и нажмите клавишу-модификатор вместе с другой клавишей. Esc отменяет ввод."
       }
     },
+    "settings.hotkeyRecorderReset": {
+      "localizations": {
+        "ko": "다시 설정",
+        "en": "Reset",
+        "ja": "リセット",
+        "zh-Hans": "重置",
+        "zh-Hant": "重設",
+        "uk": "Скинути",
+        "ru": "Сбросить"
+      }
+    },
     "settings.hotkeyRecording": {
       "localizations": {
         "ko": "단축키를 누르세요…",

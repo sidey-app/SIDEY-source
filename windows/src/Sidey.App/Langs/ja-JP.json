@@ -386,6 +386,7 @@
     "hotkeyOverlay": "オーバーレイ表示を切り替える",
     "hotkeyQuietMode": "静音モードを切り替える",
     "hotkeyRecorderHelp": "選択してから修飾キーと別のキーを押してください。Escでキャンセルできます。",
+    "hotkeyRecorderReset": "リセット",
     "hotkeyRecording": "ショートカットを入力…",
     "hotkeySideyConflict": "この組み合わせはSIDEYの別のショートカットで使用中です。保存すると割り当てが入れ替わります。",
     "hotkeySystemShortcut": "このショートカットはWindowsで使用されています。SIDEYでは動作しない場合があります。",
