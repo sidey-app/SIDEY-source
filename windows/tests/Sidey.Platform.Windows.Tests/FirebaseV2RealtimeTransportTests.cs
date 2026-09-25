@@ -539,6 +539,8 @@ public sealed class FirebaseV2RealtimeTransportTests
         var legacy = new FakeLegacyTransport(
         [
             new BackendEvent.TypingChanged(s_roomId, s_userId, true),
+            new BackendEvent.MessageChanged(s_roomId, s_messageId, "INSERT"),
+            new BackendEvent.MessagesInvalidated(s_roomId),
             new BackendEvent.CharacterPulsed(
                 new CharacterPulseEvent(Guid.NewGuid(), s_roomId, s_userId)),
             new BackendEvent.CharacterThrown(new CharacterThrowEvent(
@@ -576,6 +578,16 @@ public sealed class FirebaseV2RealtimeTransportTests
         Assert.DoesNotContain(received, item => item is BackendEvent.TypingChanged
             or BackendEvent.CharacterPulsed
             or BackendEvent.CharacterThrown);
+        Assert.Contains(received, item => item is BackendEvent.MessageChanged
+        {
+            RoomId: var roomId,
+            MessageId: var messageId,
+            Operation: "INSERT",
+        } && roomId == s_roomId && messageId == s_messageId);
+        Assert.Contains(received, item => item is BackendEvent.MessagesInvalidated
+        {
+            RoomId: var roomId,
+        } && roomId == s_roomId);
         Assert.Contains(received, item => item is BackendEvent.Diagnostic
         {
             Stage: "legacy-live-pulse result=firebase-selected",

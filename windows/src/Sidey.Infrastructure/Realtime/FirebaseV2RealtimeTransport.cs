@@ -380,10 +380,7 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
                     Emit(new BackendEvent.Diagnostic("legacy-live-throw result=firebase-selected"));
                     continue;
                 }
-                if (UsesFirebaseChat
-                    && backendEvent is BackendEvent.MessageChanged
-                        or BackendEvent.MessagesInvalidated
-                        or BackendEvent.TypingChanged)
+                if (UsesFirebaseChat && backendEvent is BackendEvent.TypingChanged)
                 {
                     continue;
                 }
