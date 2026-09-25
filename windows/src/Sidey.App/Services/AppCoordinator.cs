@@ -1159,9 +1159,34 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         catch (Exception exception)
         {
             // Realtime may have confirmed this UUID before the HTTP response was lost.
-            if (_messages.Fail(id) is null)
+            if (_messages.Entries.Any(entry =>
+                entry.Id == id && entry.State == MessageDeliveryState.Confirmed))
             {
                 StartupDiagnostics.Stage($"chat-send-error-already-confirmed type={exception.GetType().Name}");
+                return;
+            }
+            try
+            {
+                // A committed Firebase write can outlive its response. Check the
+                // authoritative history before exposing a failed outbox entry.
+                MessageHistoryPage page = await RequiredBackend().FetchMessagePageAsync(
+                    roomId, before: null, limit: 50, cancellationToken);
+                if (page.Messages.FirstOrDefault(message => message.Id == id) is { } committed)
+                {
+                    _messages.Confirm(committed);
+                    PublishState();
+                    StartupDiagnostics.Stage("chat-send-reconciled-after-error");
+                    return;
+                }
+            }
+            catch (Exception reconciliationFailure)
+            {
+                StartupDiagnostics.Stage(
+                    $"chat-send-reconcile-failed type={reconciliationFailure.GetType().Name}");
+            }
+            if (_messages.Fail(id) is null)
+            {
+                StartupDiagnostics.Stage("chat-send-reconciled-by-realtime");
                 return;
             }
             _bubbles.Remove(id);

@@ -43,6 +43,29 @@ public sealed class ChatCoordinatorTests
     }
 
     [Fact]
+    public async Task AuthoritativeHistoryConfirmsSendWhenResponseFailsAfterCommit()
+    {
+        await using var fixture = new ChatFixture();
+        fixture.Backend.Send = (_, _, _) =>
+            Task.FromException<ChatMessage>(new HttpRequestException("Response was lost."));
+        fixture.Backend.Fetch = (roomId, _) =>
+        {
+            MessageLedgerEntry pending = Assert.Single(fixture.Messages.Entries);
+            Assert.Equal(MessageDeliveryState.Pending, pending.State);
+            return Task.FromResult(new MessageHistoryPage(
+                [new ChatMessage(pending.Id, roomId, fixture.Profile.Id, pending.Body,
+                    DateTimeOffset.UtcNow)], null));
+        };
+
+        await fixture.Coordinator.SendMessageAsync(fixture.Room.Id, "Delivered despite the response error");
+
+        MessageLedgerEntry entry = Assert.Single(fixture.Coordinator.State.Messages);
+        Assert.Equal(MessageDeliveryState.Confirmed, entry.State);
+        Assert.Equal(1, fixture.Backend.Sends);
+        Assert.Equal(1, fixture.Backend.Fetches);
+    }
+
+    [Fact]
     public async Task AmbiguousCommitKeepsOriginalMessagePendingForHistoryReconciliation()
     {
         await using var fixture = new ChatFixture();
@@ -163,8 +186,11 @@ public sealed class ChatCoordinatorTests
     public class ChatBackend : DispatchProxy
     {
         public int Sends { get; private set; }
+        public int Fetches { get; private set; }
         public Func<Guid, Guid, string, Task<ChatMessage>> Send { get; set; } =
             (_, _, _) => throw new InvalidOperationException("Unexpected send.");
+        public Func<Guid, CancellationToken, Task<MessageHistoryPage>> Fetch { get; set; } =
+            (_, _) => throw new InvalidOperationException("Unexpected fetch.");
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
@@ -172,6 +198,11 @@ public sealed class ChatCoordinatorTests
             {
                 Sends++;
                 return Send((Guid)args![0]!, (Guid)args[1]!, (string)args[2]!);
+            }
+            if (targetMethod.Name == nameof(IBackendGateway.FetchMessagePageAsync))
+            {
+                Fetches++;
+                return Fetch((Guid)args![0]!, (CancellationToken)args[3]!);
             }
             if (targetMethod.Name == nameof(IBackendGateway.BroadcastTypingAsync))
                 return Task.CompletedTask;
