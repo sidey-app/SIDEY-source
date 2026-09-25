@@ -77,13 +77,14 @@ public sealed partial class ComposerWindow : Window
         }
     }
 
-    public void ShowAndFocus(string? monitorIdentifier, ComposerPlacement? placement = null)
+    public void ShowAndFocus(string? monitorIdentifier, ComposerPlacement? placement = null, bool alwaysOnTop = true)
     {
         if (_isClosed)
         {
             return;
         }
 
+        SetAlwaysOnTop(alwaysOnTop);
         ViewModel.OnShown();
         _monitorIdentifier = monitorIdentifier;
         _placement = placement?.Normalize();
@@ -98,6 +99,14 @@ public sealed partial class ComposerWindow : Window
         Activate();
         SideyWindowActivation.BringToForeground(this);
         RequestMessageInputFocus();
+    }
+
+    public void SetAlwaysOnTop(bool value)
+    {
+        if (!_isClosed && AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.IsAlwaysOnTop = value;
+        }
     }
 
     public void HideComposer()

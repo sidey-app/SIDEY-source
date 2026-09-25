@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
+using Sidey.Platform.Windows.Overlay;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
 
@@ -28,6 +29,7 @@ public partial class App : Application
     private readonly ComposerTypingOwner _typingOwner = new();
     private readonly CharacterClickComposerState _characterClickComposerState = new();
     private DispatcherQueueTimer? _characterClickTimer;
+    private DispatcherQueueTimer? _characterClickTopmostTimer;
     private bool _characterClickFeedbackInProgress;
     private Task _pendingComposerPlacementSave = Task.CompletedTask;
     private AppCoordinator? _coordinator;
@@ -500,9 +502,8 @@ public partial class App : Application
                 return;
             }
 
-            // A short delay keeps quick double-clicks from opening the composer.
-            // After 250ms, prioritize single-click feedback; a later double-click
-            // may briefly show the composer or lose its native second click.
+            // Show single-click feedback after 250ms, then restore the original
+            // visibility if Windows delivers a later native double-click.
             if (clickCount == 2)
             {
                 ComposerVisibilityAction restoration = _characterClickComposerState.CompleteDoubleClick();
@@ -544,22 +545,51 @@ public partial class App : Application
             return;
         }
 
+        TimeSpan remainingDoubleClickWindow = TimeSpan.FromSeconds(NativeOverlayWindow.DoubleClickIntervalSeconds)
+            + TimeSpan.FromMilliseconds(30) - TimeSpan.FromMilliseconds(250);
+        bool keepHotspotAboveComposer = action == ComposerVisibilityAction.Show
+            && remainingDoubleClickWindow > TimeSpan.Zero;
         _characterClickFeedbackInProgress = true;
         try
         {
-            ApplyCharacterClickVisibility(action);
+            ApplyCharacterClickVisibility(action, alwaysOnTop: !keepHotspotAboveComposer);
         }
         finally
         {
             _characterClickFeedbackInProgress = false;
         }
+
+        if (keepHotspotAboveComposer && _composer?.IsVisible == true)
+        {
+            DispatcherQueueTimer topmostTimer = _dispatcherQueue.CreateTimer();
+            topmostTimer.Interval = remainingDoubleClickWindow;
+            topmostTimer.IsRepeating = false;
+            topmostTimer.Tick += OnCharacterDoubleClickWindowElapsed;
+            _characterClickTopmostTimer = topmostTimer;
+            topmostTimer.Start();
+        }
     }
 
-    private void ApplyCharacterClickVisibility(ComposerVisibilityAction action)
+    private void OnCharacterDoubleClickWindowElapsed(DispatcherQueueTimer sender, object args)
+    {
+        _ = args;
+        sender.Tick -= OnCharacterDoubleClickWindowElapsed;
+        sender.Stop();
+        if (!ReferenceEquals(_characterClickTopmostTimer, sender))
+        {
+            return;
+        }
+
+        _characterClickTopmostTimer = null;
+        _composer?.SetAlwaysOnTop(true);
+        _characterClickComposerState.Reset();
+    }
+
+    private void ApplyCharacterClickVisibility(ComposerVisibilityAction action, bool alwaysOnTop = true)
     {
         if (action == ComposerVisibilityAction.Show && _composer?.IsVisible != true)
         {
-            ShowComposer();
+            ShowComposer(alwaysOnTop);
         }
         else if (action == ComposerVisibilityAction.Hide && _composer?.IsVisible == true)
         {
@@ -570,17 +600,23 @@ public partial class App : Application
     private void CancelPendingCharacterClick()
     {
         _characterClickComposerState.Reset();
-        if (_characterClickTimer is not { } timer)
+        if (_characterClickTimer is { } timer)
         {
-            return;
+            _characterClickTimer = null;
+            timer.Tick -= OnCharacterClickWindowElapsed;
+            timer.Stop();
         }
 
-        _characterClickTimer = null;
-        timer.Tick -= OnCharacterClickWindowElapsed;
-        timer.Stop();
+        if (_characterClickTopmostTimer is { } topmostTimer)
+        {
+            _characterClickTopmostTimer = null;
+            topmostTimer.Tick -= OnCharacterDoubleClickWindowElapsed;
+            topmostTimer.Stop();
+            _composer?.SetAlwaysOnTop(true);
+        }
     }
 
-    private void ShowComposer()
+    private void ShowComposer(bool alwaysOnTop = true)
     {
         if (_shuttingDown || _coordinator is null || _coordinator.State.NeedsOnboarding)
         {
@@ -610,7 +646,8 @@ public partial class App : Application
         ApplyComposerState(_composer.ViewModel, _coordinator.State);
         _composer.ShowAndFocus(
             _coordinator.State.Preferences.OverlayRegion.MonitorIdentifier,
-            _coordinator.State.Preferences.ComposerPlacement);
+            _coordinator.State.Preferences.ComposerPlacement,
+            alwaysOnTop);
     }
 
     private ComposerViewModel CreateComposerViewModel(bool autoCloseAfterSend)
