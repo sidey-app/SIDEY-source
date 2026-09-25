@@ -1795,10 +1795,6 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                         StartupDiagnostics.Stage(
                             $"realtime-messages-reconciled active={(replaced.RoomId == _state.ActiveRoomId).ToString().ToLowerInvariant()}");
                         _messages.ReplaceConfirmed(replaced.RoomId, replaced.Messages);
-                        if (replaced.RoomId == _state.ActiveRoomId)
-                        {
-                            _bubbles.Clear();
-                        }
                         PublishState();
                         ApplyWorldSnapshot();
                         break;

@@ -85,6 +85,36 @@ public sealed class ChatCoordinatorTests
     }
 
     [Fact]
+    public async Task HistoryReconciliationKeepsTwoRecentBubblesWhileNextSendIsPending()
+    {
+        await using ChatFixture fixture = new();
+        ChatMessage first = new(Guid.NewGuid(), fixture.Room.Id, fixture.Profile.Id,
+            "First", DateTimeOffset.UtcNow);
+        Guid secondId;
+        secondId = Guid.NewGuid();
+        fixture.Messages.Confirm(first);
+        fixture.Messages.Stage(secondId, fixture.Room.Id, fixture.Profile.Id, "Second");
+        fixture.Bubbles.Show(fixture.Profile.Id, first.Id, first.Body);
+        fixture.Bubbles.Show(fixture.Profile.Id, secondId, "Second");
+        fixture.Backend.Events = Replay(new BackendEvent.MessagesReplaced(fixture.Room.Id, [first]));
+
+        await (Task)typeof(AppCoordinator)
+            .GetMethod("PumpBackendEventsAsync", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(fixture.Coordinator, null)!;
+
+        Assert.Equal([first.Id, secondId], fixture.Bubbles.Bubbles.Select(bubble => bubble.MessageId));
+        Assert.Equal(2, fixture.Coordinator.State.Messages.Count);
+        Assert.Contains(fixture.Coordinator.State.Messages,
+            entry => entry.Id == secondId && entry.State == MessageDeliveryState.Pending);
+    }
+
+    private static async IAsyncEnumerable<BackendEvent> Replay(BackendEvent backendEvent)
+    {
+        await Task.Yield();
+        yield return backendEvent;
+    }
+
+    [Fact]
     public async Task ComposerFromThePreviousRoomCannotSendIntoTheNewActiveRoom()
     {
         await using var fixture = new ChatFixture();
@@ -191,6 +221,7 @@ public sealed class ChatCoordinatorTests
             (_, _, _) => throw new InvalidOperationException("Unexpected send.");
         public Func<Guid, CancellationToken, Task<MessageHistoryPage>> Fetch { get; set; } =
             (_, _) => throw new InvalidOperationException("Unexpected fetch.");
+        public IAsyncEnumerable<BackendEvent>? Events { get; set; }
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
@@ -206,6 +237,8 @@ public sealed class ChatCoordinatorTests
             }
             if (targetMethod.Name == nameof(IBackendGateway.BroadcastTypingAsync))
                 return Task.CompletedTask;
+            if (targetMethod.Name == nameof(IBackendGateway.SubscribeAsync))
+                return Events ?? throw new InvalidOperationException("Unexpected subscription.");
             throw new NotSupportedException(targetMethod.Name);
         }
     }
