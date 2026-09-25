@@ -57,7 +57,7 @@ def verify_pr_contract(root, body, paths):
     try:
         return validate_pr_body(root, body or "", paths)
     except PullRequestValidationError as error:
-        message = f"Pull request template validation failed: {error}"
+        message = f"Pull request validation failed: {error}"
         raise WorkflowError(message) from error
 
 

@@ -7,9 +7,9 @@ description: Prepare or create a SIDEY pull request from the exact reviewed and 
 
 Read the root `AGENTS.md` and the internal validation and pull request section
 of [CONTRIBUTING.md](../../../CONTRIBUTING.md#validation-and-pull-requests),
-then inspect the complete changed-path set. Use
-`.github/PULL_REQUEST_TEMPLATE/general.md` for all
-changes, including maintainer asset maintenance. External asset contributions
+then inspect the complete changed-path set. Start from
+`.github/PULL_REQUEST_TEMPLATE/general.md` when useful and include concrete
+change and validation evidence in any format. External asset contributions
 are not accepted. This applies equally to agent-created and manual pull requests.
 
 Separate local preparation from remote publication. Drafting a title, body or
@@ -29,9 +29,9 @@ not, return the prepared title and body without changing remote state.
 4. Write a title that passes
    `scripts/skills/commit/validate_commit_message.py --subject`.
    Do not add a pull request number to the title.
-5. Copy the general template, preserve its hidden marker and required sections,
-   and fill in concrete change and validation evidence. Do not combine templates
-   or mark a failed or inapplicable check as passed.
+5. Describe the change and validation evidence. The general template is a
+   starting point, not a required layout. Do not mark a failed or inapplicable
+   check as passed.
 6. Validate the body with the repository pull request validator and present
    the base, head, title, body and exact commit for review.
 
