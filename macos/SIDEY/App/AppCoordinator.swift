@@ -179,8 +179,9 @@ final class AppCoordinator {
                 else {
                     throw SideyBackendError.realtimeUnavailable
                 }
+                async let messages = backend.recentMessages(roomID: roomID)
                 try await messagingTransport.setActiveRoom(roomID)
-                return try await backend.recentMessages(roomID: roomID)
+                return try await messages
             },
             restoreCommittedRoom: { [weak self] in
                 guard let self, let messagingTransport = self.messagingTransport else {
