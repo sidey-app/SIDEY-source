@@ -62,7 +62,7 @@ public sealed class HistoryWindowViewModelTests
     }
 
     [Fact]
-    public async Task LiveLedgerReplacesPendingWithConfirmedAndKeepsFailedMessages()
+    public async Task LiveLedgerReplacesPendingWithConfirmedAndHidesFailedMessages()
     {
         var roomId = Guid.NewGuid();
         var userId = Guid.NewGuid();
@@ -101,9 +101,7 @@ public sealed class HistoryWindowViewModelTests
         {
             Messages = [pending with { State = MessageDeliveryState.Failed }],
         });
-        HistoryEntryViewModel failed = Assert.Single(viewModel.Items);
-        Assert.False(failed.IsPending);
-        Assert.True(failed.IsFailed);
+        Assert.Empty(viewModel.Items);
     }
 
     [Theory]

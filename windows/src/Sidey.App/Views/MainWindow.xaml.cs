@@ -135,7 +135,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             VerticalAlignment = VerticalAlignment.Center,
             IsHitTestVisible = false,
         };
-        var captureHost = new Grid { HorizontalAlignment = HorizontalAlignment.Stretch };
+        var captureHost = new Grid { Width = contentWidth };
         captureHost.Children.Add(keycaps);
         var emptyPrompt = new TextBlock
         {
@@ -148,8 +148,9 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var capture = new Button
         {
             Content = captureHost,
-            HorizontalContentAlignment = HorizontalAlignment.Stretch,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
+            Width = contentWidth,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
             MinHeight = 110,
             Style = (Style)MainRoot.Resources["HotkeyEditorCaptureStyle"],
         };
@@ -213,18 +214,25 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         };
         actions.Children.Add(reset);
         actions.Children.Add(delete);
-        var content = new StackPanel
+        var content = new Grid
         {
-            Spacing = 16,
             Width = contentWidth,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            RowSpacing = 16,
         };
-        content.Children.Add(new TextBlock
+        for (int index = 0; index < 4; index++)
+            content.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        var help = new TextBlock
         {
             Text = I18n.Get("settings.hotkeyRecorderHelp"),
             TextWrapping = TextWrapping.Wrap,
-        });
+        };
+        content.Children.Add(help);
+        Grid.SetRow(capture, 1);
         content.Children.Add(capture);
+        Grid.SetRow(actions, 2);
         content.Children.Add(actions);
+        Grid.SetRow(notice, 3);
         content.Children.Add(notice);
         var dialog = new ContentDialog
         {
@@ -826,7 +834,6 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             Stretch = Stretch.Uniform,
             StretchDirection = StretchDirection.DownOnly,
             HorizontalAlignment = HorizontalAlignment.Center,
-            Height = 190,
         });
         var cards = new Grid { ColumnSpacing = 12, HorizontalAlignment = HorizontalAlignment.Stretch };
         cards.ColumnDefinitions.Add(new ColumnDefinition());

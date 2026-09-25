@@ -1959,14 +1959,18 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     {
         bool activeRoomConnectionChanged =
             status.ActiveRoomTransportConnected != _state.ActiveRoomConnected;
-        if (activeRoomConnectionChanged && !status.ActiveRoomTransportConnected)
+        bool transportConnectionLost =
+            _state.RealtimeConnection.TransportConnected && !status.TransportConnected;
+        if ((activeRoomConnectionChanged || transportConnectionLost)
+            && !status.ActiveRoomTransportConnected)
         {
             _typing.Clear();
         }
 
         Guid? currentUserId = _state.Profile?.Id;
-        IReadOnlyList<Room> rooms = activeRoomConnectionChanged
-            ? [.. _state.Rooms.Select(room => room with
+        Guid? activeRoomId = _state.ActiveRoomId;
+        IReadOnlyList<Room> rooms = activeRoomConnectionChanged || transportConnectionLost
+            ? [.. _state.Rooms.Select(room => !status.TransportConnected || room.Id == activeRoomId ? room with
             {
                 Members = [.. room.Members.Select(member =>
                 {
@@ -1986,13 +1990,13 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                         return member;
                     }
 
-                    if (member.UserId != currentUserId)
+                    if (!status.TransportConnected && member.UserId != currentUserId)
                     {
                         _basePresence[key] = PresenceState.Offline;
                     }
                     return member with { Presence = PresenceState.Reconnecting };
                 })],
-            })]
+            } : room)]
             : _state.Rooms;
 
         SetState(_state with { Rooms = rooms, RealtimeConnection = status });

@@ -26,6 +26,7 @@
               TextWrapping="Wrap" />
         </StackPanel>
         <ToggleButton x:Name="KeepOnTopButton" Grid.Column="1" Width="40" Height="40"
+            Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
             VerticalAlignment="Top" Click="OnKeepOnTopClick"
             ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}"
             AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}">
@@ -98,14 +99,6 @@
                         Text="{Binding LocalTimeText}" />
                   </Grid>
                   <TextBlock IsTextSelectionEnabled="True" Text="{Binding Body}" TextWrapping="Wrap" />
-                  <TextBlock
-                      Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                      Text="{Binding Value, Source={i18n:I18n Key=history.sending}, Mode=OneWay}"
-                      Visibility="{Binding IsPending, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                  <TextBlock
-                      Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                      Text="{Binding Value, Source={i18n:I18n Key=history.failed}, Mode=OneWay}"
-                      Visibility="{Binding IsFailed, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </StackPanel>
               </Grid>
             </Border>

@@ -5,23 +5,23 @@
     xmlns:controls="using:Sidey.App.Controls"
     xmlns:i18n="using:Sidey.App.Localization"
     Width="540"
-    Height="280">
+    Height="200">
   <Border
       Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
       BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
       BorderThickness="1"
       CornerRadius="20">
     <Grid>
-      <Canvas x:Name="SceneCanvas" Width="540" Height="280" Visibility="Collapsed">
-        <Canvas x:Name="PlatformCanvas" Width="540" Height="24" Canvas.Top="256" IsHitTestVisible="False" />
+      <Canvas x:Name="SceneCanvas" Width="540" Height="200" Visibility="Collapsed">
+        <Canvas x:Name="PlatformCanvas" Width="540" Height="24" Canvas.Top="176" IsHitTestVisible="False" />
 
-        <StackPanel x:Name="LeftNameplate" Canvas.Top="180" Canvas.ZIndex="20" Orientation="Horizontal" Spacing="4">
+        <StackPanel x:Name="LeftNameplate" Canvas.Top="100" Canvas.ZIndex="20" Orientation="Horizontal" Spacing="4">
           <Ellipse Width="8" Height="8" VerticalAlignment="Center" Fill="{ThemeResource SystemFillColorSuccessBrush}" />
           <Border Height="20" Padding="4,0" Background="#9E050609" CornerRadius="8">
             <TextBlock Foreground="White" FontSize="12" Text="{Binding Value, Source={i18n:I18n Key=preview.moka}, Mode=OneWay}" />
           </Border>
         </StackPanel>
-        <StackPanel x:Name="RightNameplate" Canvas.Top="180" Canvas.ZIndex="20" Orientation="Horizontal" Spacing="4">
+        <StackPanel x:Name="RightNameplate" Canvas.Top="100" Canvas.ZIndex="20" Orientation="Horizontal" Spacing="4">
           <Ellipse Width="8" Height="8" VerticalAlignment="Center" Fill="{ThemeResource SystemFillColorSuccessBrush}" />
           <Border Height="20" Padding="4,0" Background="#9E050609" CornerRadius="8">
             <TextBlock Foreground="White" FontSize="12" Text="{Binding Value, Source={i18n:I18n Key=preview.dubu}, Mode=OneWay}" />
@@ -31,7 +31,7 @@
         <Canvas
             x:Name="BubblePreview"
             Height="46"
-            Canvas.Top="132"
+            Canvas.Top="52"
             Visibility="Collapsed">
           <Border
               x:Name="BubbleBody"
@@ -60,20 +60,20 @@
               Points="0,0 12,0 6,8" />
         </Canvas>
 
-        <Grid x:Name="LeftCharacterHost" Width="72" Height="72" Canvas.Top="193" Background="Transparent" DoubleTapped="OnCharacterDoubleTapped" RightTapped="OnCharacterRightTapped">
+        <Grid x:Name="LeftCharacterHost" Width="72" Height="72" Canvas.Top="113" Background="Transparent" DoubleTapped="OnCharacterDoubleTapped" RightTapped="OnCharacterRightTapped">
           <Grid.RenderTransform>
             <ScaleTransform x:Name="LeftCharacterScale" CenterX="36" CenterY="63" />
           </Grid.RenderTransform>
         </Grid>
-        <Grid x:Name="RightCharacterHost" Width="72" Height="72" Canvas.Top="193" Background="Transparent" Tapped="OnFriendTapped">
+        <Grid x:Name="RightCharacterHost" Width="72" Height="72" Canvas.Top="113" Background="Transparent" Tapped="OnFriendTapped">
           <Grid.RenderTransform>
             <ScaleTransform x:Name="RightCharacterScale" CenterX="36" CenterY="36" />
           </Grid.RenderTransform>
         </Grid>
-        <Canvas x:Name="SparkleCanvas" Width="540" Height="256" IsHitTestVisible="False">
-          <Canvas.Clip><RectangleGeometry Rect="0,0,540,256" /></Canvas.Clip>
+        <Canvas x:Name="SparkleCanvas" Width="540" Height="176" IsHitTestVisible="False">
+          <Canvas.Clip><RectangleGeometry Rect="0,0,540,176" /></Canvas.Clip>
         </Canvas>
-        <controls:PreloadedPixelAnimation x:Name="EmitterImage" Width="72" Height="72" Canvas.Top="193" Opacity="0" Canvas.ZIndex="21">
+        <controls:PreloadedPixelAnimation x:Name="EmitterImage" Width="72" Height="72" Canvas.Top="113" Opacity="0" Canvas.ZIndex="21">
           <controls:PreloadedPixelAnimation.RenderTransform>
             <ScaleTransform x:Name="EmitterScale" CenterX="36" CenterY="36" />
           </controls:PreloadedPixelAnimation.RenderTransform>
