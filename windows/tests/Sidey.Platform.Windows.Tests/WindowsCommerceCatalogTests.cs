@@ -28,11 +28,11 @@ public sealed class WindowsCommerceCatalogTests
     [Fact]
     public void CatalogContainsAllApprovedProductsAndSeparatesKeepsakesFromCharacters()
     {
-        Assert.Equal(24, WindowsCommerceCatalog.Products.Count);
-        Assert.Equal(7, WindowsCommerceCatalog.Products.Count(product => product.Kind == CommerceProductKind.Character));
+        Assert.Equal(33, WindowsCommerceCatalog.Products.Count);
+        Assert.Equal(12, WindowsCommerceCatalog.Products.Count(product => product.Kind == CommerceProductKind.Character));
         Assert.Equal(3, WindowsCommerceCatalog.Products.Count(product => product.Kind == CommerceProductKind.Bubble));
-        Assert.Equal(14, WindowsCommerceCatalog.Products.Count(product => product.Kind == CommerceProductKind.Throwable));
-        Assert.Equal(24, WindowsCommerceCatalog.Products.Select(product => product.Id).Distinct().Count());
+        Assert.Equal(18, WindowsCommerceCatalog.Products.Count(product => product.Kind == CommerceProductKind.Throwable));
+        Assert.Equal(33, WindowsCommerceCatalog.Products.Select(product => product.Id).Distinct().Count());
         foreach (CommerceProduct character in WindowsCommerceCatalog.Products.Where(product => product.Kind == CommerceProductKind.Character))
         {
             CommerceProduct keepsake = Assert.IsType<CommerceProduct>(WindowsCommerceCatalog.KeepsakeFor(character.CharacterId));
@@ -42,6 +42,10 @@ public sealed class WindowsCommerceCatalogTests
         }
         Assert.All(WindowsCommerceCatalog.Products, product => Assert.Equal(
             $"{product.Kind.ToString().ToLowerInvariant()}:{product.EffectiveCatalogItemId}", product.EntitlementKey));
+        Assert.Equal(
+            WindowsCommerceCatalog.Products.Where(product => product.Kind == CommerceProductKind.Character)
+                .Select(product => product.CharacterId).Order(StringComparer.Ordinal),
+            PixelCharacterCatalog.All.Skip(5).Select(character => character.Id).Order(StringComparer.Ordinal));
         Assert.Equal("banana", CosmeticCatalog.ResolveThrowableAssetId("throwable_banana"));
         Assert.Equal("timber", CosmeticCatalog.ResolveThrowableAssetId("throwable_timber"));
         Assert.Null(CosmeticCatalog.NormalizeThrowableId("banana"));
@@ -53,7 +57,7 @@ public sealed class WindowsCommerceCatalogTests
     {
         IReadOnlyList<CommerceProductState> states = WindowsCommerceCatalog.LockedStates();
 
-        Assert.Equal(24, states.Count);
+        Assert.Equal(33, states.Count);
         Assert.All(states, state =>
         {
             Assert.False(state.GoogleConnected);

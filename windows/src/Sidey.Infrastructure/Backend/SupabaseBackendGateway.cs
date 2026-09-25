@@ -195,9 +195,16 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         var states = new List<CommerceProductState>();
         foreach (CommerceProduct product in WindowsCommerceCatalog.Products)
         {
-            DatabaseCommerceState row = rows.SingleOrDefault(candidate =>
-                    StringComparer.Ordinal.Equals(candidate.ProductId, product.Id))
-                ?? throw new InvalidDataException("Windows commerce product is missing.");
+            DatabaseCommerceState? row = rows.SingleOrDefault(candidate =>
+                StringComparer.Ordinal.Equals(candidate.ProductId, product.Id));
+            if (row is null)
+            {
+                // A product can ship in the client before its server rollout. Keep
+                // it visible for preview, but never infer purchase eligibility.
+                states.Add(new CommerceProductState(
+                    product, GoogleConnected: false, CommercePurchaseState.Unavailable));
+                continue;
+            }
             string expectedKind = product.Kind.ToString().ToLowerInvariant();
             string? expectedCharacterId = product.Kind == CommerceProductKind.Character
                 ? product.CharacterId

@@ -21,7 +21,7 @@ public sealed class StoreStateGatewayTests
 
         IReadOnlyList<CommerceProductState> states = await context.Backend.GetWindowsCommerceStateAsync();
 
-        Assert.Equal(24, states.Count);
+        Assert.Equal(33, states.Count);
         Assert.Equal(WindowsCommerceCatalog.Products.Select(product => product.Id), states.Select(state => state.Product.Id));
         Assert.Equal(CommercePurchaseState.Owned, states[0].PurchaseState);
         Assert.Equal(CommercePurchaseState.Refunded, states[1].PurchaseState);
@@ -71,13 +71,20 @@ public sealed class StoreStateGatewayTests
     }
 
     [Fact]
-    public async Task MissingCatalogProductRejectsTheWholeResponse()
+    public async Task MissingServerProductStaysUnavailableWhileOtherProductsRemainPurchasable()
     {
         List<Dictionary<string, object?>> rows = CatalogRows();
+        string missingId = (string)rows[^1]["product_id"]!;
         rows.RemoveAt(rows.Count - 1);
         await using var context = new StoreRequestContext(rows);
 
-        await Assert.ThrowsAsync<InvalidDataException>(() => context.Backend.GetWindowsCommerceStateAsync());
+        IReadOnlyList<CommerceProductState> states = await context.Backend.GetWindowsCommerceStateAsync();
+
+        CommerceProductState missing = Assert.Single(states, state => state.Product.Id == missingId);
+        Assert.Equal(CommercePurchaseState.Unavailable, missing.PurchaseState);
+        Assert.False(missing.GoogleConnected);
+        Assert.All(states.Where(state => state.Product.Id != missingId), state =>
+            Assert.Equal(CommercePurchaseState.Available, state.PurchaseState));
     }
 
     [Theory]

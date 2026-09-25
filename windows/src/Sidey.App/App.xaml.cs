@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
+using Sidey.Platform.Windows.Overlay;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
 
@@ -27,6 +28,7 @@ public partial class App : Application
     private ComposerViewModel? _historyComposer;
     private readonly ComposerTypingOwner _typingOwner = new();
     private readonly CharacterClickComposerState _characterClickComposerState = new();
+    private DispatcherQueueTimer? _characterClickTimer;
     private Task _pendingComposerPlacementSave = Task.CompletedTask;
     private AppCoordinator? _coordinator;
     private SingleInstanceGuard? _singleInstance;
@@ -43,7 +45,6 @@ public partial class App : Application
     private DispatcherQueueTimer? _displayTopologyRefreshTimer;
     private string? _pendingUpdateNotificationVersion;
     private Timer? _uiResponsivenessTimer;
-    private bool _handlingCharacterClick;
     private bool _shuttingDown;
     private bool _launchPresentationReady;
     private bool _showAboutAfterOnboarding;
@@ -190,6 +191,7 @@ public partial class App : Application
         {
             _tray = TrayIconService.Start(coordinator.State.Preferences.GlobalHotkeys);
             _tray.CommandInvoked += OnTrayCommandInvoked;
+            _tray.HotkeyInvoked += OnTrayHotkeyInvoked;
             _tray.RoomSelected += OnTrayRoomSelected;
             _tray.DisplayTopologyChanged += OnDisplayTopologyChanged;
             _mainWindow?.SetTrayAvailable(true);
@@ -478,7 +480,7 @@ public partial class App : Application
         {
             if (!_shuttingDown)
             {
-                _characterClickComposerState.Reset();
+                CancelPendingCharacterClick();
                 ShowComposer();
             }
         });
@@ -498,31 +500,63 @@ public partial class App : Application
                 return;
             }
 
-            _handlingCharacterClick = true;
-            try
+            // Showing a composer on the first press steals focus from the hotspot
+            // and can prevent Windows from delivering its double-click message.
+            CancelPendingCharacterClick();
+            if (clickCount != 1)
             {
-                bool isVisible = _composer?.IsVisible == true;
-                ComposerVisibilityAction action = _characterClickComposerState.HandleClick(clickCount, isVisible);
-                switch (action)
-                {
-                    case ComposerVisibilityAction.Show:
-                        ShowComposer();
-                        break;
-                    case ComposerVisibilityAction.Hide:
-                        _composer?.HideComposer();
-                        break;
-                }
+                return;
+            }
 
-                if (clickCount == 1)
-                {
-                    _characterClickComposerState.CompleteSingleClick(_composer?.IsVisible == true);
-                }
-            }
-            finally
-            {
-                _handlingCharacterClick = false;
-            }
+            _characterClickComposerState.BeginSingleClick(_composer?.IsVisible == true);
+            DispatcherQueueTimer timer = _dispatcherQueue.CreateTimer();
+            timer.Interval = TimeSpan.FromSeconds(NativeOverlayWindow.DoubleClickIntervalSeconds)
+                + TimeSpan.FromMilliseconds(30);
+            timer.IsRepeating = false;
+            timer.Tick += OnCharacterClickWindowElapsed;
+            _characterClickTimer = timer;
+            timer.Start();
         });
+    }
+
+    private void OnCharacterClickWindowElapsed(DispatcherQueueTimer sender, object args)
+    {
+        _ = args;
+        sender.Tick -= OnCharacterClickWindowElapsed;
+        sender.Stop();
+        if (!ReferenceEquals(_characterClickTimer, sender))
+        {
+            return;
+        }
+
+        _characterClickTimer = null;
+        ComposerVisibilityAction action = _characterClickComposerState.CompleteSingleClick();
+        if (_shuttingDown)
+        {
+            return;
+        }
+
+        if (action == ComposerVisibilityAction.Show && _composer?.IsVisible != true)
+        {
+            ShowComposer();
+        }
+        else if (action == ComposerVisibilityAction.Hide && _composer?.IsVisible == true)
+        {
+            _composer.HideComposer();
+        }
+    }
+
+    private void CancelPendingCharacterClick()
+    {
+        _characterClickComposerState.Reset();
+        if (_characterClickTimer is not { } timer)
+        {
+            return;
+        }
+
+        _characterClickTimer = null;
+        timer.Tick -= OnCharacterClickWindowElapsed;
+        timer.Stop();
     }
 
     private void ShowComposer()
@@ -592,10 +626,7 @@ public partial class App : Application
     private void OnComposerVisibilityChanged(bool isVisible)
     {
         _ = isVisible;
-        if (!_handlingCharacterClick)
-        {
-            _characterClickComposerState.Reset();
-        }
+        CancelPendingCharacterClick();
     }
 
     private void RequestPulse()
@@ -1042,7 +1073,7 @@ public partial class App : Application
             if (_historyWindow is not null)
             {
                 _historyWindow.Title = I18n.Get("window.historyTitle");
-                _historyWindow.ViewModel.RefreshLocalizedText();
+                _historyWindow.RefreshLocalizedText();
             }
             StartupDiagnostics.Stage($"language-applied language={language}");
         });
@@ -1055,6 +1086,29 @@ public partial class App : Application
             _dispatcherQueue.TryEnqueue(() =>
             {
                 if (!_shuttingDown)
+                {
+                    HandleTrayCommand(command);
+                }
+            });
+        }
+    }
+
+    private void OnTrayHotkeyInvoked(TrayCommand command)
+    {
+        if (!_shuttingDown)
+        {
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                if (_shuttingDown)
+                {
+                    return;
+                }
+
+                if (command == TrayCommand.History && _historyWindow?.IsVisible == true)
+                {
+                    _historyWindow.HideHistory();
+                }
+                else
                 {
                     HandleTrayCommand(command);
                 }
@@ -1416,6 +1470,7 @@ public partial class App : Application
         }
 
         _shuttingDown = true;
+        CancelPendingCharacterClick();
         _monitorConnectionFailures = false;
         CancelConnectionFailureNotification();
         CancelDisplayTopologyRefresh();
@@ -1436,6 +1491,7 @@ public partial class App : Application
         if (_tray is not null)
         {
             _tray.CommandInvoked -= OnTrayCommandInvoked;
+            _tray.HotkeyInvoked -= OnTrayHotkeyInvoked;
             _tray.RoomSelected -= OnTrayRoomSelected;
             _tray.DisplayTopologyChanged -= OnDisplayTopologyChanged;
             try
