@@ -40,6 +40,7 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
     private string? _accessRevision;
     private readonly Dictionary<Guid, string> _roomRevisions = [];
     private readonly Dictionary<Guid, long> _chatSequences = [];
+    private readonly Dictionary<Guid, (Guid MessageId, long Sequence)> _liveChatEvents = [];
     private FirebaseRealtimeLiveReconciler _liveReconciler = new();
     private IReadOnlyDictionary<string, string> _throwableCatalogItemIdsByWireCode =
         new Dictionary<string, string>(StringComparer.Ordinal)
@@ -492,7 +493,11 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
             ProcessLiveActions(activeRoomId, localUserId, payload, generation, serverClock);
             if (payload.ServerEvent is { } serverEvent)
             {
-                ObserveChatSequence(activeRoomId, serverEvent.Sequence, initialMutation);
+                ObserveChatEvent(
+                    activeRoomId,
+                    serverEvent,
+                    initialMutation,
+                    ServerNowMilliseconds(serverClock));
             }
             return;
         }
@@ -718,15 +723,39 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
         }
     }
 
-    private void ObserveChatSequence(Guid roomId, long sequence, bool initialMutation)
+    private void ObserveChatEvent(
+        Guid roomId,
+        FirebaseRealtimeRoomEvent serverEvent,
+        bool initialMutation,
+        long receivedAtMilliseconds)
     {
-        bool emit;
+        bool recheckMessage;
+        bool invalidateMessages;
         lock (_snapshotGate)
         {
             bool baseline = !_chatSequences.ContainsKey(roomId) && initialMutation;
-            emit = AdvanceSequenceWithinLock(roomId, sequence) && !baseline;
+            bool hadSequence = _chatSequences.TryGetValue(roomId, out long previousSequence);
+            bool advanced = AdvanceSequenceWithinLock(roomId, serverEvent.Sequence);
+            bool unseen = !_liveChatEvents.TryGetValue(
+                roomId, out (Guid MessageId, long Sequence) previousEvent)
+                || serverEvent.Sequence > previousEvent.Sequence;
+            if (unseen)
+            {
+                _liveChatEvents[roomId] = (serverEvent.MessageId, serverEvent.Sequence);
+            }
+            long age = receivedAtMilliseconds - serverEvent.Timestamp;
+            recheckMessage = unseen && !initialMutation
+                && age >= -FirebaseRealtimeLiveReconciler.FreshnessWindowMilliseconds
+                && age <= ActiveBubbleLedger.DefaultLifetime.TotalMilliseconds;
+            invalidateMessages = advanced && !baseline
+                && (!recheckMessage
+                    || (hadSequence && serverEvent.Sequence > previousSequence + 1));
         }
-        if (emit)
+        if (recheckMessage)
+        {
+            _emit(new BackendEvent.MessageChanged(roomId, serverEvent.MessageId, "INSERT"));
+        }
+        if (invalidateMessages)
         {
             _emit(new BackendEvent.MessagesInvalidated(roomId));
         }
