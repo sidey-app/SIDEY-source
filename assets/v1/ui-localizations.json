@@ -17800,6 +17800,28 @@
         "ru": "Общие"
       }
     },
+    "settings.hotkeyAlreadyRegistered": {
+      "localizations": {
+        "ko": "Windows 또는 다른 앱이 이미 사용하는 단축키입니다. SIDEY에서 작동하지 않을 수 있습니다.",
+        "en": "Windows or another app is already using this shortcut. It may not work in SIDEY.",
+        "ja": "このショートカットはWindowsまたは別のアプリで使用中です。SIDEYでは動作しない場合があります。",
+        "zh-Hans": "Windows 或其他应用已在使用此快捷键，SIDEY 中可能无法生效。",
+        "zh-Hant": "Windows 或其他應用程式已在使用此快速鍵，SIDEY 中可能無法運作。",
+        "uk": "Це сполучення вже використовує Windows або інша програма, тому воно може не працювати в SIDEY.",
+        "ru": "Это сочетание уже используется Windows или другим приложением и может не работать в SIDEY."
+      }
+    },
+    "settings.hotkeyAvailabilityUnverified": {
+      "localizations": {
+        "ko": "이 단축키를 사용할 수 있는지 확인하지 못했습니다. 저장 후 작동하지 않을 수 있습니다.",
+        "en": "SIDEY could not check whether this shortcut is available. It may not work after saving.",
+        "ja": "このショートカットを使用できるか確認できませんでした。保存後に動作しない場合があります。",
+        "zh-Hans": "无法确认此快捷键是否可用，保存后可能无法生效。",
+        "zh-Hant": "無法確認此快速鍵是否可用，儲存後可能無法運作。",
+        "uk": "Не вдалося перевірити доступність сполучення. Після збереження воно може не працювати.",
+        "ru": "Не удалось проверить доступность сочетания. После сохранения оно может не работать."
+      }
+    },
     "settings.hotkeyComposer": {
       "localizations": {
         "ko": "메시지 입력창 열기 / 닫기",
@@ -17875,6 +17897,28 @@
         "zh-Hant": "請按快速鍵…",
         "uk": "Натисніть сполучення…",
         "ru": "Нажмите сочетание…"
+      }
+    },
+    "settings.hotkeySideyConflict": {
+      "localizations": {
+        "ko": "SIDEY의 다른 단축키가 이 조합을 사용 중입니다. 저장하면 두 단축키가 서로 바뀝니다.",
+        "en": "Another SIDEY shortcut uses this combination. Saving will swap the two shortcuts.",
+        "ja": "この組み合わせはSIDEYの別のショートカットで使用中です。保存すると割り当てが入れ替わります。",
+        "zh-Hans": "SIDEY 的其他快捷键正在使用此组合。保存后两个快捷键将互换。",
+        "zh-Hant": "SIDEY 的其他快速鍵正在使用此組合。儲存後兩個快速鍵會互換。",
+        "uk": "Це сполучення вже призначено іншій дії SIDEY. Після збереження призначення поміняються місцями.",
+        "ru": "Это сочетание уже назначено другому действию SIDEY. При сохранении назначения поменяются местами."
+      }
+    },
+    "settings.hotkeySystemShortcut": {
+      "localizations": {
+        "ko": "Windows가 이미 사용하는 단축키입니다. SIDEY에서 작동하지 않을 수 있습니다.",
+        "en": "Windows already uses this shortcut. It may not work in SIDEY.",
+        "ja": "このショートカットはWindowsで使用されています。SIDEYでは動作しない場合があります。",
+        "zh-Hans": "Windows 已在使用此快捷键，SIDEY 中可能无法生效。",
+        "zh-Hant": "Windows 已在使用此快速鍵，SIDEY 中可能無法運作。",
+        "uk": "Це сполучення використовує Windows, тому воно може не працювати в SIDEY.",
+        "ru": "Это сочетание используется Windows и может не работать в SIDEY."
       }
     },
     "settings.hotkeysDescription": {
