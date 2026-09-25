@@ -576,6 +576,14 @@ public sealed class FirebaseV2RealtimeTransportTests
         Assert.DoesNotContain(received, item => item is BackendEvent.TypingChanged
             or BackendEvent.CharacterPulsed
             or BackendEvent.CharacterThrown);
+        Assert.Contains(received, item => item is BackendEvent.Diagnostic
+        {
+            Stage: "legacy-live-pulse result=firebase-selected",
+        });
+        Assert.Contains(received, item => item is BackendEvent.Diagnostic
+        {
+            Stage: "legacy-live-throw result=firebase-selected",
+        });
     }
 
     [Theory]

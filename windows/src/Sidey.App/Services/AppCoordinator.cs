@@ -1827,7 +1827,12 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                             TimeSpan.FromSeconds(
                                 Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency)))
                         {
+                            StartupDiagnostics.Stage("realtime-pulse result=queued");
                             QueuePulseForWorld(pulsed.Pulse);
+                        }
+                        else
+                        {
+                            StartupDiagnostics.Stage("realtime-pulse result=cooldown");
                         }
                         break;
                     case BackendEvent.CharacterThrown thrown:
@@ -1847,10 +1852,15 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                                 TimeSpan.FromSeconds(
                                     Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency)))
                         {
+                            StartupDiagnostics.Stage("realtime-throw result=queued");
                             QueueThrowForWorld(characterThrow with
                             {
                                 SourceCharacterId = PixelCharacterCatalog.NormalizeId(actor.CharacterId),
                             });
+                        }
+                        else
+                        {
+                            StartupDiagnostics.Stage("realtime-throw result=filtered");
                         }
                         break;
                     case BackendEvent.ConnectionChanged connection:
@@ -2332,22 +2342,24 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     {
         if (_overlay is null)
         {
+            StartupDiagnostics.Stage("overlay-pulse result=not-started");
             return;
         }
 
         _pendingPulses.Add(pulse);
-        ApplyWorldSnapshot();
+        ApplyWorldSnapshot("pulse");
     }
 
     private void QueueThrowForWorld(CharacterThrowEvent characterThrow)
     {
         if (_overlay is null)
         {
+            StartupDiagnostics.Stage("overlay-throw result=not-started");
             return;
         }
 
         _pendingThrows.Add(characterThrow);
-        ApplyWorldSnapshot();
+        ApplyWorldSnapshot("throw");
     }
 
     private WorldSnapshot CurrentWorldSnapshot()

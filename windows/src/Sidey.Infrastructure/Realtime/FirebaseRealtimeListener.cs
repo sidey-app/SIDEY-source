@@ -545,11 +545,13 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
     {
         IReadOnlyList<FirebaseRealtimeLiveAction> actions;
         IReadOnlyDictionary<string, string> throwableCatalogItemIds;
+        FirebaseRealtimeLiveObservation observation;
         lock (_snapshotGate)
         {
             actions = _liveReconciler.Consume(
                 payload,
-                _timeProvider.GetUtcNow().ToUnixTimeMilliseconds());
+                _timeProvider.GetUtcNow().ToUnixTimeMilliseconds(),
+                out observation);
             throwableCatalogItemIds = _throwableCatalogItemIdsByWireCode;
         }
         lock (_liveEmitGate)
@@ -557,6 +559,16 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
             if (_liveActionGeneration != generation)
             {
                 return;
+            }
+            if (observation.BaselinePulses > 0 || observation.BaselineThrows > 0)
+            {
+                _emit(new BackendEvent.Diagnostic(
+                    $"firebase-live-baseline pulse={observation.BaselinePulses} throw={observation.BaselineThrows}"));
+            }
+            if (observation.StalePulses > 0 || observation.StaleThrows > 0)
+            {
+                _emit(new BackendEvent.Diagnostic(
+                    $"firebase-live-stale pulse={observation.StalePulses} throw={observation.StaleThrows}"));
             }
             foreach (FirebaseRealtimeLiveAction action in actions)
             {
@@ -577,8 +589,12 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
                         _emit(new BackendEvent.TypingChanged(roomId, typing.UserId, typing.Active));
                         break;
                     case FirebaseRealtimeLiveAction.Pulse pulse when pulse.UserId != localUserId:
+                        _emit(new BackendEvent.Diagnostic("firebase-live-pulse result=accepted"));
                         _emit(new BackendEvent.CharacterPulsed(
                             new CharacterPulseEvent(Guid.NewGuid(), roomId, pulse.UserId)));
+                        break;
+                    case FirebaseRealtimeLiveAction.Pulse:
+                        _emit(new BackendEvent.Diagnostic("firebase-live-pulse result=self-filtered"));
                         break;
                     case FirebaseRealtimeLiveAction.Throw characterThrow
                         when characterThrow.ActorUserId != localUserId
@@ -586,6 +602,7 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
                             && throwableCatalogItemIds.TryGetValue(
                                 characterThrow.Payload.WireCode,
                                 out string? throwableCatalogItemId):
+                        _emit(new BackendEvent.Diagnostic("firebase-live-throw result=accepted"));
                         _emit(new BackendEvent.CharacterThrown(new CharacterThrowEvent(
                             Guid.NewGuid(),
                             roomId,
@@ -593,6 +610,14 @@ internal sealed class FirebaseRealtimeListener : IFirebaseRealtimeListener
                             characterThrow.Payload.TargetUserId,
                             PixelCharacterCatalog.FallbackId,
                             throwableCatalogItemId)));
+                        break;
+                    case FirebaseRealtimeLiveAction.Throw characterThrow:
+                        string reason = characterThrow.ActorUserId == localUserId
+                            ? "self-filtered"
+                            : characterThrow.ActorUserId == characterThrow.Payload.TargetUserId
+                                ? "invalid-target"
+                                : "unknown-wire-code";
+                        _emit(new BackendEvent.Diagnostic($"firebase-live-throw result={reason}"));
                         break;
                 }
             }

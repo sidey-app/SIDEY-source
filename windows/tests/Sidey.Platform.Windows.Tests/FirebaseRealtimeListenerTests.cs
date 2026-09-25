@@ -694,6 +694,13 @@ public sealed class FirebaseRealtimeListenerTests
 
         lock (eventGate)
         {
+            string[] diagnostics = [.. events.OfType<BackendEvent.Diagnostic>()
+                .Select(item => item.Stage)];
+            Assert.Contains("firebase-live-baseline pulse=1 throw=1", diagnostics);
+            Assert.Contains("firebase-live-pulse result=accepted", diagnostics);
+            Assert.Contains("firebase-live-throw result=accepted", diagnostics);
+            Assert.DoesNotContain(diagnostics,
+                item => item.Contains(actorUserId.ToString("D"), StringComparison.Ordinal));
             Assert.Equal(actorUserId, Assert.Single(
                 events.OfType<BackendEvent.CharacterPulsed>()).Pulse.UserId);
             CharacterThrowEvent characterThrow = Assert.Single(

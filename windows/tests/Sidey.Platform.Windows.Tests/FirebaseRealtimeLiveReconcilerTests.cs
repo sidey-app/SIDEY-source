@@ -62,8 +62,24 @@ public sealed class FirebaseRealtimeLiveReconcilerTests
 
         IReadOnlyList<FirebaseRealtimeLiveAction> stale = reconciler.Consume(
             ParseRoom(20_000, includeTyping: false),
-            receivedAtMilliseconds: 25_001);
+            receivedAtMilliseconds: 25_001,
+            out FirebaseRealtimeLiveObservation observation);
         Assert.Empty(stale);
+        Assert.Equal(new FirebaseRealtimeLiveObservation(0, 0, 1, 1), observation);
+    }
+
+    [Fact]
+    public void InitialPersistentActionsAreReportedAsBaselineWithoutAnimating()
+    {
+        var reconciler = new FirebaseRealtimeLiveReconciler();
+
+        IReadOnlyList<FirebaseRealtimeLiveAction> actions = reconciler.Consume(
+            ParseRoom(10_000, includeTyping: false),
+            receivedAtMilliseconds: 10_000,
+            out FirebaseRealtimeLiveObservation observation);
+
+        Assert.Empty(actions);
+        Assert.Equal(new FirebaseRealtimeLiveObservation(1, 1, 0, 0), observation);
     }
 
     [Fact]
