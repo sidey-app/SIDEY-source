@@ -1,7 +1,7 @@
 {
-  "source_commit": "093225db0a8d844763fd33cd18940dda5a0407dc",
+  "source_commit": "176383b4e16296cdc710a983741e93eaa6db002d",
   "sha256": {
     "assets/v1/commerce-catalog.json": "54e2f0298c4652d113e34374bc748fda829300e327ff9dd682df316fc149884b",
-    "assets/v1/manifest.json": "3ddcebfa5d95b78dc52c4b74a2c11d97555c431cfd03a91e072d7f221047422a"
+    "assets/v1/manifest.json": "43eda72f9f5168ee2e3ac465520f3909d66a57d295f22857ebe02295456577d5"
   }
 }

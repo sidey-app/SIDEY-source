@@ -132,7 +132,7 @@ public static class PixelCharacterCatalog
         Create(
             "pixel_quokka",
             "store.product.character_quokka",
-            "55965cec0be9ac26787c255c92dd6ca5300164a505e12e506be2f87c010dcf3a6",
+            "55965cec0be9ac26787c255c92dd6ca5300164a505e12e506be2f87c010dcf3a",
             entitlementKey: "character:pixel_quokka"),
     ];
 
