@@ -207,7 +207,8 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     private var inboxReconciler = FirebaseV2InboxReconciler()
     private var liveReconciler = FirebaseV2LiveReconciler()
     private var inboxTask: Task<Void, Never>?
-    private var liveTask: Task<Void, Never>?
+    private var liveTasksByRoom: [UUID: Task<Void, Never>] = [:]
+    private var latestLiveDataByRoom: [UUID: Data] = [:]
     private var supabaseEventTask: Task<Void, Never>?
     private var typingExpiryTask: Task<Void, Never>?
     private var credentialInvalidationTask: Task<Void, Never>?
@@ -269,6 +270,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         )
         currentRooms = reconciliation.snapshot.rooms
         currentReconciliation = reconciliation
+        pruneLiveListeners(authorizedRoomIDs: Set(currentRooms.map(\.id)))
 
         // A create/join/equip mutation may already be committed even when its
         // credential refresh failed. Keep that exact requested revision closed
@@ -294,6 +296,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
                 entitlementValid: true
             )
         }
+        startWarmLiveListeners(session: synchronizedSession)
         return reconciliation
     }
 
@@ -374,7 +377,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         listenerGeneration &+= 1
         roomTransitionGeneration &+= 1
         inboxTask?.cancel()
-        liveTask?.cancel()
+        cancelAllLiveListeners()
         supabaseEventTask?.cancel()
         typingExpiryTask?.cancel()
         credentialInvalidationTask?.cancel()
@@ -382,7 +385,6 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         rolloutLeaseExpiryTask?.cancel()
         liveReadinessContinuation?.finish(throwing: CancellationError())
         inboxTask = nil
-        liveTask = nil
         supabaseEventTask = nil
         typingExpiryTask = nil
         credentialInvalidationTask = nil
@@ -416,7 +418,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             activated: session != nil,
             activeRoomID: activeRoomState.committedRealtimeActiveRoomID,
             inboxListenerCount: inboxTask == nil ? 0 : 1,
-            liveListenerCount: liveTask == nil ? 0 : 1,
+            liveListenerCount: liveTasksByRoom.count,
             grantOpen: grantBarrier.isOpen,
             shutDown: isShutDown
         )
@@ -477,6 +479,9 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             membershipValid: membershipValid,
             entitlementValid: entitlementValid
         )
+        if let currentSession = self.session {
+            startWarmLiveListeners(session: currentSession)
+        }
     }
 
     func convergeAccessGrant(
@@ -579,6 +584,58 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         await failClosedForRolloutLease()
     }
 
+    private func cancelAllLiveListeners() {
+        for task in liveTasksByRoom.values { task.cancel() }
+        liveTasksByRoom.removeAll()
+        latestLiveDataByRoom.removeAll()
+    }
+
+    private func pruneLiveListeners(authorizedRoomIDs: Set<UUID>) {
+        for roomID in Array(liveTasksByRoom.keys)
+        where !authorizedRoomIDs.contains(roomID) {
+            liveTasksByRoom.removeValue(forKey: roomID)?.cancel()
+            latestLiveDataByRoom.removeValue(forKey: roomID)
+        }
+    }
+
+    private func startWarmLiveListeners(session: FirebaseV2CompositeSession) {
+        guard !isShutDown, grantBarrier.isOpen else { return }
+        for room in currentRooms.prefix(5)
+        where session.bootstrap.rooms.contains(room.id) {
+            startLiveListenerIfNeeded(for: room.id)
+        }
+    }
+
+    private func startLiveListenerIfNeeded(for roomID: UUID) {
+        guard liveTasksByRoom[roomID] == nil else { return }
+        let generation = listenerGeneration
+        let stream = databaseValues.values(at: FirebaseV2Path.liveRoom(roomID))
+        liveTasksByRoom[roomID] = Task { [weak self] in
+            do {
+                for try await data in stream {
+                    guard !Task.isCancelled else { return }
+                    await self?.receiveLiveData(
+                        data,
+                        roomID: roomID,
+                        generation: generation
+                    )
+                }
+                guard !Task.isCancelled else { return }
+                await self?.listenerFailed(
+                    generation: generation,
+                    roomID: roomID
+                )
+            } catch is CancellationError {
+                return
+            } catch {
+                await self?.listenerFailed(
+                    generation: generation,
+                    roomID: roomID
+                )
+            }
+        }
+    }
+
     private func replaceActiveRoom(
         _ roomID: UUID?,
         session: FirebaseV2CompositeSession,
@@ -600,19 +657,20 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
            let roomID,
            activeRoomState.committedRealtimeActiveRoomID == roomID,
            committedListenerGeneration == listenerGeneration,
-           liveTask != nil,
+           liveTasksByRoom[roomID] != nil,
            liveReadinessContinuation == nil {
             guard activeRoomState.commit(operation) else { throw CancellationError() }
             transientWriter = makeTransientWriter(roomID: roomID, session: session)
             return
         }
 
-        listenerGeneration &+= 1
+        if forceListenerRestart {
+            listenerGeneration &+= 1
+            cancelAllLiveListeners()
+        }
         let generation = listenerGeneration
-        liveTask?.cancel()
         typingExpiryTask?.cancel()
         liveReadinessContinuation?.finish(throwing: CancellationError())
-        liveTask = nil
         typingExpiryTask = nil
         liveReadinessContinuation = nil
         pendingInitialLiveActions = []
@@ -627,43 +685,23 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
             bufferingPolicy: .bufferingNewest(1)
         )
         liveReadinessContinuation = readiness.continuation
-        let stream = databaseValues.values(at: FirebaseV2Path.liveRoom(roomID))
-        liveTask = Task { [weak self] in
-            do {
-                for try await data in stream {
-                    guard !Task.isCancelled else { return }
-                    await self?.receiveLiveData(
-                        data,
-                        roomID: roomID,
-                        generation: generation
-                    )
-                }
-                guard !Task.isCancelled else { return }
-                await self?.listenerFailed(generation: generation, isInbox: false)
-            } catch is CancellationError {
-                return
-            } catch {
-                await self?.listenerFailed(generation: generation, isInbox: false)
-            }
+        startLiveListenerIfNeeded(for: roomID)
+        if let latestData = latestLiveDataByRoom[roomID] {
+            await receiveLiveData(latestData, roomID: roomID, generation: generation)
         }
         do {
             try await waitForLiveReadiness(readiness.stream, generation: generation)
         } catch {
-            if generation == listenerGeneration {
-                liveTask?.cancel()
-                liveTask = nil
+            if generation == listenerGeneration,
+               transitionGeneration == roomTransitionGeneration {
+                liveTasksByRoom.removeValue(forKey: roomID)?.cancel()
+                latestLiveDataByRoom.removeValue(forKey: roomID)
                 liveReadinessContinuation = nil
                 pendingInitialLiveActions = []
             }
             throw error
         }
         guard transitionGeneration == roomTransitionGeneration else {
-            if generation == listenerGeneration {
-                liveTask?.cancel()
-                liveTask = nil
-                liveReadinessContinuation = nil
-                pendingInitialLiveActions = []
-            }
             throw CancellationError()
         }
         guard activeRoomState.commit(operation) else {
@@ -672,6 +710,9 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         committedListenerGeneration = generation
         transientWriter = makeTransientWriter(roomID: roomID, session: session)
         await drainPendingInitialLiveActions(roomID: roomID, generation: generation)
+        if let latestData = latestLiveDataByRoom[roomID] {
+            await receiveLiveData(latestData, roomID: roomID, generation: generation)
+        }
     }
 
     private func waitForLiveReadiness(
@@ -708,11 +749,11 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
                     await self?.receiveInboxData(data, generation: generation)
                 }
                 guard !Task.isCancelled else { return }
-                await self?.listenerFailed(generation: generation, isInbox: true)
+                await self?.inboxListenerFailed(generation: generation)
             } catch is CancellationError {
                 return
             } catch {
-                await self?.listenerFailed(generation: generation, isInbox: true)
+                await self?.inboxListenerFailed(generation: generation)
             }
         }
     }
@@ -740,11 +781,15 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         case .snapshot(let snapshot):
             currentRooms = snapshot.rooms
             failClosedIfActiveRoomWasRevoked()
+            pruneLiveListeners(authorizedRoomIDs: Set(currentRooms.map(\.id)))
+            if let session { startWarmLiveListeners(session: session) }
             eventContinuation.yield(event)
         case .reconciliation(let reconciliation):
             currentRooms = reconciliation.snapshot.rooms
             currentReconciliation = reconciliation
             failClosedIfActiveRoomWasRevoked()
+            pruneLiveListeners(authorizedRoomIDs: Set(currentRooms.map(\.id)))
+            if let session { startWarmLiveListeners(session: session) }
             eventContinuation.yield(event)
         default:
             eventContinuation.yield(event)
@@ -772,8 +817,14 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     ) async {
         guard !isShutDown,
               generation == listenerGeneration,
-              roomID == activeRoomState.desiredActiveRoomID,
+              liveTasksByRoom[roomID] != nil,
               let snapshot = try? FirebaseV2LiveSnapshot.decode(data) else { return }
+        latestLiveDataByRoom[roomID] = data
+        guard roomID == activeRoomState.desiredActiveRoomID,
+              liveReadinessContinuation != nil
+                || (roomID == activeRoomState.committedRealtimeActiveRoomID
+                    && committedListenerGeneration == generation)
+        else { return }
         let actions = liveReconciler.consume(
             snapshot,
             receivedAtMilliseconds: nowMilliseconds()
@@ -999,6 +1050,7 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
                 session: recovered,
                 forceListenerRestart: true
             )
+            startWarmLiveListeners(session: recovered)
         } catch {
             // Once a new custom-token sign-in succeeds, continuing with the old
             // grant/listeners would mix credential generations. There is no
@@ -1017,23 +1069,28 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
         startInboxListenerIfNeeded(for: identity.accountID)
     }
 
-    private func listenerFailed(generation: UInt64, isInbox: Bool) async {
-        guard !isShutDown else { return }
-        if isInbox {
-            guard generation == inboxListenerGeneration else { return }
-        } else {
-            guard generation == listenerGeneration else { return }
-            liveReadinessContinuation?.finish(
-                throwing: FirebaseV2CompositeTransportError.liveListenerUnavailable
-            )
-            liveReadinessContinuation = nil
-        }
+    private func inboxListenerFailed(generation: UInt64) async {
+        guard !isShutDown,
+              generation == inboxListenerGeneration else { return }
         // A terminal RTDB listener means Firebase can no longer prove that
         // this session still has room access. Close the complete composite
         // transport so chat and Firebase transients cannot continue under a
         // stale grant. Preserve the shared Supabase backend only so the
         // authenticated remote kill-switch can still rebuild the legacy
         // adapter.
+        await failClosed(message: L10n.text("firebase.transport.error.listener_failed"))
+    }
+
+    private func listenerFailed(generation: UInt64, roomID: UUID) async {
+        guard !isShutDown,
+              generation == listenerGeneration,
+              liveTasksByRoom.removeValue(forKey: roomID) != nil else { return }
+        latestLiveDataByRoom.removeValue(forKey: roomID)
+        guard roomID == activeRoomState.desiredActiveRoomID else { return }
+        liveReadinessContinuation?.finish(
+            throwing: FirebaseV2CompositeTransportError.liveListenerUnavailable
+        )
+        liveReadinessContinuation = nil
         await failClosed(message: L10n.text("firebase.transport.error.listener_failed"))
     }
 
@@ -1066,10 +1123,9 @@ actor FirebaseV2CompositeTransport: RoomMessagingTransport {
     private func retireActiveRoomResources() {
         roomTransitionGeneration &+= 1
         listenerGeneration &+= 1
-        liveTask?.cancel()
+        cancelAllLiveListeners()
         typingExpiryTask?.cancel()
         liveReadinessContinuation?.finish(throwing: CancellationError())
-        liveTask = nil
         typingExpiryTask = nil
         liveReadinessContinuation = nil
         pendingInitialLiveActions = []
