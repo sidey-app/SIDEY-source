@@ -69,7 +69,9 @@ public sealed partial class HistoryWindow : Window
 
     public HistoryWindowViewModel ViewModel { get; }
 
-    public bool IsVisible => _isVisible && !_isClosed;
+    public bool IsVisible => _isVisible && !_isClosed
+        && (AppWindow.Presenter is not OverlappedPresenter presenter
+            || presenter.State != OverlappedPresenterState.Minimized);
 
     public void RefreshLocalizedText()
     {
@@ -99,6 +101,12 @@ public sealed partial class HistoryWindow : Window
         if (_isClosed)
         {
             return;
+        }
+
+        if (AppWindow.Presenter is OverlappedPresenter
+            { State: OverlappedPresenterState.Minimized } presenter)
+        {
+            presenter.Restore();
         }
 
         _focusRequested = true;
