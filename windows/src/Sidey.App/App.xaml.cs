@@ -190,6 +190,7 @@ public partial class App : Application
         {
             _tray = TrayIconService.Start(coordinator.State.Preferences.GlobalHotkeys);
             _tray.CommandInvoked += OnTrayCommandInvoked;
+            _tray.HotkeyInvoked += OnTrayHotkeyInvoked;
             _tray.RoomSelected += OnTrayRoomSelected;
             _tray.DisplayTopologyChanged += OnDisplayTopologyChanged;
             _mainWindow?.SetTrayAvailable(true);
@@ -1042,7 +1043,7 @@ public partial class App : Application
             if (_historyWindow is not null)
             {
                 _historyWindow.Title = I18n.Get("window.historyTitle");
-                _historyWindow.ViewModel.RefreshLocalizedText();
+                _historyWindow.RefreshLocalizedText();
             }
             StartupDiagnostics.Stage($"language-applied language={language}");
         });
@@ -1055,6 +1056,29 @@ public partial class App : Application
             _dispatcherQueue.TryEnqueue(() =>
             {
                 if (!_shuttingDown)
+                {
+                    HandleTrayCommand(command);
+                }
+            });
+        }
+    }
+
+    private void OnTrayHotkeyInvoked(TrayCommand command)
+    {
+        if (!_shuttingDown)
+        {
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                if (_shuttingDown)
+                {
+                    return;
+                }
+
+                if (command == TrayCommand.History && _historyWindow?.IsVisible == true)
+                {
+                    _historyWindow.HideHistory();
+                }
+                else
                 {
                     HandleTrayCommand(command);
                 }
@@ -1436,6 +1460,7 @@ public partial class App : Application
         if (_tray is not null)
         {
             _tray.CommandInvoked -= OnTrayCommandInvoked;
+            _tray.HotkeyInvoked -= OnTrayHotkeyInvoked;
             _tray.RoomSelected -= OnTrayRoomSelected;
             _tray.DisplayTopologyChanged -= OnDisplayTopologyChanged;
             try

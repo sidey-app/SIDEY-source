@@ -13,13 +13,25 @@
       <Border x:Name="HistoryFallbackBackground" Grid.RowSpan="3" Margin="-20" Canvas.ZIndex="-1"
           Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" IsHitTestVisible="False" />
 
-      <StackPanel Spacing="4">
-        <TextBlock AutomationProperties.HeadingLevel="Level1" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Title}" />
-        <TextBlock
-            Text="{Binding Value, Source={i18n:I18n Key=history.retentionNotice}, Mode=OneWay}"
-            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-            TextWrapping="Wrap" />
-      </StackPanel>
+      <Grid ColumnSpacing="12">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Spacing="4">
+          <TextBlock AutomationProperties.HeadingLevel="Level1" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Title}" />
+          <TextBlock
+              Text="{Binding Value, Source={i18n:I18n Key=history.retentionNotice}, Mode=OneWay}"
+              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+              TextWrapping="Wrap" />
+        </StackPanel>
+        <ToggleButton x:Name="KeepOnTopButton" Grid.Column="1" Width="40" Height="40"
+            VerticalAlignment="Top" Click="OnKeepOnTopClick"
+            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTop}, Mode=OneWay}"
+            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTop}, Mode=OneWay}">
+          <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE718;" FontSize="17" />
+        </ToggleButton>
+      </Grid>
 
     <Grid Grid.Row="1">
       <ListView

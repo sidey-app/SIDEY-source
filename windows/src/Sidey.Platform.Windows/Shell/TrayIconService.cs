@@ -94,6 +94,7 @@ public sealed class TrayIconService : IDisposable
     }
 
     public event Action<TrayCommand>? CommandInvoked;
+    public event Action<TrayCommand>? HotkeyInvoked;
     public event Action<Guid>? RoomSelected;
     public event Action? DisplayTopologyChanged;
 
@@ -704,7 +705,7 @@ public sealed class TrayIconService : IDisposable
                 && service._hotkeys is not null
                 && service._hotkeys.TryGetCommand(wParam, out TrayCommand hotkeyCommand))
             {
-                service.CommandInvoked?.Invoke(hotkeyCommand);
+                service.HotkeyInvoked?.Invoke(hotkeyCommand);
                 return nint.Zero;
             }
             if (message == TrayMessage)

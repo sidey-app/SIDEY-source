@@ -125,6 +125,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         ViewModel.BeginHotkeyRecording(action);
         SetHotkeyRecordingActive(true);
         GlobalHotkeyBinding? candidate = ViewModel.HotkeyBindingFor(action);
+        double contentWidth = Math.Min(560, Math.Max(240, xamlRoot.Size.Width - 96));
         var keycaps = new StackPanel
         {
             Orientation = Orientation.Horizontal,
@@ -132,20 +133,28 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             HorizontalAlignment = HorizontalAlignment.Center,
             IsHitTestVisible = false,
         };
+        var captureHost = new Grid { Width = contentWidth };
+        captureHost.Children.Add(keycaps);
         var capture = new Button
         {
-            Content = keycaps,
-            HorizontalContentAlignment = HorizontalAlignment.Center,
+            Content = captureHost,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             MinHeight = 110,
             Style = (Style)MainRoot.Resources["HotkeyEditorCaptureStyle"],
         };
         AutomationProperties.SetName(capture, I18n.Get("settings.hotkeyRecorderHelp"));
+        var warningText = new TextBlock
+        {
+            MaxWidth = contentWidth - 72,
+            TextWrapping = TextWrapping.Wrap,
+        };
         var notice = new InfoBar
         {
             IsClosable = false,
             IsOpen = false,
             Severity = InfoBarSeverity.Warning,
+            Content = warningText,
         };
         var resetContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
         resetContent.Children.Add(new TextBlock
@@ -197,7 +206,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var content = new StackPanel
         {
             Spacing = 16,
-            Width = Math.Min(560, Math.Max(240, xamlRoot.Size.Width - 96)),
+            Width = contentWidth,
         };
         content.Children.Add(new TextBlock
         {
@@ -250,7 +259,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
                 }
             }
             notice.IsOpen = warning is not null;
-            notice.Message = warning ?? string.Empty;
+            warningText.Text = warning ?? string.Empty;
             AutomationProperties.SetName(capture, candidate is { } selectedBinding
                 ? MainWindowViewModel.HotkeyBindingText(selectedBinding)
                 : I18n.Get("settings.hotkeyRecorderHelp"));
@@ -280,7 +289,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             {
                 candidate = null;
                 ShowCandidate();
-                notice.Message = I18n.Get("settings.hotkeyNeedsModifier");
+                warningText.Text = I18n.Get("settings.hotkeyNeedsModifier");
                 notice.IsOpen = true;
                 return true;
             }

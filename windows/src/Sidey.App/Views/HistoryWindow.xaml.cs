@@ -1,6 +1,8 @@
 using System.Collections.Specialized;
 using Microsoft.UI.Input;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -17,6 +19,7 @@ public sealed partial class HistoryWindow : Window
 {
     private readonly CoordinatorState _initialState;
     private bool _isClosed;
+    private bool _isVisible;
     private bool _isComposing;
     private bool _focusRequested;
     private int _focusGeneration;
@@ -49,6 +52,15 @@ public sealed partial class HistoryWindow : Window
         SideyWindowTheme.FollowTitleBarTheme(this, HistoryRoot);
         Title = I18n.Get("window.historyTitle");
         SideyWindowIcon.Apply(AppWindow);
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            KeepOnTopButton.IsChecked = presenter.IsAlwaysOnTop;
+        }
+        else
+        {
+            KeepOnTopButton.IsEnabled = false;
+        }
+        UpdateKeepOnTopLabel();
         ApplyResponsiveSize();
         ApplyBackdrop();
         AppWindow.Closing += OnAppWindowClosing;
@@ -56,6 +68,14 @@ public sealed partial class HistoryWindow : Window
     }
 
     public HistoryWindowViewModel ViewModel { get; }
+
+    public bool IsVisible => _isVisible && !_isClosed;
+
+    public void RefreshLocalizedText()
+    {
+        ViewModel.RefreshLocalizedText();
+        UpdateKeepOnTopLabel();
+    }
 
     public void ApplyState(CoordinatorState state)
     {
@@ -82,12 +102,47 @@ public sealed partial class HistoryWindow : Window
         }
 
         _focusRequested = true;
+        _isVisible = true;
         AppWindow.Show();
         Activate();
         SideyWindowActivation.BringToForeground(this);
         _ = ViewModel.ActivateAsync();
         ViewModel.Composer.OnShown();
         RequestMessageInputFocus();
+    }
+
+    public void HideHistory()
+    {
+        if (!IsVisible)
+        {
+            return;
+        }
+
+        _isVisible = false;
+        _focusRequested = false;
+        _focusGeneration++;
+        _latestScrollGeneration++;
+        _latestScrollQueued = false;
+        ViewModel.Deactivate();
+        AppWindow.Hide();
+    }
+
+    private void OnKeepOnTopClick(object sender, RoutedEventArgs args)
+    {
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.IsAlwaysOnTop = KeepOnTopButton.IsChecked == true;
+            UpdateKeepOnTopLabel();
+        }
+    }
+
+    private void UpdateKeepOnTopLabel()
+    {
+        string label = I18n.Get(KeepOnTopButton.IsChecked == true
+            ? "history.stopKeepingOnTop"
+            : "history.keepOnTop");
+        ToolTipService.SetToolTip(KeepOnTopButton, label);
+        AutomationProperties.SetName(KeepOnTopButton, label);
     }
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
@@ -357,6 +412,7 @@ public sealed partial class HistoryWindow : Window
         }
 
         _isClosed = true;
+        _isVisible = false;
         _latestScrollGeneration++;
         ViewModel.Items.CollectionChanged -= OnHistoryItemsChanged;
         HistoryList.Loaded -= OnHistoryListLoaded;

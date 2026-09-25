@@ -93,6 +93,13 @@ public sealed class CharacterThrowAssetTests
         Assert.False(hamsterAction.SequenceEqual(cache.ActionFrame("pixel_monkey", frame: 0, flipped: false).ToArray()));
         Assert.False(hamsterAction.SequenceEqual(cache.ActionFrame("pixel_chinchilla", frame: 0, flipped: false).ToArray()));
         Assert.False(hamsterAction.SequenceEqual(cache.ActionFrame("pixel_starlight_upalupa", frame: 0, flipped: false).ToArray()));
+        foreach (string characterId in new[]
+                 {
+                     "pixel_shiba", "pixel_duck", "pixel_poop", "pixel_tteokbokki", "pixel_quokka",
+                 })
+        {
+            Assert.False(hamsterAction.SequenceEqual(cache.ActionFrame(characterId, frame: 0, flipped: false).ToArray()));
+        }
         Assert.Equal(hamsterAction, cache.ActionFrame("unknown_character", frame: 0, flipped: false).ToArray());
 
         byte[] patchBall = cache.ObjectFrame("pixel_hamster", frame: 0).ToArray();
