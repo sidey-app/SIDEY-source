@@ -1117,12 +1117,17 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         if (_state.ActiveRoomId != roomId || _state.Profile is not { } profile
             || _state.NeedsOnboarding || _state.GroupOperation != GroupOperation.Idle)
         {
+            string reason = _state.ActiveRoomId != roomId ? "active-room"
+                : _state.Profile is null ? "profile"
+                : _state.NeedsOnboarding ? "onboarding" : "group-operation";
+            StartupDiagnostics.Stage($"chat-send-rejected reason={reason}");
             throw new InvalidOperationException(I18n.Get("composer.activeRoomRequired"));
         }
 
         string normalized = MessageValidator.Normalize(body);
         if (!MessageValidator.IsValid(normalized))
         {
+            StartupDiagnostics.Stage("chat-send-rejected reason=length");
             throw new ArgumentException(I18n.Get("validation.messageLength"), nameof(body));
         }
 
@@ -1132,6 +1137,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         _bubbles.Show(profile.Id, id, normalized, bubbleStyleId: profile.EquippedBubbleStyleId);
         PublishState();
         ApplyWorldSnapshot();
+        StartupDiagnostics.Stage("chat-send-staged");
         try
         {
             ChatMessage confirmed = await RequiredBackend().SendMessageAsync(
@@ -1141,21 +1147,27 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                 cancellationToken);
             _messages.Confirm(confirmed);
             PublishState();
+            StartupDiagnostics.Stage("chat-send-confirmed");
         }
         catch (ChatCommitAmbiguousException)
         {
             // Keep the original UUID pending. Firebase notification or the next
             // authoritative history reconciliation will confirm the same entry.
             PublishState();
+            StartupDiagnostics.Stage("chat-send-ambiguous");
         }
-        catch
+        catch (Exception exception)
         {
             // Realtime may have confirmed this UUID before the HTTP response was lost.
             if (_messages.Fail(id) is null)
+            {
+                StartupDiagnostics.Stage($"chat-send-error-already-confirmed type={exception.GetType().Name}");
                 return;
+            }
             _bubbles.Remove(id);
             PublishState();
             ApplyWorldSnapshot();
+            StartupDiagnostics.Stage($"chat-send-failed type={exception.GetType().Name}");
             throw;
         }
     }

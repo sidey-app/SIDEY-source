@@ -318,6 +318,11 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
         foreach (MessageLedgerEntry entry in _state.Messages.Where(
             entry => entry.RoomId == roomId && entry.CreatedAt >= cutoff))
         {
+            // Postgres history is authoritative when a response was lost after commit.
+            if (entriesById.ContainsKey(entry.Id))
+            {
+                continue;
+            }
             entriesById[entry.Id] = entry;
         }
 

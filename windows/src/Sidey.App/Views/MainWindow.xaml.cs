@@ -43,6 +43,8 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
     private bool _hideQueued;
     private bool _isClosed;
     private bool _hotkeyRecordingActive;
+    private Action? _cancelHotkeyEditor;
+    private string? _pageRequestedAfterHotkeyEditor;
     private string _currentNavigationTag = "profile";
     private readonly Stack<string> _navigationHistory = new();
     private readonly WindowsMinimumSizeController _minimumSizeController;
@@ -123,7 +125,6 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             return;
 
         ViewModel.BeginHotkeyRecording(action);
-        SetHotkeyRecordingActive(true);
         GlobalHotkeyBinding? candidate = ViewModel.HotkeyBindingFor(action);
         double contentWidth = Math.Min(560, Math.Max(240, xamlRoot.Size.Width - 96));
         var keycaps = new StackPanel
@@ -134,7 +135,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             VerticalAlignment = VerticalAlignment.Center,
             IsHitTestVisible = false,
         };
-        var captureHost = new Grid { Width = contentWidth };
+        var captureHost = new Grid { HorizontalAlignment = HorizontalAlignment.Stretch };
         captureHost.Children.Add(keycaps);
         var emptyPrompt = new TextBlock
         {
@@ -235,7 +236,16 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.None,
             HorizontalContentAlignment = HorizontalAlignment.Center,
+            RequestedTheme = MainRoot.ActualTheme,
         };
+        bool cancelledByNavigation = false;
+        void CancelEditor()
+        {
+            cancelledByNavigation = true;
+            dialog.Hide();
+        }
+        Action cancelEditor = CancelEditor;
+        _cancelHotkeyEditor = cancelEditor;
         string? invalidShortcut = null;
 
         void ShowCandidate()
@@ -340,6 +350,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             {
                 StartupDiagnostics.NonFatal("hotkey-recorder-hook", exception);
             }
+            SetHotkeyRecordingActive(active && recorder.IsActive);
         }
         void OnWindowActivated(object sender, WindowActivatedEventArgs activationArgs) =>
             SetRecorderActive(activationArgs.WindowActivationState != WindowActivationState.Deactivated
@@ -374,7 +385,8 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         ShowCandidate();
         try
         {
-            if (await dialog.ShowAsync() == ContentDialogResult.Primary && candidate is { } selected)
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary
+                && !cancelledByNavigation && candidate is { } selected)
                 ViewModel.AssignGlobalHotkey(action, selected);
         }
         catch (Exception) when (_isClosed)
@@ -383,6 +395,8 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         finally
         {
             dialogOpen = false;
+            if (ReferenceEquals(_cancelHotkeyEditor, cancelEditor))
+                _cancelHotkeyEditor = null;
             Activated -= OnWindowActivated;
             try
             {
@@ -394,6 +408,11 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             }
             ViewModel.CancelHotkeyRecording(action);
             SetHotkeyRecordingActive(false);
+            if (_pageRequestedAfterHotkeyEditor is { } requestedPage)
+            {
+                _pageRequestedAfterHotkeyEditor = null;
+                ShowPage(requestedPage);
+            }
         }
     }
 
@@ -608,6 +627,13 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             return;
         }
 
+        if (_cancelHotkeyEditor is { } cancelEditor)
+        {
+            _pageRequestedAfterHotkeyEditor = tag;
+            cancelEditor();
+            return;
+        }
+
         ViewModel.PrepareGroupsForPresentation();
         NavigationViewItem? item = FindNavigationItem(tag);
         if (item is not null)
@@ -799,7 +825,8 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             Child = previewStage,
             Stretch = Stretch.Uniform,
             StretchDirection = StretchDirection.DownOnly,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Height = 190,
         });
         var cards = new Grid { ColumnSpacing = 12, HorizontalAlignment = HorizontalAlignment.Stretch };
         cards.ColumnDefinitions.Add(new ColumnDefinition());

@@ -29,7 +29,16 @@
             VerticalAlignment="Top" Click="OnKeepOnTopClick"
             ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}"
             AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}">
-          <FontIcon x:Name="KeepOnTopIcon" FontFamily="Segoe Fluent Icons" Glyph="&#xE840;" FontSize="18" />
+          <Canvas Width="24" Height="24" RenderTransformOrigin="0.5,0.5">
+            <Canvas.RenderTransform>
+              <RotateTransform Angle="45" />
+            </Canvas.RenderTransform>
+            <Path x:Name="KeepOnTopOutline" Data="M7,3 L17,3 L16,7 L18,10 L18,12 L6,12 L6,10 L8,7 Z"
+                Fill="Transparent" Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="1.5" />
+            <Path x:Name="KeepOnTopFill" Data="M7,3 L17,3 L16,7 L18,10 L18,12 L6,12 L6,10 L8,7 Z"
+                Fill="{ThemeResource TextFillColorPrimaryBrush}" Visibility="Collapsed" />
+            <Path Data="M12,12 L12,22" Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="1.5" />
+          </Canvas>
         </ToggleButton>
       </Grid>
 
@@ -38,6 +47,7 @@
           x:Name="HistoryList"
           ContainerContentChanging="OnHistoryContainerContentChanging"
           Loaded="OnHistoryListLoaded"
+          SizeChanged="OnHistoryListSizeChanged"
           IsItemClickEnabled="False"
           ItemsSource="{Binding Items}"
           SelectionMode="None">
