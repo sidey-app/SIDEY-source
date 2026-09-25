@@ -16436,6 +16436,17 @@
         "ru": "Вступите в группу, чтобы видеть недавние сообщения."
       }
     },
+    "history.keepOnTop": {
+      "localizations": {
+        "ko": "항상 위에 유지",
+        "en": "Always on top",
+        "ja": "常に手前に表示",
+        "zh-Hans": "始终置顶",
+        "zh-Hant": "永遠置頂",
+        "uk": "Поверх інших вікон",
+        "ru": "Поверх всех окон"
+      }
+    },
     "history.loadMoreFailed": {
       "localizations": {
         "ko": "이전 메시지를 불러오지 못했어요",
@@ -16555,6 +16566,17 @@
         "zh-Hant": "已傳送",
         "uk": "Надіслано",
         "ru": "Отправлено"
+      }
+    },
+    "history.stopKeepingOnTop": {
+      "localizations": {
+        "ko": "항상 위 해제",
+        "en": "Turn off always on top",
+        "ja": "常に手前に表示を解除",
+        "zh-Hans": "取消置顶",
+        "zh-Hant": "取消置頂",
+        "uk": "Вимкнути режим поверх інших вікон",
+        "ru": "Отключить поверх всех окон"
       }
     },
     "history.title": {
@@ -17802,24 +17824,24 @@
     },
     "settings.hotkeyAlreadyRegistered": {
       "localizations": {
-        "ko": "Windows 또는 다른 앱이 이미 사용하는 단축키입니다. SIDEY에서 작동하지 않을 수 있습니다.",
-        "en": "Windows or another app is already using this shortcut. It may not work in SIDEY.",
-        "ja": "このショートカットはWindowsまたは別のアプリで使用中です。SIDEYでは動作しない場合があります。",
-        "zh-Hans": "Windows 或其他应用已在使用此快捷键，SIDEY 中可能无法生效。",
-        "zh-Hant": "Windows 或其他應用程式已在使用此快速鍵，SIDEY 中可能無法運作。",
-        "uk": "Це сполучення вже використовує Windows або інша програма, тому воно може не працювати в SIDEY.",
-        "ru": "Это сочетание уже используется Windows или другим приложением и может не работать в SIDEY."
+        "ko": "이 단축키는 시스템 또는 다른 앱에서 이미 사용 중입니다.",
+        "en": "This shortcut is already in use by the system or another app.",
+        "ja": "このショートカットはシステムまたは別のアプリで既に使用されています。",
+        "zh-Hans": "此快捷键已被系统或其他应用使用。",
+        "zh-Hant": "此快速鍵已被系統或其他應用程式使用。",
+        "uk": "Це сполучення вже використовує система або інша програма.",
+        "ru": "Это сочетание уже используется системой или другим приложением."
       }
     },
     "settings.hotkeyAvailabilityUnverified": {
       "localizations": {
-        "ko": "이 단축키를 사용할 수 있는지 확인하지 못했습니다. 저장 후 작동하지 않을 수 있습니다.",
-        "en": "SIDEY could not check whether this shortcut is available. It may not work after saving.",
-        "ja": "このショートカットを使用できるか確認できませんでした。保存後に動作しない場合があります。",
-        "zh-Hans": "无法确认此快捷键是否可用，保存后可能无法生效。",
-        "zh-Hant": "無法確認此快速鍵是否可用，儲存後可能無法運作。",
-        "uk": "Не вдалося перевірити доступність сполучення. Після збереження воно може не працювати.",
-        "ru": "Не удалось проверить доступность сочетания. После сохранения оно может не работать."
+        "ko": "이 단축키를 사용할 수 있는지 확인하지 못했습니다.",
+        "en": "Could not verify whether this shortcut is available.",
+        "ja": "このショートカットを使用できるか確認できませんでした。",
+        "zh-Hans": "无法确认此快捷键是否可用。",
+        "zh-Hant": "無法確認此快速鍵是否可用。",
+        "uk": "Не вдалося перевірити доступність цього сполучення.",
+        "ru": "Не удалось проверить доступность этого сочетания."
       }
     },
     "settings.hotkeyComposer": {
@@ -17835,24 +17857,24 @@
     },
     "settings.hotkeyHistory": {
       "localizations": {
-        "ko": "최근 기록 열기",
-        "en": "Open recent history",
-        "ja": "最近の履歴を開く",
-        "zh-Hans": "打开最近记录",
-        "zh-Hant": "開啟最近記錄",
-        "uk": "Відкрити нещодавню історію",
-        "ru": "Открыть недавнюю историю"
+        "ko": "최근 기록 열기 / 닫기",
+        "en": "Open or close recent history",
+        "ja": "最近の履歴を開く／閉じる",
+        "zh-Hans": "打开或关闭最近记录",
+        "zh-Hant": "開啟或關閉最近記錄",
+        "uk": "Відкрити або закрити нещодавню історію",
+        "ru": "Открыть или закрыть недавнюю историю"
       }
     },
     "settings.hotkeyNeedsModifier": {
       "localizations": {
-        "ko": "Ctrl, Alt, Shift 또는 Win을 포함하세요",
-        "en": "Include Ctrl, Alt, Shift, or Win",
-        "ja": "Ctrl、Alt、Shift、Winのいずれかを含めてください",
-        "zh-Hans": "请包含 Ctrl、Alt、Shift 或 Win",
-        "zh-Hant": "請包含 Ctrl、Alt、Shift 或 Win",
-        "uk": "Додайте Ctrl, Alt, Shift або Win",
-        "ru": "Добавьте Ctrl, Alt, Shift или Win"
+        "ko": "단축키는 Win, Ctrl, Alt 또는 Shift로 시작해야 합니다.",
+        "en": "A shortcut must start with Win, Ctrl, Alt, or Shift.",
+        "ja": "ショートカットは Win、Ctrl、Alt、Shift のいずれかで始めてください。",
+        "zh-Hans": "快捷键必须以 Win、Ctrl、Alt 或 Shift 开始。",
+        "zh-Hant": "快速鍵必須以 Win、Ctrl、Alt 或 Shift 開始。",
+        "uk": "Сполучення має починатися з Win, Ctrl, Alt або Shift.",
+        "ru": "Сочетание должно начинаться с Win, Ctrl, Alt или Shift."
       }
     },
     "settings.hotkeyOverlay": {
@@ -17923,13 +17945,13 @@
     },
     "settings.hotkeySystemShortcut": {
       "localizations": {
-        "ko": "Windows가 이미 사용하는 단축키입니다. SIDEY에서 작동하지 않을 수 있습니다.",
-        "en": "Windows already uses this shortcut. It may not work in SIDEY.",
-        "ja": "このショートカットはWindowsで使用されています。SIDEYでは動作しない場合があります。",
-        "zh-Hans": "Windows 已在使用此快捷键，SIDEY 中可能无法生效。",
-        "zh-Hant": "Windows 已在使用此快速鍵，SIDEY 中可能無法運作。",
-        "uk": "Це сполучення використовує Windows, тому воно може не працювати в SIDEY.",
-        "ru": "Это сочетание используется Windows и может не работать в SIDEY."
+        "ko": "이 단축키는 시스템 기본 단축키로 이미 사용 중입니다.",
+        "en": "This shortcut is already in use as a system shortcut.",
+        "ja": "このショートカットはシステムの標準ショートカットとして使用されています。",
+        "zh-Hans": "此快捷键已被用作系统快捷键。",
+        "zh-Hant": "此快速鍵已被用作系統快速鍵。",
+        "uk": "Це сполучення вже використовується як системне.",
+        "ru": "Это сочетание уже используется как системное."
       }
     },
     "settings.hotkeysDescription": {
