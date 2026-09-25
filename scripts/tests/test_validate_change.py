@@ -92,6 +92,15 @@ class GateTests(unittest.TestCase):
                 [".github/workflows/macos-build-and-tests.yml"],
             )
 
+    def test_shared_localization_source_owns_only_generated_windows_mirrors(self):
+        source = "assets/v1/ui-localizations.json"
+        mirror = "windows/src/Sidey.App/Langs/ko-KR.json"
+        self.assertEqual(validate_paths("shared/localization", [source, mirror]), "shared")
+        for paths in ([mirror], [source, "windows/src/Sidey.App/MainWindow.xaml"]):
+            with self.subTest(paths=paths):
+                with self.assertRaisesRegex(WorkflowError, "platform boundary"):
+                    validate_paths("shared/localization", paths)
+
     def test_renamed_platform_workflows_keep_their_ownership(self):
         expected_platforms = {
             "release/macos.json": "macos",
