@@ -711,6 +711,65 @@ public sealed class FirebaseRealtimeListenerTests
         }
     }
 
+    [Theory]
+    [InlineData(14)]
+    [InlineData(-14)]
+    public async Task ServerDatedStreamAcceptsPeerActionsWithFourteenSecondClockSkew(int seconds)
+    {
+        var time = new TimerTimeProvider();
+        var actorUserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        var targetUserId = Guid.Parse("ffffffff-ffff-ffff-ffff-ffffffffffff");
+        DateTimeOffset serverNow = time.GetUtcNow().AddSeconds(seconds);
+        var events = new System.Collections.Concurrent.ConcurrentQueue<BackendEvent>();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            events.Enqueue,
+            _ => CreateClient(
+                Task.Delay(Timeout.InfiniteTimeSpan),
+                RoomTransientEvents(actorUserId, targetUserId, serverNow.ToUnixTimeMilliseconds()),
+                InboxEvents(),
+                serverNow),
+            time);
+        listener.ConfigureThrowableWireCodes(new Dictionary<string, string>
+        {
+            ["18"] = "throwable_leaf",
+        });
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => events.OfType<BackendEvent.CharacterPulsed>().Any()
+            && events.OfType<BackendEvent.CharacterThrown>().Any());
+
+        Assert.Contains(events, item => item is BackendEvent.Diagnostic diagnostic
+            && diagnostic.Stage == $"firebase-live-clock source=server offset-ms={seconds * 1_000}");
+        Assert.DoesNotContain(events, item => item is BackendEvent.Diagnostic diagnostic
+            && diagnostic.Stage.StartsWith("firebase-live-stale", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task ServerDatedStreamExpiresTypingUsingServerTime()
+    {
+        var time = new TimerTimeProvider();
+        var peerUserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        DateTimeOffset serverNow = time.GetUtcNow().AddSeconds(14);
+        var events = new System.Collections.Concurrent.ConcurrentQueue<BackendEvent>();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            events.Enqueue,
+            _ => CreateClient(
+                Task.Delay(Timeout.InfiniteTimeSpan),
+                TypingRoomEvents(peerUserId, serverNow.ToUnixTimeMilliseconds()),
+                InboxEvents(),
+                serverNow),
+            time);
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => events.OfType<BackendEvent.TypingChanged>()
+            .Any(item => item.UserId == peerUserId && item.Active));
+        time.Advance(TimeSpan.FromSeconds(6));
+        await WaitUntilAsync(() => events.OfType<BackendEvent.TypingChanged>()
+            .Any(item => item.UserId == peerUserId && !item.Active));
+    }
+
     private static FirebaseRtdbRestClient CreateClient()
         => CreateClient(Task.Delay(Timeout.InfiniteTimeSpan));
 
@@ -723,7 +782,8 @@ public sealed class FirebaseRealtimeListenerTests
     private static FirebaseRtdbRestClient CreateClient(
         Task roomEnd,
         string roomEvents,
-        string inboxEvents)
+        string inboxEvents,
+        DateTimeOffset? serverDate = null)
     {
         var urls = new FirebaseRtdbUrlBuilder(
             new Uri("https://sidey.asia-southeast1.firebasedatabase.app"));
@@ -740,6 +800,7 @@ public sealed class FirebaseRealtimeListenerTests
             {
                 Content = new StreamContent(stream),
             };
+            response.Headers.Date = serverDate;
             return Task.FromResult(response);
         });
     }
