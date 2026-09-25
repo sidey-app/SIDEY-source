@@ -25,9 +25,6 @@ ALLOWED_TYPES = frozenset(
         "test",
     }
 )
-MAX_SUMMARY_LENGTH = 50
-MAX_BODY_LINE_LENGTH = 72
-
 _CONVENTIONAL_SUBJECT = re.compile(
     r"(?P<type>[^\s():]+)(?:\((?P<scope>[^()\r\n]+)\))?: "
     r"(?P<summary>[^\r\n]+)"
@@ -35,13 +32,6 @@ _CONVENTIONAL_SUBJECT = re.compile(
 _SCOPE = re.compile(
     r"[A-Za-z0-9][A-Za-z0-9._-]*" r"(?:/[A-Za-z0-9][A-Za-z0-9._-]*)*"
 )
-_PR_NUMBER_SUFFIX = re.compile(r" \(#\d+\)$")
-_TRAILER = re.compile(r"(?P<token>[A-Za-z][A-Za-z0-9 -]*): (?P<value>\S.*)")
-_ISSUE_REFERENCE = re.compile(r"(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#\d+")
-_ISSUE_TRAILERS = frozenset(
-    {"resolves", "closes", "fixes", "see also", "ref", "related to"}
-)
-_HANGUL = re.compile(r"[\u1100-\u11ff\u3130-\u318f\uac00-\ud7a3]")
 _GENERATED_MERGE_SUBJECTS = (
     re.compile(r"Merge pull request #\d+ from \S+"),
     re.compile(r"Merge commit '[0-9a-fA-F]{7,40}' into \S+"),
@@ -74,7 +64,7 @@ def validate_subject(subject: str) -> list[str]:
     if not match:
         return [
             "The commit subject must use "
-            "'type(optional-scope): Korean summary'."
+            "'type(optional-scope): summary'."
         ]
 
     violations = []
@@ -92,77 +82,16 @@ def validate_subject(subject: str) -> list[str]:
         violations.append(
             "The summary must not have leading or trailing whitespace."
         )
-    suffix = _PR_NUMBER_SUFFIX.search(summary)
-    description = summary[: suffix.start()] if suffix else summary
-    if len(description) > MAX_SUMMARY_LENGTH:
-        violations.append(
-            f"The summary must be {MAX_SUMMARY_LENGTH} characters or fewer."
-        )
-    if description.endswith((".", "。", "．")):
-        violations.append("The summary must not end with a period.")
-    if not _HANGUL.search(description):
-        violations.append("The summary must include Korean text.")
     return violations
 
 
 def validate_message(message: str) -> list[str]:
-    """Validate a full message, including deterministic body constraints."""
+    """Validate the subject and leave optional body formatting to authors."""
 
     if not message:
         return ["The commit message is empty."]
     normalized = message.replace("\r\n", "\n").replace("\r", "\n")
-    lines = normalized.split("\n")
-    subject = lines[0]
-    violations = validate_subject(subject)
-    if is_generated_merge_subject(subject):
-        return violations
-
-    payload = lines[1:]
-    while payload and not payload[-1]:
-        payload.pop()
-    if not payload:
-        return violations
-    if payload[0]:
-        violations.append(
-            "The commit body or footers must be separated from the subject "
-            "by one blank line."
-        )
-        body_and_footers = payload
-    else:
-        body_and_footers = payload[1:]
-
-    footer_start = len(body_and_footers)
-    while footer_start and _TRAILER.fullmatch(
-        body_and_footers[footer_start - 1]
-    ):
-        footer_start -= 1
-    has_footer_block = footer_start < len(body_and_footers) and (
-        footer_start == 0 or not body_and_footers[footer_start - 1]
-    )
-    if not has_footer_block:
-        footer_start = len(body_and_footers)
-
-    for line in body_and_footers[:footer_start]:
-        if len(line) > MAX_BODY_LINE_LENGTH:
-            violations.append(
-                "Each commit body line must be "
-                f"{MAX_BODY_LINE_LENGTH} characters or fewer."
-            )
-            break
-
-    for line in body_and_footers[footer_start:]:
-        match = _TRAILER.fullmatch(line)
-        if match is None:
-            continue
-        token = " ".join(match.group("token").casefold().split())
-        if token in _ISSUE_TRAILERS and not _ISSUE_REFERENCE.fullmatch(
-            match.group("value")
-        ):
-            violations.append(
-                f"Issue footer {match.group('token')!r} must reference "
-                "one issue such as '#123'."
-            )
-    return violations
+    return validate_subject(normalized.split("\n", 1)[0])
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:

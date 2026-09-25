@@ -899,24 +899,22 @@ class WorkflowTests(unittest.TestCase):
             'general',
         )
 
-    def test_general_pr_body_rejects_asset_template_and_changed_sections(self):
+    def test_custom_pr_body_allows_changed_sections_but_rejects_empty_text(self):
         self.write_general_pr_template()
-        with self.assertRaisesRegex(w.WorkflowError, 'preserve exactly one'):
-            w.require_pr_body(
-                self.primary,
-                '# 캐릭터 에셋 PR\n',
-                ['docs/guide.md'],
-            )
+        self.assertEqual(
+            w.require_pr_body(self.primary, '# 캐릭터 에셋 PR\n', ['docs/guide.md']),
+            'general',
+        )
         marker = w.GENERAL_PR_MARKER
         missing = f'{marker}\n\n## PR 유형\n\n## 검증\n\n## 확인 사항\n'
-        with self.assertRaisesRegex(w.WorkflowError, '변경 내용'):
-            w.require_pr_body(self.primary, missing, ['docs/guide.md'])
+        self.assertEqual(w.require_pr_body(self.primary, missing, ['docs/guide.md']), 'general')
         reordered = (
             f'{marker}\n\n## 변경 내용\n\n## PR 유형\n\n'
             '## 검증\n\n## 확인 사항\n'
         )
-        with self.assertRaisesRegex(w.WorkflowError, 'section order'):
-            w.require_pr_body(self.primary, reordered, ['docs/guide.md'])
+        self.assertEqual(w.require_pr_body(self.primary, reordered, ['docs/guide.md']), 'general')
+        with self.assertRaisesRegex(w.WorkflowError, 'description'):
+            w.require_pr_body(self.primary, marker, ['docs/guide.md'])
 
     def test_general_pr_body_file_requires_existing_utf8_file(self):
         self.write_general_pr_template()

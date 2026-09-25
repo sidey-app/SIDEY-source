@@ -66,15 +66,15 @@ Directly authored commit subjects use:
 Allowed types are `feat`, `fix`, `docs`, `test`, `perf`, `chore`, `style`,
 `comment`, `ci`, `init`, `refactor`, `build`, and `revert`. The optional scope
 names the affected domain, such as `release` or `commerce`; use `test/<domain>`
-for a test scope. Keep the Korean description within 50 characters, omit a
-final period, end with a word or noun phrase, and avoid past tense. Do not
-append a pull request number to a directly authored subject.
+for a test scope. Prefer a concise Korean description that explains the
+change. Other languages, longer descriptions, and sentence punctuation are
+accepted. Do not append a pull request number to a directly authored subject.
 
-An optional Korean body explains why the change is needed and how behavior
-differs. Write in the imperative or present tense, with lines of at most 72
-characters. Use `Resolves`, `Closes`, or `Fixes` for an issue resolved by the
-commit; use `See also`, `Ref`, or `Related to` for related work. Reference an
-issue in this source repository, or qualify a public issue as
+An optional body explains why the change is needed and how behavior differs.
+Line wrapping and prose style are author choices. Use `Resolves`, `Closes`, or
+`Fixes` for an issue resolved by the commit; use `See also`, `Ref`, or
+`Related to` for related work. Reference an issue in this source repository,
+or qualify a public issue as
 `sidey-app/SIDEY#<number>` so GitHub does not link the same number in the
 wrong repository.
 
@@ -117,11 +117,12 @@ workflow records the exact source and head it checked:
 python3 scripts/skills/workflow.py check <task>
 ```
 
-Use the [general pull request template](.github/PULL_REQUEST_TEMPLATE/general.md)
-for every internal change. Write its title using the commit subject contract
-without a pull request number, and fill in concrete change and validation
-evidence. Leave any failed or inapplicable check unchecked. Review every
-changed path and confirm that the pull request identifies the checked head.
+Start from the [general pull request template](.github/PULL_REQUEST_TEMPLATE/general.md)
+when useful. A custom description is also accepted. Write the title using the
+commit subject contract without a pull request number, and include concrete
+change and validation evidence. Leave any failed or inapplicable check
+unchecked. Review every changed path and confirm that the pull request
+identifies the checked head.
 
 Pushing a branch, creating a pull request, merging, releasing, uploading to a
 store, and deploying to production are separate actions. Perform only the
