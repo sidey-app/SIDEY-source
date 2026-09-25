@@ -15,6 +15,7 @@ using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
 using Windows.System;
 using Windows.UI.ViewManagement;
+using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
 
 namespace Sidey.App.Views;
 
@@ -124,17 +125,20 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         ViewModel.BeginHotkeyRecording(action);
         SetHotkeyRecordingActive(true);
         GlobalHotkeyBinding? candidate = ViewModel.HotkeyBindingFor(action);
-        var keycaps = new ItemsControl
+        var keycaps = new StackPanel
         {
-            ItemTemplate = (DataTemplate)MainRoot.Resources["HotkeyKeycapTemplate"],
-            ItemsPanel = (ItemsPanelTemplate)MainRoot.Resources["HotkeyKeycapPanel"],
+            Orientation = Orientation.Horizontal,
+            Spacing = 10,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            IsHitTestVisible = false,
         };
         var capture = new Button
         {
             Content = keycaps,
             HorizontalContentAlignment = HorizontalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            MinHeight = 60,
+            MinHeight = 110,
+            Style = (Style)MainRoot.Resources["HotkeyEditorCaptureStyle"],
         };
         AutomationProperties.SetName(capture, I18n.Get("settings.hotkeyRecorderHelp"));
         var notice = new InfoBar
@@ -143,18 +147,51 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             IsOpen = false,
             Severity = InfoBarSeverity.Warning,
         };
+        var resetContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+        resetContent.Children.Add(new TextBlock
+        {
+            Text = "\uE777",
+            FontFamily = new FontFamily("Segoe Fluent Icons"),
+            Style = (Style)MainRoot.Resources["HotkeyEditorActionTextStyle"],
+        });
+        resetContent.Children.Add(new TextBlock
+        {
+            Text = I18n.Get("settings.hotkeyRecorderReset"),
+            Style = (Style)MainRoot.Resources["HotkeyEditorActionTextStyle"],
+        });
         var reset = new Button
         {
-            Content = new FontIcon { Glyph = "\uE777", FontSize = 16 },
+            Content = resetContent,
+            Style = (Style)MainRoot.Resources["HotkeyEditorActionStyle"],
         };
+        var deleteContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+        deleteContent.Children.Add(new TextBlock
+        {
+            Text = "\uE8BB",
+            FontFamily = new FontFamily("Segoe Fluent Icons"),
+            Style = (Style)MainRoot.Resources["HotkeyEditorActionTextStyle"],
+        });
+        deleteContent.Children.Add(new TextBlock
+        {
+            Text = I18n.Get("common.delete"),
+            Style = (Style)MainRoot.Resources["HotkeyEditorActionTextStyle"],
+        });
         var delete = new Button
         {
-            Content = I18n.Get("common.delete"),
+            Content = deleteContent,
+            Style = (Style)MainRoot.Resources["HotkeyEditorActionStyle"],
         };
         GlobalHotkeyBinding defaultBinding = GlobalHotkeySettings.Default.BindingFor(action);
-        AutomationProperties.SetName(reset, $"{I18n.Get("settings.hotkeyRecorderHelp")}: {defaultBinding.ToDisplayText()}");
+        AutomationProperties.SetName(reset,
+            $"{I18n.Get("settings.hotkeyRecorderReset")}: {defaultBinding.ToDisplayText()}");
+        AutomationProperties.SetName(delete, I18n.Get("common.delete"));
         ToolTipService.SetToolTip(reset, defaultBinding.ToDisplayText());
-        var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        var actions = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            HorizontalAlignment = HorizontalAlignment.Center,
+        };
         actions.Children.Add(reset);
         actions.Children.Add(delete);
         var content = new StackPanel
@@ -188,7 +225,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
                 labels = MainWindowViewModel.HotkeyBindingText(binding).Split(" + ");
             else
                 labels = [I18n.Get("settings.hotkeyRecording")];
-            keycaps.ItemsSource = labels;
+            SetHotkeyEditorKeys(keycaps, labels);
             dialog.IsPrimaryButtonEnabled = candidate is { } valid
                 && (valid.IsValid() || valid == GlobalHotkeyBinding.Disabled);
             string? warning = null;
@@ -219,28 +256,23 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
                 : I18n.Get("settings.hotkeyRecorderHelp"));
         }
 
-        capture.PreviewKeyDown += (_, keyArgs) =>
+        bool RecordKey(uint virtualKey, GlobalHotkeyModifiers modifiers)
         {
-            GlobalHotkeyModifiers modifiers = CurrentHotkeyModifiers();
-            if (keyArgs.Key == VirtualKey.Tab
-                && (modifiers & ~GlobalHotkeyModifiers.Shift) == GlobalHotkeyModifiers.None)
-                return;
-
-            keyArgs.Handled = true;
-            if (keyArgs.Key == VirtualKey.Escape)
+            if (WindowsFocusedHotkeyRecorder.ShouldPassThrough(virtualKey, modifiers))
+                return false;
+            if (virtualKey == (uint)VirtualKey.Escape)
             {
                 dialog.Hide();
-                return;
+                return true;
             }
-            uint virtualKey = (uint)keyArgs.Key;
             if (GlobalHotkeyBinding.IsModifierKey(virtualKey))
             {
                 candidate = null;
-                keycaps.ItemsSource = GlobalHotkeyBinding.ModifierDisplayText(modifiers)
-                    .Split(" + ", StringSplitOptions.RemoveEmptyEntries);
+                SetHotkeyEditorKeys(keycaps, GlobalHotkeyBinding.ModifierDisplayText(modifiers)
+                    .Split(" + ", StringSplitOptions.RemoveEmptyEntries));
                 dialog.IsPrimaryButtonEnabled = false;
                 notice.IsOpen = false;
-                return;
+                return true;
             }
 
             var binding = new GlobalHotkeyBinding(modifiers, virtualKey);
@@ -250,10 +282,52 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
                 ShowCandidate();
                 notice.Message = I18n.Get("settings.hotkeyNeedsModifier");
                 notice.IsOpen = true;
-                return;
+                return true;
             }
             candidate = binding;
             ShowCandidate();
+            return true;
+        }
+
+        bool dialogOpen = true;
+        using var recorder = new WindowsFocusedHotkeyRecorder(
+            WinRT.Interop.WindowNative.GetWindowHandle(this),
+            () => capture.FocusState != FocusState.Unfocused,
+            (virtualKey, modifiers) =>
+            {
+                if (!DispatcherQueue.TryEnqueue(() =>
+                    {
+                        if (dialogOpen && capture.FocusState != FocusState.Unfocused)
+                            _ = RecordKey(virtualKey, modifiers);
+                    }))
+                    throw new InvalidOperationException("Shortcut editor is no longer available.");
+            });
+        void SetRecorderActive(bool active)
+        {
+            if (!dialogOpen)
+                return;
+            try
+            {
+                recorder.SetActive(active);
+            }
+            catch (System.ComponentModel.Win32Exception exception)
+            {
+                StartupDiagnostics.NonFatal("hotkey-recorder-hook", exception);
+            }
+        }
+        void OnWindowActivated(object sender, WindowActivatedEventArgs activationArgs) =>
+            SetRecorderActive(activationArgs.WindowActivationState != WindowActivationState.Deactivated
+                && capture.FocusState != FocusState.Unfocused);
+        Activated += OnWindowActivated;
+        capture.GotFocus += (_, _) => SetRecorderActive(true);
+        capture.LostFocus += (_, _) => SetRecorderActive(false);
+        capture.PreviewKeyDown += (_, keyArgs) =>
+        {
+            uint virtualKey = (uint)keyArgs.Key;
+            GlobalHotkeyModifiers modifiers = CurrentHotkeyModifiers();
+            if (recorder.IsActive)
+                modifiers |= recorder.PressedModifiers & GlobalHotkeyModifiers.Windows;
+            keyArgs.Handled = RecordKey(virtualKey, modifiers);
         };
         capture.Click += (_, _) => capture.Focus(FocusState.Programmatic);
         reset.Click += (_, _) =>
@@ -280,8 +354,64 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         }
         finally
         {
+            dialogOpen = false;
+            Activated -= OnWindowActivated;
+            try
+            {
+                recorder.SetActive(false);
+            }
+            catch (System.ComponentModel.Win32Exception exception)
+            {
+                StartupDiagnostics.NonFatal("hotkey-recorder-unhook", exception);
+            }
             ViewModel.CancelHotkeyRecording(action);
             SetHotkeyRecordingActive(false);
+        }
+    }
+
+    private void SetHotkeyEditorKeys(StackPanel keycaps, IEnumerable<string> labels)
+    {
+        string[] ordered = [.. labels];
+        keycaps.Children.Clear();
+        foreach (string label in ordered.Contains("Win")
+            ? new[] { "Win" }.Concat(ordered.Where(value => value != "Win"))
+            : ordered)
+        {
+            UIElement symbol;
+            if (label == "Win")
+            {
+                var logo = new Grid { Width = 22, Height = 22, RowSpacing = 2, ColumnSpacing = 2 };
+                logo.RowDefinitions.Add(new RowDefinition());
+                logo.RowDefinitions.Add(new RowDefinition());
+                logo.ColumnDefinitions.Add(new ColumnDefinition());
+                logo.ColumnDefinitions.Add(new ColumnDefinition());
+                for (int row = 0; row < 2; row++)
+                {
+                    for (int column = 0; column < 2; column++)
+                    {
+                        var pane = new Rectangle { Fill = new SolidColorBrush(Microsoft.UI.Colors.White) };
+                        Grid.SetRow(pane, row);
+                        Grid.SetColumn(pane, column);
+                        logo.Children.Add(pane);
+                    }
+                }
+                AutomationProperties.SetName(logo, "Win");
+                symbol = logo;
+            }
+            else
+            {
+                symbol = new TextBlock
+                {
+                    Text = label,
+                    Style = (Style)MainRoot.Resources["HotkeyEditorLabelStyle"],
+                };
+            }
+            var keycap = new Border
+            {
+                Style = (Style)MainRoot.Resources["HotkeyEditorKeycapStyle"],
+                Child = symbol,
+            };
+            keycaps.Children.Add(keycap);
         }
     }
 
