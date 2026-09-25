@@ -15,6 +15,7 @@ public partial class App : Application
     private static readonly TimeSpan s_connectionFailureNotificationDelay = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan s_connectionFailureNotificationCooldown = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan s_displayTopologyRefreshDelay = TimeSpan.FromMilliseconds(500);
+    private static readonly TimeSpan s_characterClickDelay = TimeSpan.FromMilliseconds(100);
 
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly WindowsUpdateServiceAdapter _updateService;
@@ -502,7 +503,7 @@ public partial class App : Application
                 return;
             }
 
-            // Show single-click feedback after 250ms, then restore the original
+            // Show single-click feedback after 100ms, then restore the original
             // visibility if Windows delivers a later native double-click.
             if (clickCount == 2)
             {
@@ -520,7 +521,7 @@ public partial class App : Application
 
             _characterClickComposerState.BeginSingleClick(_composer?.IsVisible == true);
             DispatcherQueueTimer timer = _dispatcherQueue.CreateTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(250);
+            timer.Interval = s_characterClickDelay;
             timer.IsRepeating = false;
             timer.Tick += OnCharacterClickWindowElapsed;
             _characterClickTimer = timer;
@@ -546,13 +547,13 @@ public partial class App : Application
         }
 
         TimeSpan remainingDoubleClickWindow = TimeSpan.FromSeconds(NativeOverlayWindow.DoubleClickIntervalSeconds)
-            + TimeSpan.FromMilliseconds(30) - TimeSpan.FromMilliseconds(250);
+            + TimeSpan.FromMilliseconds(30) - s_characterClickDelay;
         bool keepHotspotAboveComposer = action == ComposerVisibilityAction.Show
             && remainingDoubleClickWindow > TimeSpan.Zero;
         _characterClickFeedbackInProgress = true;
         try
         {
-            ApplyCharacterClickVisibility(action, alwaysOnTop: !keepHotspotAboveComposer);
+            ApplyCharacterClickVisibility(action, alwaysOnTop: !keepHotspotAboveComposer, animateShow: true);
         }
         finally
         {
@@ -585,11 +586,12 @@ public partial class App : Application
         _characterClickComposerState.Reset();
     }
 
-    private void ApplyCharacterClickVisibility(ComposerVisibilityAction action, bool alwaysOnTop = true)
+    private void ApplyCharacterClickVisibility(
+        ComposerVisibilityAction action, bool alwaysOnTop = true, bool animateShow = false)
     {
         if (action == ComposerVisibilityAction.Show && _composer?.IsVisible != true)
         {
-            ShowComposer(alwaysOnTop);
+            ShowComposer(alwaysOnTop, animateShow);
         }
         else if (action == ComposerVisibilityAction.Hide && _composer?.IsVisible == true)
         {
@@ -616,7 +618,7 @@ public partial class App : Application
         }
     }
 
-    private void ShowComposer(bool alwaysOnTop = true)
+    private void ShowComposer(bool alwaysOnTop = true, bool animateShow = false)
     {
         if (_shuttingDown || _coordinator is null || _coordinator.State.NeedsOnboarding)
         {
@@ -647,7 +649,8 @@ public partial class App : Application
         _composer.ShowAndFocus(
             _coordinator.State.Preferences.OverlayRegion.MonitorIdentifier,
             _coordinator.State.Preferences.ComposerPlacement,
-            alwaysOnTop);
+            alwaysOnTop,
+            animateShow && _coordinator.AnimationsEnabled);
     }
 
     private ComposerViewModel CreateComposerViewModel(bool autoCloseAfterSend)

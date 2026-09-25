@@ -21,6 +21,15 @@
       <Setter Property="Height" Value="64" />
       <Setter Property="Padding" Value="12" />
     </Style>
+    <Style x:Key="HotkeyEditorInvalidKeycapStyle" TargetType="Border">
+      <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="MinWidth" Value="64" />
+      <Setter Property="Height" Value="64" />
+      <Setter Property="Padding" Value="12" />
+    </Style>
     <Style x:Key="HotkeyEditorCaptureStyle" TargetType="Button">
       <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
       <Setter Property="BorderThickness" Value="0" />
@@ -44,6 +53,15 @@
       <Setter Property="HorizontalAlignment" Value="Center" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+    <Style x:Key="HotkeyEditorIconRectangleStyle" TargetType="Rectangle">
+      <Setter Property="Fill" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+    </Style>
+    <Style x:Key="HotkeyEditorIconPolygonStyle" TargetType="Polygon">
+      <Setter Property="Fill" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+    </Style>
+    <Style x:Key="HotkeyEditorInvalidLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource HotkeyEditorLabelStyle}">
+      <Setter Property="Foreground" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+    </Style>
     <Style x:Key="HotkeyEditorActionStyle" TargetType="Button" BasedOn="{StaticResource SubtleButtonStyle}">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />
@@ -53,6 +71,14 @@
       <Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorPrimaryBrush}" />
       <Setter Property="FontSize" Value="16" />
       <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="SideySettingsRowTitleStyle" TargetType="TextBlock">
+      <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+    <Style x:Key="SideySettingsRowDescriptionStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
   </UserControl.Resources>
   <Grid Background="Transparent">
@@ -934,8 +960,8 @@
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.overlay}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.overlayDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.overlay}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.overlayDescription}, Mode=OneWay}" />
                     </StackPanel>
                     <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding IsOverlayVisible, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.overlayTooltip}, Mode=OneWay}" />
                   </Grid>
@@ -943,8 +969,8 @@
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.startup}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.startupDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.startup}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.startupDescription}, Mode=OneWay}" />
                     </StackPanel>
                     <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding StartAtLogin, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.startupTooltip}, Mode=OneWay}" />
                   </Grid>
@@ -959,7 +985,7 @@
                 <StackPanel Spacing="12">
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="OverlayHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
                         Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
@@ -974,7 +1000,7 @@
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="QuietModeHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
                         Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
@@ -989,7 +1015,7 @@
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="ComposerHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
                         Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
@@ -1004,7 +1030,7 @@
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="HistoryHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
                         Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
@@ -1028,8 +1054,8 @@
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.quietMode}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.quietModeDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.quietMode}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.quietModeDescription}, Mode=OneWay}" />
                     </StackPanel>
                     <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding IsQuietMode, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.quietModeTooltip}, Mode=OneWay}" />
                   </Grid>
@@ -1037,8 +1063,8 @@
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.rightClickThrow}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.rightClickThrowDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.rightClickThrow}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.rightClickThrowDescription}, Mode=OneWay}" />
                     </StackPanel>
                     <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding RequiresRightClickToThrow, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.rightClickThrowTooltip}, Mode=OneWay}" />
                   </Grid>
@@ -1046,8 +1072,8 @@
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.offlineMembers}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.offlineMembersDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.offlineMembers}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.offlineMembersDescription}, Mode=OneWay}" />
                     </StackPanel>
                     <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding ShowOfflineMembers, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.offlineMembersTooltip}, Mode=OneWay}" />
                   </Grid>
@@ -1063,8 +1089,8 @@
                   <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                   <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                   <StackPanel VerticalAlignment="Center" Spacing="4">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.characterSounds}, Mode=OneWay}" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Text="{Binding Value, Source={i18n:I18n Key=settings.characterSoundsDescription}, Mode=OneWay}" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.characterSounds}, Mode=OneWay}" />
+                    <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.characterSoundsDescription}, Mode=OneWay}" />
                   </StackPanel>
                   <Grid x:Name="SoundControlsGrid" Grid.Column="1" Width="340" ColumnSpacing="8">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="36" /><ColumnDefinition Width="44" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
@@ -1091,8 +1117,8 @@
                     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="EdgeControlColumn" Width="220" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.edge}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.edgeDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.edge}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.edgeDescription}, Mode=OneWay}" />
                     </StackPanel>
                     <ComboBox x:Name="EdgeComboBox" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{Binding SelectedEdgeIndex, Mode=TwoWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.edgeTooltip}, Mode=OneWay}">
                       <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.edgeBottom}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.edgeLeft}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.edgeRight}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.edgeTop}, Mode=OneWay}" />
@@ -1103,8 +1129,8 @@
                     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="SpanControlColumn" Width="220" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.span}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.spanDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.span}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.spanDescription}, Mode=OneWay}" />
                     </StackPanel>
                     <ComboBox x:Name="SpanComboBox" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{Binding SelectedSpanIndex, Mode=TwoWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.spanTooltip}, Mode=OneWay}">
                       <ComboBoxItem Content="1/3" /><ComboBoxItem Content="1/2" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.spanFull}, Mode=OneWay}" />
@@ -1115,8 +1141,8 @@
                     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="MonitorControlColumn" Width="220" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.monitor}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.monitorDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.monitor}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.monitorDescription}, Mode=OneWay}" />
                     </StackPanel>
                     <ComboBox x:Name="MonitorComboBox" Grid.Column="1" HorizontalAlignment="Stretch" DisplayMemberPath="Name" ItemsSource="{Binding Monitors}" SelectedValue="{Binding SelectedMonitorIdentifier, Mode=TwoWay}" SelectedValuePath="Identifier" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.monitorTooltip}, Mode=OneWay}" />
                   </Grid>

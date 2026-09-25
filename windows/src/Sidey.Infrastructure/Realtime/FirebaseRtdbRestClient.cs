@@ -244,6 +244,8 @@ internal sealed class FirebaseRtdbEventStream(
     private readonly FirebaseSseParser _parser = new();
     private int _disposed;
 
+    public DateTimeOffset? ServerDate => response.Headers.Date;
+
     public async IAsyncEnumerable<FirebaseSseEvent> ReadEventsAsync(
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {

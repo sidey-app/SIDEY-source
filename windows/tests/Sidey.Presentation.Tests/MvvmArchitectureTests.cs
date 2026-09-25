@@ -326,7 +326,33 @@ public sealed class MvvmArchitectureTests
                 && element.Attribute("Text")?.Value
                     == "{Binding Value, Source={i18n:I18n Key=settings.characterSounds}, Mode=OneWay}");
 
-        Assert.Equal("SemiBold", title.Attribute("FontWeight")?.Value);
+        Assert.Equal("{StaticResource SideySettingsRowTitleStyle}", title.Attribute("Style")?.Value);
+        XElement titleStyle = Assert.Single(
+            view.Descendants(),
+            element => element.Name.LocalName == "Style"
+                && element.Attributes().Any(attribute =>
+                    attribute.Name.LocalName == "Key"
+                    && attribute.Value == "SideySettingsRowTitleStyle"));
+        Assert.Contains(titleStyle.Elements(), element =>
+            element.Name.LocalName == "Setter"
+                && element.Attribute("Property")?.Value == "FontWeight"
+                && element.Attribute("Value")?.Value == "Normal");
+        XElement description = Assert.Single(
+            layout.Descendants(),
+            element => element.Name.LocalName == "TextBlock"
+                && element.Attribute("Text")?.Value
+                    == "{Binding Value, Source={i18n:I18n Key=settings.characterSoundsDescription}, Mode=OneWay}");
+        Assert.Equal("{StaticResource SideySettingsRowDescriptionStyle}", description.Attribute("Style")?.Value);
+        XElement descriptionStyle = Assert.Single(
+            view.Descendants(),
+            element => element.Name.LocalName == "Style"
+                && element.Attributes().Any(attribute =>
+                    attribute.Name.LocalName == "Key"
+                    && attribute.Value == "SideySettingsRowDescriptionStyle"));
+        Assert.Contains(descriptionStyle.Elements(), element =>
+            element.Name.LocalName == "Setter"
+                && element.Attribute("Property")?.Value == "FontSize"
+                && element.Attribute("Value")?.Value == "13");
         Assert.Equal("0", layout.Attribute("RowSpacing")?.Value);
 
         XElement narrow = Assert.Single(

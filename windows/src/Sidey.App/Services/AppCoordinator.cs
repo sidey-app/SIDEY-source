@@ -1117,12 +1117,17 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         if (_state.ActiveRoomId != roomId || _state.Profile is not { } profile
             || _state.NeedsOnboarding || _state.GroupOperation != GroupOperation.Idle)
         {
+            string reason = _state.ActiveRoomId != roomId ? "active-room"
+                : _state.Profile is null ? "profile"
+                : _state.NeedsOnboarding ? "onboarding" : "group-operation";
+            StartupDiagnostics.Stage($"chat-send-rejected reason={reason}");
             throw new InvalidOperationException(I18n.Get("composer.activeRoomRequired"));
         }
 
         string normalized = MessageValidator.Normalize(body);
         if (!MessageValidator.IsValid(normalized))
         {
+            StartupDiagnostics.Stage("chat-send-rejected reason=length");
             throw new ArgumentException(I18n.Get("validation.messageLength"), nameof(body));
         }
 
@@ -1132,6 +1137,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         _bubbles.Show(profile.Id, id, normalized, bubbleStyleId: profile.EquippedBubbleStyleId);
         PublishState();
         ApplyWorldSnapshot();
+        StartupDiagnostics.Stage("chat-send-staged");
         try
         {
             ChatMessage confirmed = await RequiredBackend().SendMessageAsync(
@@ -1141,21 +1147,52 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                 cancellationToken);
             _messages.Confirm(confirmed);
             PublishState();
+            StartupDiagnostics.Stage("chat-send-confirmed");
         }
         catch (ChatCommitAmbiguousException)
         {
             // Keep the original UUID pending. Firebase notification or the next
             // authoritative history reconciliation will confirm the same entry.
             PublishState();
+            StartupDiagnostics.Stage("chat-send-ambiguous");
         }
-        catch
+        catch (Exception exception)
         {
             // Realtime may have confirmed this UUID before the HTTP response was lost.
-            if (_messages.Fail(id) is null)
+            if (_messages.Entries.Any(entry =>
+                entry.Id == id && entry.State == MessageDeliveryState.Confirmed))
+            {
+                StartupDiagnostics.Stage($"chat-send-error-already-confirmed type={exception.GetType().Name}");
                 return;
+            }
+            try
+            {
+                // A committed Firebase write can outlive its response. Check the
+                // authoritative history before exposing a failed outbox entry.
+                MessageHistoryPage page = await RequiredBackend().FetchMessagePageAsync(
+                    roomId, before: null, limit: 50, cancellationToken);
+                if (page.Messages.FirstOrDefault(message => message.Id == id) is { } committed)
+                {
+                    _messages.Confirm(committed);
+                    PublishState();
+                    StartupDiagnostics.Stage("chat-send-reconciled-after-error");
+                    return;
+                }
+            }
+            catch (Exception reconciliationFailure)
+            {
+                StartupDiagnostics.Stage(
+                    $"chat-send-reconcile-failed type={reconciliationFailure.GetType().Name}");
+            }
+            if (_messages.Fail(id) is null)
+            {
+                StartupDiagnostics.Stage("chat-send-reconciled-by-realtime");
+                return;
+            }
             _bubbles.Remove(id);
             PublishState();
             ApplyWorldSnapshot();
+            StartupDiagnostics.Stage($"chat-send-failed type={exception.GetType().Name}");
             throw;
         }
     }
@@ -1758,10 +1795,6 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                         StartupDiagnostics.Stage(
                             $"realtime-messages-reconciled active={(replaced.RoomId == _state.ActiveRoomId).ToString().ToLowerInvariant()}");
                         _messages.ReplaceConfirmed(replaced.RoomId, replaced.Messages);
-                        if (replaced.RoomId == _state.ActiveRoomId)
-                        {
-                            _bubbles.Clear();
-                        }
                         PublishState();
                         ApplyWorldSnapshot();
                         break;
@@ -1794,7 +1827,12 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                             TimeSpan.FromSeconds(
                                 Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency)))
                         {
+                            StartupDiagnostics.Stage("realtime-pulse result=queued");
                             QueuePulseForWorld(pulsed.Pulse);
+                        }
+                        else
+                        {
+                            StartupDiagnostics.Stage("realtime-pulse result=cooldown");
                         }
                         break;
                     case BackendEvent.CharacterThrown thrown:
@@ -1814,10 +1852,15 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                                 TimeSpan.FromSeconds(
                                     Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency)))
                         {
+                            StartupDiagnostics.Stage("realtime-throw result=queued");
                             QueueThrowForWorld(characterThrow with
                             {
                                 SourceCharacterId = PixelCharacterCatalog.NormalizeId(actor.CharacterId),
                             });
+                        }
+                        else
+                        {
+                            StartupDiagnostics.Stage("realtime-throw result=filtered");
                         }
                         break;
                     case BackendEvent.ConnectionChanged connection:
@@ -1922,14 +1965,18 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     {
         bool activeRoomConnectionChanged =
             status.ActiveRoomTransportConnected != _state.ActiveRoomConnected;
-        if (activeRoomConnectionChanged && !status.ActiveRoomTransportConnected)
+        bool transportConnectionLost =
+            _state.RealtimeConnection.TransportConnected && !status.TransportConnected;
+        if ((activeRoomConnectionChanged || transportConnectionLost)
+            && !status.ActiveRoomTransportConnected)
         {
             _typing.Clear();
         }
 
         Guid? currentUserId = _state.Profile?.Id;
-        IReadOnlyList<Room> rooms = activeRoomConnectionChanged
-            ? [.. _state.Rooms.Select(room => room with
+        Guid? activeRoomId = _state.ActiveRoomId;
+        IReadOnlyList<Room> rooms = activeRoomConnectionChanged || transportConnectionLost
+            ? [.. _state.Rooms.Select(room => !status.TransportConnected || room.Id == activeRoomId ? room with
             {
                 Members = [.. room.Members.Select(member =>
                 {
@@ -1949,13 +1996,13 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                         return member;
                     }
 
-                    if (member.UserId != currentUserId)
+                    if (!status.TransportConnected && member.UserId != currentUserId)
                     {
                         _basePresence[key] = PresenceState.Offline;
                     }
                     return member with { Presence = PresenceState.Reconnecting };
                 })],
-            })]
+            } : room)]
             : _state.Rooms;
 
         SetState(_state with { Rooms = rooms, RealtimeConnection = status });
@@ -2295,22 +2342,24 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     {
         if (_overlay is null)
         {
+            StartupDiagnostics.Stage("overlay-pulse result=not-started");
             return;
         }
 
         _pendingPulses.Add(pulse);
-        ApplyWorldSnapshot();
+        ApplyWorldSnapshot("pulse");
     }
 
     private void QueueThrowForWorld(CharacterThrowEvent characterThrow)
     {
         if (_overlay is null)
         {
+            StartupDiagnostics.Stage("overlay-throw result=not-started");
             return;
         }
 
         _pendingThrows.Add(characterThrow);
-        ApplyWorldSnapshot();
+        ApplyWorldSnapshot("throw");
     }
 
     private WorldSnapshot CurrentWorldSnapshot()

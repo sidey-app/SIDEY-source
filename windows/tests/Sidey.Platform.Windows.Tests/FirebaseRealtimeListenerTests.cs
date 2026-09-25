@@ -193,7 +193,37 @@ public sealed class FirebaseRealtimeListenerTests
         }
         Assert.Single(invalidations);
         Assert.Equal(s_roomId, invalidations[0].RoomId);
+        Assert.DoesNotContain(events, item => item is BackendEvent.MessageChanged);
         Assert.DoesNotContain(events, item => item is BackendEvent.TechnicalError);
+    }
+
+    [Theory]
+    [InlineData(14)]
+    [InlineData(-14)]
+    public async Task FreshChatEventRechecksMessageEvenWhenInboxHintArrivesFirst(
+        int clockSkewSeconds)
+    {
+        var time = new TimerTimeProvider();
+        DateTimeOffset serverNow = time.GetUtcNow().AddSeconds(clockSkewSeconds);
+        var releaseRoomEvent = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var events = new System.Collections.Concurrent.ConcurrentQueue<BackendEvent>();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            events.Enqueue,
+            _ => CreateDelayedChatClient(releaseRoomEvent.Task, serverNow),
+            time);
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => events.OfType<BackendEvent.MessagesInvalidated>().Any());
+        Assert.Empty(events.OfType<BackendEvent.MessageChanged>());
+
+        releaseRoomEvent.SetResult();
+        await WaitUntilAsync(() => events.OfType<BackendEvent.MessageChanged>().Any());
+        BackendEvent.MessageChanged change = Assert.Single(
+            events.OfType<BackendEvent.MessageChanged>());
+        Assert.Equal(s_roomId, change.RoomId);
+        Assert.Equal(Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"), change.MessageId);
+        Assert.Equal("INSERT", change.Operation);
     }
 
     [Fact]
@@ -694,6 +724,13 @@ public sealed class FirebaseRealtimeListenerTests
 
         lock (eventGate)
         {
+            string[] diagnostics = [.. events.OfType<BackendEvent.Diagnostic>()
+                .Select(item => item.Stage)];
+            Assert.Contains("firebase-live-baseline pulse=1 throw=1", diagnostics);
+            Assert.Contains("firebase-live-pulse result=accepted", diagnostics);
+            Assert.Contains("firebase-live-throw result=accepted", diagnostics);
+            Assert.DoesNotContain(diagnostics,
+                item => item.Contains(actorUserId.ToString("D"), StringComparison.Ordinal));
             Assert.Equal(actorUserId, Assert.Single(
                 events.OfType<BackendEvent.CharacterPulsed>()).Pulse.UserId);
             CharacterThrowEvent characterThrow = Assert.Single(
@@ -702,6 +739,65 @@ public sealed class FirebaseRealtimeListenerTests
             Assert.Equal(targetUserId, characterThrow.TargetUserId);
             Assert.Equal("throwable_leaf", characterThrow.ThrowableId);
         }
+    }
+
+    [Theory]
+    [InlineData(14)]
+    [InlineData(-14)]
+    public async Task ServerDatedStreamAcceptsPeerActionsWithFourteenSecondClockSkew(int seconds)
+    {
+        var time = new TimerTimeProvider();
+        var actorUserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        var targetUserId = Guid.Parse("ffffffff-ffff-ffff-ffff-ffffffffffff");
+        DateTimeOffset serverNow = time.GetUtcNow().AddSeconds(seconds);
+        var events = new System.Collections.Concurrent.ConcurrentQueue<BackendEvent>();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            events.Enqueue,
+            _ => CreateClient(
+                Task.Delay(Timeout.InfiniteTimeSpan),
+                RoomTransientEvents(actorUserId, targetUserId, serverNow.ToUnixTimeMilliseconds()),
+                InboxEvents(),
+                serverNow),
+            time);
+        listener.ConfigureThrowableWireCodes(new Dictionary<string, string>
+        {
+            ["18"] = "throwable_leaf",
+        });
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => events.OfType<BackendEvent.CharacterPulsed>().Any()
+            && events.OfType<BackendEvent.CharacterThrown>().Any());
+
+        Assert.Contains(events, item => item is BackendEvent.Diagnostic diagnostic
+            && diagnostic.Stage == $"firebase-live-clock source=server offset-ms={seconds * 1_000}");
+        Assert.DoesNotContain(events, item => item is BackendEvent.Diagnostic diagnostic
+            && diagnostic.Stage.StartsWith("firebase-live-stale", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task ServerDatedStreamExpiresTypingUsingServerTime()
+    {
+        var time = new TimerTimeProvider();
+        var peerUserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        DateTimeOffset serverNow = time.GetUtcNow().AddSeconds(14);
+        var events = new System.Collections.Concurrent.ConcurrentQueue<BackendEvent>();
+        await using var listener = new FirebaseRealtimeListener(
+            new FakeCredentialProvider(),
+            events.Enqueue,
+            _ => CreateClient(
+                Task.Delay(Timeout.InfiniteTimeSpan),
+                TypingRoomEvents(peerUserId, serverNow.ToUnixTimeMilliseconds()),
+                InboxEvents(),
+                serverNow),
+            time);
+
+        await listener.StartAsync(s_roomId, CancellationToken.None);
+        await WaitUntilAsync(() => events.OfType<BackendEvent.TypingChanged>()
+            .Any(item => item.UserId == peerUserId && item.Active));
+        time.Advance(TimeSpan.FromSeconds(6));
+        await WaitUntilAsync(() => events.OfType<BackendEvent.TypingChanged>()
+            .Any(item => item.UserId == peerUserId && !item.Active));
     }
 
     private static FirebaseRtdbRestClient CreateClient()
@@ -716,7 +812,8 @@ public sealed class FirebaseRealtimeListenerTests
     private static FirebaseRtdbRestClient CreateClient(
         Task roomEnd,
         string roomEvents,
-        string inboxEvents)
+        string inboxEvents,
+        DateTimeOffset? serverDate = null)
     {
         var urls = new FirebaseRtdbUrlBuilder(
             new Uri("https://sidey.asia-southeast1.firebasedatabase.app"));
@@ -733,6 +830,32 @@ public sealed class FirebaseRealtimeListenerTests
             {
                 Content = new StreamContent(stream),
             };
+            response.Headers.Date = serverDate;
+            return Task.FromResult(response);
+        });
+    }
+
+    private static FirebaseRtdbRestClient CreateDelayedChatClient(
+        Task releaseRoomEvent,
+        DateTimeOffset serverNow)
+    {
+        var urls = new FirebaseRtdbUrlBuilder(
+            new Uri("https://sidey.asia-southeast1.firebasedatabase.app"));
+        return FirebaseRtdbRestClient.CreateForTesting(urls, (request, _) =>
+        {
+            bool inbox = request.RequestUri!.AbsolutePath.Contains(
+                "/v2/n/", StringComparison.Ordinal);
+            Stream stream = inbox
+                ? new PrefixThenWaitStream(Encoding.UTF8.GetBytes(InboxEvents()))
+                : new PrefixThenSuffixStream(
+                    Encoding.UTF8.GetBytes(RoomEvents()),
+                    Encoding.UTF8.GetBytes(ChatPatchEvent(serverNow.ToUnixTimeMilliseconds())),
+                    releaseRoomEvent);
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StreamContent(stream),
+            };
+            response.Headers.Date = serverNow;
             return Task.FromResult(response);
         });
     }
@@ -897,6 +1020,23 @@ public sealed class FirebaseRealtimeListenerTests
             },
         });
         return $"event: put\ndata: {initial}\n\n";
+    }
+
+    private static string ChatPatchEvent(long timestamp)
+    {
+        string update = JsonSerializer.Serialize(new
+        {
+            path = "/e",
+            data = new
+            {
+                i = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+                s = Guid.Parse("ffffffff-ffff-ffff-ffff-ffffffffffff"),
+                b = "new message",
+                t = timestamp,
+                n = 2,
+            },
+        });
+        return $"event: put\ndata: {update}\n\n";
     }
 
     private static string RoomTransientEvents(Guid actorUserId, Guid targetUserId, long now)

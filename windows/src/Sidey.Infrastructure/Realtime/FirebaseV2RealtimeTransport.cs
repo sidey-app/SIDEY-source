@@ -370,12 +370,17 @@ internal sealed class FirebaseV2RealtimeTransport : IRealtimeTransport
         {
             await foreach (BackendEvent backendEvent in _legacy.ReadEventsAsync(cancellationToken))
             {
-                if (UsesFirebaseChat
-                    && backendEvent is BackendEvent.MessageChanged
-                        or BackendEvent.MessagesInvalidated
-                        or BackendEvent.TypingChanged
-                        or BackendEvent.CharacterPulsed
-                        or BackendEvent.CharacterThrown)
+                if (UsesFirebaseChat && backendEvent is BackendEvent.CharacterPulsed)
+                {
+                    Emit(new BackendEvent.Diagnostic("legacy-live-pulse result=firebase-selected"));
+                    continue;
+                }
+                if (UsesFirebaseChat && backendEvent is BackendEvent.CharacterThrown)
+                {
+                    Emit(new BackendEvent.Diagnostic("legacy-live-throw result=firebase-selected"));
+                    continue;
+                }
+                if (UsesFirebaseChat && backendEvent is BackendEvent.TypingChanged)
                 {
                     continue;
                 }

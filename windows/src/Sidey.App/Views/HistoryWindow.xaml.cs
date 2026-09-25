@@ -18,6 +18,7 @@ namespace Sidey.App.Views;
 public sealed partial class HistoryWindow : Window
 {
     private readonly CoordinatorState _initialState;
+    private readonly WindowsMinimumSizeController _minimumSizeController;
     private bool _isClosed;
     private bool _isVisible;
     private bool _isComposing;
@@ -27,15 +28,18 @@ public sealed partial class HistoryWindow : Window
     private long? _extentHeightCallbackToken;
     private long? _viewportHeightCallbackToken;
     private double _lastScrollableHeight;
+    private double _lastVerticalOffset;
     private bool _followLatest = true;
     private bool _historyPointerPressed;
     private double _historyPointerStartOffset;
     private bool _latestScrollQueued;
+    private bool _smoothLatestScroll;
     private int _latestScrollGeneration;
     private readonly PointerEventHandler _historyWheelHandler;
     private readonly PointerEventHandler _historyPressHandler;
     private readonly PointerEventHandler _historyPointerEndedHandler;
     private readonly KeyEventHandler _historyKeyHandler;
+    private readonly KeyEventHandler _windowKeyHandler;
 
     public HistoryWindow(HistoryWindowViewModel viewModel)
     {
@@ -50,12 +54,14 @@ public sealed partial class HistoryWindow : Window
         _historyPressHandler = OnHistoryPress;
         _historyPointerEndedHandler = OnHistoryPointerEnded;
         _historyKeyHandler = OnHistoryKey;
+        _windowKeyHandler = OnWindowKey;
         HistoryList.AddHandler(UIElement.PointerWheelChangedEvent, _historyWheelHandler, handledEventsToo: true);
         HistoryList.AddHandler(UIElement.PointerPressedEvent, _historyPressHandler, handledEventsToo: true);
         HistoryList.AddHandler(UIElement.PointerReleasedEvent, _historyPointerEndedHandler, handledEventsToo: true);
         HistoryList.AddHandler(UIElement.PointerCanceledEvent, _historyPointerEndedHandler, handledEventsToo: true);
         HistoryList.AddHandler(UIElement.PointerCaptureLostEvent, _historyPointerEndedHandler, handledEventsToo: true);
         HistoryList.AddHandler(UIElement.KeyDownEvent, _historyKeyHandler, handledEventsToo: true);
+        HistoryRoot.AddHandler(UIElement.KeyDownEvent, _windowKeyHandler, handledEventsToo: true);
         ViewModel.Items.CollectionChanged += OnHistoryItemsChanged;
         Activated += OnWindowActivated;
         ApplyTheme(_initialState.Preferences.Theme);
@@ -71,7 +77,10 @@ public sealed partial class HistoryWindow : Window
             KeepOnTopButton.IsEnabled = false;
         }
         UpdateKeepOnTopLabel();
-        ApplyResponsiveSize();
+        ResponsiveWindowSize minimumWindowSize = ApplyResponsiveSize();
+        _minimumSizeController = new WindowsMinimumSizeController(
+            WinRT.Interop.WindowNative.GetWindowHandle(this),
+            minimumWindowSize);
         ApplyBackdrop();
         AppWindow.Closing += OnAppWindowClosing;
         Closed += OnWindowClosed;
@@ -122,6 +131,7 @@ public sealed partial class HistoryWindow : Window
         _focusRequested = true;
         _isVisible = true;
         AppWindow.Show();
+        UpdateScrollToLatestButton();
         Activate();
         SideyWindowActivation.BringToForeground(this);
         _ = ViewModel.ActivateAsync();
@@ -141,6 +151,8 @@ public sealed partial class HistoryWindow : Window
         _focusGeneration++;
         _latestScrollGeneration++;
         _latestScrollQueued = false;
+        _smoothLatestScroll = false;
+        ScrollToLatestButton.Visibility = Visibility.Collapsed;
         ViewModel.Deactivate();
         AppWindow.Hide();
     }
@@ -157,10 +169,16 @@ public sealed partial class HistoryWindow : Window
     private void UpdateKeepOnTopLabel()
     {
         string label = I18n.Get(KeepOnTopButton.IsChecked == true
-            ? "history.stopKeepingOnTop"
-            : "history.keepOnTop");
+            ? "history.stopKeepingOnTopShortcut"
+            : "history.keepOnTopShortcut");
         ToolTipService.SetToolTip(KeepOnTopButton, label);
         AutomationProperties.SetName(KeepOnTopButton, label);
+        KeepOnTopOutline.Visibility = KeepOnTopButton.IsChecked == true
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+        KeepOnTopFill.Visibility = KeepOnTopButton.IsChecked == true
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
@@ -228,7 +246,7 @@ public sealed partial class HistoryWindow : Window
         SideyWindowTheme.ApplyBackdrop(this, HistoryFallbackBackground);
     }
 
-    private void ApplyResponsiveSize()
+    private ResponsiveWindowSize ApplyResponsiveSize()
     {
         WindowsMonitorInfo monitor = WindowsMonitorService.Select(
             _initialState.Preferences.OverlayRegion.MonitorIdentifier);
@@ -239,6 +257,7 @@ public sealed partial class HistoryWindow : Window
         AppWindow.Move(new Windows.Graphics.PointInt32(
             monitor.WorkAreaPixels.X + ((monitor.WorkAreaPixels.Width - size.Width) / 2),
             monitor.WorkAreaPixels.Y + ((monitor.WorkAreaPixels.Height - size.Height) / 2)));
+        return ResponsiveWindowSizePolicy.Minimum(monitor, SideyWindowKind.History);
     }
 
     private void OnHistoryContainerContentChanging(
@@ -259,22 +278,40 @@ public sealed partial class HistoryWindow : Window
     {
         _ = sender;
         _ = args;
-        DetachHistoryScroller();
-        _historyScroller = FindScrollViewer(HistoryList);
-        if (_historyScroller is not null)
-        {
-            _lastScrollableHeight = _historyScroller.ScrollableHeight;
-            _historyScroller.ViewChanged += OnHistoryScrollChanged;
-            _extentHeightCallbackToken = _historyScroller.RegisterPropertyChangedCallback(
-                ScrollViewer.ExtentHeightProperty, OnHistoryScrollGeometryChanged);
-            _viewportHeightCallbackToken = _historyScroller.RegisterPropertyChangedCallback(
-                ScrollViewer.ViewportHeightProperty, OnHistoryScrollGeometryChanged);
-        }
+        HistoryList.ApplyTemplate();
+        TryAttachHistoryScroller();
 
         if (ViewModel.Items.Count > 0)
         {
             RequestScrollToLatest();
         }
+    }
+
+    private void OnHistoryListSizeChanged(object sender, SizeChangedEventArgs args)
+    {
+        _ = sender;
+        _ = args;
+        TryAttachHistoryScroller();
+    }
+
+    private void TryAttachHistoryScroller()
+    {
+        if (_isClosed || FindScrollViewer(HistoryList) is not { } scroller
+            || ReferenceEquals(scroller, _historyScroller))
+        {
+            return;
+        }
+
+        DetachHistoryScroller();
+        _historyScroller = scroller;
+        _lastScrollableHeight = scroller.ScrollableHeight;
+        _lastVerticalOffset = scroller.VerticalOffset;
+        scroller.ViewChanged += OnHistoryScrollChanged;
+        _extentHeightCallbackToken = scroller.RegisterPropertyChangedCallback(
+            ScrollViewer.ExtentHeightProperty, OnHistoryScrollGeometryChanged);
+        _viewportHeightCallbackToken = scroller.RegisterPropertyChangedCallback(
+            ScrollViewer.ViewportHeightProperty, OnHistoryScrollGeometryChanged);
+        UpdateScrollToLatestButton();
     }
 
     private void OnHistoryItemsChanged(object? sender, NotifyCollectionChangedEventArgs args)
@@ -283,6 +320,7 @@ public sealed partial class HistoryWindow : Window
         if (ViewModel.Items.Count == 0)
         {
             _followLatest = true;
+            UpdateScrollToLatestButton();
             return;
         }
 
@@ -298,24 +336,40 @@ public sealed partial class HistoryWindow : Window
 
     private void OnHistoryScrollChanged(object? sender, ScrollViewerViewChangedEventArgs args)
     {
-        _ = args;
-        if (!_latestScrollQueued && sender is ScrollViewer scroller)
+        if (_smoothLatestScroll && !args.IsIntermediate)
         {
-            // Late ListView measurement can move the bottom without user input.
-            if (scroller.ScrollableHeight - scroller.VerticalOffset <= 4)
+            _smoothLatestScroll = false;
+            _followLatest = true;
+            if (_historyScroller is { } animatedScroller
+                && animatedScroller.ScrollableHeight - animatedScroller.VerticalOffset > 4)
             {
-                _followLatest = true;
-            }
-            else if (_historyPointerPressed
-                && scroller.VerticalOffset < _historyPointerStartOffset - 1)
-            {
-                StopFollowingLatest();
-            }
-            if (scroller.VerticalOffset <= 40 && ViewModel.LoadMoreCommand.CanExecute(null))
-            {
-                ViewModel.LoadMoreCommand.Execute(null);
+                RequestScrollToLatest();
             }
         }
+        if (sender is ScrollViewer scroller)
+        {
+            if (!_latestScrollQueued && !_smoothLatestScroll)
+            {
+                // The list can consume wheel and touch input before the outer handler sees it.
+                // Detect a real upward move from the scroller as well as pointer gestures.
+                if (scroller.ScrollableHeight - scroller.VerticalOffset <= 4)
+                {
+                    _followLatest = true;
+                }
+                else if (scroller.VerticalOffset < _lastVerticalOffset - 1
+                    || (_historyPointerPressed
+                        && scroller.VerticalOffset < _historyPointerStartOffset - 1))
+                {
+                    StopFollowingLatest();
+                }
+                if (scroller.VerticalOffset <= 40 && ViewModel.LoadMoreCommand.CanExecute(null))
+                {
+                    ViewModel.LoadMoreCommand.Execute(null);
+                }
+            }
+            _lastVerticalOffset = scroller.VerticalOffset;
+        }
+        UpdateScrollToLatestButton();
     }
 
     private void OnHistoryScrollGeometryChanged(DependencyObject sender, DependencyProperty property)
@@ -332,10 +386,11 @@ public sealed partial class HistoryWindow : Window
         {
             _lastScrollableHeight = scrollableHeight;
         }
-        if (grew && _followLatest)
+        if (grew && _followLatest && !_smoothLatestScroll)
         {
             RequestScrollToLatest();
         }
+        UpdateScrollToLatestButton();
     }
 
     private void OnHistoryWheel(object sender, PointerRoutedEventArgs args)
@@ -390,13 +445,38 @@ public sealed partial class HistoryWindow : Window
             _viewportHeightCallbackToken = null;
         }
         _historyScroller = null;
+        _lastVerticalOffset = 0;
         _historyPointerPressed = false;
+        _smoothLatestScroll = false;
+        UpdateScrollToLatestButton();
+    }
+
+    private void OnWindowKey(object sender, KeyRoutedEventArgs args)
+    {
+        _ = sender;
+        bool altDown = (InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu)
+            & Windows.UI.Core.CoreVirtualKeyStates.Down) != 0;
+        if (!altDown || args.Key is not (VirtualKey.Up or VirtualKey.Down))
+        {
+            return;
+        }
+
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            bool keepOnTop = args.Key == VirtualKey.Up;
+            presenter.IsAlwaysOnTop = keepOnTop;
+            KeepOnTopButton.IsChecked = keepOnTop;
+            UpdateKeepOnTopLabel();
+            args.Handled = true;
+        }
     }
 
     private void OnHistoryKey(object sender, KeyRoutedEventArgs args)
     {
         _ = sender;
-        if (args.Key is VirtualKey.Up or VirtualKey.PageUp or VirtualKey.Home)
+        bool altDown = (InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu)
+            & Windows.UI.Core.CoreVirtualKeyStates.Down) != 0;
+        if (!altDown && args.Key is (VirtualKey.Up or VirtualKey.PageUp or VirtualKey.Home))
         {
             StopFollowingLatest();
         }
@@ -404,9 +484,47 @@ public sealed partial class HistoryWindow : Window
 
     private void StopFollowingLatest()
     {
+        if (_smoothLatestScroll && _historyScroller is { } scroller)
+        {
+            _smoothLatestScroll = false;
+            scroller.ChangeView(null, scroller.VerticalOffset, null, disableAnimation: true);
+        }
         _followLatest = false;
+        _smoothLatestScroll = false;
         _latestScrollGeneration++;
         _latestScrollQueued = false;
+        UpdateScrollToLatestButton();
+    }
+
+    private void OnScrollToLatestClick(object sender, RoutedEventArgs args)
+    {
+        _ = sender;
+        _ = args;
+        if (_historyScroller is not { } scroller || ViewModel.Items.Count == 0)
+        {
+            return;
+        }
+
+        _latestScrollGeneration++;
+        _latestScrollQueued = false;
+        _smoothLatestScroll = true;
+        UpdateScrollToLatestButton();
+        if (!scroller.ChangeView(null, scroller.ScrollableHeight, null, disableAnimation: false))
+        {
+            _smoothLatestScroll = false;
+            RequestScrollToLatest();
+        }
+    }
+
+    private void UpdateScrollToLatestButton()
+    {
+        ScrollToLatestButton.Visibility = !_smoothLatestScroll
+            && !_latestScrollQueued
+            && ViewModel.Items.Count > 0
+            && _historyScroller is { } scroller
+            && scroller.ScrollableHeight - scroller.VerticalOffset > 40
+                ? Visibility.Visible
+                : Visibility.Collapsed;
     }
 
     private void RequestScrollToLatest()
@@ -418,6 +536,7 @@ public sealed partial class HistoryWindow : Window
 
         _followLatest = true;
         _latestScrollQueued = true;
+        UpdateScrollToLatestButton();
         int generation = ++_latestScrollGeneration;
         QueueLatestScroll(generation, remainingPasses: 2);
     }
@@ -442,7 +561,7 @@ public sealed partial class HistoryWindow : Window
         {
             HistoryList.ScrollIntoView(latest);
             HistoryList.UpdateLayout();
-            _historyScroller ??= FindScrollViewer(HistoryList);
+            TryAttachHistoryScroller();
             _historyScroller?.ChangeView(null, _historyScroller.ScrollableHeight, null, disableAnimation: true);
         }
 
@@ -500,15 +619,18 @@ public sealed partial class HistoryWindow : Window
         _latestScrollGeneration++;
         ViewModel.Items.CollectionChanged -= OnHistoryItemsChanged;
         HistoryList.Loaded -= OnHistoryListLoaded;
+        HistoryList.SizeChanged -= OnHistoryListSizeChanged;
         HistoryList.RemoveHandler(UIElement.PointerWheelChangedEvent, _historyWheelHandler);
         HistoryList.RemoveHandler(UIElement.PointerPressedEvent, _historyPressHandler);
         HistoryList.RemoveHandler(UIElement.PointerReleasedEvent, _historyPointerEndedHandler);
         HistoryList.RemoveHandler(UIElement.PointerCanceledEvent, _historyPointerEndedHandler);
         HistoryList.RemoveHandler(UIElement.PointerCaptureLostEvent, _historyPointerEndedHandler);
         HistoryList.RemoveHandler(UIElement.KeyDownEvent, _historyKeyHandler);
+        HistoryRoot.RemoveHandler(UIElement.KeyDownEvent, _windowKeyHandler);
         DetachHistoryScroller();
         _focusRequested = false;
         _focusGeneration++;
+        _minimumSizeController.Dispose();
         HistoryInput.Loaded -= OnMessageInputLoaded;
         Activated -= OnWindowActivated;
         HistoryRoot.DataContext = null;

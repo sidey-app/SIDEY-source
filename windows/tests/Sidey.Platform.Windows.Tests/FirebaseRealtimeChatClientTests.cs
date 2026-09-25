@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Sidey.Core.Localization;
 using Sidey.Infrastructure.Authentication;
 using Sidey.Infrastructure.Realtime;
 
@@ -104,6 +105,10 @@ public sealed class FirebaseRealtimeChatClientTests
         Assert.Equal(expectedCode, exception.Code);
         Assert.Equal(FirebaseRealtimeChatFailureClassification.KnownNonCommit, exception.Classification);
         Assert.Equal(httpStatus, exception.StatusCode);
+        if (expectedCode == "resource-exhausted")
+        {
+            Assert.Equal(I18n.Get("error.chatRateLimited"), exception.Message);
+        }
         Assert.DoesNotContain("server-message-secret-body", exception.ToString(), StringComparison.Ordinal);
         Assert.DoesNotContain("secret-chat-body", exception.ToString(), StringComparison.Ordinal);
         Assert.Equal(1, requests);

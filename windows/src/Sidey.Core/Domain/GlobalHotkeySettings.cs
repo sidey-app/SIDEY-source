@@ -97,6 +97,8 @@ public readonly record struct GlobalHotkeyBinding(
         0x0D => "Enter",
         0x13 => "Pause",
         0x14 => "Caps Lock",
+        0x15 => "IME Kana/Hangul",
+        0x19 => "IME Hanja/Kanji",
         0x1B => "Esc",
         0x20 => "Space",
         0x21 => "Page Up",

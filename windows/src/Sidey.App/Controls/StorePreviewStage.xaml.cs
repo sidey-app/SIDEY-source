@@ -15,7 +15,7 @@ namespace Sidey.App.Controls;
 public sealed partial class StorePreviewStage : UserControl
 {
     private const double StageWidth = 540;
-    private const double PlatformTop = 256;
+    private const double PlatformTop = 176;
     private const double RenderedCharacterSize = 72;
     private const double PreviewScale = RenderedCharacterSize / 48d;
     private const double RenderedFootBaseline = 9;
@@ -67,7 +67,7 @@ public sealed partial class StorePreviewStage : UserControl
     private readonly List<PixelFrameSurface> _ownedFrames = [];
     private readonly List<ImageSource> _ownedImageFrames = [];
     private readonly EdgeTrackGeometry _movementGeometry = new(
-        new RectD(0, 0, StageWidth, 280),
+        new RectD(0, 0, StageWidth, 200),
         OverlayEdge.Bottom,
         tangentExtent: RenderedCharacterSize * 3);
     private readonly List<PixelMovementAgent> _movementAgents = [];

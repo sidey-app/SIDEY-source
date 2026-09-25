@@ -62,7 +62,7 @@ public sealed class HistoryWindowViewModelTests
     }
 
     [Fact]
-    public async Task LiveLedgerReplacesPendingWithConfirmedAndKeepsFailedMessages()
+    public async Task LiveLedgerReplacesPendingWithConfirmedAndHidesFailedMessages()
     {
         var roomId = Guid.NewGuid();
         var userId = Guid.NewGuid();
@@ -101,9 +101,35 @@ public sealed class HistoryWindowViewModelTests
         {
             Messages = [pending with { State = MessageDeliveryState.Failed }],
         });
-        HistoryEntryViewModel failed = Assert.Single(viewModel.Items);
-        Assert.False(failed.IsPending);
-        Assert.True(failed.IsFailed);
+        Assert.Empty(viewModel.Items);
+    }
+
+    [Theory]
+    [InlineData(MessageDeliveryState.Pending)]
+    [InlineData(MessageDeliveryState.Failed)]
+    public async Task ConfirmedServerHistoryOverridesStaleLocalDeliveryState(
+        MessageDeliveryState localState)
+    {
+        var roomId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var messageId = Guid.NewGuid();
+        DateTimeOffset serverTime = DateTimeOffset.UtcNow.AddSeconds(-1);
+        var local = new MessageLedgerEntry(
+            messageId, roomId, userId, "보내는 중", serverTime.AddSeconds(-2), localState);
+        var coordinator = new FakeSideyCoordinator
+        {
+            State = StateWithRooms(roomId, null, userId) with { Messages = [local] },
+            MessagePage = [new ChatMessage(messageId, roomId, userId, "서버 확정", serverTime)],
+        };
+        var viewModel = new HistoryWindowViewModel(coordinator);
+
+        await viewModel.ActivateAsync();
+
+        HistoryEntryViewModel item = Assert.Single(viewModel.Items);
+        Assert.Equal(messageId, item.Id);
+        Assert.Equal("서버 확정", item.Body);
+        Assert.False(item.IsPending);
+        Assert.False(item.IsFailed);
     }
 
     [Fact]

@@ -284,6 +284,80 @@ public sealed class OnboardingGroupIntegrationTests
         Assert.False(coordinator.State.Preferences.OnboardingCompleted);
     }
 
+    [Fact]
+    public async Task SwitchingRoomsPreservesOtherRoomPresenceDuringConnectionTransition()
+    {
+        await using var coordinator = new AppCoordinator(new MemoryPreferences());
+        var currentUserId = Guid.NewGuid();
+        var firstFriendId = Guid.NewGuid();
+        var nextFriendId = Guid.NewGuid();
+        var nextSleepingFriendId = Guid.NewGuid();
+        Room firstRoom = new(Guid.NewGuid(), "First", currentUserId,
+            [new RoomMember(currentUserId, "Me", "pixel_cat", PresenceState.Online),
+             new RoomMember(firstFriendId, "First friend", "pixel_cat", PresenceState.Online)],
+            "TEST", true, 1);
+        Room nextRoom = new(Guid.NewGuid(), "Next", currentUserId,
+            [new RoomMember(currentUserId, "Me", "pixel_cat", PresenceState.Online),
+             new RoomMember(nextFriendId, "Next friend", "pixel_cat", PresenceState.Online),
+             new RoomMember(nextSleepingFriendId, "Sleeping friend", "pixel_cat", PresenceState.Away)],
+            "TEST", true, 1);
+        SetField(coordinator, "_state", CoordinatorState.Initial with
+        {
+            Profile = new Profile(currentUserId, "Me", "pixel_cat"),
+            Rooms = [firstRoom, nextRoom],
+            ActiveRoomId = firstRoom.Id,
+            Preferences = AppPreferences.Default with
+            {
+                OverlayVisible = false,
+                ShowOfflineMembers = false,
+            },
+            RealtimeConnection = new RealtimeConnectionStatus(true, true, true),
+        });
+        Dictionary<(Guid RoomId, Guid UserId), PresenceState> knownPresence =
+            Assert.IsType<Dictionary<(Guid RoomId, Guid UserId), PresenceState>>(
+            typeof(AppCoordinator).GetField("_basePresence", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(coordinator));
+        knownPresence[(firstRoom.Id, firstFriendId)] = PresenceState.Online;
+        knownPresence[(nextRoom.Id, nextFriendId)] = PresenceState.Online;
+        knownPresence[(nextRoom.Id, nextSleepingFriendId)] = PresenceState.Away;
+
+        Bind<Action<RealtimeConnectionStatus>>(coordinator, "SetRealtimeConnection")(
+            new RealtimeConnectionStatus(true, false, false));
+        Assert.Equal(PresenceState.Online, coordinator.State.Rooms.Single(room => room.Id == nextRoom.Id)
+            .Members.Single(member => member.UserId == nextFriendId).Presence);
+
+        Bind<Action<Guid, IReadOnlyList<ChatMessage>>>(coordinator, "CommitRoomSwitch")(
+            nextRoom.Id, []);
+        Bind<Action<RealtimeConnectionStatus>>(coordinator, "SetRealtimeConnection")(
+            new RealtimeConnectionStatus(true, true, false));
+        WorldSnapshot world = Bind<Func<WorldSnapshot>>(coordinator, "CurrentWorldSnapshot")();
+
+        Assert.Equal(nextRoom.Id, world.RoomId);
+        Assert.Equal(PresenceState.Online,
+            Assert.Single(world.Members, member => member.Id == nextFriendId).Presence);
+        Assert.Equal(PresenceState.Away,
+            Assert.Single(world.Members, member => member.Id == nextSleepingFriendId).Presence);
+
+        Bind<Action<RealtimeConnectionStatus>>(coordinator, "SetRealtimeConnection")(
+            new RealtimeConnectionStatus(true, false, false));
+        Bind<Action<Guid, IReadOnlyList<ChatMessage>>>(coordinator, "CommitRoomSwitch")(
+            firstRoom.Id, []);
+        Bind<Action<RealtimeConnectionStatus>>(coordinator, "SetRealtimeConnection")(
+            new RealtimeConnectionStatus(true, true, false));
+        world = Bind<Func<WorldSnapshot>>(coordinator, "CurrentWorldSnapshot")();
+
+        Assert.Equal(firstRoom.Id, world.RoomId);
+        Assert.Equal(PresenceState.Online,
+            Assert.Single(world.Members, member => member.Id == firstFriendId).Presence);
+
+        Bind<Action<RealtimeConnectionStatus>>(coordinator, "SetRealtimeConnection")(
+            RealtimeConnectionStatus.Disconnected);
+        Assert.Equal(PresenceState.Reconnecting,
+            coordinator.State.Rooms.Single(room => room.Id == firstRoom.Id)
+                .Members.Single(member => member.UserId == firstFriendId).Presence);
+        Assert.Equal(PresenceState.Offline, knownPresence[(nextRoom.Id, nextFriendId)]);
+    }
+
     private static void SetField(AppCoordinator coordinator, string name, object value) =>
         typeof(AppCoordinator).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(coordinator, value);
 

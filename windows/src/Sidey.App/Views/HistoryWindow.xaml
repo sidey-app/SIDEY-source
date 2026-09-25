@@ -26,10 +26,35 @@
               TextWrapping="Wrap" />
         </StackPanel>
         <ToggleButton x:Name="KeepOnTopButton" Grid.Column="1" Width="40" Height="40"
+            Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
             VerticalAlignment="Top" Click="OnKeepOnTopClick"
-            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTop}, Mode=OneWay}"
-            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTop}, Mode=OneWay}">
-          <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE718;" FontSize="17" />
+            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}"
+            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}">
+          <Canvas Width="24" Height="24" RenderTransformOrigin="0.5,0.5">
+            <VisualStateManager.VisualStateGroups>
+              <VisualStateGroup x:Name="KeepOnTopIconStates">
+                <VisualState x:Name="Unpinned" />
+                <VisualState x:Name="Pinned">
+                  <VisualState.StateTriggers>
+                    <StateTrigger IsActive="{Binding IsChecked, ElementName=KeepOnTopButton}" />
+                  </VisualState.StateTriggers>
+                  <VisualState.Setters>
+                    <Setter Target="KeepOnTopOutline.Stroke" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                    <Setter Target="KeepOnTopFill.Fill" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                    <Setter Target="KeepOnTopStem.Stroke" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                  </VisualState.Setters>
+                </VisualState>
+              </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+            <Canvas.RenderTransform>
+              <RotateTransform Angle="45" />
+            </Canvas.RenderTransform>
+            <Path x:Name="KeepOnTopOutline" Data="M7,3 L17,3 L16,7 L18,10 L18,12 L6,12 L6,10 L8,7 Z"
+                Fill="Transparent" Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="1.5" />
+            <Path x:Name="KeepOnTopFill" Data="M7,3 L17,3 L16,7 L18,10 L18,12 L6,12 L6,10 L8,7 Z"
+                Fill="{ThemeResource TextFillColorPrimaryBrush}" Visibility="Collapsed" />
+            <Path x:Name="KeepOnTopStem" Data="M12,12 L12,22" Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="1.5" />
+          </Canvas>
         </ToggleButton>
       </Grid>
 
@@ -38,6 +63,7 @@
           x:Name="HistoryList"
           ContainerContentChanging="OnHistoryContainerContentChanging"
           Loaded="OnHistoryListLoaded"
+          SizeChanged="OnHistoryListSizeChanged"
           IsItemClickEnabled="False"
           ItemsSource="{Binding Items}"
           SelectionMode="None">
@@ -88,14 +114,6 @@
                         Text="{Binding LocalTimeText}" />
                   </Grid>
                   <TextBlock IsTextSelectionEnabled="True" Text="{Binding Body}" TextWrapping="Wrap" />
-                  <TextBlock
-                      Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                      Text="{Binding Value, Source={i18n:I18n Key=history.sending}, Mode=OneWay}"
-                      Visibility="{Binding IsPending, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                  <TextBlock
-                      Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                      Text="{Binding Value, Source={i18n:I18n Key=history.failed}, Mode=OneWay}"
-                      Visibility="{Binding IsFailed, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </StackPanel>
               </Grid>
             </Border>
@@ -128,6 +146,14 @@
           </Grid>
         </ListView.Header>
       </ListView>
+
+      <Button x:Name="ScrollToLatestButton" Width="44" Height="44" Margin="0,0,16,16"
+          HorizontalAlignment="Right" VerticalAlignment="Bottom" CornerRadius="22"
+          Visibility="Collapsed" Click="OnScrollToLatestClick"
+          ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.scrollToLatest}, Mode=OneWay}"
+          AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.scrollToLatest}, Mode=OneWay}">
+        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74B;" FontSize="20" />
+      </Button>
 
       <StackPanel
           HorizontalAlignment="Center"

@@ -7,6 +7,12 @@ internal abstract record FirebaseRealtimeLiveAction
     public sealed record Throw(Guid ActorUserId, FirebaseRealtimeThrow Payload) : FirebaseRealtimeLiveAction;
 }
 
+internal sealed record FirebaseRealtimeLiveObservation(
+    int BaselinePulses,
+    int BaselineThrows,
+    int StalePulses,
+    int StaleThrows);
+
 internal sealed class FirebaseRealtimeLiveReconciler
 {
     internal const long FreshnessWindowMilliseconds = 5_000;
@@ -20,7 +26,13 @@ internal sealed class FirebaseRealtimeLiveReconciler
 
     public IReadOnlyList<FirebaseRealtimeLiveAction> Consume(
         FirebaseRealtimeRoomPayload snapshot,
-        long receivedAtMilliseconds)
+        long receivedAtMilliseconds) =>
+        Consume(snapshot, receivedAtMilliseconds, out _);
+
+    public IReadOnlyList<FirebaseRealtimeLiveAction> Consume(
+        FirebaseRealtimeRoomPayload snapshot,
+        long receivedAtMilliseconds,
+        out FirebaseRealtimeLiveObservation observation)
     {
         Dictionary<Guid, long> nextDeadlines = FreshTypingDeadlines(
             snapshot.Typing,
@@ -28,6 +40,11 @@ internal sealed class FirebaseRealtimeLiveReconciler
         HashSet<Guid> nextTyping = [.. nextDeadlines.Keys];
         if (!_baselineEstablished)
         {
+            observation = new FirebaseRealtimeLiveObservation(
+                snapshot.CharacterPulses.Count,
+                snapshot.CharacterThrows.Count,
+                0,
+                0);
             _baselineEstablished = true;
             _typingUserIds = nextTyping;
             _typingDeadlines = nextDeadlines;
@@ -45,6 +62,8 @@ internal sealed class FirebaseRealtimeLiveReconciler
         }
 
         List<FirebaseRealtimeLiveAction> actions = [];
+        int stalePulses = 0;
+        int staleThrows = 0;
         actions.AddRange(nextTyping.Except(_typingUserIds)
             .OrderBy(userId => userId)
             .Select(userId => new FirebaseRealtimeLiveAction.Typing(userId, true)));
@@ -64,6 +83,10 @@ internal sealed class FirebaseRealtimeLiveReconciler
                 {
                     actions.Add(new FirebaseRealtimeLiveAction.Pulse(userId));
                 }
+                else
+                {
+                    stalePulses++;
+                }
             }
         }
         foreach ((Guid userId, FirebaseRealtimeThrow payload) in snapshot.CharacterThrows.OrderBy(entry => entry.Key))
@@ -76,8 +99,13 @@ internal sealed class FirebaseRealtimeLiveReconciler
                 {
                     actions.Add(new FirebaseRealtimeLiveAction.Throw(userId, payload));
                 }
+                else
+                {
+                    staleThrows++;
+                }
             }
         }
+        observation = new FirebaseRealtimeLiveObservation(0, 0, stalePulses, staleThrows);
         return actions;
     }
 

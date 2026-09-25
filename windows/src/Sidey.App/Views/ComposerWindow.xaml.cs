@@ -3,6 +3,8 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
@@ -31,6 +33,7 @@ public sealed partial class ComposerWindow : Window
     private ComposerPlacement? _placement;
     private string? _monitorIdentifier;
     private int _focusRequestId;
+    private Storyboard? _showStoryboard;
 
     public ComposerWindow(ComposerViewModel viewModel)
     {
@@ -77,7 +80,9 @@ public sealed partial class ComposerWindow : Window
         }
     }
 
-    public void ShowAndFocus(string? monitorIdentifier, ComposerPlacement? placement = null, bool alwaysOnTop = true)
+    public void ShowAndFocus(
+        string? monitorIdentifier, ComposerPlacement? placement = null,
+        bool alwaysOnTop = true, bool animateEntrance = false)
     {
         if (_isClosed)
         {
@@ -90,8 +95,14 @@ public sealed partial class ComposerWindow : Window
         _placement = placement?.Normalize();
         RestorePlacement();
         bool visibilityChanged = !_isVisible;
+        StopShowAnimation();
+        if (visibilityChanged && animateEntrance)
+        {
+            PrepareShowAnimation();
+        }
         _isVisible = true;
         AppWindow.Show();
+        _showStoryboard?.Begin();
         if (visibilityChanged)
         {
             ComposerVisibilityChanged?.Invoke(true);
@@ -117,6 +128,7 @@ public sealed partial class ComposerWindow : Window
         }
 
         _isHiding = true;
+        StopShowAnimation();
         FinishDrag(restoreFocus: false);
         _borderlessWindow.SetDragGripHovered(false);
         _isVisible = false;
@@ -144,6 +156,7 @@ public sealed partial class ComposerWindow : Window
         }
 
         ViewModel.RestoreDraft(body);
+        StopShowAnimation();
         _isVisible = true;
         AppWindow.Show();
         Activate();
@@ -262,6 +275,7 @@ public sealed partial class ComposerWindow : Window
         _ = sender;
         _ = args;
         _isClosed = true;
+        StopShowAnimation();
         FinishDrag(restoreFocus: false);
         _borderlessWindow.DisplayConfigurationChanged -= OnDisplayConfigurationChanged;
         _borderlessWindow.Dispose();
@@ -279,6 +293,57 @@ public sealed partial class ComposerWindow : Window
         _focusRequested = true;
         int requestId = ++_focusRequestId;
         QueueMessageInputFocus(requestId, FocusAttemptCount);
+    }
+
+    private void PrepareShowAnimation()
+    {
+        var duration = new Duration(TimeSpan.FromMilliseconds(160));
+        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+        ComposerRoot.Opacity = 0;
+        ComposerRoot.RenderTransform = new TranslateTransform { Y = 8 };
+
+        var opacity = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = duration,
+            EasingFunction = easing,
+        };
+        Storyboard.SetTarget(opacity, ComposerRoot);
+        Storyboard.SetTargetProperty(opacity, "Opacity");
+
+        var translation = new DoubleAnimation
+        {
+            From = 8,
+            To = 0,
+            Duration = duration,
+            EasingFunction = easing,
+            EnableDependentAnimation = true,
+        };
+        Storyboard.SetTarget(translation, ComposerRoot);
+        Storyboard.SetTargetProperty(
+            translation, "(UIElement.RenderTransform).(TranslateTransform.Y)");
+
+        var storyboard = new Storyboard();
+        storyboard.Children.Add(opacity);
+        storyboard.Children.Add(translation);
+        storyboard.Completed += (_, _) =>
+        {
+            if (ReferenceEquals(_showStoryboard, storyboard))
+            {
+                StopShowAnimation();
+            }
+        };
+        _showStoryboard = storyboard;
+    }
+
+    private void StopShowAnimation()
+    {
+        Storyboard? storyboard = _showStoryboard;
+        _showStoryboard = null;
+        storyboard?.Stop();
+        ComposerRoot.Opacity = 1;
+        ComposerRoot.RenderTransform = null;
     }
 
     private void QueueMessageInputFocus(int requestId, int attemptsRemaining)
