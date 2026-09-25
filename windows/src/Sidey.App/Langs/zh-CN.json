@@ -386,6 +386,7 @@
     "hotkeyOverlay": "切换悬浮层显示",
     "hotkeyQuietMode": "切换安静模式",
     "hotkeyRecorderHelp": "选择后，同时按下修饰键和另一个按键。按 Esc 取消。",
+    "hotkeyRecorderReset": "重置",
     "hotkeyRecording": "请按快捷键…",
     "hotkeySideyConflict": "SIDEY 的其他快捷键正在使用此组合。保存后两个快捷键将互换。",
     "hotkeySystemShortcut": "Windows 已在使用此快捷键，SIDEY 中可能无法生效。",

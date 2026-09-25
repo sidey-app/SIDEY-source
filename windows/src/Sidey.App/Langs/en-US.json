@@ -386,6 +386,7 @@
     "hotkeyOverlay": "Toggle overlay",
     "hotkeyQuietMode": "Toggle quiet mode",
     "hotkeyRecorderHelp": "Select, then press a modifier key and another key. Press Esc to cancel.",
+    "hotkeyRecorderReset": "Reset",
     "hotkeyRecording": "Press a shortcut…",
     "hotkeySideyConflict": "Another SIDEY shortcut uses this combination. Saving will swap the two shortcuts.",
     "hotkeySystemShortcut": "Windows already uses this shortcut. It may not work in SIDEY.",
