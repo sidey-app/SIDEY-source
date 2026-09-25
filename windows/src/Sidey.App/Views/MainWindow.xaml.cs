@@ -10,6 +10,7 @@ using Sidey.App.Controls;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
+using Sidey.Platform.Windows.Shell;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
 using Windows.System;
@@ -132,8 +133,8 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         {
             Content = keycaps,
             HorizontalContentAlignment = HorizontalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
             MinHeight = 60,
-            MinWidth = 320,
         };
         AutomationProperties.SetName(capture, I18n.Get("settings.hotkeyRecorderHelp"));
         var notice = new InfoBar
@@ -156,7 +157,11 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         actions.Children.Add(reset);
         actions.Children.Add(delete);
-        var content = new StackPanel { Spacing = 16 };
+        var content = new StackPanel
+        {
+            Spacing = 16,
+            Width = Math.Min(560, Math.Max(240, xamlRoot.Size.Width - 96)),
+        };
         content.Children.Add(new TextBlock
         {
             Text = I18n.Get("settings.hotkeyRecorderHelp"),
@@ -173,6 +178,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             PrimaryButtonText = I18n.Get("common.save"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.None,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
         };
 
         void ShowCandidate()
@@ -185,10 +191,29 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             keycaps.ItemsSource = labels;
             dialog.IsPrimaryButtonEnabled = candidate is { } valid
                 && (valid.IsValid() || valid == GlobalHotkeyBinding.Disabled);
-            bool conflict = candidate is { } selected
-                && ViewModel.ConflictingHotkeyAction(action, selected) is not null;
-            notice.IsOpen = conflict;
-            notice.Message = conflict ? I18n.Get("settings.hotkeysDescription") : string.Empty;
+            string? warning = null;
+            if (candidate is { } selected && !selected.IsDisabled)
+            {
+                if (ViewModel.ConflictingHotkeyAction(action, selected) is not null)
+                {
+                    warning = I18n.Get("settings.hotkeySideyConflict");
+                }
+                else if (selected.IsValid())
+                {
+                    warning = WindowsHotkeyAvailability.Check(selected) switch
+                    {
+                        WindowsHotkeyAvailabilityResult.SystemShortcut =>
+                            I18n.Get("settings.hotkeySystemShortcut"),
+                        WindowsHotkeyAvailabilityResult.AlreadyRegistered =>
+                            I18n.Get("settings.hotkeyAlreadyRegistered"),
+                        WindowsHotkeyAvailabilityResult.Unverified =>
+                            I18n.Get("settings.hotkeyAvailabilityUnverified"),
+                        _ => null,
+                    };
+                }
+            }
+            notice.IsOpen = warning is not null;
+            notice.Message = warning ?? string.Empty;
             AutomationProperties.SetName(capture, candidate is { } selectedBinding
                 ? MainWindowViewModel.HotkeyBindingText(selectedBinding)
                 : I18n.Get("settings.hotkeyRecorderHelp"));

@@ -107,6 +107,73 @@ public sealed class WindowsShellSurfacePolicyTests
         Assert.Equal(popup, resolver.ForegroundSurface());
     }
 
+    [Theory]
+    [InlineData(0x00000008L, 0, 0, 1920, 1080, true)]
+    [InlineData(0x00000008L, -8, -8, 1928, 1088, true)]
+    [InlineData(0, 0, 0, 1920, 1080, false)]
+    [InlineData(0x00000008L, 0, 0, 1919, 1080, false)]
+    [InlineData(0x00000008L, 1920, 0, 3840, 1080, false)]
+    public void OnlyTopmostWindowsCoveringTheSelectedMonitorYieldAsCaptureSurfaces(
+        long extendedStyle,
+        long left,
+        long top,
+        long right,
+        long bottom,
+        bool expected)
+    {
+        Assert.Equal(expected, WindowsShellSurfacePolicy.IsFullscreenTopmostSurface(
+            new nint(extendedStyle), left, top, right, bottom,
+            new NativePixelRect(0, 0, 1920, 1080)));
+    }
+
+    [Theory]
+    [InlineData("ScreenClippingHost", true)]
+    [InlineData("SnippingTool", true)]
+    [InlineData("notepad", false)]
+    [InlineData(null, false)]
+    public void OnlyKnownCaptureHostsUseTheNonforegroundFullscreenFallback(
+        string? processName,
+        bool expected)
+    {
+        Assert.Equal(expected, WindowsShellSurfacePolicy.IsCaptureHost(processName));
+    }
+
+    [Theory]
+    [InlineData("ScreenClippingHost", true)]
+    [InlineData("SnippingTool", true)]
+    [InlineData("notepad", false)]
+    [InlineData(null, false)]
+    public void ForegroundFullscreenWindowYieldsOnlyForCaptureHosts(
+        string? processName,
+        bool expected)
+    {
+        Assert.Equal(expected, WindowsShellSurfacePolicy.IsFullscreenCaptureSurface(
+            processName,
+            new nint(0x00000008),
+            0, 0, 1920, 1080,
+            new NativePixelRect(0, 0, 1920, 1080)));
+    }
+
+    [Fact]
+    public void FullscreenTopmostForegroundYieldsAndRestoresWithoutChangingItsHandle()
+    {
+        var monitor = new NativePixelRect(0, 0, 1920, 1080);
+        nint foreground = 202;
+        bool fullscreenTopmost = false;
+        var resolver = new WindowsShellSurfaceResolver(
+            _ => nint.Zero,
+            () => foreground,
+            _ => false,
+            (_, _) => true,
+            (_, _) => fullscreenTopmost);
+
+        Assert.Equal(nint.Zero, resolver.ForegroundSurface(monitor));
+        fullscreenTopmost = true;
+        Assert.Equal(foreground, resolver.ForegroundSurface(monitor));
+        fullscreenTopmost = false;
+        Assert.Equal(nint.Zero, resolver.ForegroundSurface(monitor));
+    }
+
     [Fact]
     public void ApplicationTransientPopupsDoNotLowerOverlay()
     {
