@@ -6,7 +6,6 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
 using Sidey.App.Controls;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
@@ -16,6 +15,7 @@ using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
 using Windows.System;
 using Windows.UI.ViewManagement;
+using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
 
 namespace Sidey.App.Views;
 
