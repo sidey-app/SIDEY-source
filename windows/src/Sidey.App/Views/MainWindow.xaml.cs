@@ -246,6 +246,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             HorizontalContentAlignment = HorizontalAlignment.Center,
             RequestedTheme = MainRoot.ActualTheme,
         };
+        dialog.Resources["ContentDialogMaxWidth"] = 660d;
         bool cancelledByNavigation = false;
         void CancelEditor()
         {
@@ -455,13 +456,28 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             }
             else if (label == "Shift")
             {
-                symbol = new TextBlock
+                var shiftIcon = new Grid { Width = 24, Height = 24 };
+                shiftIcon.Children.Add(new Microsoft.UI.Xaml.Shapes.Polygon
                 {
-                    Text = "⇧",
-                    FontFamily = new FontFamily("Segoe UI Symbol"),
-                    FontSize = 30,
-                    Style = (Style)MainRoot.Resources["HotkeyEditorLabelStyle"],
-                };
+                    Points =
+                    [
+                        new(12, 1), new(23, 12), new(18, 12), new(18, 20),
+                        new(6, 20), new(6, 12), new(1, 12),
+                    ],
+                    Fill = new SolidColorBrush(Microsoft.UI.Colors.White),
+                    Width = 24,
+                    Height = 20,
+                    VerticalAlignment = VerticalAlignment.Top,
+                });
+                shiftIcon.Children.Add(new Rectangle
+                {
+                    Fill = new SolidColorBrush(Microsoft.UI.Colors.White),
+                    Width = 12,
+                    Height = 2,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                });
+                AutomationProperties.SetName(shiftIcon, "Shift");
+                symbol = shiftIcon;
             }
             else
             {

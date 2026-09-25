@@ -18,6 +18,7 @@ namespace Sidey.App.Views;
 public sealed partial class HistoryWindow : Window
 {
     private readonly CoordinatorState _initialState;
+    private readonly WindowsMinimumSizeController _minimumSizeController;
     private bool _isClosed;
     private bool _isVisible;
     private bool _isComposing;
@@ -76,7 +77,10 @@ public sealed partial class HistoryWindow : Window
             KeepOnTopButton.IsEnabled = false;
         }
         UpdateKeepOnTopLabel();
-        ApplyResponsiveSize();
+        ResponsiveWindowSize minimumWindowSize = ApplyResponsiveSize();
+        _minimumSizeController = new WindowsMinimumSizeController(
+            WinRT.Interop.WindowNative.GetWindowHandle(this),
+            minimumWindowSize);
         ApplyBackdrop();
         AppWindow.Closing += OnAppWindowClosing;
         Closed += OnWindowClosed;
@@ -242,7 +246,7 @@ public sealed partial class HistoryWindow : Window
         SideyWindowTheme.ApplyBackdrop(this, HistoryFallbackBackground);
     }
 
-    private void ApplyResponsiveSize()
+    private ResponsiveWindowSize ApplyResponsiveSize()
     {
         WindowsMonitorInfo monitor = WindowsMonitorService.Select(
             _initialState.Preferences.OverlayRegion.MonitorIdentifier);
@@ -253,6 +257,7 @@ public sealed partial class HistoryWindow : Window
         AppWindow.Move(new Windows.Graphics.PointInt32(
             monitor.WorkAreaPixels.X + ((monitor.WorkAreaPixels.Width - size.Width) / 2),
             monitor.WorkAreaPixels.Y + ((monitor.WorkAreaPixels.Height - size.Height) / 2)));
+        return ResponsiveWindowSizePolicy.Minimum(monitor, SideyWindowKind.History);
     }
 
     private void OnHistoryContainerContentChanging(
@@ -625,6 +630,7 @@ public sealed partial class HistoryWindow : Window
         DetachHistoryScroller();
         _focusRequested = false;
         _focusGeneration++;
+        _minimumSizeController.Dispose();
         HistoryInput.Loaded -= OnMessageInputLoaded;
         Activated -= OnWindowActivated;
         HistoryRoot.DataContext = null;
