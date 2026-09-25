@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
-using Sidey.Platform.Windows.Overlay;
 using Sidey.Presentation.Services;
 using Sidey.Presentation.ViewModels;
 
@@ -29,6 +28,7 @@ public partial class App : Application
     private readonly ComposerTypingOwner _typingOwner = new();
     private readonly CharacterClickComposerState _characterClickComposerState = new();
     private DispatcherQueueTimer? _characterClickTimer;
+    private bool _characterClickFeedbackInProgress;
     private Task _pendingComposerPlacementSave = Task.CompletedTask;
     private AppCoordinator? _coordinator;
     private SingleInstanceGuard? _singleInstance;
@@ -500,8 +500,17 @@ public partial class App : Application
                 return;
             }
 
-            // Showing a composer on the first press steals focus from the hotspot
-            // and can prevent Windows from delivering its double-click message.
+            // A short delay keeps quick double-clicks from opening the composer.
+            // After 250ms, prioritize single-click feedback; a later double-click
+            // may briefly show the composer or lose its native second click.
+            if (clickCount == 2)
+            {
+                ComposerVisibilityAction restoration = _characterClickComposerState.CompleteDoubleClick();
+                CancelPendingCharacterClick();
+                ApplyCharacterClickVisibility(restoration);
+                return;
+            }
+
             CancelPendingCharacterClick();
             if (clickCount != 1)
             {
@@ -510,8 +519,7 @@ public partial class App : Application
 
             _characterClickComposerState.BeginSingleClick(_composer?.IsVisible == true);
             DispatcherQueueTimer timer = _dispatcherQueue.CreateTimer();
-            timer.Interval = TimeSpan.FromSeconds(NativeOverlayWindow.DoubleClickIntervalSeconds)
-                + TimeSpan.FromMilliseconds(30);
+            timer.Interval = TimeSpan.FromMilliseconds(250);
             timer.IsRepeating = false;
             timer.Tick += OnCharacterClickWindowElapsed;
             _characterClickTimer = timer;
@@ -536,6 +544,19 @@ public partial class App : Application
             return;
         }
 
+        _characterClickFeedbackInProgress = true;
+        try
+        {
+            ApplyCharacterClickVisibility(action);
+        }
+        finally
+        {
+            _characterClickFeedbackInProgress = false;
+        }
+    }
+
+    private void ApplyCharacterClickVisibility(ComposerVisibilityAction action)
+    {
         if (action == ComposerVisibilityAction.Show && _composer?.IsVisible != true)
         {
             ShowComposer();
@@ -626,7 +647,10 @@ public partial class App : Application
     private void OnComposerVisibilityChanged(bool isVisible)
     {
         _ = isVisible;
-        CancelPendingCharacterClick();
+        if (!_characterClickFeedbackInProgress)
+        {
+            CancelPendingCharacterClick();
+        }
     }
 
     private void RequestPulse()
