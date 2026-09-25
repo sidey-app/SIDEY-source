@@ -15523,6 +15523,17 @@
         "ru": "Доступно обновление"
       }
     },
+    "error.chatRateLimited": {
+      "localizations": {
+        "ko": "메시지를 너무 빠르게 보내고 있습니다.",
+        "en": "You're sending messages too quickly.",
+        "ja": "メッセージの送信が速すぎます。",
+        "zh-Hans": "消息发送得太快了。",
+        "zh-Hant": "訊息傳送得太快了。",
+        "uk": "Ви надсилаєте повідомлення надто швидко.",
+        "ru": "Вы отправляете сообщения слишком быстро."
+      }
+    },
     "error.fatalTitle": {
       "localizations": {
         "ko": "SIDEY 시작 오류",
@@ -16447,6 +16458,17 @@
         "ru": "Поверх всех окон"
       }
     },
+    "history.keepOnTopShortcut": {
+      "localizations": {
+        "ko": "항상 위에 유지(Alt+위쪽 화살표)",
+        "en": "Always on top (Alt+Up arrow)",
+        "ja": "常に手前に表示（Alt+上矢印）",
+        "zh-Hans": "始终置顶（Alt+向上箭头）",
+        "zh-Hant": "永遠置頂（Alt+向上箭頭）",
+        "uk": "Поверх інших вікон (Alt+стрілка вгору)",
+        "ru": "Поверх всех окон (Alt+стрелка вверх)"
+      }
+    },
     "history.loadMoreFailed": {
       "localizations": {
         "ko": "이전 메시지를 불러오지 못했어요",
@@ -16546,6 +16568,17 @@
         "ru": "Недавние сообщения · {0}"
       }
     },
+    "history.scrollToLatest": {
+      "localizations": {
+        "ko": "최근 메시지로 이동",
+        "en": "Jump to latest messages",
+        "ja": "最新のメッセージへ移動",
+        "zh-Hans": "跳转到最新消息",
+        "zh-Hant": "跳至最新訊息",
+        "uk": "Перейти до останніх повідомлень",
+        "ru": "Перейти к последним сообщениям"
+      }
+    },
     "history.sending": {
       "localizations": {
         "ko": "전송 중",
@@ -16577,6 +16610,17 @@
         "zh-Hant": "取消置頂",
         "uk": "Вимкнути режим поверх інших вікон",
         "ru": "Отключить поверх всех окон"
+      }
+    },
+    "history.stopKeepingOnTopShortcut": {
+      "localizations": {
+        "ko": "항상 위 해제(Alt+아래쪽 화살표)",
+        "en": "Turn off always on top (Alt+Down arrow)",
+        "ja": "最前面表示を解除（Alt+下矢印）",
+        "zh-Hans": "取消置顶（Alt+向下箭头）",
+        "zh-Hant": "取消置頂（Alt+向下箭頭）",
+        "uk": "Вимкнути поверх інших вікон (Alt+стрілка вниз)",
+        "ru": "Отключить поверх всех окон (Alt+стрелка вниз)"
       }
     },
     "history.title": {
@@ -17866,6 +17910,17 @@
         "ru": "Открыть или закрыть недавнюю историю"
       }
     },
+    "settings.hotkeyInvalid": {
+      "localizations": {
+        "ko": "잘못된 바로 가기",
+        "en": "Invalid shortcut",
+        "ja": "無効なショートカット",
+        "zh-Hans": "无效的快捷键",
+        "zh-Hant": "無效的快速鍵",
+        "uk": "Неприпустиме сполучення клавіш",
+        "ru": "Недопустимое сочетание клавиш"
+      }
+    },
     "settings.hotkeyNeedsModifier": {
       "localizations": {
         "ko": "단축키는 Win, Ctrl, Alt 또는 Shift로 시작해야 합니다.",
@@ -17897,6 +17952,17 @@
         "zh-Hant": "切換安靜模式",
         "uk": "Перемкнути тихий режим",
         "ru": "Переключить тихий режим"
+      }
+    },
+    "settings.hotkeyRecorderEmpty": {
+      "localizations": {
+        "ko": "이 바로 가기를 변경하려면 키 조합을 누르세요.",
+        "en": "Press a key combination to change this shortcut.",
+        "ja": "ショートカットを変更するには、キーの組み合わせを押してください。",
+        "zh-Hans": "要更改此快捷键，请按下组合键。",
+        "zh-Hant": "若要變更此快速鍵，請按下按鍵組合。",
+        "uk": "Щоб змінити сполучення, натисніть потрібні клавіші.",
+        "ru": "Чтобы изменить сочетание, нажмите нужные клавиши."
       }
     },
     "settings.hotkeyRecorderHelp": {
