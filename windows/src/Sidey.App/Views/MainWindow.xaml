@@ -21,6 +21,15 @@
       <Setter Property="Height" Value="64" />
       <Setter Property="Padding" Value="12" />
     </Style>
+    <Style x:Key="HotkeyEditorInvalidKeycapStyle" TargetType="Border">
+      <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="MinWidth" Value="64" />
+      <Setter Property="Height" Value="64" />
+      <Setter Property="Padding" Value="12" />
+    </Style>
     <Style x:Key="HotkeyEditorCaptureStyle" TargetType="Button">
       <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
       <Setter Property="BorderThickness" Value="0" />
@@ -43,6 +52,9 @@
       <Setter Property="FontSize" Value="20" />
       <Setter Property="HorizontalAlignment" Value="Center" />
       <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="HotkeyEditorInvalidLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource HotkeyEditorLabelStyle}">
+      <Setter Property="Foreground" Value="{ThemeResource SystemFillColorCriticalBrush}" />
     </Style>
     <Style x:Key="HotkeyEditorActionStyle" TargetType="Button" BasedOn="{StaticResource SubtleButtonStyle}">
       <Setter Property="Background" Value="Transparent" />

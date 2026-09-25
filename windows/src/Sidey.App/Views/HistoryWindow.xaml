@@ -27,9 +27,9 @@
         </StackPanel>
         <ToggleButton x:Name="KeepOnTopButton" Grid.Column="1" Width="40" Height="40"
             VerticalAlignment="Top" Click="OnKeepOnTopClick"
-            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTop}, Mode=OneWay}"
-            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTop}, Mode=OneWay}">
-          <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE718;" FontSize="17" />
+            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}"
+            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}">
+          <FontIcon x:Name="KeepOnTopIcon" FontFamily="Segoe Fluent Icons" Glyph="&#xE840;" FontSize="18" />
         </ToggleButton>
       </Grid>
 
@@ -128,6 +128,14 @@
           </Grid>
         </ListView.Header>
       </ListView>
+
+      <Button x:Name="ScrollToLatestButton" Width="44" Height="44" Margin="0,0,16,16"
+          HorizontalAlignment="Right" VerticalAlignment="Bottom" CornerRadius="22"
+          Visibility="Collapsed" Click="OnScrollToLatestClick"
+          ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.scrollToLatest}, Mode=OneWay}"
+          AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.scrollToLatest}, Mode=OneWay}">
+        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74B;" FontSize="20" />
+      </Button>
 
       <StackPanel
           HorizontalAlignment="Center"

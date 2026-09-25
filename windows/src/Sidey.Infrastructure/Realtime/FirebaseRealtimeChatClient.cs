@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Sidey.Core.Domain;
+using Sidey.Core.Localization;
 using Sidey.Infrastructure.Authentication;
 
 namespace Sidey.Infrastructure.Realtime;
@@ -28,9 +29,12 @@ internal sealed class FirebaseRealtimeChatException : Exception
         string code,
         FirebaseRealtimeChatFailureClassification classification,
         HttpStatusCode? statusCode = null)
-        : base(classification == FirebaseRealtimeChatFailureClassification.KnownNonCommit
-            ? "Firebase realtime chat was rejected before commit."
-            : "Firebase realtime chat outcome is ambiguous.")
+        : base(code == "resource-exhausted"
+            && classification == FirebaseRealtimeChatFailureClassification.KnownNonCommit
+                ? I18n.Get("error.chatRateLimited")
+                : classification == FirebaseRealtimeChatFailureClassification.KnownNonCommit
+                    ? "Firebase realtime chat was rejected before commit."
+                    : "Firebase realtime chat outcome is ambiguous.")
     {
         Code = code;
         Classification = classification;

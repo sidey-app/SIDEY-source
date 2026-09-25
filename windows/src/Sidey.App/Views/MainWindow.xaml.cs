@@ -131,10 +131,19 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             Orientation = Orientation.Horizontal,
             Spacing = 10,
             HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
             IsHitTestVisible = false,
         };
         var captureHost = new Grid { Width = contentWidth };
         captureHost.Children.Add(keycaps);
+        var emptyPrompt = new TextBlock
+        {
+            Text = I18n.Get("settings.hotkeyRecorderEmpty"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            TextWrapping = TextWrapping.Wrap,
+        };
+        captureHost.Children.Add(emptyPrompt);
         var capture = new Button
         {
             Content = captureHost,
@@ -222,22 +231,27 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             Title = HotkeyActionTitle(action),
             Content = content,
             PrimaryButtonText = I18n.Get("common.save"),
+            PrimaryButtonStyle = (Style)Application.Current.Resources["AccentButtonStyle"],
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.None,
             HorizontalContentAlignment = HorizontalAlignment.Center,
         };
+        string? invalidShortcut = null;
 
         void ShowCandidate()
         {
             string[] labels;
-            if (candidate is { } binding)
+            if (invalidShortcut is { } invalid)
+                labels = [invalid];
+            else if (candidate is { IsDisabled: false } binding)
                 labels = MainWindowViewModel.HotkeyBindingText(binding).Split(" + ");
             else
-                labels = [I18n.Get("settings.hotkeyRecording")];
-            SetHotkeyEditorKeys(keycaps, labels);
+                labels = [];
+            emptyPrompt.Visibility = labels.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+            SetHotkeyEditorKeys(keycaps, labels, invalidShortcut is not null);
             dialog.IsPrimaryButtonEnabled = candidate is { } valid
                 && (valid.IsValid() || valid == GlobalHotkeyBinding.Disabled);
-            string? warning = null;
+            string? warning = invalidShortcut is null ? null : I18n.Get("settings.hotkeyInvalid");
             if (candidate is { } selected && !selected.IsDisabled)
             {
                 if (ViewModel.ConflictingHotkeyAction(action, selected) is not null)
@@ -258,11 +272,12 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
                     };
                 }
             }
+            notice.Severity = invalidShortcut is null ? InfoBarSeverity.Warning : InfoBarSeverity.Error;
             notice.IsOpen = warning is not null;
             warningText.Text = warning ?? string.Empty;
-            AutomationProperties.SetName(capture, candidate is { } selectedBinding
+            AutomationProperties.SetName(capture, invalidShortcut ?? (candidate is { } selectedBinding
                 ? MainWindowViewModel.HotkeyBindingText(selectedBinding)
-                : I18n.Get("settings.hotkeyRecorderHelp"));
+                : I18n.Get("settings.hotkeyRecorderHelp")));
         }
 
         bool RecordKey(uint virtualKey, GlobalHotkeyModifiers modifiers)
@@ -277,6 +292,8 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             if (GlobalHotkeyBinding.IsModifierKey(virtualKey))
             {
                 candidate = null;
+                invalidShortcut = null;
+                emptyPrompt.Visibility = Visibility.Collapsed;
                 SetHotkeyEditorKeys(keycaps, GlobalHotkeyBinding.ModifierDisplayText(modifiers)
                     .Split(" + ", StringSplitOptions.RemoveEmptyEntries));
                 dialog.IsPrimaryButtonEnabled = false;
@@ -288,12 +305,12 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             if (!binding.IsValid())
             {
                 candidate = null;
+                invalidShortcut = binding.ToDisplayText();
                 ShowCandidate();
-                warningText.Text = I18n.Get("settings.hotkeyNeedsModifier");
-                notice.IsOpen = true;
                 return true;
             }
             candidate = binding;
+            invalidShortcut = null;
             ShowCandidate();
             return true;
         }
@@ -342,12 +359,14 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         reset.Click += (_, _) =>
         {
             candidate = defaultBinding;
+            invalidShortcut = null;
             ShowCandidate();
             capture.Focus(FocusState.Programmatic);
         };
         delete.Click += (_, _) =>
         {
             candidate = GlobalHotkeyBinding.Disabled;
+            invalidShortcut = null;
             ShowCandidate();
             capture.Focus(FocusState.Programmatic);
         };
@@ -378,7 +397,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         }
     }
 
-    private void SetHotkeyEditorKeys(StackPanel keycaps, IEnumerable<string> labels)
+    private void SetHotkeyEditorKeys(StackPanel keycaps, IEnumerable<string> labels, bool invalid = false)
     {
         string[] ordered = [.. labels];
         keycaps.Children.Clear();
@@ -407,17 +426,29 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
                 AutomationProperties.SetName(logo, "Win");
                 symbol = logo;
             }
+            else if (label == "Shift")
+            {
+                symbol = new TextBlock
+                {
+                    Text = "⇧",
+                    FontFamily = new FontFamily("Segoe UI Symbol"),
+                    FontSize = 30,
+                    Style = (Style)MainRoot.Resources["HotkeyEditorLabelStyle"],
+                };
+            }
             else
             {
                 symbol = new TextBlock
                 {
                     Text = label,
-                    Style = (Style)MainRoot.Resources["HotkeyEditorLabelStyle"],
+                    Style = (Style)MainRoot.Resources[invalid
+                        ? "HotkeyEditorInvalidLabelStyle" : "HotkeyEditorLabelStyle"],
                 };
             }
             var keycap = new Border
             {
-                Style = (Style)MainRoot.Resources["HotkeyEditorKeycapStyle"],
+                Style = (Style)MainRoot.Resources[invalid
+                    ? "HotkeyEditorInvalidKeycapStyle" : "HotkeyEditorKeycapStyle"],
                 Child = symbol,
             };
             keycaps.Children.Add(keycap);
@@ -1204,10 +1235,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             selectedPage.ChangeView(null, 0, null, disableAnimation: true);
             DispatcherQueue.TryEnqueue(() =>
                 selectedPage.ChangeView(null, 0, null, disableAnimation: true));
-            if (tag != "profile")
-            {
-                AnimatePageRefresh(selectedPage);
-            }
+            AnimatePageRefresh(selectedPage);
         }
     }
 
