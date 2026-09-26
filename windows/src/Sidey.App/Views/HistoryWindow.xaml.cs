@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Sidey.App.Localization;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
@@ -46,6 +47,7 @@ public sealed partial class HistoryWindow : Window
         ViewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         _initialState = viewModel.CurrentState;
         InitializeComponent();
+        RefreshLocalizationLayout();
         HistoryRoot.DataContext = ViewModel;
         HistoryInput.TextCompositionStarted += (_, _) => _isComposing = true;
         HistoryInput.TextCompositionEnded += (_, _) => _isComposing = false;
@@ -66,7 +68,7 @@ public sealed partial class HistoryWindow : Window
         Activated += OnWindowActivated;
         ApplyTheme(_initialState.Preferences.Theme);
         SideyWindowTheme.FollowTitleBarTheme(this, HistoryRoot);
-        Title = I18n.Get("window.historyTitle");
+        Title = I18n.Get("history.window.title");
         SideyWindowIcon.Apply(AppWindow);
         if (AppWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -94,9 +96,12 @@ public sealed partial class HistoryWindow : Window
 
     public void RefreshLocalizedText()
     {
+        RefreshLocalizationLayout();
         ViewModel.RefreshLocalizedText();
         UpdateKeepOnTopLabel();
     }
+
+    public void RefreshLocalizationLayout() => LocalizationLayout.Apply(HistoryRoot);
 
     public void ApplyState(CoordinatorState state)
     {
@@ -169,8 +174,8 @@ public sealed partial class HistoryWindow : Window
     private void UpdateKeepOnTopLabel()
     {
         string label = I18n.Get(KeepOnTopButton.IsChecked == true
-            ? "history.stopKeepingOnTopShortcut"
-            : "history.keepOnTopShortcut");
+            ? "history.window.always_on_top.disable_shortcut"
+            : "history.window.always_on_top.enable_shortcut");
         ToolTipService.SetToolTip(KeepOnTopButton, label);
         AutomationProperties.SetName(KeepOnTopButton, label);
         KeepOnTopOutline.Visibility = KeepOnTopButton.IsChecked == true

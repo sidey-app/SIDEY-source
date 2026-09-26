@@ -1,0 +1,1630 @@
+{
+  "character": {
+    "pixel_cat": {
+      "display_name": "猫咪宝宝"
+    },
+    "pixel_hamster": {
+      "display_name": "仓鼠宝宝"
+    },
+    "pixel_penguin": {
+      "display_name": "企鹅宝宝"
+    },
+    "pixel_puppy": {
+      "display_name": "狗狗宝宝"
+    },
+    "pixel_rabbit": {
+      "display_name": "兔兔宝宝"
+    },
+    "unknown": {
+      "display_name": "角色"
+    }
+  },
+  "common": {
+    "cancel": "取消",
+    "close": "关闭",
+    "continue": "继续",
+    "me": "我",
+    "next": "下一步",
+    "save": "保存"
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "使用邀请码加入"
+    },
+    "collapse": "收起群组",
+    "create": {
+      "action": "创建群组",
+      "name": {
+        "placeholder": "新群组名称"
+      }
+    },
+    "delete": {
+      "action": "删除群组"
+    },
+    "expand": "展开群组",
+    "member": {
+      "remove": {
+        "action": "移出"
+      }
+    },
+    "rename": {
+      "action": "重命名",
+      "name_placeholder": "群组名称，1–20 个字符"
+    },
+    "room_name": {
+      "label": "群组名称"
+    }
+  },
+  "history": {
+    "load_more": {
+      "failed": "无法加载更早的消息",
+      "loading": "正在加载更早的消息…"
+    },
+    "loading": "正在加载最近消息…"
+  },
+  "message": {
+    "send": {
+      "accessibility": "发送消息"
+    }
+  },
+  "onboarding": {
+    "character": {
+      "label": "我的角色"
+    },
+    "group": {
+      "create": {
+        "description": "创建一个群组。"
+      },
+      "description": "创建群组或使用收到的邀请码加入，像素世界就会出现。",
+      "title": "与好友创建群组"
+    },
+    "step": {
+      "group": "群组",
+      "profile": "个人资料"
+    }
+  },
+  "platforms": {
+    "macos": {
+      "account": {
+        "delete": {
+          "failed": "无法删除账号，请再试一次。"
+        }
+      },
+      "account_delete": {
+        "error": {
+          "request_failed": "无法完成删除账号的要求。"
+        }
+      },
+      "app": {
+        "settings": {
+          "navigation_label": "App 设置"
+        }
+      },
+      "apple_auth": {
+        "error": {
+          "missing_authorization_code": "无法完成「使用 Apple 登录」，请再试一次。",
+          "missing_identity_token": "无法完成「使用 Apple 登录」，请再试一次。",
+          "missing_request_nonce": "无法完成「使用 Apple 登录」，请再试一次。"
+        }
+      },
+      "auth": {
+        "apple": {
+          "description": "为了恢复购买项目并保护账号，必须使用 Apple 登录。",
+          "title": "使用 Apple 登录",
+          "verifying": "正在确认登录"
+        },
+        "apple_sign_in": {
+          "failed": "无法使用 Apple 登录，请再试一次。"
+        }
+      },
+      "backend": {
+        "connect": {
+          "failed_detail": "无法连接到服务器。请检查网络连接后再试一次。（%@）"
+        },
+        "connection": {
+          "connecting": "连接中",
+          "failed": "连接错误",
+          "idle": "等待中",
+          "online": "已连接"
+        },
+        "error": {
+          "already_member": "你已加入这个群组。",
+          "authentication_required": "登录状态已失效，请重新登录。",
+          "current_user_unavailable": "无法确认当前的账号，请重新登录。",
+          "generic": "无法完成要求，请稍后再试。",
+          "invalid_invite_code": "请确认邀请码后再试一次。",
+          "invalid_message": "消息请勿超过 200 个字符及 3 行。",
+          "invalid_profile": "昵称请输入 2 至 8 个字符，且不要换行。",
+          "invalid_room_name": "群组名称请输入 1 至 20 个字符，且不要换行。",
+          "invalid_timestamp": "无法读取消息信息，请稍后再试。",
+          "invite_rate_limited": "尝试邀请码的次数过多，请在 10 分钟后再试。",
+          "malformed_response": "无法获取最新数据，请稍后再试。",
+          "member_limit_reached": {
+            "one": "这个群组已有 %lld 位成员，名额已满。",
+            "other": "这个群组已有 %lld 位成员，名额已满。"
+          },
+          "member_not_found": "找不到要移除的成员。",
+          "membership_required": "只有这个群组的成员可以执行此操作。",
+          "message_receive_failed": "无法接收消息，请稍后再试。",
+          "no_active_room": "没有可发送消息的群组。",
+          "owner_cannot_remove_self": "群主无法移除自己。",
+          "owner_required": "只有群主可以执行此操作。",
+          "profile_required": "请先保存个人资料。",
+          "realtime_unavailable": "正在准备服务器连接，请稍后再试。",
+          "room_limit_reached": "每位用户最多可以使用 5 个群组。",
+          "room_resync_failed": "无法获取最新群组状态，请稍后再试。",
+          "session_recovery_failed": "无法还原先前的登录状态。系统并未创建新账号，请重新登录或联系支持。",
+          "stale_realtime_epoch": "群组访问权限已变更，请重新连接。"
+        },
+        "realtime_recovery_failed": "无法重新连接到服务器，请稍后再试。（%@）"
+      },
+      "commerce": {
+        "character": {
+          "equip": {
+            "failed": "无法装备角色，请再试一次。（%@）",
+            "success": "已装备 %@。"
+          }
+        },
+        "equipment": {
+          "success": {
+            "default_bubble": "已装备默认消息泡泡。",
+            "default_character": "已装备默认角色。",
+            "default_throwable": "已装备默认软球。",
+            "named": "已装备 %@。"
+          }
+        },
+        "error": {
+          "catalog_unavailable": "无法加载商店状态。"
+        },
+        "kind": {
+          "bubble": "消息气泡",
+          "character": "角色",
+          "throwable": "投掷玩具"
+        }
+      },
+      "common": {
+        "retry": "再试一次"
+      },
+      "composer": {
+        "drag": {
+          "accessibility": "移动输入框控制点",
+          "tooltip": "拖动以移动输入窗口"
+        }
+      },
+      "connection": {
+        "state": {
+          "connecting": "连接中…",
+          "failed": "连接错误",
+          "idle": "待机中",
+          "online": "已连接"
+        }
+      },
+      "firebase": {
+        "auth": {
+          "error": {
+            "account_mismatch": "当前登录的账号不一致，请重新登录。",
+            "invalid_rollout_lease_claim": "无法确认服务器连接所需的登录信息，请重新登录。",
+            "invalid_session_claim": "登录状态已失效，请重新登录。",
+            "login_mismatch": "登录状态已失效，请重新登录。",
+            "malformed_account_identifier": "无法确认当前的账号，请重新登录。",
+            "rollout_lease_expired": "登录状态已失效，请重新登录。",
+            "rollout_lease_mismatch": "当前的登录信息无法连接至服务器，请重新登录。",
+            "session_mismatch": "登录状态已失效，请重新登录。",
+            "token_refresh_validation_failed": "登录状态已失效，请重新登录。"
+          }
+        },
+        "bootstrap": {
+          "error": {
+            "authentication_required": "登录状态已失效，请重新登录。",
+            "grant_not_converged": "正在完成服务器连接，请稍后再试。",
+            "invalid_argument": "无法准备服务器连接，请稍后再试。",
+            "invalid_http_response": "无法准备服务器连接，请稍后再试。",
+            "malformed_success": "无法准备服务器连接，请稍后再试。",
+            "method_not_allowed": "当前的 App 版本无法连接至服务器，请更新 App。",
+            "missing_access_token": "登录状态已失效，请重新登录。",
+            "rate_limited": "连接要求过多，请稍后再试。",
+            "rollout_disabled": "当前无法连接至服务器，系统会自动再试。",
+            "unavailable": "无法准备服务器连接，请稍后再试。",
+            "unexpected_contract": "当前的 App 版本无法连接至服务器，请更新 App。"
+          }
+        },
+        "chat": {
+          "error": {
+            "authentication_expired": "登录状态已失效，请重新登录。",
+            "invalid_message": "请确认消息内容后再发送一次。",
+            "permission_denied": "当前无法在此群组发送消息。",
+            "rate_limited": "消息发送得太快了。",
+            "state_conflict": "无法发送消息，请稍后再试。"
+          }
+        },
+        "configuration": {
+          "error": {
+            "invalid_plist": "无法读取 App 连接设置，请重新安装 App。",
+            "missing_plist": "App 连接设置有问题，请重新安装 App。",
+            "sdk_app_unavailable": "无法启动 App 连接，请重新启动 App。",
+            "sdk_options_unavailable": "无法准备 App 连接，请重新启动 App。",
+            "unexpected_app": "App 连接设置不正确，请重新安装 App。",
+            "unexpected_bundle": "App 连接设置不正确，请重新安装 App。",
+            "unexpected_database": "App 连接设置不正确，请重新安装 App。",
+            "unexpected_project": "App 连接设置不正确，请重新安装 App。"
+          }
+        },
+        "production": {
+          "error": {
+            "app_version_unavailable": "无法确认 App 版本，因此无法连接到服务器。请重新启动 App。",
+            "duplicate_wire_code": "App 数据有问题，因此无法连接至服务器。请重新安装 App。"
+          }
+        },
+        "transport": {
+          "error": {
+            "access_grant_closed": "正在确认群组访问权限，请稍后再试。",
+            "listener_failed": "消息连接已中断，请重新连接。",
+            "live_listener_unavailable": "无法准备消息连接，请稍后重新连接。",
+            "reconciliation_failed": "无法获取最新群组状态，请稍后再试。",
+            "room_not_authorized": "无法确认此群组的访问权限，请重新连接。",
+            "shut_down": "服务器连接已中断，请重新连接。"
+          }
+        }
+      },
+      "group": {
+        "create": {
+          "in_progress": "创建中…",
+          "keychain_warning": "群组已创建，但无法将邀请码保存至钥匙串。请另外妥善保存当前显示的邀请码。",
+          "realtime_grant_pending": "群组已创建，但尚未完成服务器连接。请稍后再确认。（%@）"
+        },
+        "delete": {
+          "success": "已删除「%@」群组。"
+        },
+        "join": {
+          "in_progress": "加入中…",
+          "keychain_warning": "你已加入群组，但无法将邀请码保存至钥匙串。请另外妥善保存收到的邀请码。",
+          "realtime_grant_pending": "你已加入群组，但尚未完成服务器连接。请稍后再确认。（%@）"
+        },
+        "leave": {
+          "confirmation": {
+            "last_member": "由于你是最后一位成员，群组和所有消息将永久删除且无法恢复。",
+            "member": "你将无法再查看此群组及原有消息。",
+            "owner_transfer": "群主会改由现有成员中最早加入的人担任，而你将无法再查看此群组及原有消息。"
+          },
+          "success": "已离开「%@」群组。"
+        },
+        "name": {
+          "unknown": "群组"
+        },
+        "remove_member": {
+          "success": "已将 %@ 移出群组。"
+        },
+        "rename": {
+          "success": "已变更群组名称。"
+        },
+        "switch": {
+          "failed": "无法切换群组，请再试一次。（%@）"
+        }
+      },
+      "groups": {
+        "active": "使用中",
+        "create": {
+          "invite_code": {
+            "description": "只有收到此代码的朋友可以加入群组。",
+            "title": "刚生成的邀请码"
+          },
+          "name": {
+            "description": "输入 1–20 个字符的名称即可创建群组。"
+          },
+          "subtitle": "创建群组并与朋友分享邀请码。"
+        },
+        "current": {
+          "empty": {
+            "description": "创建新群组，或输入朋友传来的邀请码。",
+            "title": "尚未加入任何群组"
+          },
+          "subtitle": {
+            "one": "管理你与朋友一起加入的群组。每个群组最多可有 %lld 位成员。",
+            "other": "管理你与朋友一起加入的群组。每个群组最多可有 %lld 位成员。"
+          },
+          "title": "当前群组"
+        },
+        "delete": {
+          "confirmation_title": "要删除「%@」群组吗？",
+          "message": "群组与所有消息都会永久删除，且无法恢复。"
+        },
+        "invite_code": {
+          "copy": {
+            "action": "复制邀请码",
+            "complete": "已复制",
+            "help": "复制保存在此设备「钥匙串」中的邀请码。"
+          },
+          "rotate": {
+            "$value": "重新生成邀请码",
+            "help": "撤销可能已外泄的旧代码，并生成一组新的 128 位代码。"
+          }
+        },
+        "join": {
+          "invite_code": {
+            "description": "输入邀请码后，可确认是否能加入群组及剩余名额。",
+            "placeholder": "邀请码",
+            "title": "邀请码"
+          },
+          "subtitle": "使用朋友传来的邀请码加入群组。"
+        },
+        "leave": {
+          "action": "退出群组",
+          "confirmation_title": "要离开「%@」群组吗？",
+          "message": {
+            "last_owner": "你是最后一位成员，因此群组与所有消息都会永久删除，且无法恢复。",
+            "member": "你将无法再查看此群组及其原有消息。",
+            "owner_transfer": "群主会改由最早加入的剩余成员担任，而你将无法再查看此群组及其原有消息。"
+          }
+        },
+        "management": {
+          "navigation_label": "群组"
+        },
+        "member": {
+          "owner": "群主",
+          "remove": {
+            "confirmation_title": "要移除「%@」吗？",
+            "message": "此成员将无法再查看群组及其原有消息。",
+            "title": "移除成员"
+          }
+        },
+        "members": {
+          "empty": "没有可显示的成员。"
+        },
+        "operation": {
+          "creating": "正在创建…",
+          "joining": "正在加入…",
+          "select": "使用此群组",
+          "switching": "正在切换群组…"
+        },
+        "room": {
+          "summary": {
+            "invite_ready": {
+              "one": "%1$lld/%2$lld 位成员 · 邀请码 %3$@",
+              "other": "%1$lld/%2$lld 位成员 · 邀请码 %3$@"
+            },
+            "invite_rotation_required": {
+              "one": "%1$lld/%2$lld 位成员 · 需要重新生成邀请码",
+              "other": "%1$lld/%2$lld 位成员 · 需要重新生成邀请码"
+            }
+          }
+        }
+      },
+      "history": {
+        "close": {
+          "accessibility": "关闭最近消息"
+        },
+        "empty": {
+          "description": "此群组的最近消息会显示在这里。",
+          "title": "暂无消息"
+        },
+        "error": {
+          "load_failed": "无法加载记录"
+        },
+        "older": {
+          "exhausted": {
+            "one": "已看完最近 %lld 天的记录",
+            "other": "已看完最近 %lld 天的记录"
+          }
+        },
+        "retention_notice": {
+          "one": "消息会在 %lld 天后自动删除。",
+          "other": "消息会在 %lld 天后自动删除。"
+        },
+        "title": "最近消息",
+        "window": {
+          "title": "%@ 最近记录"
+        }
+      },
+      "invite": {
+        "error": {
+          "backend_unavailable": "当前无法读取邀请码，请稍后再试。",
+          "clipboard_failed": "无法将邀请码复制到剪贴板，请再试一次。",
+          "not_stored_on_device": "此设备未保存邀请码。请生成新邀请码或向群主索取。",
+          "read_failed": "无法读取邀请码，请再试一次。（%@）",
+          "revoked": "这个群组先前的邀请码已撤销，群主需要发出新的邀请码。"
+        },
+        "rotate": {
+          "keychain_warning": "新的邀请码已发出，但无法保存至钥匙串。请另外妥善保存当前显示的邀请码。",
+          "success": "已发出新的邀请码。"
+        }
+      },
+      "keychain": {
+        "error": {
+          "status": "钥匙串错误 %lld"
+        },
+        "operation_reason": "安全地加载登录状态与群组邀请码。",
+        "transition": {
+          "message": "SIDEY 使用 macOS 钥匙串，安全地保存及加载登录状态与群组邀请码。",
+          "migration_explanation": "首次加载旧版本保存的信息时，macOS 可能会要求输入 Mac 登录密码。如果不想下次再次询问，请在随后显示的 macOS 窗口中选择“始终允许”。如果选择“允许”，根据已保存的信息，窗口可能会再显示几次，或在下次启动时再次出现。",
+          "privacy_explanation": "App 不会查看或保存你输入的密码。",
+          "quit": "退出 SIDEY"
+        }
+      },
+      "landing": {
+        "accessibility": {
+          "ready": "SIDEY 启动屏幕",
+          "restoring": "SIDEY 正在恢复登录状态"
+        },
+        "status": {
+          "ready": "使用鼠标左键点按即可开始。",
+          "restoring": "正在恢复登录状态…"
+        },
+        "tagline": "好友们已来到屏幕旁。"
+      },
+      "launch_at_login": {
+        "update_failed": "无法更改登录时打开设置，请再试一次。（%@）"
+      },
+      "message": {
+        "composer": {
+          "placeholder": "输入消息"
+        },
+        "delivery": {
+          "failed": "发送失败",
+          "pending": "发送中"
+        },
+        "error": {
+          "realtime_disconnected": "服务器连接已中断，因此无法发送消息。请重新连接。",
+          "wait_for_group_switch": "请等候群组切换完成后再发送。"
+        },
+        "retention_sync_failed": "无法应用消息保留设置，请再试一次。（%@）",
+        "send": {
+          "failed": "无法发送消息，请再试一次。（%@）"
+        }
+      },
+      "mutation": {
+        "post_commit_sync_failed": "变更已保存，但暂时无法显示最新状态。请稍后再确认。（%@）",
+        "realtime_recovering": "变更已保存，正在重新连接到服务器。"
+      },
+      "onboarding": {
+        "group": {
+          "invite_code": {
+            "placeholder": "好友发来的邀请码"
+          },
+          "member_limit": {
+            "one": "群组最多可有 %lld 位成员。",
+            "other": "群组最多可有 %lld 位成员。"
+          },
+          "path": {
+            "accessibility": "加入群组的方式"
+          }
+        },
+        "profile": {
+          "description": "以后可以随时在设置中更改。",
+          "nickname": {
+            "placeholder": "昵称，2–8 个字符"
+          },
+          "title": "设置昵称"
+        }
+      },
+      "overlay": {
+        "span": {
+          "full": "全部"
+        }
+      },
+      "pixel_world": {
+        "doze_label": "Zzz",
+        "interaction": {
+          "throw": "使用鼠标左键点按好友角色，即可投掷默认软球。",
+          "tree": "在小树上点按鼠标右键，即可停止或开始走动。"
+        },
+        "nickname": {
+          "current_user": "%@ · 我"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "选择在好友屏幕上代表你的像素角色。",
+          "selection": {
+            "accessibility": "角色选择"
+          },
+          "state": {
+            "equipping": "正在装备"
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "description": "选择已拥有的气泡，所有群组都会立即应用。",
+            "selection": {
+              "accessibility": "消息泡泡选择"
+            }
+          },
+          "character": {
+            "description": "选择已拥有的角色后，会立即应用到所有群组。",
+            "selection": {
+              "accessibility": "角色选择"
+            }
+          },
+          "default_bubble": "默认消息泡泡",
+          "default_throwable": "默认软球",
+          "hint": {
+            "current": "当前使用中",
+            "select": "选择后会立即应用到所有群组"
+          },
+          "throwable": {
+            "description": "选择已拥有的投掷玩具，所有群组都会立即应用。",
+            "selection": {
+              "accessibility": "投掷玩具选择"
+            }
+          }
+        },
+        "current_user": {
+          "badge": "我"
+        },
+        "duplicates_allowed": "同一群组内可以使用相同的角色和昵称。",
+        "error": {
+          "character_not_owned": "个人资料只能选择你已拥有的角色。"
+        },
+        "nickname": {
+          "description": "显示在好友屏幕和消息中的名字 · 2–8 个字符",
+          "save": "变更昵称",
+          "unknown": "好友",
+          "unknown_friend": "未知好友",
+          "unknown_member": "成员"
+        },
+        "onboarding": {
+          "next_hint": "保存个人资料后，请创建群组或使用邀请码加入。"
+        },
+        "selection": {
+          "state": {
+            "not_selected": "未选取",
+            "selected": "已选取"
+          }
+        },
+        "subtitle": "设置朋友会看到的名称和角色。",
+        "success": {
+          "nickname_updated": "已变更昵称。",
+          "saved": "已保存个人资料。"
+        }
+      },
+      "realtime": {
+        "kill_switch": {
+          "error": {
+            "legacy_connection_creation_failed": "无法准备服务器连接，请稍后再试。",
+            "legacy_connection_recovery_failed": "无法重新连接到服务器，请稍后再试。"
+          },
+          "transition_failed": "无法连接至服务器，请稍后重新连接。（%@）"
+        },
+        "rollout": {
+          "error": {
+            "cache_unavailable": "无法保存服务器连接状态，请重新启动 App。",
+            "contract_mismatch": "当前的 App 版本无法连接至服务器，请更新 App。",
+            "enabled_policy_unavailable": "无法连接至服务器，请稍后再试。",
+            "malformed_response": "无法连接至服务器，请稍后再试。"
+          }
+        }
+      },
+      "settings": {
+        "account": {
+          "delete": {
+            "authentication_notice": "输入「删除」并再次使用 Apple 登录后，账号会立即删除。",
+            "confirmation_phrase": "删除",
+            "description": "这会删除你的个人资料、消息和群组成员资格。基于会计与防止欺诈的需要，购买记录可能会与账号分开保存。",
+            "placeholder": "输入「删除」以确认",
+            "reveal": "删除账号…",
+            "title": "删除账号"
+          },
+          "privacy_policy": "隐私政策",
+          "restore_purchases": "恢复购买项目",
+          "subtitle": "管理账号信息与 App 内购买项目。",
+          "terms": "服务条款",
+          "title": "账号与隐私"
+        },
+        "display": {
+          "offline_members": {
+            "description": "将离线好友显示为睡着的角色，并带有红色状态点。",
+            "title": "显示离线成员"
+          },
+          "quiet_mode": {
+            "description": "隐藏消息气泡和输入状态指示，保留未读数。"
+          },
+          "subtitle": "调整朋友状态与消息在屏幕上的显示方式。",
+          "throw_guard": {
+            "description": "关闭时，使用鼠标左键点按好友角色即可直接投掷。开启时，先在自己的角色上连按两下鼠标右键，再于 10 秒内使用鼠标左键点按好友角色即可投掷。",
+            "title": "连按两下鼠标右键后投掷"
+          }
+        },
+        "general": {
+          "overlay_visible": {
+            "description": "在所选的屏幕边缘显示好友的像素世界。"
+          },
+          "subtitle": "设置 App 的基本显示与启动方式。"
+        },
+        "placement": {
+          "edge": {
+            "description": "选择角色行走的屏幕边缘。",
+            "picker": "边缘",
+            "title": "屏幕边缘"
+          },
+          "monitor": {
+            "description": "选择显示像素世界和消息输入框的显示器。",
+            "picker": "屏幕",
+            "title": "显示器"
+          },
+          "span": {
+            "description": "选择角色可在屏幕边缘活动的范围。",
+            "full": "整个边缘",
+            "half": "1/2",
+            "picker": "长度",
+            "third": "1/3",
+            "title": "活动范围"
+          },
+          "subtitle": "选择显示像素角色的屏幕与位置。",
+          "title": "角色位置"
+        },
+        "shortcuts": {
+          "key": {
+            "picker": "按键"
+          },
+          "restore_default": {
+            "accessibility": "还原默认快捷键",
+            "help": "还原默认快捷键"
+          },
+          "subtitle": "选择至少一个修饰键，再指定英文字母或数字键。变更会立即应用。",
+          "title": "键盘快捷键"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "当前群组中的角色被投掷玩具击中时播放音效。",
+            "title": "角色音效"
+          },
+          "subtitle": "设置角色音效播放方式。"
+        }
+      },
+      "shortcut": {
+        "action": {
+          "composer": "打开或关闭输入窗口",
+          "history": "打开最近记录",
+          "overlay": "显示或隐藏浮动层",
+          "quiet_mode": "隐藏消息"
+        },
+        "error": {
+          "duplicate": "「%@」已使用此快捷键，将保留原有快捷键。",
+          "modifier_required": "请至少选择一个辅助键，将保留原有快捷键。",
+          "new_binding_registration_failed": "无法注册新的快捷键，因此将保留原有快捷键。",
+          "new_binding_used_by_other_app": "此组合已被其他 App 使用，将保留原有快捷键。",
+          "registration_failed": "无法注册快捷键，请改用其他快捷键。",
+          "used_by_other_app": "此快捷键已被其他 App 使用。请改用其他快捷键，或检查发生冲突的 App 设置。"
+        },
+        "modifier": {
+          "command": "Command 键",
+          "control": "Control 键",
+          "option": "Option 键",
+          "shift": "Shift 键"
+        },
+        "status": {
+          "change_failed": "变更失败",
+          "unavailable": "快捷键无法使用"
+        }
+      },
+      "status": {
+        "icon": {
+          "unread": {
+            "accessibility": "%@，有未读消息"
+          }
+        },
+        "menu": {
+          "active_group": "当前群组",
+          "compose": "撰写消息…",
+          "group_settings": "群组设置…",
+          "history": "最近记录…",
+          "no_connected_groups": "尚未加入群组",
+          "overlay": {
+            "hide": "隐藏浮动层",
+            "show": "显示浮动层"
+          },
+          "quiet_mode": "隐藏消息",
+          "quit": "退出 %@",
+          "settings": "设置…",
+          "store": "商店…"
+        },
+        "room": {
+          "unread_count": "(%@)"
+        },
+        "tooltip": {
+          "unread": "%@ · 有未读消息"
+        }
+      },
+      "store": {
+        "coming_soon": {
+          "badge": "即将推出",
+          "detail": "商店准备中，敬请期待。",
+          "product": {
+            "accessibility": "%@，即将推出"
+          }
+        },
+        "empty": {
+          "description": "试试其他关键词或筛选条件。",
+          "title": "没有符合条件的商品"
+        },
+        "error": {
+          "auto_equip_failed": "购买已完成，但无法自动装备。请前往个人资料手动装备。",
+          "auto_equip_realtime_grant_pending": "已自动装备商品。如果未立即显示，请稍后再确认。（%@）",
+          "entitlements_reconcile_failed": "无法确认 App 内购买项目，请再试一次「恢复购买项目」。",
+          "equipment_realtime_grant_pending": "装备已完成。如果未立即显示，请稍后再确认。（%@）",
+          "equipment_update_failed": "无法更新使用中的项目。",
+          "product_unavailable": "App Store 找不到此商品。",
+          "products_load_failed": "无法加载 App Store 商品信息，请稍后再试。",
+          "purchase_failed": "无法完成 %@ 的购买，请稍后再试。",
+          "purchase_pending": "购买正在等待批准，批准后会自动应用。",
+          "purchase_status_failed": "无法确认购买状态，请稍后再试。",
+          "server_rejected": "无法确认购买项目，请再试一次「恢复购买项目」。",
+          "transaction_update_failed": "无法应用购买项目，请再试一次「恢复购买项目」。",
+          "unknown_result": "无法确认 App Store 购买结果，请稍后查看购买状态。",
+          "unverified_transaction": "无法确认购买项目，因此尚未应用。请再试一次「恢复购买项目」。",
+          "verifier_not_configured": "当前无法确认购买项目，请稍后再试。"
+        },
+        "filter": {
+          "hide_owned": "隐藏已拥有商品",
+          "kind": {
+            "$value": "商品类型",
+            "accessibility": "商店商品类型"
+          },
+          "menu": "排序与筛选"
+        },
+        "footer": {
+          "app_store": {
+            "entitlement": "App 内购买由 App Store 处理。确认购买后即可立即使用。",
+            "headline": "价格与付款由 App Store 显示及处理。",
+            "refund": "退款与付款问题按 Apple 的 App Store 政策和流程处理。"
+          },
+          "coming_soon": "商店即将推出。你仍可继续使用已拥有的商品。",
+          "direct": {
+            "entitlement": "显示价格含税。确认购买后，即可使用数字自定义商品。",
+            "refund": "开始提供后，不接受因改变主意而退款；未提供、与合同不符、重复或未经授权付款等法定情况可全额退款。"
+          }
+        },
+        "kind": {
+          "bubble": "消息气泡",
+          "character": "角色",
+          "keepsake": "心爱之物",
+          "throwable": "投掷玩具"
+        },
+        "navigation_label": "装扮与商店",
+        "preview": {
+          "accessibility": "%@ 预览",
+          "character_interaction_hint": "使用鼠标左键点按另一个角色可试丢 %@。连按两下鼠标左键可查看角色的放大反应。",
+          "default_throwable": "默认软球",
+          "double_click_hint": "连按两下鼠标左键可查看角色的放大反应。",
+          "member": {
+            "dubu": "豆腐",
+            "moka": "摩卡"
+          },
+          "message": {
+            "left": "晚饭吃什么？",
+            "right": "吃火锅怎么样？"
+          },
+          "reduce_motion_hint": "已开启“减弱动态效果”，因此显示静态画面。",
+          "sound": {
+            "off": "关闭预览声音",
+            "on": "开启预览声音"
+          },
+          "tree_toggle_hint": "在小树上点按鼠标右键可让它停下，再点按一次鼠标右键即可继续走。"
+        },
+        "price": {
+          "loading": {
+            "$value": "正在加载价格…",
+            "short": "正在确认价格"
+          },
+          "required": "需要确认价格",
+          "retry": "重新确认价格",
+          "unavailable": {
+            "$value": "无法获取 App Store 价格。",
+            "short": "无法确认价格"
+          }
+        },
+        "processing": "处理中",
+        "product": {
+          "detail": {
+            "close": "关闭商品详细信息",
+            "hint": "查看详细信息"
+          },
+          "equipped": "使用中",
+          "preview": {
+            "hint": "预览详细信息"
+          },
+          "processing": {
+            "accessibility": "正在处理 %@"
+          },
+          "sold_separately": "与角色分开出售",
+          "status": {
+            "accessibility": "%@，%@"
+          },
+          "unavailable": {
+            "detail": "此商品当前尚无法购买。"
+          }
+        },
+        "purchase": {
+          "accessibility": "以 %2$@ 购买 %1$@",
+          "action": "以 %2$@ 购买 %1$@",
+          "available": "可购买",
+          "confirming": "正在确认付款…",
+          "error": "错误",
+          "opening_checkout": "正在打开结账页面…",
+          "owned": "已拥有",
+          "refunded": "已退款",
+          "success": "已购买 %@。",
+          "unavailable": "暂时无法购买，请稍后重试。"
+        },
+        "purchase_and_equip": {
+          "success": "已购买并使用 %@。"
+        },
+        "restore": {
+          "action": "恢复购买项目",
+          "failed": "无法恢复购买项目，请再试一次。",
+          "success": "已恢复 App Store 购买项目。"
+        },
+        "sort": {
+          "price_ascending": "价格从低到高",
+          "price_descending": "价格从高到低"
+        },
+        "status": {
+          "retry": "重试"
+        },
+        "subtitle": "挑选角色、消息气泡和投掷玩具。",
+        "title": "装扮与商店"
+      },
+      "tree_movement": {
+        "error": {
+          "save_failed": "无法保存小树的移动设置，请再试一次。"
+        }
+      }
+    },
+    "windows": {
+      "accessibility": {
+        "motion": {
+          "disabled": "Windows 中的动画效果已关闭。"
+        }
+      },
+      "account": {
+        "delete": {
+          "confirmation": {
+            "action": "删除账户",
+            "message": "你的个人资料和群组参与信息将被永久删除，购买记录与账号的关联也会解除。",
+            "title": "删除账号？"
+          },
+          "description": "永久删除与账号关联的个人数据。",
+          "final_confirmation": {
+            "message": "删除的账号和数据无法恢复。",
+            "title": "删除账号？"
+          },
+          "title": "删除账户"
+        },
+        "description": "退出登录或管理账号。",
+        "sign_out": {
+          "confirmation": {
+            "action": "退出登录",
+            "message": "只会退出此电脑上的登录。再次使用时，需要通过 Google 登录。",
+            "title": "退出登录？"
+          },
+          "description": "只退出此电脑上的登录。",
+          "title": "退出登录"
+        },
+        "title": "账户"
+      },
+      "app": {
+        "info": {
+          "description": "查看版本和支持信息。",
+          "navigation_label": "关于",
+          "title": "关于"
+        },
+        "launch": {
+          "failed": "无法启动应用。请关闭应用后重试。"
+        },
+        "startup": {
+          "error": {
+            "title": "SIDEY 启动错误"
+          },
+          "failed": "无法启动 SIDEY。",
+          "failed_with_log": "无法启动 SIDEY。\n\n诊断日志: {0}",
+          "runtime_missing": "缺少 SIDEY 的部分文件，请重新安装应用。"
+        }
+      },
+      "auth": {
+        "google": {
+          "already_linked": "此 Google 账号已关联到当前个人资料。个人资料和数据未发生更改。",
+          "cancelled": "Google 登录已取消或未能完成。请重试。",
+          "identity_changed": "此 Google 账号与当前账号关联的 Google 账号不同。现有个人资料和数据未发生更改。",
+          "link_expired": "Google 登录请求已过期。请取消登录后重试。",
+          "required": "请关联 Google 账号。",
+          "sign_in_complete": "Google 登录已完成。你可以关闭浏览器中的登录标签页。"
+        },
+        "request": {
+          "failed": "无法登录，请稍后重试。（错误代码：{0}）"
+        },
+        "response": {
+          "empty": "登录未完成，请重试。"
+        },
+        "session": {
+          "expired": "登录状态已失效，请重新登录。",
+          "replace_blocked": "这台设备已有登录信息，无法创建新账户。请先退出登录。",
+          "restore_failed": "无法恢复登录状态，请重新登录。",
+          "stored_invalid": "保存的登录信息无法使用，请重新登录。",
+          "values_missing": "登录信息不完整，请重试。"
+        }
+      },
+      "common": {
+        "back": "返回",
+        "delete": "删除",
+        "friend": "好友",
+        "skip": "跳过"
+      },
+      "composer": {
+        "drag": {
+          "tooltip": "拖动以移动输入窗口"
+        },
+        "group": {
+          "required": "请先设置个人资料并选择一个群组。"
+        },
+        "message": {
+          "placeholder": "输入消息…"
+        },
+        "window": {
+          "title": "SIDEY 消息"
+        }
+      },
+      "connection": {
+        "configuration": {
+          "not_configured": "缺少服务器连接设置。请重新安装应用。"
+        },
+        "error": {
+          "access_required": "SIDEY 需要重新确认你的账号或群组状态。请在连接状态中选择“重新连接”。如果反复出现同一提示，请附上诊断日志联系我们。",
+          "busy": "目前连接请求较多，连接时间比平时更长。SIDEY 会继续自动尝试。如果几分钟后仍未连接，请附上诊断日志联系我们。",
+          "configuration_unavailable": "SIDEY 目前无法开始连接。请稍等片刻，然后在连接状态中选择“重新连接”。如果同一问题持续出现，请附上诊断日志联系我们。",
+          "network_unavailable": "SIDEY 无法连接到服务器。请检查网络连接，然后在连接状态中选择“重新连接”。如果其他网站可以打开但问题仍持续，请附上诊断日志联系我们。",
+          "secure_connection_failed": "无法建立安全连接。请确认 Windows 的日期和时间正确，然后重新连接。如果问题仍持续，请附上诊断日志联系我们。",
+          "service_unavailable": "服务器没有正常响应。SIDEY 会继续自动尝试。如果几分钟后仍未连接，请在连接状态中选择“重新连接”; 如果仍然无效，请附上诊断日志联系我们。"
+        },
+        "group_resync_failed": "无法刷新群组状态，请重新连接: {0}",
+        "group_revision_missing": "无法开始接收群组更新，请重新连接。",
+        "notice": {
+          "connected": "已连接到服务器。",
+          "reconnecting": "正在重新连接服务器…"
+        },
+        "retry": {
+          "action": "重新连接"
+        },
+        "server": {
+          "not_configured": "缺少服务器连接设置。请重新安装应用。"
+        },
+        "state": {
+          "connected": "已连接到服务器",
+          "disconnected": "未连接到服务器",
+          "reconnecting": "正在连接"
+        },
+        "unavailable": "目前无法接收实时更新，请重新连接。"
+      },
+      "external_link": {
+        "open": {
+          "failed": "无法在默认浏览器中打开页面。"
+        }
+      },
+      "groups": {
+        "create": {
+          "description": "创建新群组，并将生成的邀请码分享给好友。",
+          "in_progress": "正在创建…",
+          "result_missing": "群组已创建，但暂时无法显示。请重新打开群组页面。",
+          "success": {
+            "default": "群组已创建。"
+          },
+          "tooltip": "使用输入的名称创建群组。"
+        },
+        "delete": {
+          "confirmation": {
+            "message": "所有成员和消息将被永久删除，且无法恢复。",
+            "title": "要删除“{0}”吗？"
+          },
+          "final_confirmation": {
+            "message": "“{0}”及其所有消息将立即被永久删除。",
+            "title": "要永久删除这个群组吗？"
+          },
+          "success": "群组已删除。",
+          "tooltip": "永久删除此群组。"
+        },
+        "description": "管理一起显示的好友和当前群组。每个群组最多可有 12 人。",
+        "empty": {
+          "description": "创建新群组，或输入好友发来的邀请码。",
+          "title": "尚未加入群组"
+        },
+        "error": {
+          "not_found": "找不到群组。"
+        },
+        "invite": {
+          "code": {
+            "label": "邀请码",
+            "missing": "此设备上没有保存邀请码。",
+            "replaced": "此设备上保存的邀请码已被替换，请向群主索取新邀请码。",
+            "revoked": "旧邀请码已失效，请让群主生成新邀请码。"
+          },
+          "copy": {
+            "action": "复制邀请码",
+            "complete": "已复制"
+          },
+          "rotate": {
+            "action": "生成新邀请码",
+            "code_missing": "无法生成邀请码，请重试。",
+            "confirmation": {
+              "action": "生成新邀请码",
+              "message": "现有邀请码会立即失效，此操作无法撤销。",
+              "title": "要生成新邀请码吗？"
+            },
+            "success": "新邀请码已生成，并安全保存在此设备上。"
+          }
+        },
+        "join": {
+          "description": "使用好友发来的邀请码加入群组。",
+          "failed": "无法加入群组: {0}",
+          "in_progress": "正在加入…",
+          "result_missing": "已加入群组，但暂时无法显示。请重新打开群组页面。",
+          "room_id_missing": "已加入群组，但暂时无法打开。请重新打开群组列表。",
+          "success": {
+            "default": "已加入群组。"
+          },
+          "tooltip": "加入此邀请码对应的群组。"
+        },
+        "leave": {
+          "action": "退出群组",
+          "confirmation": {
+            "action": "退出",
+            "member_message": "你将无法再查看此群组和已有消息。",
+            "owner_message": "群主会转交给最早加入的剩余成员，你也将无法再查看群组和已有消息。",
+            "title": "要退出“{0}”吗？"
+          },
+          "success": "已退出群组。",
+          "tooltip": "退出此群组。"
+        },
+        "member": {
+          "remove": {
+            "confirmation": {
+              "message": "此成员将无法再查看群组和已有消息。",
+              "title": "要移出“{0}”吗？"
+            },
+            "success": "成员已移出。",
+            "tooltip": "将此成员移出群组。"
+          }
+        },
+        "navigation_label": "群组",
+        "operation": {
+          "busy": "请等待其他群组操作完成后再试。"
+        },
+        "refresh": {
+          "failed": "无法刷新群组信息，请稍后重试: {0}"
+        },
+        "rename": {
+          "success": "群组名称已更改。",
+          "title": "更改群组名称",
+          "tooltip": "更改群组名称。"
+        },
+        "state": {
+          "active": "当前"
+        },
+        "summary": {
+          "invite_ready": "{0}/12 人 · 邀请码 {1}",
+          "invite_rotation_required": "{0}/12 人 · 需要生成新邀请码"
+        },
+        "switch": {
+          "action": "切换到此群组",
+          "in_progress": "正在连接…",
+          "success": "当前群组已更改。",
+          "tooltip": "在屏幕上显示此群组。"
+        },
+        "title": "当前群组"
+      },
+      "history": {
+        "empty": {
+          "description": "此群组的最近消息会显示在这里。",
+          "title": "暂无消息"
+        },
+        "group": {
+          "none": "没有当前群组",
+          "required": "加入群组后即可查看最近消息。"
+        },
+        "load": {
+          "initial_failed": "无法加载消息记录",
+          "retry": "重试"
+        },
+        "pagination": {
+          "exhausted": "最近 3 天的消息已全部显示"
+        },
+        "recent": {
+          "title": "最近消息"
+        },
+        "retention": {
+          "notice": "消息会在 3 天后从服务器自动删除。",
+          "reload_failed": "无法重新加载已过期的消息，请稍后重试: {0}"
+        },
+        "scroll": {
+          "latest": "跳转到最新消息"
+        },
+        "user": {
+          "unknown": "未知成员"
+        },
+        "window": {
+          "always_on_top": {
+            "disable": "取消置顶",
+            "disable_shortcut": "取消置顶(Alt+向下箭头)",
+            "enable": "始终置顶",
+            "enable_shortcut": "始终置顶(Alt+向上箭头)"
+          },
+          "title": "SIDEY 最近消息"
+        }
+      },
+      "legal": {
+        "description": "查看条款和政策。",
+        "privacy": {
+          "action": "查看隐私政策"
+        },
+        "refund": {
+          "action": "查看取消与退款政策"
+        },
+        "terms": {
+          "action": "查看使用条款"
+        },
+        "title": "政策"
+      },
+      "message": {
+        "delivery": {
+          "recheck_failed": "无法确认能否查看此消息，请稍后重试: {0}"
+        },
+        "send": {
+          "failed": "发送消息失败: {0}",
+          "rate_limited": "消息发送得太快了。"
+        }
+      },
+      "onboarding": {
+        "auth": {
+          "google": {
+            "cancel": "取消登录",
+            "continue": "通过 Google 继续",
+            "description": "关联 Google 账号即可开始使用。现有个人资料、群组和聊天记录会保留。",
+            "pending": "请在浏览器中完成 Google 登录。"
+          },
+          "start": "开始设置"
+        },
+        "complete": {
+          "description": "之后也可以随时在设置中创建或加入群组。",
+          "title": "一切准备就绪"
+        },
+        "connection": {
+          "connected": "已连接",
+          "connecting": "正在连接…"
+        },
+        "group": {
+          "invite_code": {
+            "label": "邀请码",
+            "member_limit": "每个群组最多可有 12 人。",
+            "placeholder": "好友发来的邀请码",
+            "required": "请输入邀请码。"
+          },
+          "join": {
+            "action": "加入"
+          },
+          "name": {
+            "placeholder": "例如: 我们的天地"
+          },
+          "path": {
+            "label": "选择加入方式"
+          }
+        },
+        "launch": {
+          "action": "开始"
+        },
+        "profile": {
+          "description": "以后可以随时在设置中更改。",
+          "title": "设置昵称"
+        },
+        "step": {
+          "complete": "完成"
+        },
+        "tagline": "好友已来到你的屏幕旁。"
+      },
+      "overlay": {
+        "current_user": "{0} · 我"
+      },
+      "platform": {
+        "requirements": {
+          "description": "SIDEY 需要 x64 版 Windows 10 1809 (内部版本 17763) 或更高版本。",
+          "title": "不受支持的 Windows 版本",
+          "window_title": "SIDEY — 不受支持的 Windows"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "选择在好友屏幕上代表你的像素角色。",
+          "save": {
+            "success": "角色已更改。"
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "default": "默认消息气泡",
+            "description": "选择已拥有的气泡，所有群组都会立即应用。",
+            "title": "消息气泡"
+          },
+          "equipped": "使用中",
+          "save": {
+            "success": "装扮已应用。"
+          },
+          "throwable": {
+            "default": "默认软球",
+            "description": "选择已拥有的投掷玩具，所有群组都会立即应用。",
+            "title": "投掷玩具"
+          }
+        },
+        "description": "设置好友看到的名字和角色。",
+        "duplicates": {
+          "notice": "可以和好友使用相同的昵称或角色。"
+        },
+        "nickname": {
+          "description": "显示在好友屏幕和消息中的名字 · 2–8 个字符",
+          "save": {
+            "action": "更改昵称",
+            "tooltip": "保存新昵称。"
+          }
+        },
+        "save": {
+          "success": "资料已保存。"
+        }
+      },
+      "settings": {
+        "display": {
+          "description": "调整好友状态和消息的显示方式。",
+          "offline_members": {
+            "description": "将离线好友显示为睡着的角色，并带有红色状态点。",
+            "title": "显示离线成员",
+            "tooltip": "切换离线成员显示状态"
+          },
+          "quiet_mode": {
+            "description": "隐藏消息气泡和输入状态指示，保留未读数。",
+            "tooltip": "隐藏或显示消息"
+          },
+          "throw_guard": {
+            "description": "关闭时可左键单击好友角色直接投掷。开启时，先在自己的角色上双击鼠标右键，再于 10 秒内左键单击好友角色即可投掷。",
+            "title": "双击鼠标右键后投掷",
+            "tooltip": "投掷前，需要在自己的角色上双击鼠标右键"
+          }
+        },
+        "general": {
+          "description": "设置默认显示和启动方式。"
+        },
+        "language": {
+          "description": "选择应用所使用的语言，更改会立即生效。",
+          "title": "语言/Language"
+        },
+        "navigation_label": "设置",
+        "overlay": {
+          "description": "在所选屏幕边缘显示好友的像素世界。",
+          "tooltip": "切换像素世界显示状态"
+        },
+        "placement": {
+          "description": "选择角色显示的位置。",
+          "edge": {
+            "description": "选择角色行走的屏幕边缘。",
+            "title": "屏幕边缘",
+            "tooltip": "像素世界所在的屏幕边缘"
+          },
+          "monitor": {
+            "description": "选择显示像素世界和消息输入框的显示器。",
+            "title": "显示器",
+            "tooltip": "像素世界和消息输入框所在的显示器",
+            "unavailable": "没有可用的显示器。"
+          },
+          "span": {
+            "description": "选择角色可在屏幕边缘活动的范围。",
+            "full": "整个边缘",
+            "title": "活动范围",
+            "tooltip": "像素世界占用的屏幕范围"
+          },
+          "title": "角色位置"
+        },
+        "save": {
+          "failed": "无法保存设置: {0}"
+        },
+        "shortcuts": {
+          "action": {
+            "composer": "打开或关闭消息输入框",
+            "history": "打开或关闭最近记录",
+            "overlay": "切换悬浮层显示",
+            "quiet_mode": "隐藏或显示消息"
+          },
+          "description": "选择快捷键后，按下想要设置的组合键。若该组合已被使用，两个快捷键会互换。",
+          "error": {
+            "already_registered": "此快捷键已被系统或其他应用使用。",
+            "availability_unverified": "无法确认此快捷键是否可用。",
+            "in_app_conflict": "应用中的其他快捷键正在使用此组合。保存后两个快捷键将互换。",
+            "invalid": "无效的快捷键",
+            "modifier_required": "快捷键必须以 Win、Ctrl、Alt 或 Shift 开始。",
+            "system_conflict": "此快捷键已被用作系统快捷键。"
+          },
+          "recorder": {
+            "empty": "要更改此快捷键，请按下组合键。",
+            "help": "选择后，同时按下修饰键和另一个按键。按 Esc 取消。",
+            "recording": "请按快捷键…",
+            "reset": "重置"
+          },
+          "title": "键盘快捷键"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "当前群组中的角色被投掷玩具击中时播放音效。",
+            "title": "角色音效"
+          },
+          "description": "设置角色音效。",
+          "mute": "静音",
+          "unmute": "取消静音",
+          "volume": "音量"
+        },
+        "storage": {
+          "folder_invalid": "设置文件夹路径无效。",
+          "read_failed": "无法读取已保存的设置。请重新启动应用。"
+        },
+        "theme": {
+          "dark": "深色",
+          "description": "选择应用的浅色、深色或系统主题。",
+          "light": "浅色",
+          "system": "跟随 Windows",
+          "title": "主题"
+        },
+        "update": {
+          "check": {
+            "action": "检查更新"
+          },
+          "check_now": {
+            "tooltip": "检查是否有新版本。"
+          },
+          "description": "检查是否有新版本。",
+          "last_checked": {
+            "never": "上次检查: 从未",
+            "today": "今天 {0}",
+            "value": "上次检查: {0}",
+            "yesterday": "昨天 {0}"
+          },
+          "release_notes": {
+            "action": "更新说明"
+          },
+          "title": "更新"
+        }
+      },
+      "store": {
+        "auth": {
+          "google": {
+            "failed": "无法开始关联 Google 账号。"
+          }
+        },
+        "availability": {
+          "coming_soon": {
+            "description": "商店目前仅提供预览，购买功能尚未开放。",
+            "title": "暂不可购买"
+          }
+        },
+        "checkout": {
+          "opening": "正在打开结账页面…"
+        },
+        "description": "预览角色、消息气泡和投掷玩具的实际效果。",
+        "empty": {
+          "description": "试试其他关键词或筛选条件。",
+          "title": "没有符合条件的商品"
+        },
+        "filter": {
+          "hide_owned": "隐藏已拥有商品",
+          "menu": "排序与筛选",
+          "reset": "全部重置",
+          "search": {
+            "label": "搜索",
+            "placeholder": "搜索名称或介绍"
+          }
+        },
+        "kind": {
+          "bubble": "消息气泡",
+          "character": "角色",
+          "keepsake": "心爱之物",
+          "throwable": "投掷玩具"
+        },
+        "navigation_label": "装扮与商店",
+        "preview": {
+          "member": {
+            "dubu": "豆腐",
+            "moka": "摩卡"
+          },
+          "message": {
+            "left": "晚饭吃什么？",
+            "right": "吃火锅怎么样？"
+          },
+          "open": "预览",
+          "sound": {
+            "off": "关闭预览声音",
+            "on": "开启预览声音"
+          },
+          "tree_movement_hint": "右键单击小树让它停下，再次右键单击就会继续走。",
+          "unavailable": "无法加载预览。"
+        },
+        "price": {
+          "krw": "{0:N0} 韩元"
+        },
+        "product": {
+          "sold_separately": "与角色分开出售"
+        },
+        "purchase": {
+          "action": "以 {0} 购买",
+          "confirming": "正在确认付款…",
+          "failed": "无法确认购买状态，请稍后再查看。",
+          "owned": "已拥有",
+          "success": "购买完成。",
+          "timeout": "付款确认超时，请重新打开商店查看状态。",
+          "unavailable": "暂时无法购买，请稍后重试。"
+        },
+        "sort": {
+          "price_ascending": "价格从低到高",
+          "price_descending": "价格从高到低"
+        },
+        "status": {
+          "retry": "重试",
+          "unavailable": "无法加载商店，请稍后重试。"
+        },
+        "title": "装扮与商店"
+      },
+      "support": {
+        "diagnostics": {
+          "description": "日志文件将压缩并保存到桌面。与我们分享这些文件可帮助修复错误。",
+          "export": {
+            "action": "导出",
+            "failed": "无法导出诊断数据。",
+            "success": "诊断数据已保存到桌面。"
+          },
+          "title": "导出诊断数据"
+        },
+        "feedback": {
+          "action": "发送反馈",
+          "description": "如果遇到问题或需要帮助，你可以提交 GitHub Issue 与我们联系。",
+          "title": "反馈"
+        }
+      },
+      "tray": {
+        "app": {
+          "exit": "退出"
+        },
+        "connection": {
+          "error": {
+            "message": "请在连接状态中选择“重新连接”。如果 SIDEY 仍无法连接，请附上诊断日志联系我们。",
+            "title": "SIDEY 连接已断开"
+          }
+        },
+        "group": {
+          "active": "当前群组"
+        },
+        "groups": {
+          "empty": "没有已连接的群组",
+          "open": "群组设置…"
+        },
+        "history": {
+          "open": "最近消息…"
+        },
+        "message": {
+          "compose": "编写消息…"
+        },
+        "overlay": {
+          "hide": "隐藏浮层"
+        },
+        "quiet_mode": {
+          "toggle": "隐藏消息"
+        },
+        "settings": {
+          "open": "设置…"
+        },
+        "shortcuts": {
+          "registration_failed": "以下快捷键不可用: {0}。可能已被其他应用占用，请使用托盘菜单。"
+        },
+        "start": {
+          "failed": "无法启动托盘图标。关闭窗口将退出 SIDEY。"
+        },
+        "store": {
+          "open": "商店…"
+        },
+        "unread": {
+          "tooltip": "SIDEY · {0} 条未读消息"
+        },
+        "update": {
+          "available": "有可用更新。{0}",
+          "check": "检查更新…",
+          "check_failed": "无法检查更新，请稍后重试。",
+          "installed": "SIDEY 已更新至 {0}。单击鼠标左键可查看更新内容。",
+          "latest": "已是最新版本。"
+        }
+      },
+      "update": {
+        "available": "SIDEY {0} 已可用。",
+        "checking": "正在检查更新…",
+        "download": {
+          "hash_mismatch": "无法验证更新文件，请重新下载。",
+          "in_progress": "正在下载更新…",
+          "progress": "正在下载更新…({0}%)"
+        },
+        "failed": "无法完成更新，请稍后重试。",
+        "install": {
+          "cancelled": "已取消安装更新。",
+          "invalid": "无法下载更新，请稍后重试。",
+          "launch_failed": "无法打开安装程序，请选择“检查更新”后重试。",
+          "launched": "下载完成，安装程序已打开。",
+          "missing": "当前更新暂时无法下载，请稍后重试。"
+        },
+        "latest": "当前已是最新版本。",
+        "metadata": {
+          "invalid": "无法检查更新，请稍后重试。"
+        },
+        "not_published": "暂无可用的 Windows 更新。",
+        "prompt": {
+          "download": "下载",
+          "later": "以后再说",
+          "message": "要下载 SIDEY {0} 吗？",
+          "title": "有可用更新"
+        },
+        "release_notes": {
+          "open_failed": "无法打开更新说明: {0}"
+        }
+      },
+      "validation": {
+        "message": {
+          "length": "请输入 1–200 个字符的消息。"
+        },
+        "nickname": {
+          "length": "请输入 2–8 个字符的昵称。"
+        },
+        "room_name": {
+          "length": "请输入 1–20 个字符的群组名称。"
+        }
+      }
+    }
+  },
+  "profile": {
+    "applying": "正在应用",
+    "character": {
+      "label": "角色"
+    },
+    "nickname": {
+      "label": "昵称",
+      "placeholder": "2–8 个字符"
+    },
+    "title": "我的资料"
+  },
+  "settings": {
+    "display": {
+      "quiet_mode": {
+        "title": "隐藏消息"
+      }
+    },
+    "overlay": {
+      "title": "显示像素世界"
+    },
+    "placement": {
+      "edge": {
+        "bottom": "底部",
+        "left": "左侧",
+        "right": "右侧",
+        "top": "顶部"
+      }
+    },
+    "section": {
+      "display": {
+        "title": "显示"
+      },
+      "general": {
+        "title": "常规"
+      },
+      "sound": {
+        "title": "声音"
+      }
+    },
+    "window": {
+      "title": "SIDEY 设置"
+    },
+    "startup": {
+      "title": "登录时启动",
+      "description": "登录系统时自动启动应用。"
+    }
+  },
+  "store": {
+    "sort": {
+      "catalog": "默认顺序",
+      "label": "排序"
+    }
+  }
+}

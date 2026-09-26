@@ -3,10 +3,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:i18n="using:Sidey.App.Localization">
-  <Grid Padding="32">
+  <Grid x:Name="UnsupportedRoot" Padding="32">
     <StackPanel MaxWidth="520" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
-      <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=unsupported.title}, Mode=OneWay}" />
-      <TextBlock Text="{Binding Value, Source={i18n:I18n Key=unsupported.description}, Mode=OneWay}" TextWrapping="Wrap" />
+      <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=platform.requirements.title}, Mode=OneWay}" />
+      <TextBlock Text="{Binding Value, Source={i18n:I18n Key=platform.requirements.description}, Mode=OneWay}" TextWrapping="Wrap" />
     </StackPanel>
   </Grid>
 </Window>

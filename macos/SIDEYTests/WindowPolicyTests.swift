@@ -812,7 +812,7 @@ final class WindowPolicyTests: XCTestCase {
         XCTAssertNotNil(menu.item(withTitle: L10n.text("status.menu.group_settings")))
         XCTAssertNil(menu.item(withTitle: "업데이트 확인…"))
         XCTAssertEqual(menu.item(withTitle: L10n.text("status.menu.quiet_mode"))?.state, .on)
-        XCTAssertEqual(menu.item(withTitle: L10n.text("status.menu.launch_at_login"))?.state, .on)
+        XCTAssertEqual(menu.item(withTitle: L10n.text("settings.startup.title"))?.state, .on)
         let groups = try XCTUnwrap(menu.item(withTitle: L10n.text("status.menu.active_group"))?.submenu)
         XCTAssertEqual(groups.item(withTitle: "작업방")?.state, .on)
         let count = NumberFormatter.localizedString(from: NSNumber(value: 3), number: .decimal)

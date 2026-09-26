@@ -12,7 +12,7 @@ final class StoreReviewDebugWindow: NSWindowController {
         let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 620, height: 800),
             styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
         super.init(window: window)
-        window.title = L10n.text("store.review.window.title")
+        window.title = InternalL10n.text("store.review.window.title")
         window.isReleasedWhenClosed = false
         window.appearance = NSAppearance(named: .aqua)
         window.contentView = NSHostingView(rootView: StoreReviewDebugView(review: review) { [weak window] size in
@@ -33,7 +33,7 @@ final class StoreReviewDebugWindow: NSWindowController {
                         try capture(to: directory.appendingPathComponent(product.appStoreProductID + ".png"))
                     }
                     review.selectedID = CommerceProduct.pig.id
-                } catch { window.title = L10n.text("store.review.capture_failed") }
+                } catch { window.title = InternalL10n.text("store.review.capture_failed") }
             }
         }
     }
@@ -90,7 +90,7 @@ private final class StoreReviewSelection: ObservableObject {
     var actions: SettingsActions {
         var actions = SettingsActions.empty
         actions.onPurchase = { [weak self] _ in
-            self?.notice = L10n.text("store.review.purchase_disabled")
+            self?.notice = InternalL10n.text("store.review.purchase_disabled")
         }
         actions.onCharacterImpact = { [weak self] id, time in self?.audio.play(objectID: id, at: time) }
         actions.onStopCharacterSounds = { [weak self] in self?.audio.stopAll() }
@@ -104,14 +104,14 @@ private struct StoreReviewDebugView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Picker(L10n.text("store.review.product"), selection: $review.selectedID) {
+                Picker(InternalL10n.text("store.review.product"), selection: $review.selectedID) {
                     ForEach(CommerceCatalog.products, id: \.id) { Text($0.displayName).tag($0.id) }
                 }.frame(width: 270)
-                Picker(L10n.text("store.review.ownership"), selection: $review.ownership) {
-                    Text(L10n.text("store.review.ownership.none")).tag(0)
-                    Text(L10n.text("store.review.ownership.character")).tag(1)
-                    Text(L10n.text("store.review.ownership.keepsake")).tag(2)
-                    Text(L10n.text("store.review.ownership.all")).tag(3)
+                Picker(InternalL10n.text("store.review.ownership"), selection: $review.ownership) {
+                    Text(InternalL10n.text("store.review.ownership.none")).tag(0)
+                    Text(InternalL10n.text("store.review.ownership.character")).tag(1)
+                    Text(InternalL10n.text("store.review.ownership.keepsake")).tag(2)
+                    Text(InternalL10n.text("store.review.ownership.all")).tag(3)
                 }.frame(width: 150)
             }.padding(12)
             if !review.notice.isEmpty { Text(review.notice).font(.caption) }

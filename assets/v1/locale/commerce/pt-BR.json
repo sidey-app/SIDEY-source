@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Axolote estelar",
+    "description": "Este axolote levou uma estrela perdida para casa e a abraça bem forte, até enquanto dorme.",
+    "iap_description": "Um axolote que abraça uma estrela perdida."
+  },
+  "character_guinea_pig": {
+    "display_name": "Filhote de porquinho-da-índia",
+    "description": "Ele esqueceu onde escondeu o lanche. Pelas bochechas cheias, não deve estar muito longe.",
+    "iap_description": "Ele esqueceu onde escondeu o lanche."
+  },
+  "character_monkey": {
+    "display_name": "Macaquinho",
+    "description": "Ele veio compartilhar uma banana. Diz que só deu uma mordida no caminho… então por que já falta metade?",
+    "iap_description": "Ele veio compartilhar uma banana."
+  },
+  "character_chinchilla": {
+    "display_name": "Filhote de chinchila",
+    "description": "Acabou de sair do banho de areia e veio brincar. Antes de dar oi, precisa exibir todo esse pelo fofinho.",
+    "iap_description": "Saiu do banho de areia e veio brincar."
+  },
+  "character_otter": {
+    "display_name": "Filhote de lontra",
+    "description": "Ela veio mostrar sua concha favorita. Você pode olhar, mas ela vai fazer cara feia se você pegar.",
+    "iap_description": "Ela veio mostrar sua concha favorita."
+  },
+  "character_pig": {
+    "display_name": "Porquinho",
+    "description": "Ele seguiu o cheiro dos lanches e decidiu ficar. Agora acha que esta é a casa dele.",
+    "iap_description": "Seguiu o cheiro dos lanches e ficou."
+  },
+  "character_tree": {
+    "display_name": "Arvorezinha",
+    "description": "Uma arvorezinha saiu para passear. Quando mandaram que descansasse, ela começou a escolher onde criar raízes.",
+    "iap_description": "Uma arvorezinha saiu para passear."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Balão de coelhinho rosa",
+    "description": "Um balão de fala rosa decorado com um coelhinho.",
+    "iap_description": "Balão rosa decorado com um coelhinho."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Balão de pintinho manteiga",
+    "description": "Um balão de fala amarelo-manteiga decorado com um pintinho.",
+    "iap_description": "Balão amarelo-manteiga com um pintinho."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Balão de gato estrelado",
+    "description": "Um balão de fala violeta-escuro decorado com um gato estrelado.",
+    "iap_description": "Balão violeta com um gato estrelado."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Coração saltitante",
+    "description": "Um coração para arremessar que quica enquanto voa.",
+    "iap_description": "Coração arremessável que quica ao voar."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Minicanhão",
+    "description": "Um minicanhão para arremessar que dispara um projétil com o pavio aceso.",
+    "iap_description": "Minicanhão com projétil de pavio aceso."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Patinho de borracha",
+    "description": "Um pato arremessando outro pato. Provavelmente não é uma briga de família.",
+    "iap_description": "Um pato arremessando outro pato."
+  },
+  "throwable_snowflake": {
+    "display_name": "Floco de neve",
+    "description": "Um floco de neve que se espalha em pequenos cristais ao atingir o alvo.",
+    "iap_description": "Floco de neve que se desfaz em cristais."
+  },
+  "throwable_baseball": {
+    "display_name": "Bola de beisebol",
+    "description": "Uma bola com costuras vermelhas que se achata com o impacto e sai quicando.",
+    "iap_description": "Bola com costuras vermelhas que quica."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Bola Wakku",
+    "description": "Croc! Curta o som crocante da Bola Wakku se partindo em pedaços.",
+    "iap_description": "Croc! A Bola Wakku se parte em pedaços."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Cookie choco macio de Dubai",
+    "description": "A casquinha de cacau e o recheio verde se achatam com um croc muito satisfatório.",
+    "iap_description": "Casca de cacau e recheio verde crocante."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Mini-pimentão do porquinho",
+    "description": "Um lanche guardado com todo o cuidado. Se você pegar em até três segundos depois de arremessar, tudo bem, né?",
+    "iap_description": "Um lanche guardado com todo o cuidado."
+  },
+  "throwable_banana": {
+    "display_name": "Banana do macaquinho",
+    "description": "O macaquinho compartilhou esta banana. Ainda não conseguimos perguntar se foi de propósito.",
+    "iap_description": "O macaquinho compartilhou esta banana."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Saquinho de areia da chinchila",
+    "description": "É a areia de banho da chinchila. Jogar isso em você provavelmente não é uma indireta para tomar banho.",
+    "iap_description": "É a areia de banho da chinchila."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Orbe estelar do axolote",
+    "description": "Luz das estrelas concentrada em um pequeno orbe. Alguém conferiu se está faltando uma estrela no céu?",
+    "iap_description": "Luz estelar reunida em um pequeno orbe."
+  },
+  "throwable_clam": {
+    "display_name": "Concha da lontra",
+    "description": "A concha que a lontra levava para todo lado. Não há nenhuma pérola dentro, só um pouco de apego.",
+    "iap_description": "A concha que a lontra levava para todo lado."
+  },
+  "throwable_pork": {
+    "display_name": "Carne do porquinho",
+    "description": "Que tapa bem dado! Aliás, alguém viu o porquinho vizinho ultimamente?",
+    "iap_description": "Que tapa bem dado!"
+  },
+  "throwable_timber": {
+    "display_name": "Miniárvore da arvorezinha",
+    "description": "Uma árvore arremessa uma arvorezinha. Talvez seja melhor conferir a árvore genealógica primeiro.",
+    "iap_description": "Uma árvore arremessa uma arvorezinha."
+  },
+  "character_shiba": {
+    "display_name": "Shiba inu",
+    "description": "A gente já passeou. O shiba simplesmente se recusa a aceitar esse fato.",
+    "iap_description": "A gente já passeou."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Bola de tênis",
+    "description": "Escolhemos alguém para arremessar. Ainda estamos procurando alguém para buscar.",
+    "iap_description": "Escolhemos alguém para arremessar."
+  },
+  "character_duck": {
+    "display_name": "Pato",
+    "description": "Especialista em fugir das responsabilidades. Os pés de pato estão aí para provar.",
+    "iap_description": "Especialista em fugir das responsabilidades."
+  },
+  "character_poop": {
+    "display_name": "Cocô",
+    "description": "Não sabemos quem chamou, mas chegou.",
+    "iap_description": "Não sabemos quem chamou, mas chegou."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Bola de papel higiênico",
+    "description": "Ninguém sabe se é papel higiênico usado. É melhor desviar!",
+    "iap_description": "Ninguém sabe se é papel higiênico usado."
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Disseram que não era apimentado. Só não disseram para quem.",
+    "iap_description": "Disseram que não era apimentado."
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Espetinho de eomuk coreano",
+    "description": "Era para comer. Por que você está balançando isso desse jeito?",
+    "iap_description": "Era para comer."
+  },
+  "character_quokka": {
+    "display_name": "Quokka",
+    "description": "Sempre sorrindo. Sim, foi ele que acabou de arremessar aquela folha.",
+    "iap_description": "Sempre sorrindo."
+  },
+  "throwable_leaf": {
+    "display_name": "Folha",
+    "description": "É a marmita do quokka. Não perguntamos se ele deixava arremessar.",
+    "iap_description": "É a marmita do quokka."
+  }
+}

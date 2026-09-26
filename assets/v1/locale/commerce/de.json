@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Sternenlicht-Axolotl",
+    "description": "Dieses Axolotl hat einen verlorenen Stern mit nach Hause gebracht und hält ihn sogar im Schlaf fest umarmt.",
+    "iap_description": "Ein Axolotl, das einen Stern umarmt."
+  },
+  "character_guinea_pig": {
+    "display_name": "Meerschweinchenbaby",
+    "description": "Es hat vergessen, wo es seinen Snack versteckt hat. Diesen vollen Backen nach kann er nicht weit weg sein.",
+    "iap_description": "Snack versteckt – und prompt vergessen."
+  },
+  "character_monkey": {
+    "display_name": "Affenbaby",
+    "description": "Es ist gekommen, um eine Banane zu teilen. Unterwegs habe es nur einmal abgebissen, sagt es … Warum fehlt dann die Hälfte?",
+    "iap_description": "Brachte eine Banane. Warum fehlt die Hälfte?"
+  },
+  "character_chinchilla": {
+    "display_name": "Chinchillababy",
+    "description": "Frisch aus dem Sandbad ist es zum Spielen gekommen. Vor der Begrüßung muss es erst sein flauschiges Fell präsentieren.",
+    "iap_description": "Frisch aus dem Sandbad und extra flauschig."
+  },
+  "character_otter": {
+    "display_name": "Otterbaby",
+    "description": "Es ist gekommen, um seine Lieblingsmuschel zu zeigen. Anschauen ist erlaubt, aber wenn du sie wegnimmst, schmollt es.",
+    "iap_description": "Lieblingsmuschel ansehen, aber nicht nehmen."
+  },
+  "character_pig": {
+    "display_name": "Schweinchen",
+    "description": "Es ist dem Duft von Snacks gefolgt und hat beschlossen, zu bleiben. Jetzt hält es diesen Ort für sein Zuhause.",
+    "iap_description": "Dem Snackduft gefolgt und direkt eingezogen."
+  },
+  "character_tree": {
+    "display_name": "Bäumchen",
+    "description": "Ein kleines Bäumchen ging spazieren. Als es sich ausruhen sollte, begann es, einen Platz zum Wurzelschlagen zu suchen.",
+    "iap_description": "Sucht einen Platz für seine Wurzeln."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Rosa Häschen-Sprechblase",
+    "description": "Eine rosa Sprechblase mit einer Häschenverzierung.",
+    "iap_description": "Rosa Sprechblase mit Häschen."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Buttergelbe Küken-Sprechblase",
+    "description": "Eine buttergelbe Sprechblase mit einer Kükenverzierung.",
+    "iap_description": "Buttergelbe Sprechblase mit Küken."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Sternenkatzen-Sprechblase",
+    "description": "Eine tiefviolette Sprechblase mit einer Sternenkatzenverzierung.",
+    "iap_description": "Violette Sprechblase mit Sternenkatze."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Hüpfendes Herz",
+    "description": "Ein werfbares Herz, das beim Fliegen hüpft.",
+    "iap_description": "Ein Herz zum Werfen, das im Flug hüpft."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Minikanone",
+    "description": "Eine werfbare Minikanone, die ein Geschoss mit brennender Lunte abfeuert.",
+    "iap_description": "Minikanone mit brennender Lunte."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Quietscheente",
+    "description": "Eine Ente wirft eine Ente. Wahrscheinlich kein Familienstreit.",
+    "iap_description": "Ente wirft Ente. Kein Familienstreit."
+  },
+  "throwable_snowflake": {
+    "display_name": "Schneeflocke",
+    "description": "Eine Schneeflocke, die beim Aufprall in winzige Kristallsplitter zerfällt.",
+    "iap_description": "Zerspringt beim Aufprall in kleine Kristalle."
+  },
+  "throwable_baseball": {
+    "display_name": "Baseball",
+    "description": "Ein rot vernähter Ball, der beim Aufprall zusammengedrückt wird und davonhüpft.",
+    "iap_description": "Rote Nähte, ein Platsch und ein Hüpfer."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Wakku-Ball",
+    "description": "Knack! Genieße den knackigen Klang, wenn der Wakku-Ball in Stücke zerbricht.",
+    "iap_description": "Knack! Der Wakku-Ball zerbricht in Stücke."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Weicher Dubai-Schoko-Cookie",
+    "description": "Seine Kakaohülle und die grüne Füllung werden mit einem herrlich satten Knacken zusammengedrückt.",
+    "iap_description": "Kakaohülle, grüne Füllung und ein Knacken."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Meerschweinchen-Minipaprika",
+    "description": "Ein sorgfältig aufbewahrter Snack. Wenn du ihn innerhalb von drei Sekunden nach dem Werfen aufhebst, ist das doch in Ordnung, oder?",
+    "iap_description": "Snack gerettet. Drei-Sekunden-Regel gilt!"
+  },
+  "throwable_banana": {
+    "display_name": "Banane des Affenbabys",
+    "description": "Das Äffchen hat diese Banane geteilt. Wir konnten noch nicht fragen, ob das Absicht war.",
+    "iap_description": "Eine geteilte Banane. Angeblich."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Sandbeutel des Chinchillas",
+    "description": "Das ist der Badesand des Chinchillas. Ihn zu werfen, ist wahrscheinlich kein Hinweis darauf, dass du dich waschen solltest.",
+    "iap_description": "Badesand, wohl kein Hinweis zum Waschen."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Sternenkugel des Axolotls",
+    "description": "Sternenlicht in einer kleinen Kugel. Hat jemand geprüft, ob am Himmel ein Stern fehlt?",
+    "iap_description": "Gebündeltes Sternenlicht. Fehlt ein Stern?"
+  },
+  "throwable_clam": {
+    "display_name": "Muschel des Otters",
+    "description": "Die Muschel, die der Otter überallhin mitnahm. Darin ist keine Perle, nur ein wenig Anhänglichkeit.",
+    "iap_description": "Keine Perle, nur eine innige Bindung."
+  },
+  "throwable_pork": {
+    "display_name": "Schweinefleisch vom Ferkel",
+    "description": "Ein ordentlich satter Klaps! Übrigens: Hat jemand in letzter Zeit das Schweinchen von nebenan gesehen?",
+    "iap_description": "Klatsch! Wo ist das Schweinchen von nebenan?"
+  },
+  "throwable_timber": {
+    "display_name": "Miniaturbaum des Bäumchens",
+    "description": "Ein Baum wirft einen kleinen Baum. Vielleicht sollten wir zuerst den Stammbaum prüfen.",
+    "iap_description": "Ein Baum wirft einen Baum. Stammbaum prüfen!"
+  },
+  "character_shiba": {
+    "display_name": "Shiba Inu",
+    "description": "Wir waren bereits spazieren. Der Shiba weigert sich, das anzuerkennen.",
+    "iap_description": "Schon Gassi gewesen. Der Shiba leugnet alles."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Tennisball",
+    "description": "Wir haben jemanden zum Werfen gefunden. Jetzt suchen wir noch jemanden zum Holen.",
+    "iap_description": "Werfen geklärt. Wer holt den Ball?"
+  },
+  "character_duck": {
+    "display_name": "Ente",
+    "description": "Ein Profi darin, sich vor Verantwortung zu drücken. Die Entenfüße sind der Beweis.",
+    "iap_description": "Drückt sich vor allem – auf Entenfüßen."
+  },
+  "character_poop": {
+    "display_name": "Häufchen",
+    "description": "Keine Ahnung, wer gerufen hat, aber hier ist es.",
+    "iap_description": "Wer hat gerufen? Egal, hier ist es."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Toilettenpapierball",
+    "description": "Niemand weiß, ob es benutztes Toilettenpapier ist. Einfach ausweichen!",
+    "iap_description": "Benutzt oder nicht? Einfach ausweichen!"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Es sollte mild sein. Es wurde nur nie gesagt, nach wessen Maßstab.",
+    "iap_description": "Sollte mild sein. Für wen eigentlich?"
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Eomuk-Spieß",
+    "description": "Das war zum Essen gedacht. Warum schwingst du es herum?",
+    "iap_description": "Zum Essen gedacht. Warum wird es geschwenkt?"
+  },
+  "character_quokka": {
+    "display_name": "Quokka",
+    "description": "Immer am Lächeln. Ja, genau dieses Quokka hat gerade das Blatt geworfen.",
+    "iap_description": "Lächelt noch immer nach dem Blattwurf."
+  },
+  "throwable_leaf": {
+    "display_name": "Blatt",
+    "description": "Das ist das Lunchpaket des Quokkas. Wir haben nicht gefragt, ob wir es werfen dürfen.",
+    "iap_description": "Quokkas Lunchpaket. Ohne Erlaubnis geworfen."
+  }
+}

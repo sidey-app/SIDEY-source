@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Axolotl stelar",
+    "description": "Acest axolotl a adus acasă o stea rătăcită și o ține strâns în brațe chiar și în somn.",
+    "iap_description": "Un axolotl îmbrățișează o stea rătăcită."
+  },
+  "character_guinea_pig": {
+    "display_name": "Pui de porcușor de Guineea",
+    "description": "A uitat unde și-a ascuns gustarea. După obrăjorii aceia plini, nu poate fi prea departe.",
+    "iap_description": "A uitat unde și-a ascuns gustarea."
+  },
+  "character_monkey": {
+    "display_name": "Pui de maimuță",
+    "description": "A venit să împartă o banană. Spune că a luat o singură înghițitură pe drum… atunci de ce lipsește jumătate?",
+    "iap_description": "A venit să împartă o banană."
+  },
+  "character_chinchilla": {
+    "display_name": "Pui de chinchilla",
+    "description": "Proaspăt ieșită din baia de nisip, a venit la joacă. Înainte să salute, trebuie să-și etaleze blănița pufoasă.",
+    "iap_description": "După baia de nisip, a venit la joacă."
+  },
+  "character_otter": {
+    "display_name": "Pui de vidră",
+    "description": "A venit să-și arate scoica preferată. O puteți admira, dar se va bosumfla dacă i-o luați.",
+    "iap_description": "A venit să-și arate scoica preferată."
+  },
+  "character_pig": {
+    "display_name": "Purceluș",
+    "description": "A urmat mirosul gustărilor și a decis să rămână. Acum crede că aici este acasă.",
+    "iap_description": "A urmat mirosul gustărilor și a rămas."
+  },
+  "character_tree": {
+    "display_name": "Copăcel",
+    "description": "Un copăcel a ieșit la plimbare. Când i s-a spus să ia o pauză, a început să-și aleagă locul unde să prindă rădăcini.",
+    "iap_description": "Un copăcel a ieșit la plimbare."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Bulă cu iepuraș roz",
+    "description": "O bulă de dialog roz, decorată cu un iepuraș.",
+    "iap_description": "O bulă de dialog roz, decorată cu un iepuraș."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Bulă cu pui galben",
+    "description": "O bulă de dialog galben-unt, decorată cu un pui.",
+    "iap_description": "Bulă galben-unt decorată cu un pui."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Bulă cu pisică înstelată",
+    "description": "O bulă de dialog violet închis, decorată cu o pisică înstelată.",
+    "iap_description": "Bulă violet decorată cu o pisică înstelată."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Inimă săltăreață",
+    "description": "O inimă de aruncat care saltă în timp ce zboară.",
+    "iap_description": "Inimă de aruncat care saltă în zbor."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Tunuleț",
+    "description": "Un tunuleț de aruncat care trage un proiectil cu fitil aprins.",
+    "iap_description": "Tunuleț cu proiectil și fitil aprins."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Rățușcă piuitoare",
+    "description": "O rață care aruncă o rață. Probabil nu este o ceartă în familie.",
+    "iap_description": "O rață care aruncă o rață."
+  },
+  "throwable_snowflake": {
+    "display_name": "Fulg de nea",
+    "description": "Un fulg de nea care, la impact, se împrăștie în cioburi mici de cristal.",
+    "iap_description": "Fulg de nea care se sparge în cristale."
+  },
+  "throwable_baseball": {
+    "display_name": "Minge de baseball",
+    "description": "O minge cu cusături roșii, care se turtește la impact și sare mai departe.",
+    "iap_description": "Minge cu cusături roșii care sare."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Mingea Wakku",
+    "description": "Poc! Bucurați-vă de sunetul crocant când mingea Wakku se sparge în bucăți.",
+    "iap_description": "Poc! Mingea Wakku se sparge în bucăți."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Biscuit moale cu cacao Dubai",
+    "description": "Învelișul de cacao și umplutura verde se turtesc cu un sunet crocant și satisfăcător.",
+    "iap_description": "Cacao crocantă cu umplutură verde."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Mini-ardeiul porcușorului",
+    "description": "O gustare păstrată cu grijă. Dacă o ridicați în trei secunde după ce ați aruncat-o, încă este în regulă, nu?",
+    "iap_description": "O gustare păstrată cu grijă."
+  },
+  "throwable_banana": {
+    "display_name": "Banana maimuței",
+    "description": "Maimuța a împărțit această banană. Nu am apucat încă să întrebăm dacă a făcut-o intenționat.",
+    "iap_description": "Maimuța a împărțit această banană."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Săculeț cu nisip de chinchilla",
+    "description": "Este nisipul de baie al chinchillei. Faptul că îl aruncă probabil nu înseamnă că trebuie să vă spălați.",
+    "iap_description": "Este nisipul de baie al chinchillei."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Globul stelar al axolotlului",
+    "description": "Lumină stelară strânsă într-un glob mic. A verificat cineva dacă lipsește o stea de pe cer?",
+    "iap_description": "Lumină stelară strânsă într-un glob mic."
+  },
+  "throwable_clam": {
+    "display_name": "Scoica vidrei",
+    "description": "Scoica pe care vidra o purta peste tot. Înăuntru nu este nicio perlă, doar un pic de atașament rămas.",
+    "iap_description": "Scoica pe care vidra o purta peste tot."
+  },
+  "throwable_pork": {
+    "display_name": "Bucățică de porc de la purcel",
+    "description": "O plesnitură zdravănă și satisfăcătoare! Apropo, a mai văzut cineva purcelul vecin în ultima vreme?",
+    "iap_description": "O plesnitură zdravănă și satisfăcătoare!"
+  },
+  "throwable_timber": {
+    "display_name": "Copăcelul copăcelului",
+    "description": "Un copac aruncă un copăcel. Poate ar trebui să verificăm mai întâi arborele genealogic.",
+    "iap_description": "Un copac aruncă un copăcel."
+  },
+  "character_shiba": {
+    "display_name": "Shiba Inu",
+    "description": "Am ieșit deja la plimbare. Shiba refuză să recunoască acest fapt.",
+    "iap_description": "Am ieșit deja la plimbare."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Minge de tenis",
+    "description": "Am găsit pe cineva care să o arunce. Încă îl căutăm pe cel care să o aducă.",
+    "iap_description": "Am găsit pe cineva care să o arunce."
+  },
+  "character_duck": {
+    "display_name": "Rață",
+    "description": "O expertă în a se feri de răspundere. Lăbuțele de rață o dovedesc.",
+    "iap_description": "O expertă în a se feri de răspundere."
+  },
+  "character_poop": {
+    "display_name": "Caca",
+    "description": "Nu știm sigur cine a chemat-o, dar iat-o.",
+    "iap_description": "Nu știm sigur cine a chemat-o, dar iat-o."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Bilă de hârtie igienică",
+    "description": "Nimeni nu știe dacă hârtia igienică a fost folosită. Feriți-vă din calea ei!",
+    "iap_description": "Folosită sau nu? Ferește-te de hârtie!"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Au spus că nu este picant. Nu au spus însă după standardele cui.",
+    "iap_description": "Au spus că nu este picant."
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Frigăruie cu eomuk coreean",
+    "description": "Trebuia mâncată. De ce o fluturați prin aer?",
+    "iap_description": "Trebuia mâncată. De ce o fluturați prin aer?"
+  },
+  "character_quokka": {
+    "display_name": "Quokka",
+    "description": "Zâmbește mereu. Da, chiar ea tocmai a aruncat frunza aceea.",
+    "iap_description": "Zâmbește mereu."
+  },
+  "throwable_leaf": {
+    "display_name": "Frunză",
+    "description": "Este prânzul la pachet al quokkăi. Nu am întrebat-o dacă putem să-l aruncăm.",
+    "iap_description": "Este prânzul la pachet al quokkăi."
+  }
+}

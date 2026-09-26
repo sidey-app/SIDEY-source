@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "請使用 scripts/macos/open_current.sh 重新開啟，或在 Xcode 中建置後執行。",
+          "unverified_source": "無法確認此 App 是否由目前的原始碼建置。"
+        }
+      },
+      "common": {
+        "quit": "結束"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "請同時設定 SIDEY_SUPABASE_URL 與 SIDEY_SUPABASE_PUBLISHABLE_KEY。",
+          "missing_development_configuration": "Sidey-dev 需要 SIDEY-staging URL 與 publishable key。",
+          "production_backend_in_development": "Sidey-dev 無法連線至正式環境的 Supabase 專案。",
+          "secret_key_not_allowed": "用戶端不可使用 Supabase secret/service-role 金鑰。",
+          "unsupported_realtime_protocol": "SIDEY 即時通訊協定設定含有不支援的值。"
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "未提交的變更"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "商店檢查 · 擷取失敗",
+          "ownership": {
+            "$value": "擁有狀態",
+            "all": "兩者",
+            "character": "僅角色",
+            "keepsake": "僅珍藏物",
+            "none": "未擁有"
+          },
+          "product": "商品",
+          "purchase_disabled": "檢查畫面不會進行實際購買。",
+          "window": {
+            "title": "Sidey-dev · 商店檢查 · 不會實際購買"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "由於未設定後端伺服器環境變數，目前正以包含 12 個角色的本機預覽模式執行。"
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "指標算繪器未在執行。",
+          "not_started": "指標算繪器尚未啟動。"
+        },
+        "export": {
+          "action": "匯出目前指標 JSON",
+          "failed": "匯出指標失敗: {0}",
+          "path": "匯出路徑: {0}",
+          "success": "目前的指標 JSON 已匯出，手動結果仍為 not_run。",
+          "tooltip": "將目前的算繪效能指標儲存為 JSON。"
+        },
+        "preview_notice": "內部倉鼠限定算繪指標模式，尚未記錄手動驗證結果。",
+        "samples": {
+          "empty": "沒有指標樣本"
+        },
+        "summary": "經過 {0:F0} 秒 · {1} 個樣本 · 最大畫格時間 {2:F2} 毫秒 · 工作集 {3:F1} MB (峰值 {4:F1} MB) · GDI {5} · USER {6}",
+        "title": "內部算繪指標"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Supabase 覆寫設定需要 HTTPS URL (localhost 可使用 HTTP) 和可發佈金鑰。不得使用 secret 或 service-role 金鑰。"
+        }
+      }
+    }
+  }
+}

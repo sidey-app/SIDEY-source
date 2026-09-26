@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Ajolote estelar",
+    "description": "Este ajolote encontró una estrella perdida y se la llevó a casa. La abraza con fuerza hasta cuando duerme.",
+    "iap_description": "Un ajolote que abraza una estrella al dormir."
+  },
+  "character_guinea_pig": {
+    "display_name": "Cría de cobaya",
+    "description": "Ha olvidado dónde escondió su merienda. Por esos mofletes tan llenos, no puede andar muy lejos.",
+    "iap_description": "Escondió la merienda y olvidó dónde."
+  },
+  "character_monkey": {
+    "display_name": "Monito",
+    "description": "Vino a compartir un plátano. Dice que solo le dio un mordisco por el camino… entonces, ¿por qué falta la mitad?",
+    "iap_description": "Trajo un plátano. ¿Por qué falta la mitad?"
+  },
+  "character_chinchilla": {
+    "display_name": "Cría de chinchilla",
+    "description": "Recién salida de su baño de arena, ha venido a jugar. Antes de saludar, tiene que presumir de ese pelaje tan suave.",
+    "iap_description": "Recién salida del baño de arena y muy suave."
+  },
+  "character_otter": {
+    "display_name": "Cría de nutria",
+    "description": "Ha venido a enseñar su almeja favorita. Puedes mirar, pero se enfadará si se la quitas.",
+    "iap_description": "Mira su almeja favorita, pero no la cojas."
+  },
+  "character_pig": {
+    "display_name": "Cerdito",
+    "description": "Siguió el olor de la comida y decidió quedarse. Ahora cree que esta es su casa.",
+    "iap_description": "Siguió el olor de la comida y se instaló."
+  },
+  "character_tree": {
+    "display_name": "Arbolito",
+    "description": "Un arbolito salió a pasear. Cuando le dijeron que descansara, empezó a buscar dónde echar raíces.",
+    "iap_description": "De paseo, buscando dónde echar raíces."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Bocadillo de conejito rosa",
+    "description": "Un bocadillo rosa decorado con un conejito.",
+    "iap_description": "Un bocadillo rosa decorado con un conejito."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Globo Pollito Mantequilla",
+    "description": "Un bocadillo amarillo mantequilla decorado con un pollito.",
+    "iap_description": "Bocadillo amarillo mantequilla con pollito."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Bocadillo de gato estrellado",
+    "description": "Un bocadillo violeta intenso decorado con un gato estrellado.",
+    "iap_description": "Bocadillo violeta con gato estrellado."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Corazón saltarín",
+    "description": "Un corazón arrojadizo que rebota mientras vuela.",
+    "iap_description": "Un corazón de juguete que rebota al volar."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Minicañón",
+    "description": "Un minicañón arrojadizo que dispara un proyectil con la mecha encendida.",
+    "iap_description": "Un minicañón con un proyectil con mecha."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Patito de goma",
+    "description": "Un pato que lanza otro pato. Seguramente no sea una disputa familiar.",
+    "iap_description": "Un pato lanza otro. No es cosa de familia."
+  },
+  "throwable_snowflake": {
+    "display_name": "Copo de nieve",
+    "description": "Un copo de nieve que se deshace en pequeños cristales al impactar.",
+    "iap_description": "Se deshace en cristalitos al impactar."
+  },
+  "throwable_baseball": {
+    "display_name": "Pelota de béisbol",
+    "description": "Una pelota con costuras rojas que se aplasta al impactar y sale rebotando.",
+    "iap_description": "Costuras rojas, se aplasta y rebota."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Pelota Wakku",
+    "description": "¡Crac! Disfruta del crujido de la pelota Wakku al romperse en pedazos.",
+    "iap_description": "¡Crac! La pelota Wakku se rompe en pedazos."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Galleta tierna de Dubái",
+    "description": "Su cobertura de cacao y su relleno verde se aplastan con un crujido de lo más satisfactorio.",
+    "iap_description": "Cobertura de cacao, relleno verde y crujido."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Mini pimiento de la cobaya",
+    "description": "Una merienda guardada con mucho cuidado. Si la recoges antes de tres segundos después de lanzarla, no pasa nada, ¿verdad?",
+    "iap_description": "Merienda guardada. ¡Regla de 3 segundos!"
+  },
+  "throwable_banana": {
+    "display_name": "Plátano del monito",
+    "description": "El monito compartió este plátano. Aún no hemos podido preguntarle si lo hizo a propósito.",
+    "iap_description": "Un plátano compartido. Supuestamente."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Bolsa de arena de chinchilla",
+    "description": "Es la arena de baño de la chinchilla. Lanzártela seguramente no sea una indirecta para que te laves.",
+    "iap_description": "Arena de baño, no una indirecta para lavarte."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Orbe estelar del ajolote",
+    "description": "Luz de estrella concentrada en un pequeño orbe. ¿Alguien ha comprobado si falta una estrella en el cielo?",
+    "iap_description": "Luz estelar. ¿Falta una estrella en el cielo?"
+  },
+  "throwable_clam": {
+    "display_name": "Almeja de la nutria",
+    "description": "La almeja que la nutria llevaba a todas partes. Dentro no hay una perla, solo algo de apego.",
+    "iap_description": "Sin perla, pero con mucho apego."
+  },
+  "throwable_pork": {
+    "display_name": "Carne del cerdito",
+    "description": "¡Menudo tortazo! Por cierto, ¿alguien ha visto últimamente al cerdito de al lado?",
+    "iap_description": "¡Paf! ¿Dónde está el cerdito de al lado?"
+  },
+  "throwable_timber": {
+    "display_name": "Miniárbol del arbolito",
+    "description": "Un árbol lanza un arbolito. Quizá deberíamos revisar primero el árbol genealógico.",
+    "iap_description": "Un árbol lanza otro. ¿Son familia?"
+  },
+  "character_shiba": {
+    "display_name": "Shiba inu",
+    "description": "Ya hemos salido a pasear. El shiba se niega a reconocerlo.",
+    "iap_description": "Ya salió a pasear. El shiba lo niega todo."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Pelota de tenis",
+    "description": "Ya elegimos a alguien para lanzarla. Aún buscamos a alguien que vaya a recogerla.",
+    "iap_description": "Ya hay quien la lance. ¿Quién irá a buscarla?"
+  },
+  "character_duck": {
+    "display_name": "Pato",
+    "description": "Todo un experto en escurrir el bulto. Sus patas de pato lo demuestran.",
+    "iap_description": "Elude toda culpa sobre sus patas de pato."
+  },
+  "character_poop": {
+    "display_name": "Caca",
+    "description": "No sabemos quién la pidió, pero aquí está.",
+    "iap_description": "No sabemos quién la pidió, pero aquí está."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Bola de papel higiénico",
+    "description": "Nadie sabe si el papel higiénico está usado. ¡Tú esquívalo!",
+    "iap_description": "¿Usado o no? Nadie lo sabe. ¡Esquívalo!"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Dijeron que no picaba. Nunca dijeron para quién.",
+    "iap_description": "Dijeron que no picaba. ¿Según quién?"
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Brocheta de pasta de pescado",
+    "description": "Era para comérsela. ¿Por qué la estás agitando?",
+    "iap_description": "Era para comer. ¿Por qué la agitas?"
+  },
+  "character_quokka": {
+    "display_name": "Quokka",
+    "description": "Siempre sonríe. Sí, es quien acaba de lanzar esa hoja.",
+    "iap_description": "Sigue sonriendo tras lanzar esa hoja."
+  },
+  "throwable_leaf": {
+    "display_name": "Hoja",
+    "description": "Es la comida para llevar del quokka. No le preguntamos si podíamos lanzarla.",
+    "iap_description": "La comida del quokka, lanzada sin permiso."
+  }
+}

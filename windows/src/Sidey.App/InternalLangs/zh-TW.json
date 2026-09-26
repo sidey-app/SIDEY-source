@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Supabase 覆寫設定需要 HTTPS URL (localhost 可使用 HTTP) 和可發佈金鑰。不得使用 secret 或 service-role 金鑰。"
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "由於未設定後端伺服器環境變數，目前正以包含 12 個角色的本機預覽模式執行。"
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "指標算繪器未在執行。",
+      "not_started": "指標算繪器尚未啟動。"
+    },
+    "export": {
+      "action": "匯出目前指標 JSON",
+      "failed": "匯出指標失敗: {0}",
+      "path": "匯出路徑: {0}",
+      "success": "目前的指標 JSON 已匯出，手動結果仍為 not_run。",
+      "tooltip": "將目前的算繪效能指標儲存為 JSON。"
+    },
+    "preview_notice": "內部倉鼠限定算繪指標模式，尚未記錄手動驗證結果。",
+    "samples": {
+      "empty": "沒有指標樣本"
+    },
+    "summary": "經過 {0:F0} 秒 · {1} 個樣本 · 最大畫格時間 {2:F2} 毫秒 · 工作集 {3:F1} MB (峰值 {4:F1} MB) · GDI {5} · USER {6}",
+    "title": "內部算繪指標"
+  }
+}

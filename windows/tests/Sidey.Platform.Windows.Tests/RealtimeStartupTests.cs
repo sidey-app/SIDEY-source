@@ -686,10 +686,10 @@ public sealed class RealtimeStartupTests
     }
 
     [Theory]
-    [InlineData("ConnectionRateLimitReached: quota reached", "connection.busy")]
-    [InlineData("RealtimeDisabledForTenant: upgrade required", "connection.configurationUnavailable")]
-    [InlineData("Unauthorized: denied", "connection.accessRequired")]
-    [InlineData("Unknown Error on Channel", "connection.serviceUnavailable")]
+    [InlineData("ConnectionRateLimitReached: quota reached", "connection.error.busy")]
+    [InlineData("RealtimeDisabledForTenant: upgrade required", "connection.error.configuration_unavailable")]
+    [InlineData("Unauthorized: denied", "connection.error.access_required")]
+    [InlineData("Unknown Error on Channel", "connection.error.service_unavailable")]
     public void ServerRejectionsUseActionableMessagesWithoutProviderDetails(string reason, string messageKey)
     {
         using var payload = JsonDocument.Parse(JsonSerializer.Serialize(new { response = new { reason } }));
@@ -706,9 +706,9 @@ public sealed class RealtimeStartupTests
     }
 
     [Theory]
-    [InlineData(400, "connection.configurationUnavailable")]
-    [InlineData(403, "connection.configurationUnavailable")]
-    [InlineData(401, "connection.accessRequired")]
+    [InlineData(400, "connection.error.configuration_unavailable")]
+    [InlineData(403, "connection.error.configuration_unavailable")]
+    [InlineData(401, "connection.error.access_required")]
     public void HandshakeHttpFailuresAvoidUnsupportedAccountAdvice(int statusCode, string messageKey)
     {
         var exception = new HttpRequestException(
@@ -722,9 +722,9 @@ public sealed class RealtimeStartupTests
     [Fact]
     public void TrayConnectionFailureOffersManualRecoveryWithoutPromisingAutomaticRetry()
     {
-        string message = I18n.Get("tray.connectionFailedBody");
+        string message = I18n.Get("tray.connection.error.message");
 
-        Assert.Contains(I18n.Get("connection.retry"), message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(I18n.Get("connection.retry.action"), message, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("automatically", message, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("자동", message, StringComparison.Ordinal);
     }
@@ -760,7 +760,7 @@ public sealed class RealtimeStartupTests
             server.Token);
         BackendEvent.TechnicalError error = await WaitForEventAsync<BackendEvent.TechnicalError>(transport);
 
-        Assert.Equal(I18n.Get("connection.busy"), error.Message);
+        Assert.Equal(I18n.Get("connection.error.busy"), error.Message);
         Assert.DoesNotContain("ConnectionRateLimitReached", error.Message, StringComparison.Ordinal);
         Assert.DoesNotContain("quota", error.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -811,7 +811,7 @@ public sealed class RealtimeStartupTests
                 Stage: "realtime-reconnect-paused reason=configuration",
             });
         BackendEvent.TechnicalError error = await WaitForEventAsync<BackendEvent.TechnicalError>(transport);
-        Assert.Equal(I18n.Get("connection.configurationUnavailable"), error.Message);
+        Assert.Equal(I18n.Get("connection.error.configuration_unavailable"), error.Message);
 
         network.ChangePath();
         transport.RequestReconnect();
@@ -862,7 +862,7 @@ public sealed class RealtimeStartupTests
                 Stage: "realtime-reconnect-paused reason=configuration",
             });
         BackendEvent.TechnicalError error = await WaitForEventAsync<BackendEvent.TechnicalError>(transport);
-        Assert.Equal(I18n.Get("connection.configurationUnavailable"), error.Message);
+        Assert.Equal(I18n.Get("connection.error.configuration_unavailable"), error.Message);
 
         network.ChangePath();
         transport.RequestReconnect();
@@ -892,8 +892,8 @@ public sealed class RealtimeStartupTests
         var network = new SocketException((int)SocketError.NetworkUnreachable);
         var secure = new AuthenticationException("Handshake failed.", new IOException("Certificate error."));
 
-        Assert.Equal(I18n.Get("connection.networkUnavailable"), RealtimeUserErrorMessage.From(network));
-        Assert.Equal(I18n.Get("connection.secureConnectionFailed"), RealtimeUserErrorMessage.From(secure));
+        Assert.Equal(I18n.Get("connection.error.network_unavailable"), RealtimeUserErrorMessage.From(network));
+        Assert.Equal(I18n.Get("connection.error.secure_connection_failed"), RealtimeUserErrorMessage.From(secure));
     }
 
     [Fact]

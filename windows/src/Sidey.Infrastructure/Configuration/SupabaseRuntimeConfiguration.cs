@@ -11,13 +11,25 @@ public sealed record SupabaseRuntimeConfiguration(Uri Url, string PublishableKey
 
     public static SupabaseRuntimeConfiguration FromEnvironment()
     {
+#if DEBUG
+        return FromEnvironment(allowOverride: true);
+#else
+        return FromEnvironment(allowOverride: false);
+#endif
+    }
+
+    internal static SupabaseRuntimeConfiguration FromEnvironment(bool allowOverride)
+    {
+        if (!allowOverride)
+        {
+            return Production();
+        }
+
         string? url = Environment.GetEnvironmentVariable("SIDEY_SUPABASE_URL")?.Trim();
         string? key = Environment.GetEnvironmentVariable("SIDEY_SUPABASE_PUBLISHABLE_KEY")?.Trim();
         if (string.IsNullOrEmpty(url) && string.IsNullOrEmpty(key))
         {
-            return new SupabaseRuntimeConfiguration(
-                new Uri($"https://{ProductionHost}"),
-                ProductionPublishableKey);
+            return Production();
         }
 
         if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? parsed)
@@ -26,11 +38,15 @@ public sealed record SupabaseRuntimeConfiguration(Uri Url, string PublishableKey
             || LooksLikeSecretKey(key))
         {
             throw new InvalidOperationException(
-                I18n.Get("backend.invalidOverride"));
+                I18n.Get("configuration.backend.override_invalid"));
         }
 
         return new SupabaseRuntimeConfiguration(parsed, key);
     }
+
+    private static SupabaseRuntimeConfiguration Production() => new(
+        new Uri($"https://{ProductionHost}"),
+        ProductionPublishableKey);
 
     internal static bool IsAllowedBackend(Uri url) =>
         url.Scheme == Uri.UriSchemeHttps

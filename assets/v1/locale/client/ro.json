@@ -1,0 +1,1630 @@
+{
+  "character": {
+    "pixel_cat": {
+      "display_name": "Pisicuță"
+    },
+    "pixel_hamster": {
+      "display_name": "Pui de hamster"
+    },
+    "pixel_penguin": {
+      "display_name": "Pui de pinguin"
+    },
+    "pixel_puppy": {
+      "display_name": "Cățeluș"
+    },
+    "pixel_rabbit": {
+      "display_name": "Iepuraș"
+    },
+    "unknown": {
+      "display_name": "Personaj"
+    }
+  },
+  "common": {
+    "cancel": "Anulați",
+    "close": "Închideți",
+    "continue": "Continuați",
+    "me": "Eu",
+    "next": "Următorul",
+    "save": "Salvați"
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "Alăturați-vă cu un cod de invitație"
+    },
+    "collapse": "Restrângeți grupul",
+    "create": {
+      "action": "Creați un grup",
+      "name": {
+        "placeholder": "Numele grupului"
+      }
+    },
+    "delete": {
+      "action": "Ștergeți grupul"
+    },
+    "expand": "Extindeți grupul",
+    "member": {
+      "remove": {
+        "action": "Eliminați"
+      }
+    },
+    "rename": {
+      "action": "Redenumiți",
+      "name_placeholder": "Numele grupului, 1–20 de caractere"
+    },
+    "room_name": {
+      "label": "Numele grupului"
+    }
+  },
+  "history": {
+    "load_more": {
+      "failed": "Mesajele mai vechi nu au putut fi încărcate.",
+      "loading": "Se încarcă mesajele mai vechi…"
+    },
+    "loading": "Se încarcă mesajele recente…"
+  },
+  "message": {
+    "send": {
+      "accessibility": "Trimiteți mesajul"
+    }
+  },
+  "onboarding": {
+    "character": {
+      "label": "Personajul meu"
+    },
+    "group": {
+      "create": {
+        "description": "Creați un grup."
+      },
+      "description": "Creați un grup sau alăturați-vă cu un cod de invitație pentru a da viață lumii pixelate.",
+      "title": "Creați un grup cu prietenii"
+    },
+    "step": {
+      "group": "Grup",
+      "profile": "Profil"
+    }
+  },
+  "platforms": {
+    "macos": {
+        "account": {
+            "delete": {
+                "failed": "Contul nu a putut fi șters. Încercați din nou."
+            }
+        },
+        "account_delete": {
+            "error": {
+                "request_failed": "Solicitarea de ștergere a contului nu a putut fi finalizată. Încercați din nou."
+            }
+        },
+        "app": {
+            "settings": {
+                "navigation_label": "Setările aplicației"
+            }
+        },
+        "apple_auth": {
+            "error": {
+                "missing_authorization_code": "Autentificarea cu Apple nu a putut fi finalizată. Încercați din nou.",
+                "missing_identity_token": "Autentificarea cu Apple nu a putut fi finalizată. Încercați din nou.",
+                "missing_request_nonce": "Autentificarea cu Apple nu a putut fi finalizată. Încercați din nou."
+            }
+        },
+        "auth": {
+            "apple": {
+                "description": "În versiunea din App Store, autentificarea cu Apple este necesară pentru restaurarea cumpărăturilor și protejarea contului.",
+                "title": "Autentificare cu Apple",
+                "verifying": "Se verifică autentificarea"
+            },
+            "apple_sign_in": {
+                "failed": "Autentificarea cu Apple nu a reușit. Încercați din nou."
+            }
+        },
+        "backend": {
+            "connect": {
+                "failed_detail": "Conectarea la server nu a reușit. Verificați conexiunea la internet și încercați din nou. (%@)"
+            },
+            "connection": {
+                "connecting": "Se conectează",
+                "failed": "Eroare de conexiune",
+                "idle": "În așteptare",
+                "online": "Conectat"
+            },
+            "error": {
+                "already_member": "V-ați alăturat deja acestui grup.",
+                "authentication_required": "Autentificați-vă din nou pentru a continua.",
+                "current_user_unavailable": "Autentificarea nu a putut fi verificată. Autentificați-vă din nou.",
+                "generic": "Solicitarea nu a putut fi finalizată. Încercați din nou mai târziu.",
+                "invalid_invite_code": "Verificați codul de invitație și încercați din nou.",
+                "invalid_message": "Introduceți un mesaj de cel mult 200 de caractere și 3 rânduri.",
+                "invalid_profile": "Introduceți o poreclă de 2–8 caractere, fără sfârșituri de rând.",
+                "invalid_room_name": "Introduceți un nume de grup de 1–20 de caractere, fără sfârșituri de rând.",
+                "invalid_timestamp": "Detaliile mesajului nu au putut fi citite. Încercați din nou mai târziu.",
+                "invite_rate_limited": "Prea multe încercări de introducere a codului. Încercați din nou peste 10 minute.",
+                "malformed_response": "Solicitarea nu a putut fi finalizată. Încercați din nou mai târziu.",
+                "member_limit_reached": {
+                    "one": "Acest grup este deja complet, cu %lld membru.",
+                    "other": "Acest grup este deja complet, cu %lld membri."
+                },
+                "member_not_found": "Membrul de eliminat nu a putut fi găsit.",
+                "membership_required": "Numai membrii acestui grup pot face acest lucru.",
+                "message_receive_failed": "Mesajul nu a putut fi primit. Încercați din nou mai târziu.",
+                "no_active_room": "Alegeți un grup înainte de a trimite un mesaj.",
+                "owner_cannot_remove_self": "Proprietarul grupului nu se poate elimina pe sine.",
+                "owner_required": "Numai proprietarul grupului poate face acest lucru.",
+                "profile_required": "Salvați mai întâi profilul.",
+                "realtime_unavailable": "Conexiunea la server este încă în curs de pregătire. Încercați din nou în curând.",
+                "room_limit_reached": "Fiecare persoană poate folosi până la 5 grupuri.",
+                "room_resync_failed": "Cea mai recentă stare a grupului nu a putut fi încărcată. Încercați din nou mai târziu.",
+                "session_recovery_failed": "Autentificarea anterioară nu a putut fi restaurată. Nu a fost creat niciun cont nou. Autentificați-vă din nou sau contactați asistența.",
+                "stale_realtime_epoch": "Accesul la grup s-a schimbat. Reconectați-vă pentru a continua."
+            },
+            "realtime_recovery_failed": "Reconectarea la server nu a reușit. Încercați din nou în curând. (%@)"
+        },
+        "commerce": {
+            "character": {
+                "equip": {
+                    "failed": "Personajul nu a putut fi echipat. Încercați din nou. (%@)",
+                    "success": "%@ a fost echipat."
+                }
+            },
+            "equipment": {
+                "success": {
+                    "default_bubble": "Bula de dialog implicită a fost echipată.",
+                    "default_character": "Personajul implicit a fost echipat.",
+                    "default_throwable": "Mingea moale implicită a fost echipată.",
+                "named": "Echipat: %@."
+                }
+            },
+            "error": {
+                "catalog_unavailable": "Magazinul nu a putut fi încărcat. Încercați din nou mai târziu."
+            },
+            "kind": {
+                "bubble": "Bule de dialog",
+                "character": "Personaje",
+                "throwable": "Jucării de aruncat"
+            }
+        },
+        "common": {
+            "retry": "Încercați din nou"
+        },
+        "composer": {
+            "drag": {
+                "accessibility": "Mutați mânerul câmpului de mesaj",
+                "tooltip": "Mutați câmpul de mesaj"
+            }
+        },
+        "connection": {
+            "state": {
+                "connecting": "Se conectează…",
+                "failed": "Eroare de conexiune",
+                "idle": "Inactiv",
+                "online": "Conectat"
+            }
+        },
+        "firebase": {
+            "auth": {
+                "error": {
+                    "account_mismatch": "Contul autentificat s-a schimbat. Autentificați-vă din nou.",
+                    "invalid_rollout_lease_claim": "Autentificarea pentru conexiunea la server nu a putut fi verificată. Autentificați-vă din nou.",
+                    "invalid_session_claim": "Autentificarea nu a putut fi verificată. Autentificați-vă din nou.",
+                    "login_mismatch": "Autentificarea nu corespunde contului curent. Autentificați-vă din nou.",
+                    "malformed_account_identifier": "Contul nu a putut fi verificat. Autentificați-vă din nou.",
+                    "rollout_lease_expired": "Autentificarea a expirat. Autentificați-vă din nou.",
+                    "rollout_lease_mismatch": "Autentificarea curentă nu permite conectarea la server. Autentificați-vă din nou.",
+                    "session_mismatch": "Autentificarea nu corespunde contului curent. Autentificați-vă din nou.",
+                    "token_refresh_validation_failed": "Autentificarea nu a putut fi verificată. Autentificați-vă din nou."
+                }
+            },
+            "bootstrap": {
+                "error": {
+                    "authentication_required": "Autentificarea a expirat. Autentificați-vă din nou.",
+                    "grant_not_converged": "Conexiunea la server este încă în curs de pregătire. Încercați din nou în curând.",
+                    "invalid_argument": "Conectarea la server nu a reușit. Încercați din nou mai târziu.",
+                    "invalid_http_response": "Conectarea la server nu a reușit. Încercați din nou mai târziu.",
+                    "malformed_success": "Conectarea la server nu a reușit. Încercați din nou mai târziu.",
+                    "method_not_allowed": "Această versiune nu se poate conecta la server. Actualizați aplicația.",
+                    "missing_access_token": "Autentificarea a expirat. Autentificați-vă din nou.",
+                    "rate_limited": "Prea multe încercări de conectare. Încercați din nou în curând.",
+                    "rollout_disabled": "Conectarea la server nu este posibilă momentan. Aplicația va continua să încerce automat.",
+                    "unavailable": "Conectarea la server nu a reușit. Încercați din nou mai târziu.",
+                    "unexpected_contract": "Această versiune nu se poate conecta la server. Actualizați aplicația."
+                }
+            },
+            "chat": {
+                "error": {
+                    "authentication_expired": "Autentificarea a expirat. Autentificați-vă din nou.",
+                    "invalid_message": "Verificați mesajul și trimiteți-l din nou.",
+                    "permission_denied": "Nu aveți permisiunea de a trimite mesaje în acest grup.",
+                    "rate_limited": "Trimiteți mesaje prea repede.",
+                    "state_conflict": "Mesajul nu a putut fi trimis. Încercați din nou în curând."
+                }
+            },
+            "configuration": {
+                "error": {
+                    "invalid_plist": "Setările de conectare ale aplicației nu au putut fi citite. Reinstalați aplicația.",
+                    "missing_plist": "Setările de conectare ale aplicației lipsesc. Reinstalați aplicația.",
+                    "sdk_app_unavailable": "Conexiunea aplicației nu a putut fi pornită. Redeschideți aplicația.",
+                    "sdk_options_unavailable": "Conexiunea aplicației nu a putut fi pregătită. Redeschideți aplicația.",
+                    "unexpected_app": "Setările de conectare ale aplicației sunt incorecte. Reinstalați aplicația.",
+                    "unexpected_bundle": "Setările de conectare ale aplicației sunt incorecte. Reinstalați aplicația.",
+                    "unexpected_database": "Setările de conectare ale aplicației sunt incorecte. Reinstalați aplicația.",
+                    "unexpected_project": "Setările de conectare ale aplicației sunt incorecte. Reinstalați aplicația."
+                }
+            },
+            "production": {
+                "error": {
+                    "app_version_unavailable": "Versiunea aplicației nu a putut fi verificată, așadar conexiunea la server nu poate porni. Redeschideți aplicația.",
+                    "duplicate_wire_code": "O problemă cu datele aplicației blochează conexiunea la server. Reinstalați aplicația."
+                }
+            },
+            "transport": {
+                "error": {
+                    "access_grant_closed": "Accesul la grup este încă în curs de verificare. Încercați din nou în curând.",
+                    "listener_failed": "Conexiunea pentru mesaje s-a încheiat. Reconectați-vă pentru a continua.",
+                    "live_listener_unavailable": "Conexiunea pentru mesaje nu a putut fi pregătită. Reconectați-vă în curând.",
+                    "reconciliation_failed": "Cea mai recentă stare a grupului nu a putut fi verificată. Încercați din nou în curând.",
+                    "room_not_authorized": "Accesul la acest grup nu a putut fi verificat. Reconectați-vă pentru a continua.",
+                    "shut_down": "Conexiunea la server s-a încheiat. Reconectați-vă pentru a continua."
+                }
+            }
+        },
+        "group": {
+            "create": {
+                "in_progress": "Se creează…",
+                "keychain_warning": "Grupul a fost creat, dar codul de invitație nu a putut fi salvat în portchei. Salvați codul afișat acum într-un loc sigur.",
+                "realtime_grant_pending": "Grupul a fost creat, dar conexiunea la server nu a putut fi finalizată. Verificați din nou în curând. (%@)"
+            },
+            "delete": {
+                "success": "Grupul „%@” a fost șters."
+            },
+            "join": {
+                "in_progress": "Se intră în grup…",
+                "keychain_warning": "V-ați alăturat grupului, dar codul de invitație nu a putut fi salvat în portchei. Salvați codul primit într-un loc sigur.",
+                "realtime_grant_pending": "V-ați alăturat grupului, dar conexiunea la server nu a putut fi finalizată. Verificați din nou în curând. (%@)"
+            },
+            "leave": {
+                "confirmation": {
+                    "last_member": "Deoarece sunteți ultimul membru, grupul și toate mesajele vor fi șterse definitiv și nu vor putea fi recuperate.",
+                    "member": "Nu veți mai putea accesa grupul sau mesajele existente.",
+                    "owner_transfer": "Membrul rămas care s-a alăturat primul va deveni proprietar, iar dvs. nu veți mai putea accesa grupul sau mesajele existente."
+                },
+                "success": "Ați părăsit grupul „%@”."
+            },
+            "name": {
+                "unknown": "Grup"
+            },
+            "remove_member": {
+                "success": "%@ a fost eliminat din grup."
+            },
+            "rename": {
+                "success": "Grupul a fost redenumit."
+            },
+            "switch": {
+                "failed": "Grupul nu a putut fi schimbat. Încercați din nou. (%@)"
+            }
+        },
+        "groups": {
+            "active": "Activ",
+            "create": {
+                "invite_code": {
+                    "description": "Numai prietenii care primesc acest cod se pot alătura grupului.",
+                    "title": "Cod de invitație nou"
+                },
+                "name": {
+                    "description": "Introduceți un nume de 1–20 de caractere pentru a crea un grup."
+                },
+                "subtitle": "Creați un grup și distribuiți codul de invitație prietenilor."
+            },
+            "current": {
+                "empty": {
+                    "description": "Creați un grup nou sau introduceți un cod de invitație primit de la un prieten.",
+                    "title": "Nu există încă grupuri"
+                },
+                "subtitle": {
+                    "one": "Gestionați grupurile pe care le aveți cu prietenii. Fiecare grup poate avea cel mult %lld membru.",
+                    "other": "Gestionați grupurile pe care le aveți cu prietenii. Fiecare grup poate avea cel mult %lld membri."
+                },
+                "title": "Grupurile dvs."
+            },
+            "delete": {
+                "confirmation_title": "Ștergeți grupul „%@”?",
+                "message": "Grupul și toate mesajele vor fi șterse definitiv și nu vor putea fi recuperate."
+            },
+            "invite_code": {
+                "copy": {
+                    "action": "Copiați codul de invitație",
+                    "complete": "Copiat",
+                    "help": "Copiați codul de invitație salvat în portcheiul acestui dispozitiv."
+                },
+                "rotate": {
+                    "$value": "Înlocuiți codul de invitație",
+                    "help": "Revocați codul posibil expus și emiteți un cod nou de 128 de biți."
+                }
+            },
+            "join": {
+                "invite_code": {
+                    "description": "Introduceți un cod de invitație pentru a verifica dacă vă puteți alătura și dacă grupul are locuri libere.",
+                    "placeholder": "Cod de invitație",
+                    "title": "Cod de invitație"
+                },
+                "subtitle": "Alăturați-vă unui grup cu un cod de invitație primit de la un prieten."
+            },
+            "leave": {
+                "action": "Părăsiți grupul",
+                "confirmation_title": "Părăsiți grupul „%@”?",
+                "message": {
+                    "last_owner": "Deoarece sunteți ultimul membru, grupul și toate mesajele vor fi șterse definitiv și nu vor putea fi recuperate.",
+                    "member": "Nu veți mai putea accesa grupul sau mesajele existente.",
+                    "owner_transfer": "Membrul rămas care s-a alăturat primul va deveni proprietar, iar dvs. nu veți mai putea accesa grupul sau mesajele existente."
+                }
+            },
+            "management": {
+                "navigation_label": "Grupuri"
+            },
+            "member": {
+                "owner": "Proprietar",
+                "remove": {
+                    "confirmation_title": "Eliminați pe %@?",
+                    "message": "Acest membru nu va mai putea accesa grupul sau mesajele existente.",
+                    "title": "Eliminați membrul"
+                }
+            },
+            "members": {
+                "empty": "Nu există membri de afișat."
+            },
+            "operation": {
+                "creating": "Se creează…",
+                "joining": "Se intră în grup…",
+                "select": "Comutați la grup",
+                "switching": "Se schimbă grupul…"
+            },
+            "room": {
+                "summary": {
+                    "invite_ready": {
+                        "one": "%1$lld/%2$lld membru · Cod de invitație %3$@",
+                        "other": "%1$lld/%2$lld membri · Cod de invitație %3$@"
+                    },
+                    "invite_rotation_required": {
+                        "one": "%1$lld/%2$lld membru · Codul de invitație trebuie înlocuit",
+                        "other": "%1$lld/%2$lld membri · Codul de invitație trebuie înlocuit"
+                    }
+                }
+            }
+        },
+        "history": {
+            "close": {
+                "accessibility": "Închideți mesajele recente"
+            },
+            "empty": {
+                "description": "Mesajele recente din acest grup vor apărea aici.",
+                "title": "Nu există încă mesaje"
+            },
+            "error": {
+                "load_failed": "Mesajele recente nu au putut fi încărcate"
+            },
+            "older": {
+                "exhausted": {
+                    "one": "Ați văzut toate mesajele din ultima %lld zi.",
+                    "other": "Ați văzut toate mesajele din ultimele %lld zile."
+                }
+            },
+            "retention_notice": {
+                "one": "Mesajele sunt șterse automat după %lld zi.",
+                "other": "Mesajele sunt șterse automat după %lld zile."
+            },
+            "title": "Mesaje recente",
+            "window": {
+                "title": "%@ · Mesaje recente"
+            }
+        },
+        "invite": {
+            "error": {
+                "backend_unavailable": "Codul de invitație nu poate fi verificat acum. Încercați din nou în curând.",
+                "clipboard_failed": "Codul de invitație nu a putut fi copiat. Încercați din nou.",
+                "not_stored_on_device": "Codul de invitație nu este salvat pe acest dispozitiv. Creați un cod nou sau cereți unul proprietarului.",
+                "read_failed": "Codul de invitație nu a putut fi citit. Încercați din nou. (%@)",
+                "revoked": "Codul de invitație anterior al acestui grup a fost revocat. Proprietarul grupului trebuie să emită unul nou."
+            },
+            "rotate": {
+                "keychain_warning": "A fost emis un cod nou, dar nu a putut fi salvat în portchei. Salvați codul afișat acum într-un loc sigur.",
+                "success": "A fost emis un cod de invitație nou."
+            }
+        },
+        "keychain": {
+            "error": {
+                "status": "Eroare de portchei %lld"
+            },
+            "operation_reason": "Accesați în siguranță informațiile de autentificare și codurile de invitație ale grupurilor.",
+            "transition": {
+                "message": "Aplicația folosește portcheiul macOS pentru a stoca și a prelua în siguranță informațiile de autentificare și codurile de invitație ale grupurilor.",
+                "migration_explanation": "La prima încărcare a informațiilor salvate de o versiune anterioară, macOS vă poate cere parola de autentificare pe Mac. Pentru a nu vi se mai cere, selectați „Permite întotdeauna” în dialogul macOS care urmează. Dacă selectați „Permite”, dialogul poate apărea de câteva ori sau poate reapărea la următoarea deschidere a aplicației, în funcție de informațiile salvate.",
+                "privacy_explanation": "Aplicația nu vede și nu stochează parola introdusă.",
+                "quit": "Închideți SIDEY"
+            }
+        },
+        "landing": {
+            "accessibility": {
+                "ready": "Ecranul de pornire SIDEY",
+                "restoring": "SIDEY restaurează autentificarea anterioară"
+            },
+            "status": {
+                "ready": "Faceți clic pentru a începe.",
+                "restoring": "Se restaurează autentificarea anterioară…"
+            },
+            "tagline": "Prietenii au ajuns la marginea ecranului."
+        },
+        "launch_at_login": {
+            "update_failed": "Setarea Deschidere la autentificare nu a putut fi schimbată. Încercați din nou. (%@)"
+        },
+        "message": {
+            "composer": {
+                "placeholder": "Introduceți un mesaj"
+            },
+            "delivery": {
+                "failed": "Trimitere nereușită",
+                "pending": "Se trimite"
+            },
+            "error": {
+                "realtime_disconnected": "Conexiunea la server s-a încheiat. Reconectați-vă înainte de a trimite un mesaj.",
+                "wait_for_group_switch": "Așteptați finalizarea schimbării grupului înainte de a trimite."
+            },
+            "retention_sync_failed": "Setarea pentru păstrarea mesajelor nu a putut fi aplicată. Încercați din nou. (%@)",
+            "send": {
+                "failed": "Mesajul nu a putut fi trimis. Încercați din nou. (%@)"
+            }
+        },
+        "mutation": {
+            "post_commit_sync_failed": "Modificarea a fost salvată, dar ecranul nu a putut fi reîmprospătat. Verificați din nou în curând. (%@)",
+            "realtime_recovering": "Modificările au fost salvate. Se reconectează la server…"
+        },
+        "onboarding": {
+            "group": {
+                "invite_code": {
+                    "placeholder": "Cod de invitație de la un prieten"
+                },
+                "member_limit": {
+                    "one": "Un grup poate avea cel mult %lld membru.",
+                    "other": "Un grup poate avea cel mult %lld membri."
+                },
+                "path": {
+                    "accessibility": "Alegeți dacă doriți să creați un grup sau să vă alăturați unuia"
+                }
+            },
+            "profile": {
+                "description": "Puteți schimba oricând această opțiune în Setări.",
+                "nickname": {
+                    "placeholder": "Poreclă, 2–8 caractere"
+                },
+                "title": "Alegeți-vă numele"
+            }
+        },
+        "overlay": {
+            "span": {
+                "full": "Complet"
+            }
+        },
+        "pixel_world": {
+            "doze_label": "Zzz",
+            "interaction": {
+                    "throw": "Faceți clic stânga pe un prieten pentru a arunca mingea moale implicită.",
+                "tree": "Faceți clic dreapta pe copac pentru a opri sau a porni mersul."
+            },
+            "nickname": {
+                "current_user": "%@ · Dvs."
+            }
+        },
+        "profile": {
+            "character": {
+                "description": "Alegeți personajul pixelat care vă reprezintă pe ecranele prietenilor.",
+                "selection": {
+                    "accessibility": "Selectarea personajului"
+                },
+                "state": {
+                    "equipping": "Se echipează"
+                }
+            },
+            "cosmetics": {
+                "bubble": {
+                    "description": "Alegeți o bulă de dialog pe care o dețineți. Va fi aplicată imediat în toate grupurile.",
+                    "selection": {
+                        "accessibility": "Selectarea bulei de dialog"
+                    }
+                },
+                "character": {
+                    "description": "Alegeți un personaj pe care îl dețineți. Va fi aplicat imediat în toate grupurile.",
+                    "selection": {
+                        "accessibility": "Selectarea personajului"
+                    }
+                },
+                "default_bubble": "Bulă implicită",
+                "default_throwable": "Minge moale implicită",
+                "hint": {
+                    "current": "Folosit în prezent",
+                    "select": "Se aplică imediat în toate grupurile"
+                },
+                "throwable": {
+                    "description": "Alegeți o jucărie de aruncat pe care o dețineți. Va fi folosită imediat în toate grupurile.",
+                    "selection": {
+                        "accessibility": "Selectarea jucăriei de aruncat"
+                    }
+                }
+            },
+            "current_user": {
+                "badge": "Dvs."
+            },
+            "duplicates_allowed": "Puteți folosi același personaj sau aceeași poreclă ca alt membru al grupului.",
+            "error": {
+                "character_not_owned": "Alegeți pentru profil un personaj pe care îl dețineți."
+            },
+            "nickname": {
+                "description": "Numele pe care prietenii îl văd în lumea pixelată și în mesaje · 2–8 caractere",
+                "save": "Actualizați porecla",
+                "unknown": "Prieten",
+                "unknown_friend": "Prieten necunoscut",
+                "unknown_member": "Membru"
+            },
+            "onboarding": {
+                "next_hint": "După salvarea profilului, creați un grup sau alăturați-vă unuia cu un cod de invitație."
+            },
+            "selection": {
+                "state": {
+                    "not_selected": "Neselectat",
+                    "selected": "Selectat"
+                }
+            },
+            "subtitle": "Setați numele și personajul pe care le vor vedea prietenii.",
+            "success": {
+                "nickname_updated": "Porecla a fost actualizată.",
+                "saved": "Profilul a fost salvat."
+            }
+        },
+        "realtime": {
+            "kill_switch": {
+                "error": {
+                    "legacy_connection_creation_failed": "Conectarea la server nu a reușit. Încercați din nou în curând.",
+                    "legacy_connection_recovery_failed": "Reconectarea la server nu a reușit. Încercați din nou în curând."
+                },
+                "transition_failed": "Conectarea la server nu a reușit. Reconectați-vă în curând. (%@)"
+            },
+            "rollout": {
+                "error": {
+                    "cache_unavailable": "Starea conexiunii la server nu a putut fi salvată. Redeschideți aplicația.",
+                    "contract_mismatch": "Această versiune nu se poate conecta la server. Actualizați aplicația.",
+                    "enabled_policy_unavailable": "Conectarea la server nu a reușit. Încercați din nou mai târziu.",
+                    "malformed_response": "Conectarea la server nu a reușit. Încercați din nou mai târziu."
+                }
+            }
+        },
+        "settings": {
+            "account": {
+                "delete": {
+                    "authentication_notice": "Introduceți „DELETE”, apoi autentificați-vă din nou cu Apple pentru a șterge imediat contul.",
+                    "confirmation_phrase": "DELETE",
+                    "description": "Astfel se șterg profilul, mesajele și informațiile despre grupurile la care v-ați alăturat. Evidențele cumpărăturilor pot fi păstrate separat de cont atunci când este necesar pentru contabilitate și prevenirea fraudelor.",
+                    "placeholder": "Tastați „DELETE” pentru confirmare",
+                    "reveal": "Ștergeți contul…",
+                    "title": "Ștergeți contul"
+                },
+                "privacy_policy": "Politica de confidențialitate",
+                "restore_purchases": "Restaurați cumpărăturile",
+                "subtitle": "Gestionați datele contului și cumpărăturile din aplicație.",
+                "terms": "Condiții de utilizare",
+                "title": "Cont și confidențialitate"
+            },
+            "display": {
+                "offline_members": {
+                    "description": "Afișați prietenii offline ca personaje adormite, cu un punct roșu de stare.",
+                    "title": "Afișați membrii offline"
+                },
+                "quiet_mode": {
+                    "description": "Ascundeți bulele de mesaje și indicatorii de tastare, păstrând starea conexiunii și numărul de mesaje necitite."
+                },
+                "subtitle": "Controlați cum apar pe ecran starea și mesajele prietenilor.",
+                "throw_guard": {
+                    "description": "Când opțiunea este dezactivată, faceți clic stânga pe personajul unui prieten pentru a arunca imediat. Când este activată, faceți mai întâi dublu clic dreapta pe personajul dvs., apoi faceți clic stânga pe personajul unui prieten în 10 secunde.",
+                    "title": "Dublu clic dreapta înainte de aruncare"
+                }
+            },
+            "general": {
+                "overlay_visible": {
+                    "description": "Afișați lumea pixelată a prietenilor de-a lungul marginii selectate a ecranului."
+                },
+                "subtitle": "Configurați afișarea de bază și pornirea aplicației."
+            },
+            "placement": {
+                "edge": {
+                    "description": "Alegeți marginea ecranului pe care se deplasează personajele.",
+                    "picker": "Margine",
+                    "title": "Margine"
+                },
+                "monitor": {
+                    "description": "Alegeți ecranul pentru lumea pixelată. Mutați separat câmpul de mesaj folosind mânerul din stânga.",
+                    "picker": "Monitor",
+                    "title": "Monitor"
+                },
+                "span": {
+                    "description": "Alegeți cât din marginea selectată ocupă lumea.",
+                    "full": "Complet",
+                    "half": "1/2",
+                    "picker": "Lungime",
+                    "third": "1/3",
+                    "title": "Lungimea lumii"
+                },
+                "subtitle": "Alegeți ecranul și poziția personajelor pixelate.",
+                "title": "Poziția lumii"
+            },
+            "shortcuts": {
+                "key": {
+                    "picker": "Tastă"
+                },
+                "restore_default": {
+                    "accessibility": "Restaurați comanda rapidă implicită",
+                    "help": "Restaurați comanda rapidă implicită"
+                },
+                "subtitle": "Alegeți cel puțin o tastă modificatoare și o tastă cu literă sau cifră. Modificările se aplică imediat.",
+                "title": "Comenzi rapide globale"
+            },
+            "sound": {
+                "character_effects": {
+                    "description": "Redați un sunet când un personaj din grupul curent este lovit de o jucărie de aruncat.",
+                    "title": "Efecte sonore ale personajelor"
+                },
+                "subtitle": "Configurați efectele sonore ale personajelor."
+            }
+        },
+        "shortcut": {
+            "action": {
+                "composer": "Deschideți sau închideți câmpul de mesaj",
+                "history": "Deschideți mesajele recente",
+                "overlay": "Afișați sau ascundeți suprapunerea",
+                "quiet_mode": "Ascundere mesaje"
+            },
+            "error": {
+                "duplicate": "Este deja folosită de „%@”. Comanda rapidă existentă va fi păstrată.",
+                "modifier_required": "Alegeți cel puțin o tastă modificatoare. Comanda rapidă existentă va fi păstrată.",
+                "new_binding_registration_failed": "Noua comandă rapidă nu a putut fi înregistrată, așadar cea existentă va fi păstrată.",
+                "new_binding_used_by_other_app": "Această combinație este folosită de altă aplicație. Comanda rapidă existentă va fi păstrată.",
+                "registration_failed": "Comanda rapidă nu a putut fi înregistrată. Alegeți alta.",
+                "used_by_other_app": "Această comandă rapidă este folosită de altă aplicație. Alegeți alta sau verificați setările aplicației cu care intră în conflict."
+            },
+            "modifier": {
+                "command": "Command",
+                "control": "Control",
+                "option": "Option",
+                "shift": "Shift"
+            },
+            "status": {
+                "change_failed": "Modificarea nu a reușit",
+                "unavailable": "Comandă rapidă indisponibilă"
+            }
+        },
+        "status": {
+            "icon": {
+                "unread": {
+                    "accessibility": "%@, mesaje necitite"
+                }
+            },
+            "menu": {
+                "active_group": "Grup activ",
+                "compose": "Mesaj nou…",
+                "group_settings": "Setările grupului…",
+                "history": "Mesaje recente…",
+                "no_connected_groups": "Nu v-ați alăturat niciunui grup",
+                "overlay": {
+                    "hide": "Ascundeți suprapunerea",
+                    "show": "Afișați suprapunerea"
+                },
+                "quiet_mode": "Ascundere mesaje",
+                "quit": "Închideți %@",
+                "settings": "Setări…",
+                "store": "Magazin…"
+            },
+            "room": {
+                "unread_count": " (%@)"
+            },
+            "tooltip": {
+                "unread": "%@ · Mesaje necitite"
+            }
+        },
+        "store": {
+            "coming_soon": {
+                "badge": "În curând",
+                "detail": "Magazinul se pregătește. Revenim în curând.",
+                "product": {
+                    "accessibility": "%@, în curând"
+                }
+            },
+            "empty": {
+                "description": "Încercați să schimbați tipul produsului sau filtrul articolelor deținute.",
+                "title": "Nu există produse corespunzătoare"
+            },
+            "error": {
+                "auto_equip_failed": "Cumpărătura a fost finalizată, dar articolul nu a putut fi echipat automat. Echipați-l manual în Profil.",
+                "auto_equip_realtime_grant_pending": "Articolul este echipat. Dacă nu apare imediat, verificați din nou în curând. (%@)",
+                "entitlements_reconcile_failed": "Cumpărăturile din aplicație nu au putut fi verificate. Încercați din nou opțiunea Restaurați cumpărăturile.",
+                "equipment_realtime_grant_pending": "Articolul este echipat. Dacă nu apare imediat, verificați din nou în curând. (%@)",
+                "equipment_update_failed": "Articolul echipat nu a putut fi actualizat.",
+                "product_unavailable": "Acest produs nu este disponibil în App Store.",
+                "products_load_failed": "Produsele App Store nu au putut fi încărcate. Încercați din nou mai târziu.",
+                "purchase_failed": "Cumpărarea produsului %@ nu a putut fi finalizată. Încercați din nou mai târziu.",
+                "purchase_pending": "Aprobarea cumpărăturii este în așteptare. Articolul va apărea automat după aprobare.",
+                "purchase_status_failed": "Cumpărătura nu a putut fi confirmată. Verificați din nou în curând.",
+                "server_rejected": "Cumpărăturile din aplicație nu au putut fi verificate. Încercați din nou opțiunea Restaurați cumpărăturile.",
+                "transaction_update_failed": "Cumpărătura nu a putut fi aplicată. Încercați din nou opțiunea Restaurați cumpărăturile.",
+                "unknown_result": "Rezultatul cumpărăturii nu a putut fi confirmat. Verificați din nou în curând.",
+                "unverified_transaction": "Cumpărătura nu a putut fi verificată, deci nu a fost aplicată. Încercați din nou opțiunea Restaurați cumpărăturile.",
+                "verifier_not_configured": "Cumpărăturile nu pot fi verificate momentan. Încercați din nou mai târziu."
+            },
+            "filter": {
+                "hide_owned": "Ascundeți produsele deținute",
+                "kind": {
+                    "$value": "Tip de produs",
+                    "accessibility": "Tip de produs din magazin"
+                },
+                "menu": "Sortare și filtrare"
+            },
+            "footer": {
+                "app_store": {
+                    "entitlement": "Cumpărăturile din aplicație sunt procesate de App Store. Puteți folosi un articol imediat ce achiziția este confirmată.",
+                    "headline": "Prețurile sunt afișate, iar cumpărăturile sunt procesate de App Store.",
+                    "refund": "Rambursările și întrebările privind facturarea urmează politicile și procedurile App Store ale Apple."
+                },
+                "coming_soon": "Magazinul va fi disponibil în curând. Puteți folosi în continuare articolele pe care le dețineți deja.",
+                "direct": {
+                    "entitlement": "Prețurile afișate includ taxele. Puteți folosi articolele de personalizare imediat ce plata este confirmată.",
+                    "refund": "Rambursarea pentru răzgândire nu este disponibilă după începerea accesului. Rambursările integrale sunt acordate atunci când legea o impune, inclusiv pentru nelivrare, neconformitate, plată dublă sau neautorizată."
+                }
+            },
+            "kind": {
+                "bubble": "Bulă de dialog",
+                "character": "Personaj",
+                "keepsake": "Obiect drag",
+                "throwable": "Jucărie de aruncat"
+            },
+            "navigation_label": "Aspect și magazin",
+            "preview": {
+                "accessibility": "Previzualizare pentru %@",
+                    "character_interaction_hint": "Faceți clic stânga pe celălalt personaj pentru a încerca să aruncați %@. Faceți dublu clic stânga pe un personaj pentru a-i vedea reacția într-o fereastră pop-up.",
+                "default_throwable": "Minge moale implicită",
+                    "double_click_hint": "Faceți dublu clic stânga pe un personaj pentru a-i vedea reacția într-o fereastră pop-up.",
+                "member": {
+                    "dubu": "Dubu",
+                    "moka": "Moka"
+                },
+                "message": {
+                    "left": "Aveți vreo idee pentru cină?",
+                    "right": "Ce spuneți de o tocăniță picantă de pui?"
+                },
+                "reduce_motion_hint": "Opțiunea Reducere mișcare este activată, așadar este afișată o scenă statică.",
+                "sound": {
+                    "off": "Dezactivați sunetul previzualizării",
+                    "on": "Activați sunetul previzualizării"
+                },
+                "tree_toggle_hint": "Faceți clic dreapta pe copac pentru a-l opri, apoi din nou pentru a-l face să meargă."
+            },
+            "price": {
+                "loading": {
+                    "$value": "Se încarcă prețul…",
+                    "short": "Se verifică prețul"
+                },
+                "required": "Prețul trebuie verificat",
+                "retry": "Verificați din nou prețul",
+                "unavailable": {
+                    "$value": "Prețul din App Store nu este disponibil.",
+                    "short": "Preț indisponibil"
+                }
+            },
+            "processing": "Se procesează",
+            "product": {
+                "detail": {
+                    "close": "Închideți detaliile produsului",
+                    "hint": "Vedeți detaliile"
+                },
+                "equipped": "Echipat",
+                "preview": {
+                    "hint": "Previzualizați detaliile"
+                },
+                "processing": {
+                    "accessibility": "Se procesează %@"
+                },
+                "sold_separately": "Se vinde separat",
+                "status": {
+                    "accessibility": "%@, %@"
+                },
+                "unavailable": {
+                    "detail": "Acest produs nu este încă disponibil pentru cumpărare."
+                }
+            },
+            "purchase": {
+                "accessibility": "Cumpărați %@ pentru %@",
+                "action": "Cumpărați %@ · %@",
+                "available": "Disponibil",
+                "confirming": "Se confirmă plata…",
+                "error": "Eroare",
+                "opening_checkout": "Se deschide cumpărătura…",
+                "owned": "Deținut",
+                "refunded": "Rambursare efectuată",
+                "success": "Achiziția pentru %@ a fost finalizată.",
+                "unavailable": "Indisponibil momentan"
+            },
+            "purchase_and_equip": {
+                "success": "Ați cumpărat și echipat %@."
+            },
+            "restore": {
+                "action": "Restaurați cumpărăturile",
+                "failed": "Cumpărăturile nu au putut fi restaurate. Încercați din nou.",
+                "success": "Cumpărăturile au fost restaurate."
+            },
+            "sort": {
+                "price_ascending": "Cele mai ieftine întâi",
+                "price_descending": "Cele mai scumpe întâi"
+            },
+            "status": {
+                "retry": "Încercați din nou"
+            },
+            "subtitle": "Alegeți personaje, bule de dialog și jucării de aruncat.",
+            "title": "Aspect și magazin"
+        },
+        "tree_movement": {
+            "error": {
+                "save_failed": "Setarea pentru mișcarea copacului nu a putut fi salvată. Încercați din nou."
+            }
+        }
+    },
+    "windows": {
+      "accessibility": {
+        "motion": {
+          "disabled": "Efectele de animație sunt dezactivate în Windows."
+        }
+      },
+      "account": {
+        "delete": {
+          "confirmation": {
+            "action": "Ștergeți contul",
+            "message": "Profilul și participările la grupuri vor fi șterse definitiv. Legătura dintre achiziții și cont va fi eliminată.",
+            "title": "Ștergeți contul?"
+          },
+          "description": "Ștergeți definitiv datele personale asociate contului.",
+          "final_confirmation": {
+            "message": "Un cont șters și datele sale nu pot fi recuperate.",
+            "title": "Ștergeți contul?"
+          },
+          "title": "Ștergeți contul"
+        },
+        "description": "Deconectați-vă sau gestionați contul.",
+        "sign_out": {
+          "confirmation": {
+            "action": "Deconectați-vă",
+            "message": "Veți fi deconectat numai pe acest PC. Pentru a folosi din nou SIDEY, conectați-vă cu Google.",
+            "title": "Vă deconectați?"
+          },
+          "description": "Deconectați-vă numai pe acest PC.",
+          "title": "Deconectați-vă"
+        },
+        "title": "Cont"
+      },
+      "app": {
+        "info": {
+          "description": "Vedeți informații despre versiune și asistență.",
+          "navigation_label": "Informații",
+          "title": "Informații"
+        },
+        "launch": {
+          "failed": "Aplicația nu a putut fi pornită. Închideți-o și încercați din nou."
+        },
+        "startup": {
+          "error": {
+            "title": "Eroare la pornirea SIDEY"
+          },
+          "failed": "SIDEY nu a putut fi pornit.",
+          "failed_with_log": "SIDEY nu a putut fi pornit.\n\nJurnal de diagnosticare: {0}",
+          "runtime_missing": "Lipsesc fișiere necesare pentru rularea SIDEY. Reinstalați aplicația."
+        }
+      },
+      "auth": {
+        "google": {
+          "already_linked": "Acest cont Google este deja conectat la profilul curent. Profilul și datele nu au fost modificate.",
+          "cancelled": "Conectarea cu Google a fost anulată sau nu a fost finalizată. Încercați din nou.",
+          "identity_changed": "Acest cont Google este diferit de cel conectat la contul curent. Profilul și datele existente nu au fost modificate.",
+          "link_expired": "Solicitarea de conectare cu Google a expirat. Anulați conectarea și începeți din nou.",
+          "required": "Conectați contul Google.",
+          "sign_in_complete": "Conectarea cu Google este finalizată. Puteți închide fila de conectare din browser."
+        },
+        "request": {
+          "failed": "Conectarea nu a reușit. Încercați din nou mai târziu. (Cod de eroare: {0})"
+        },
+        "response": {
+          "empty": "Conectarea nu a putut fi finalizată. Încercați din nou."
+        },
+        "session": {
+          "expired": "Sesiunea de conectare a expirat. Conectați-vă din nou.",
+          "replace_blocked": "Au rămas informații de conectare pe acest PC. Reporniți aplicația, apoi conectați-vă.",
+          "restore_failed": "Conectarea anterioară nu a putut fi restaurată. Nu a fost creat un cont nou. Conectați-vă din nou.",
+          "stored_invalid": "Informațiile de conectare salvate nu au putut fi citite. Conectați-vă din nou.",
+          "values_missing": "Conectarea nu a putut fi finalizată. Încercați din nou."
+        }
+      },
+      "common": {
+        "back": "Înapoi",
+        "delete": "Ștergeți",
+        "friend": "Prieten",
+        "skip": "Omiteți"
+      },
+      "composer": {
+        "drag": {
+          "tooltip": "Glisați pentru a muta caseta de scriere"
+        },
+        "group": {
+          "required": "Configurați profilul și selectați un grup căruia să îi trimiteți mesajul."
+        },
+        "message": {
+          "placeholder": "Tastați un mesaj"
+        },
+        "window": {
+          "title": "Mesaj SIDEY"
+        }
+      },
+      "connection": {
+        "configuration": {
+          "not_configured": "Lipsesc setările pentru conexiunea la server. Reinstalați aplicația."
+        },
+        "error": {
+          "access_required": "Accesul la cont sau grup nu a putut fi verificat. Selectați Reconectare în Conexiune la server. Dacă problema persistă, contactați asistența și atașați jurnalul de diagnosticare.",
+          "busy": "Serverul este ocupat momentan, așa că stabilirea conexiunii durează mai mult decât de obicei. Reconectarea se va încerca automat. Dacă nu se conectează după câteva minute, contactați asistența și atașați jurnalul de diagnosticare.",
+          "configuration_unavailable": "Conexiunea la server nu poate fi inițiată momentan. Așteptați puțin și selectați Reconectare în Conexiune la server. Dacă problema persistă, contactați asistența și atașați jurnalul de diagnosticare.",
+          "network_unavailable": "Conexiunea la server nu poate fi stabilită. Verificați conexiunea la internet, apoi selectați Reconectare în Conexiune la server. Dacă alte site-uri se deschid, dar problema persistă, contactați asistența și atașați jurnalul de diagnosticare.",
+          "secure_connection_failed": "Nu s-a putut stabili o conexiune securizată. Verificați dacă data și ora din Windows sunt corecte, apoi reconectați-vă. Dacă problema persistă, contactați asistența și atașați jurnalul de diagnosticare.",
+          "service_unavailable": "Conexiunea la server nu poate fi stabilită. Reconectarea se va încerca automat. Dacă nu se conectează după câteva minute, selectați Reconectare în Conexiune la server. Dacă problema persistă, contactați asistența și atașați jurnalul de diagnosticare."
+        },
+        "group_resync_failed": "Cea mai recentă stare a grupului nu a putut fi încărcată. Reconectați-vă. ({0})",
+        "group_revision_missing": "Informațiile de conectare ale grupului s-au schimbat. Reconectați-vă.",
+        "notice": {
+          "connected": "Conectat la server.",
+          "reconnecting": "Se reconectează la server…"
+        },
+        "retry": {
+          "action": "Reconectare"
+        },
+        "server": {
+          "not_configured": "Lipsesc setările pentru conexiunea la server. Reinstalați aplicația."
+        },
+        "state": {
+          "connected": "Conectat",
+          "disconnected": "Neconectat",
+          "reconnecting": "Se conectează…"
+        },
+        "unavailable": "Conexiunea la server nu poate fi stabilită. Încercați din nou mai târziu."
+      },
+      "external_link": {
+        "open": {
+          "failed": "Pagina nu a putut fi deschisă în browserul implicit. Încercați din nou."
+        }
+      },
+      "groups": {
+        "create": {
+          "description": "Creați un grup și distribuiți codul de invitație prietenilor.",
+          "in_progress": "Se creează…",
+          "result_missing": "Grupul nu a putut fi creat. Încercați din nou.",
+          "success": {
+            "default": "Grupul a fost creat."
+          },
+          "tooltip": "Creați un grup cu numele introdus."
+        },
+        "delete": {
+          "confirmation": {
+            "message": "Grupul și toate mesajele vor fi șterse definitiv și nu vor putea fi recuperate.",
+            "title": "Ștergeți grupul „{0}”?"
+          },
+          "final_confirmation": {
+            "message": "Grupul „{0}” și toate mesajele vor fi șterse definitiv acum.",
+            "title": "Ștergeți definitiv grupul?"
+          },
+          "success": "Grupul a fost șters.",
+          "tooltip": "Ștergeți definitiv acest grup."
+        },
+        "description": "Gestionați grupurile împreună cu prietenii. Fiecare grup poate avea cel mult 12 membri.",
+        "empty": {
+          "description": "Creați un grup sau introduceți codul de invitație primit de la un prieten.",
+          "title": "Nu v-ați alăturat încă niciunui grup"
+        },
+        "error": {
+          "not_found": "Grupul nu a putut fi găsit. Verificați din nou lista grupurilor."
+        },
+        "invite": {
+          "code": {
+            "label": "Cod de invitație",
+            "missing": "Nu este salvat niciun cod de invitație pe acest dispozitiv. Creați un cod nou.",
+            "replaced": "Codul de invitație salvat pe acest dispozitiv a fost deja înlocuit. Cereți proprietarului noul cod.",
+            "revoked": "Vechiul cod de invitație al grupului a fost revocat. Proprietarul trebuie să creeze un cod nou."
+          },
+          "copy": {
+            "action": "Copiați codul de invitație",
+            "complete": "Copiat"
+          },
+          "rotate": {
+            "action": "Creați un cod de invitație nou",
+            "code_missing": "Nu s-a putut crea un cod de invitație nou. Încercați din nou.",
+            "confirmation": {
+              "action": "Creați un cod nou",
+              "message": "Codul existent va fi revocat imediat. Această acțiune nu poate fi anulată.",
+              "title": "Creați un cod de invitație nou?"
+            },
+            "success": "A fost creat un cod de invitație nou și a fost salvat pe acest PC."
+          }
+        },
+        "join": {
+          "description": "Alăturați-vă unui grup folosind codul de invitație primit de la un prieten.",
+          "failed": "Nu v-ați putut alătura grupului. Verificați codul de invitație și încercați din nou. ({0})",
+          "in_progress": "Se alătură…",
+          "result_missing": "Grupul la care v-ați alăturat nu a putut fi încărcat. Încercați din nou.",
+          "room_id_missing": "Alăturarea la grup nu a putut fi finalizată. Încercați din nou.",
+          "success": {
+            "default": "V-ați alăturat grupului."
+          },
+          "tooltip": "Alăturați-vă grupului corespunzător acestui cod de invitație."
+        },
+        "leave": {
+          "action": "Părăsiți grupul",
+          "confirmation": {
+            "action": "Părăsiți",
+            "member_message": "Nu veți mai avea acces la grup și la mesajele existente.",
+            "owner_message": "Membrul care s-a alăturat primul va deveni proprietar. Dacă nu mai rămân membri, grupul va fi șters.",
+            "title": "Părăsiți grupul „{0}”?"
+          },
+          "success": "Ați părăsit grupul.",
+          "tooltip": "Părăsiți acest grup."
+        },
+        "member": {
+          "remove": {
+            "confirmation": {
+              "message": "Acest membru nu va mai avea acces la grup și la mesajele existente.",
+              "title": "Eliminați „{0}” din grup?"
+            },
+            "success": "Membrul a fost eliminat.",
+            "tooltip": "Eliminați acest membru din grup."
+          }
+        },
+        "navigation_label": "Grupuri",
+        "operation": {
+          "busy": "Așteptați finalizarea celeilalte operațiuni de grup și încercați din nou."
+        },
+        "refresh": {
+          "failed": "Informațiile grupului nu au putut fi reîmprospătate. Încercați din nou mai târziu. ({0})"
+        },
+        "rename": {
+          "success": "Numele grupului a fost schimbat.",
+          "title": "Redenumiți grupul",
+          "tooltip": "Schimbați numele grupului."
+        },
+        "state": {
+          "active": "Activ"
+        },
+        "summary": {
+          "invite_ready": "{0}/12 membri · cod de invitație {1}",
+          "invite_rotation_required": "{0}/12 membri · este necesar un cod de invitație nou"
+        },
+        "switch": {
+          "action": "Comutați grupul",
+          "in_progress": "Se comută grupul…",
+          "success": "Grupul activ a fost schimbat.",
+          "tooltip": "Comutați la acest grup."
+        },
+        "title": "Grupul curent"
+      },
+      "history": {
+        "empty": {
+          "description": "Mesajele recente din acest grup vor apărea aici.",
+          "title": "Niciun mesaj încă"
+        },
+        "group": {
+          "none": "Niciun grup activ",
+          "required": "Alăturați-vă unui grup pentru a vedea mesajele recente."
+        },
+        "load": {
+          "initial_failed": "Mesajele recente nu au putut fi încărcate.",
+          "retry": "Încercați din nou"
+        },
+        "pagination": {
+          "exhausted": "Ați văzut toate mesajele din ultimele 3 zile."
+        },
+        "recent": {
+          "title": "Istoric recent"
+        },
+        "retention": {
+          "notice": "Mesajele sunt șterse automat după 3 zile.",
+          "reload_failed": "Mesajele anterioare nu au putut fi reîncărcate. Încercați din nou mai târziu. ({0})"
+        },
+        "scroll": {
+          "latest": "Mergeți la cel mai recent mesaj"
+        },
+        "user": {
+          "unknown": "Prieten necunoscut"
+        },
+        "window": {
+          "always_on_top": {
+            "disable": "Dezactivați menținerea deasupra",
+            "disable_shortcut": "Dezactivați menținerea deasupra (Alt+săgeată în jos)",
+            "enable": "Mențineți deasupra",
+            "enable_shortcut": "Mențineți deasupra (Alt+săgeată în sus)"
+          },
+          "title": "Istoric recent SIDEY"
+        }
+      },
+      "legal": {
+        "description": "Consultați termenii și politicile.",
+        "privacy": {
+          "action": "Consultați politica de confidențialitate"
+        },
+        "refund": {
+          "action": "Consultați politica de anulare și rambursare"
+        },
+        "terms": {
+          "action": "Consultați termenii de utilizare"
+        },
+        "title": "Politici"
+      },
+      "message": {
+        "delivery": {
+          "recheck_failed": "Nu s-a putut verifica dacă mesajul a fost trimis. Verificați din nou mai târziu. ({0})"
+        },
+        "send": {
+          "failed": "Mesajul nu a putut fi trimis. Încercați din nou. ({0})",
+          "rate_limited": "Trimiteți mesaje prea repede. Încercați din nou peste puțin timp."
+        }
+      },
+      "onboarding": {
+        "auth": {
+          "google": {
+            "cancel": "Anulați conectarea",
+            "continue": "Continuați cu Google",
+            "description": "Conectați contul Google pentru a începe. Profilul, grupurile și istoricul conversațiilor existente vor fi păstrate.",
+            "pending": "Finalizați conectarea cu Google în browser."
+          },
+          "start": "Începeți"
+        },
+        "complete": {
+          "description": "Puteți crea grupuri sau vă puteți alătura mai târziu din Setări.",
+          "title": "Totul este pregătit."
+        },
+        "connection": {
+          "connected": "Conexiune realizată",
+          "connecting": "Se stabilește conexiunea…"
+        },
+        "group": {
+          "invite_code": {
+            "label": "Cod de invitație",
+            "member_limit": "Un grup poate avea cel mult 12 membri.",
+            "placeholder": "Cod de la un prieten",
+            "required": "Introduceți un cod de invitație."
+          },
+          "join": {
+            "action": "Alăturați-vă"
+          },
+          "name": {
+            "placeholder": "De exemplu: Grupul nostru"
+          },
+          "path": {
+            "label": "Mod de participare"
+          }
+        },
+        "launch": {
+          "action": "Porniți"
+        },
+        "profile": {
+          "description": "Puteți schimba această opțiune mai târziu din Setări.",
+          "title": "Alegeți un nume"
+        },
+        "step": {
+          "complete": "Finalizat"
+        },
+        "tagline": "Prietenii au ajuns lângă ecranul dvs."
+      },
+      "overlay": {
+        "current_user": "{0} · eu"
+      },
+      "platform": {
+        "requirements": {
+          "description": "SIDEY necesită Windows 10 versiunea 1809 (compilarea 17763) sau o versiune mai recentă și un PC x64.",
+          "title": "Versiune Windows neacceptată",
+          "window_title": "SIDEY — Windows neacceptat"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Alegeți un personaj pixelat care să vă reprezinte pe ecranele prietenilor.",
+          "save": {
+            "success": "Personajul a fost schimbat."
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "default": "Bulă implicită",
+            "description": "Alegeți o bulă pe care o dețineți. Va fi aplicată imediat în toate grupurile.",
+            "title": "Bule"
+          },
+          "equipped": "Echipat",
+          "save": {
+            "success": "Aspectul a fost aplicat."
+          },
+          "throwable": {
+            "default": "Minge moale implicită",
+            "description": "Alegeți o jucărie de aruncat pe care o dețineți. Va fi folosită imediat în toate grupurile.",
+            "title": "Jucării de aruncat"
+          }
+        },
+        "description": "Configurați numele și personajul pe care le văd prietenii.",
+        "duplicates": {
+          "notice": "Membrii grupului pot folosi același personaj sau același pseudonim."
+        },
+        "nickname": {
+          "description": "Acest nume apare în lumea pixelată și în mesajele prietenilor. Introduceți 2–8 caractere.",
+          "save": {
+            "action": "Schimbați pseudonimul",
+            "tooltip": "Salvați pseudonimul schimbat."
+          }
+        },
+        "save": {
+          "success": "Profilul a fost salvat."
+        }
+      },
+      "settings": {
+        "display": {
+          "description": "Configurați modul în care starea și mesajele prietenilor apar pe ecran.",
+          "offline_members": {
+            "description": "Afișați și prietenii offline ca personaje adormite, cu un punct roșu de stare.",
+            "title": "Afișați membrii offline",
+            "tooltip": "Afișați membrii offline"
+          },
+          "quiet_mode": {
+            "description": "Ascundeți bulele de mesaje și indicatorii de tastare, dar păstrați starea conexiunii și numărul de mesaje necitite.",
+            "tooltip": "Ascundeți sau afișați mesajele"
+          },
+          "throw_guard": {
+            "description": "Când opțiunea este dezactivată, faceți clic stânga pe personajul unui prieten pentru a arunca imediat. Când este activată, faceți mai întâi dublu clic dreapta pe propriul personaj, apoi faceți clic stânga pe un prieten în următoarele 10 secunde pentru a arunca.",
+            "title": "Aruncați după ce faceți dublu clic dreapta pe personajul meu",
+            "tooltip": "Solicitați dublu clic dreapta pe personajul meu înainte de aruncare"
+          }
+        },
+        "general": {
+          "description": "Configurați afișarea și pornirea implicite."
+        },
+        "language": {
+          "description": "Alegeți limba aplicației. Schimbarea se aplică imediat.",
+          "title": "Limbă / Language"
+        },
+        "navigation_label": "Setări",
+        "overlay": {
+          "description": "Afișați lumea pixelată a prietenilor de-a lungul marginii selectate a ecranului.",
+          "tooltip": "Afișați lumea pixelată"
+        },
+        "placement": {
+          "description": "Alegeți ecranul și poziția personajelor pixelate.",
+          "edge": {
+            "description": "Alegeți marginea ecranului pe care se deplasează personajele.",
+            "title": "Marginea ecranului",
+            "tooltip": "Marginea ecranului pentru lumea pixelată"
+          },
+          "monitor": {
+            "description": "Alegeți ecranul pe care apar lumea pixelată și fereastra de mesaje.",
+            "title": "Monitor",
+            "tooltip": "Monitor pentru lumea pixelată și fereastra de mesaje",
+            "unavailable": "Nu este disponibil niciun monitor. Conectați un monitor și încercați din nou."
+          },
+          "span": {
+            "description": "Alegeți cât spațiu ocupă lumea de-a lungul marginii selectate.",
+            "full": "Complet",
+            "title": "Lungimea zonei",
+            "tooltip": "Zona ecranului ocupată de lumea pixelată"
+          },
+          "title": "Poziționarea lumii"
+        },
+        "save": {
+          "failed": "Setările nu au putut fi salvate. Încercați din nou. ({0})"
+        },
+        "shortcuts": {
+          "action": {
+            "composer": "Deschideți/închideți fereastra de mesaje",
+            "history": "Deschideți/închideți istoricul recent",
+            "overlay": "Afișați/ascundeți suprapunerea",
+            "quiet_mode": "Ascundeți sau afișați mesajele"
+          },
+          "description": "Selectați o comandă rapidă, apoi apăsați combinația dorită. Dacă alegeți o combinație deja utilizată, cele două comenzi rapide își vor schimba între ele atribuirile.",
+          "error": {
+            "already_registered": "Această comandă rapidă este deja utilizată de sistem sau de altă aplicație. Alegeți alta.",
+            "availability_unverified": "Nu s-a putut verifica dacă această comandă rapidă este disponibilă. Alegeți alta.",
+            "in_app_conflict": "O altă comandă rapidă din aplicație folosește această combinație. La salvare, cele două comenzi rapide își vor schimba între ele atribuirile.",
+            "invalid": "Comandă rapidă nevalidă",
+            "modifier_required": "O comandă rapidă trebuie să înceapă cu Win, Ctrl, Alt sau Shift.",
+            "system_conflict": "Această comandă rapidă este deja utilizată de Windows. Alegeți alta."
+          },
+          "recorder": {
+            "empty": "Apăsați o combinație de taste pentru a schimba această comandă rapidă.",
+            "help": "Apăsați Win, Ctrl, Alt sau Shift împreună cu altă tastă. Apăsați Esc pentru anulare.",
+            "recording": "Apăsați comanda rapidă…",
+            "reset": "Resetați"
+          },
+          "title": "Comenzi rapide de la tastatură"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Redați un efect sonor când o jucărie aruncată lovește un personaj din grupul curent.",
+            "title": "Efecte sonore ale personajelor"
+          },
+          "description": "Configurați efectele sonore ale personajelor.",
+          "mute": "Dezactivați sunetul",
+          "unmute": "Activați sunetul",
+          "volume": "Volum"
+        },
+        "storage": {
+          "folder_invalid": "Folderul pentru salvarea setărilor nu a putut fi deschis. Reporniți aplicația.",
+          "read_failed": "Setările salvate nu au putut fi citite. Reporniți aplicația."
+        },
+        "theme": {
+          "dark": "Întunecat",
+          "description": "Alegeți tema deschisă, închisă sau a sistemului pentru aplicație.",
+          "light": "Luminos",
+          "system": "După setarea Windows",
+          "title": "Temă"
+        },
+        "update": {
+          "check": {
+            "action": "Căutați actualizări"
+          },
+          "check_now": {
+            "tooltip": "Verificați dacă există o versiune nouă."
+          },
+          "description": "Verificați dacă există o versiune nouă.",
+          "last_checked": {
+            "never": "Ultima verificare: niciodată",
+            "today": "Astăzi la {0}",
+            "value": "Ultima verificare: {0}",
+            "yesterday": "Ieri la {0}"
+          },
+          "release_notes": {
+            "action": "Noutăți"
+          },
+          "title": "Actualizări"
+        }
+      },
+      "store": {
+        "auth": {
+          "google": {
+            "failed": "Conectarea contului Google nu a putut fi inițiată. Încercați din nou."
+          }
+        },
+        "availability": {
+          "coming_soon": {
+            "description": "Magazinul este disponibil momentan doar pentru previzualizare. Achizițiile nu sunt încă disponibile.",
+            "title": "Achiziții disponibile în curând"
+          }
+        },
+        "checkout": {
+          "opening": "Se deschide fereastra de plată…"
+        },
+        "description": "Previzualizați modul în care personajele, bulele și obiectele aruncate se mișcă pe ecran.",
+        "empty": {
+          "description": "Schimbați termenul de căutare, tipul produsului sau filtrul pentru produsele deținute.",
+          "title": "Niciun produs corespunzător"
+        },
+        "filter": {
+          "hide_owned": "Ascundeți produsele deținute",
+          "menu": "Sortare și filtrare",
+          "reset": "Resetați filtrele",
+          "search": {
+            "label": "Căutare",
+            "placeholder": "Căutați după numele sau descrierea produsului"
+          }
+        },
+        "kind": {
+          "bubble": "Bule de dialog",
+          "character": "Personaje",
+          "keepsake": "Obiect drag",
+          "throwable": "Jucării de aruncat"
+        },
+        "navigation_label": "Aspect și magazin",
+        "preview": {
+          "member": {
+            "dubu": "Dubu",
+            "moka": "Moka"
+          },
+          "message": {
+            "left": "Ce mâncăm?",
+            "right": "Ce zici de o tocăniță picantă de pui?"
+          },
+          "open": "Previzualizare",
+          "sound": {
+            "off": "Dezactivați sunetul previzualizării",
+            "on": "Activați sunetul previzualizării"
+          },
+          "tree_movement_hint": "Faceți clic dreapta pe copac pentru a-l opri. Faceți din nou clic pentru a-l pune în mișcare.",
+          "unavailable": "Previzualizarea nu a putut fi încărcată. Încercați din nou."
+        },
+        "price": {
+          "krw": "₩{0:N0}"
+        },
+        "product": {
+          "sold_separately": "Vândut separat de personaj"
+        },
+        "purchase": {
+          "action": "Cumpărați pentru {0}",
+          "confirming": "Se confirmă plata…",
+          "failed": "Starea achiziției nu a putut fi verificată. Verificați din nou mai târziu.",
+          "owned": "Deținut",
+          "success": "Achiziția a fost finalizată.",
+          "timeout": "Verificarea plății a expirat. Redeschideți magazinul pentru a verifica starea.",
+          "unavailable": "Nu poate fi cumpărat acum. Încercați din nou mai târziu."
+        },
+        "sort": {
+          "price_ascending": "Cele mai ieftine întâi",
+          "price_descending": "Cele mai scumpe întâi"
+        },
+        "status": {
+          "retry": "Încercați din nou",
+          "unavailable": "Starea magazinului nu a putut fi încărcată. Încercați din nou mai târziu."
+        },
+        "title": "Aspect și magazin"
+      },
+      "support": {
+        "diagnostics": {
+          "description": "Comprimați fișierele jurnal și salvați-le pe desktop. Distribuiți-le echipei de asistență pentru a ajuta la rezolvarea problemei.",
+          "export": {
+            "action": "Exportați",
+            "failed": "Datele de diagnosticare nu au putut fi exportate. Încercați din nou.",
+            "success": "Datele de diagnosticare au fost salvate pe desktop."
+          },
+          "title": "Exportați datele de diagnosticare"
+        },
+        "feedback": {
+          "action": "Trimiteți feedback",
+          "description": "Dacă întâmpinați o problemă sau aveți nevoie de ajutor, deschideți un tichet pe GitHub.",
+          "title": "Feedback"
+        }
+      },
+      "tray": {
+        "app": {
+          "exit": "Ieșire"
+        },
+        "connection": {
+          "error": {
+            "message": "Selectați Reconectare în Conexiune la server. Dacă problema persistă, contactați asistența și atașați jurnalul de diagnosticare.",
+            "title": "Eroare de conexiune la serverul SIDEY"
+          }
+        },
+        "group": {
+          "active": "Grup activ"
+        },
+        "groups": {
+          "empty": "Nu v-ați alăturat niciunui grup",
+          "open": "Setări grup…"
+        },
+        "history": {
+          "open": "Istoric recent…"
+        },
+        "message": {
+          "compose": "Compuneți un mesaj…"
+        },
+        "overlay": {
+          "hide": "Ascundeți suprapunerea"
+        },
+        "quiet_mode": {
+          "toggle": "Ascundere mesaje"
+        },
+        "settings": {
+          "open": "Setări…"
+        },
+        "shortcuts": {
+          "registration_failed": "Comanda rapidă {0} nu poate fi utilizată. Este posibil să fie folosită de altă aplicație. Folosiți meniul din bara de sistem."
+        },
+        "start": {
+          "failed": "Pictograma din bara de sistem nu a putut fi pornită. Închiderea ferestrei va închide SIDEY."
+        },
+        "store": {
+          "open": "Magazin…"
+        },
+        "unread": {
+          "tooltip": "SIDEY · {0} mesaje necitite"
+        },
+        "update": {
+          "available": "Este disponibilă o actualizare pentru SIDEY {0}.",
+          "check": "Căutați actualizări…",
+          "check_failed": "Nu s-a putut verifica dacă există actualizări. Încercați din nou mai târziu.",
+          "installed": "Actualizarea la SIDEY {0} este finalizată. Selectați notificarea pentru a vedea modificările.",
+          "latest": "Aveți cea mai recentă versiune."
+        }
+      },
+      "update": {
+        "available": "Este disponibilă o actualizare pentru SIDEY {0}.",
+        "checking": "Se caută actualizări…",
+        "download": {
+          "hash_mismatch": "Fișierul de actualizare descărcat nu a putut fi verificat. Descărcați-l din nou.",
+          "in_progress": "Se descarcă actualizarea.",
+          "progress": "Se descarcă actualizarea. ({0}%)"
+        },
+        "failed": "Actualizarea nu a putut fi finalizată. Încercați din nou mai târziu.",
+        "install": {
+          "cancelled": "Instalarea actualizării a fost anulată.",
+          "invalid": "Informațiile de instalare a actualizării nu au putut fi verificate. Încercați din nou mai târziu.",
+          "launch_failed": "Programul de instalare nu a putut fi deschis. Selectați Căutați actualizări și încercați din nou.",
+          "launched": "Descărcarea este finalizată, iar programul de instalare a fost lansat.",
+          "missing": "Actualizarea nu poate fi instalată acum. Încercați din nou mai târziu."
+        },
+        "latest": "Folosiți cea mai recentă versiune.",
+        "metadata": {
+          "invalid": "Informațiile despre actualizare nu au putut fi verificate. Încercați din nou mai târziu."
+        },
+        "not_published": "Noua actualizare nu este disponibilă încă. Verificați din nou mai târziu.",
+        "prompt": {
+          "download": "Descărcați",
+          "later": "Mai târziu",
+          "message": "Descărcați SIDEY {0}?",
+          "title": "Este disponibilă o actualizare"
+        },
+        "release_notes": {
+          "open_failed": "Noutățile nu au putut fi deschise. Încercați din nou. ({0})"
+        }
+      },
+      "validation": {
+        "message": {
+          "length": "Mesajul trebuie să conțină 1–200 de caractere."
+        },
+        "nickname": {
+          "length": "Pseudonimul trebuie să conțină 2–8 caractere."
+        },
+        "room_name": {
+          "length": "Numele grupului trebuie să conțină 1–20 de caractere."
+        }
+      }
+    }
+  },
+  "profile": {
+    "applying": "Se aplică…",
+    "character": {
+      "label": "Personaj"
+    },
+    "nickname": {
+      "label": "Pseudonim",
+      "placeholder": "2–8 caractere"
+    },
+    "title": "Profilul meu"
+  },
+  "settings": {
+    "display": {
+      "quiet_mode": {
+        "title": "Ascundere mesaje"
+      }
+    },
+    "overlay": {
+      "title": "Afișați lumea pixelată"
+    },
+    "placement": {
+      "edge": {
+        "bottom": "Jos",
+        "left": "Stânga",
+        "right": "Dreapta",
+        "top": "Sus"
+      }
+    },
+    "section": {
+      "display": {
+        "title": "Afișare"
+      },
+      "general": {
+        "title": "General"
+      },
+      "sound": {
+        "title": "Sunet"
+      }
+    },
+    "window": {
+      "title": "Setări SIDEY"
+    },
+    "startup": {
+      "title": "Pornire automată la conectare",
+      "description": "Aplicația pornește automat când vă conectați."
+    }
+  },
+  "store": {
+    "sort": {
+      "catalog": "Implicit",
+      "label": "Sortare"
+    }
+  }
+}

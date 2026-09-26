@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Suprascrierea Supabase trebuie să includă un URL HTTPS (sau localhost prin HTTP) și o cheie publicabilă. Cheile secret și service-role nu sunt permise."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "Previzualizarea locală cu 12 personaje rulează deoarece lipsesc variabilele de mediu ale serverului."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "Motorul de randare pentru metrici nu rulează.",
+      "not_started": "Motorul de randare pentru metrici nu a pornit."
+    },
+    "export": {
+      "action": "Exportați metricile curente ca JSON",
+      "failed": "Exportul metricilor nu a reușit: {0}",
+      "path": "Calea de export: {0}",
+      "success": "Metricile curente au fost exportate ca JSON. Rezultatele manuale rămân not_run.",
+      "tooltip": "Salvați metricile curente de performanță a randării ca JSON."
+    },
+    "preview_notice": "Mod intern de măsurare a randării, limitat la hamster. Verificarea manuală nu a fost înregistrată.",
+    "samples": {
+      "empty": "Nicio mostră de metrici"
+    },
+    "summary": "Timp scurs {0:F0} s · {1} mostre · cadru maxim {2:F2} ms · set de lucru {3:F1} MB (vârf {4:F1} MB) · GDI {5} · USER {6}",
+    "title": "Metrici interne de randare"
+  }
+}

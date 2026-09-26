@@ -85,23 +85,42 @@ Supabase Presence를 제거하지 않는다.
 승인된 asset 구조와 플랫폼 지원 범위는
 [`assets/v1/manifest.json`](../assets/v1/manifest.json), 판매 상품 metadata와 플랫폼
 식별자는 [`assets/v1/commerce-catalog.json`](../assets/v1/commerce-catalog.json)이,
-사용자에게 보이는 상품 번역은
-[`assets/v1/commerce-localizations.json`](../assets/v1/commerce-localizations.json)이
-소유한다. 생성 스크립트가 이 원본에서 웹과 네이티브 mirror, App Store Connect 입력을
-만들고 검증한다.
+사용자에게 보이는 상품 번역은 언어별
+[`assets/v1/locale/commerce/`](../assets/v1/locale/commerce/) 파일이 소유한다. 생성
+스크립트가 이 원본에서 웹과 네이티브 mirror, App Store Connect 입력을 만들고 검증한다.
 backend가 상품 변경을 필요로 하면 검토된 private source commit의 snapshot과
 provenance를 별도로 받아 서버용 매핑을 생성한다. Source catalog 변경만으로 backend가
 배포되지는 않는다.
 
-네이티브 앱 UI 번역은 [`assets/v1/ui-localizations.json`](../assets/v1/ui-localizations.json)이
-원본이다. 공통 문구와 플랫폼 고유 문구를 구분해 보존하고, 결정론적 생성기가 macOS
-String Catalog와 Windows 언어별 JSON mirror를 만든다. 각 플랫폼의 지원 언어와 fallback,
-placeholder 및 plural 형식은 다를 수 있지만 생성된 bundle을 직접 고쳐 원본과 갈라지게
-하지 않는다. 상품명과 상품 설명은
-[`assets/v1/commerce-localizations.json`](../assets/v1/commerce-localizations.json)이 별도로
-소유하며, Windows 언어 bundle은 UI 원본과 commerce 원본을 한 생성기에서 합쳐 생성한다.
-두 원본이 같은 Windows key를 함께 소유하면 검증을 실패시킨다. App Store listing 문구는
-앱 내부 문구와 사용처 및 길이 제한이 다르므로 전용 manifest가 계속 소유한다.
+네이티브 앱 UI 번역은 언어별
+[`assets/v1/locale/client/`](../assets/v1/locale/client/) 파일이 원본이고,
+[`assets/v1/ui-localizations.json`](../assets/v1/ui-localizations.json)은 지원 언어와 플랫폼별
+소비 범위만 정의한다. 각 언어 파일은 semantic key를 중첩 객체로 보존하고, 플랫폼별로
+실제 문구가 다른 항목만 `platforms` 아래에 둔다. 결정론적 생성기가 macOS String Catalog와
+Windows 언어별 JSON mirror를 만든다. 각 플랫폼의 지원 언어와 fallback, placeholder 및
+plural 형식은 다를 수 있지만 생성된 bundle을 직접 고쳐 원본과 갈라지게 하지 않는다.
+아직 해당 플랫폼에서 제공하지 않는 언어도 완성된 플랫폼 번역을 locale 원본에 보관하며,
+`ui-localizations.json`의 consumer 목록에 포함되기 전에는 bundle로 내보내지 않는다.
+하나의 semantic key가 자체 값과 하위 key를 함께 가지는 경우 자체 값은 `$value`에 두고,
+macOS 복수형은 `one`과 `other`를 같은 leaf에 둔다.
+개발 빌드와 검토 도구에서만 쓰는 문구는
+[`assets/v1/locale/internal/`](../assets/v1/locale/internal/)이 별도로 소유한다. 생성기는
+macOS `InternalLocalizable.xcstrings`와 Windows `InternalLangs`를 만들며, 두 산출물은
+Release 앱에 포함하지 않는다. 아직 해당 플랫폼에서 제공하지 않는 언어의 내부 문구도
+완성된 번역을 원본에 보관하지만 consumer 목록에 포함되기 전에는 산출하지 않는다.
+번역의 어투와 표기는 언어별
+[Microsoft Localization Style Guide](https://learn.microsoft.com/globalization/reference/microsoft-style-guides)를
+기준으로 맞추고, 영어 UI 문구는 Microsoft Writing Style Guide도 함께 따른다.
+유료 상품명과 상품 설명은 언어별
+[`assets/v1/locale/commerce/`](../assets/v1/locale/commerce/) 파일이 별도로 소유하며,
+macOS와 Windows 언어 bundle은 UI 원본과 commerce 원본을 한 생성기에서 합쳐 생성한다.
+무료 캐릭터 이름과 알 수 없는 캐릭터 fallback은 client 원본이 소유한다. 유료 캐릭터
+이름은 commerce 원본에서 같은 `character.<id>.display_name` 형식으로 생성한다. 사용되지 않는
+캐릭터 색상 설명은 로컬라이제이션 계약에 두지 않는다. 두 원본이 같은 네이티브 key를
+함께 소유하면 검증을 실패시킨다. 모든 언어의 상품은 30자 이하의 앱 내 구입 표시명,
+앱과 웹에서 사용하는 설명, 45자 이하의 앱 내 구입 설명을 함께 명시한다. 현재 App Store 산출물은 지원하는 4개 언어만
+소비한다. App Store listing 문구는 앱 내부 문구와 사용처 및 길이 제한이 다르므로 전용
+manifest가 계속 소유한다.
 
 ## 배포 산출물
 

@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Un remplacement Supabase nécessite une URL HTTPS (ou HTTP localhost) et une clé publiable. Les clés secret et service-role sont interdites."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "Un aperçu local avec 12 personnages est en cours, car les variables d’environnement du serveur ne sont pas configurées."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "Le moteur de rendu des métriques n’est pas en cours d’exécution.",
+      "not_started": "Le moteur de rendu des métriques n’a pas démarré."
+    },
+    "export": {
+      "action": "Exporter le JSON des métriques actuelles",
+      "failed": "Échec de l’exportation des métriques : {0}",
+      "path": "Chemin d’exportation : {0}",
+      "success": "Le JSON des métriques actuelles a été exporté. Les résultats manuels restent sur not_run.",
+      "tooltip": "Enregistrez les métriques actuelles de performances de rendu au format JSON."
+    },
+    "preview_notice": "Mode interne de métriques du moteur de rendu limité au hamster. La vérification manuelle n’a pas été enregistrée.",
+    "samples": {
+      "empty": "Aucun échantillon de métrique"
+    },
+    "summary": "Durée {0:F0} s · {1} échantillons · image max. {2:F2} ms · plage de travail {3:F1} Mo (pic {4:F1} Mo) · GDI {5} · USER {6}",
+    "title": "Métriques internes du moteur de rendu"
+  }
+}

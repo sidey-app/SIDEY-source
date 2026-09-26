@@ -18,13 +18,13 @@
         <StackPanel x:Name="LeftNameplate" Canvas.Top="100" Canvas.ZIndex="20" Orientation="Horizontal" Spacing="4">
           <Ellipse Width="8" Height="8" VerticalAlignment="Center" Fill="{ThemeResource SystemFillColorSuccessBrush}" />
           <Border Height="20" Padding="4,0" Background="#9E050609" CornerRadius="8">
-            <TextBlock Foreground="White" FontSize="12" Text="{Binding Value, Source={i18n:I18n Key=preview.moka}, Mode=OneWay}" />
+            <TextBlock Foreground="White" FontSize="12" Text="{Binding Value, Source={i18n:I18n Key=store.preview.member.moka}, Mode=OneWay}" />
           </Border>
         </StackPanel>
         <StackPanel x:Name="RightNameplate" Canvas.Top="100" Canvas.ZIndex="20" Orientation="Horizontal" Spacing="4">
           <Ellipse Width="8" Height="8" VerticalAlignment="Center" Fill="{ThemeResource SystemFillColorSuccessBrush}" />
           <Border Height="20" Padding="4,0" Background="#9E050609" CornerRadius="8">
-            <TextBlock Foreground="White" FontSize="12" Text="{Binding Value, Source={i18n:I18n Key=preview.dubu}, Mode=OneWay}" />
+            <TextBlock Foreground="White" FontSize="12" Text="{Binding Value, Source={i18n:I18n Key=store.preview.member.dubu}, Mode=OneWay}" />
           </Border>
         </StackPanel>
 
@@ -88,7 +88,7 @@
 
       <TextBlock x:Name="TreeMovementHint" Margin="12,12,60,0" MaxWidth="400"
           HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="Wrap" FontSize="12" IsHitTestVisible="False"
-          Text="{Binding Value, Source={i18n:I18n Key=preview.treeMovementHint}, Mode=OneWay}" />
+          Text="{Binding Value, Source={i18n:I18n Key=store.preview.tree_movement_hint}, Mode=OneWay}" />
       <Button x:Name="PreviewSoundButton" Width="36" Height="36" Margin="12" Padding="0"
           HorizontalAlignment="Right" VerticalAlignment="Top" Click="OnPreviewSoundClick">
         <SymbolIcon x:Name="PreviewSoundIcon" Symbol="Volume" />

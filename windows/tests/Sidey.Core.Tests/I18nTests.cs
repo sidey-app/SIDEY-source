@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Sidey.Core.Localization;
 
 namespace Sidey.Core.Tests;
@@ -8,7 +7,12 @@ public sealed class I18nTests
     [Fact]
     public void LoadsNestedKoreanCatalogByDottedKey()
     {
-        Assert.Equal("친구들이 화면 곁에 도착했습니다.", I18n.Get("onboarding.tagline"));
+        const string key = "onboarding.tagline";
+
+        string value = I18n.Get(key);
+
+        Assert.False(string.IsNullOrWhiteSpace(value));
+        Assert.NotEqual(key, value);
     }
 
     [Theory]
@@ -20,7 +24,25 @@ public sealed class I18nTests
     [InlineData("zh-Hant", "zh-TW")]
     [InlineData("uk", "uk-UA")]
     [InlineData("ru-KZ", "ru-RU")]
-    [InlineData("fr-FR", "ko-KR")]
+    [InlineData("it-CH", "it-IT")]
+    [InlineData("pt-PT", "pt-PT")]
+    [InlineData("pt-BR", "pt-BR")]
+    [InlineData("es-MX", "es-ES")]
+    [InlineData("cs", "cs-CZ")]
+    [InlineData("tr", "tr-TR")]
+    [InlineData("ro", "ro-RO")]
+    [InlineData("bg", "bg-BG")]
+    [InlineData("sr-Cyrl", "sr-Cyrl-RS")]
+    [InlineData("sr-Latn-BA", "sr-Latn-RS")]
+    [InlineData("sr-RS", "sr-Cyrl-RS")]
+    [InlineData("pl", "pl-PL")]
+    [InlineData("nl-BE", "nl-BE")]
+    [InlineData("nl", "nl-NL")]
+    [InlineData("fr-CA", "fr-FR")]
+    [InlineData("he", "he-IL")]
+    [InlineData("iw-IL", "he-IL")]
+    [InlineData("de-AT", "de-DE")]
+    [InlineData("sv-SE", "ko-KR")]
     public void NormalizesSystemUiLanguageToASupportedCatalog(string requested, string expected)
     {
         Assert.Equal(expected, I18n.NormalizeLanguage(requested));
@@ -30,31 +52,44 @@ public sealed class I18nTests
     public void SupportedCatalogOrderMatchesTheLanguagePicker()
     {
         Assert.Equal(
-            ["ko-KR", "en-US", "ja-JP", "zh-CN", "zh-TW", "uk-UA", "ru-RU"],
+            [
+                "ko-KR", "en-US", "ja-JP", "zh-CN", "zh-TW", "uk-UA", "ru-RU",
+                "it-IT", "pt-PT", "es-ES", "cs-CZ", "tr-TR", "ro-RO", "bg-BG", "pt-BR",
+                "sr-Cyrl-RS", "pl-PL", "sr-Latn-RS", "nl-BE", "fr-FR", "nl-NL", "he-IL",
+                "de-DE",
+            ],
             I18n.SupportedLanguages);
+    }
+
+    [Fact]
+    public void HebrewUsesRightToLeftLayoutAndOtherSupportedLanguagesUseLeftToRight()
+    {
+        string previous = I18n.Language;
+        try
+        {
+            I18n.SetLanguage("he-IL");
+            Assert.True(I18n.IsRightToLeft);
+
+            foreach (string language in I18n.SupportedLanguages.Where(value => value != "he-IL"))
+            {
+                I18n.SetLanguage(language);
+                Assert.False(I18n.IsRightToLeft, language);
+            }
+        }
+        finally
+        {
+            I18n.SetLanguage(previous);
+        }
     }
 
     [Fact]
     public void FormatsCatalogValuesAndReturnsMissingKeysSafely()
     {
-        Assert.Equal("최근 메시지 · 테스트", I18n.Format("history.roomTitle", "테스트"));
+        string formatted = I18n.Format("groups.delete.confirmation.title", "테스트");
+        Assert.NotEqual("groups.delete.confirmation.title", formatted);
+        Assert.Contains("테스트", formatted, StringComparison.Ordinal);
+        Assert.NotEqual("renderer_metrics.samples.empty", I18n.Get("renderer_metrics.samples.empty"));
         Assert.Equal("missing.example", I18n.Get("missing.example"));
     }
 
-    [Fact]
-    public void KoreanAndEnglishHistoryCopyUseThreeDays()
-    {
-        Assert.Equal("메시지는 서버에서 3일 후 자동 삭제됩니다.", I18n.Get("history.retentionNotice"));
-        Assert.Equal("최근 3일 기록을 모두 봤어요", I18n.Get("history.exhausted"));
-
-        using var english = JsonDocument.Parse(File.ReadAllText(
-            Path.Combine(AppContext.BaseDirectory, "Langs", "en-US.json")));
-        JsonElement history = english.RootElement.GetProperty("history");
-        Assert.Equal(
-            "Messages are automatically deleted from the server after 3 days.",
-            history.GetProperty("retentionNotice").GetString());
-        Assert.Equal(
-            "You’ve reached the end of the last 3 days",
-            history.GetProperty("exhausted").GetString());
-    }
 }

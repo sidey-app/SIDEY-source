@@ -12,13 +12,17 @@ from typing import Any, Iterator
 
 ROOT = Path(__file__).resolve().parents[2]
 CATALOG = ROOT / "macos" / "SIDEY" / "Resources" / "Localizable.xcstrings"
+INTERNAL_CATALOG = ROOT / "macos" / "SIDEY" / "Resources" / "InternalLocalizable.xcstrings"
 SOURCE_ROOT = ROOT / "macos" / "SIDEY"
 SUPPORTED_LOCALES = ("en", "ko", "ja", "zh-Hant")
 SEMANTIC_KEY = re.compile(r"^[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+$")
 LOCALIZATION_CALL = re.compile(
-    r'(?:L10n\.(?:text|format)|Text|Button|Toggle|Label|TextField|SecureField|'
+    r'(?<!Internal)(?:L10n\.(?:text|format)|Text|Button|Toggle|Label|TextField|SecureField|'
     r'navigationTitle|accessibilityLabel|accessibilityHint|help|confirmationDialog)'
     r'\(\s*"([a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+)"'
+)
+INTERNAL_LOCALIZATION_CALL = re.compile(
+    r'InternalL10n\.text\(\s*"([a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+)"'
 )
 RESOURCE_LITERAL = re.compile(
     r'(?:LocalizedStringResource\s*=|->\s*LocalizedStringResource\s*\{)'
@@ -117,6 +121,13 @@ def referenced_keys(source_root: Path = SOURCE_ROOT) -> set[str]:
     return keys
 
 
+def referenced_internal_keys(source_root: Path = SOURCE_ROOT) -> set[str]:
+    keys: set[str] = set()
+    for path in source_root.rglob("*.swift"):
+        keys.update(INTERNAL_LOCALIZATION_CALL.findall(path.read_text(encoding="utf-8")))
+    return keys
+
+
 def validate_key_coverage(strings: dict[str, Any]) -> None:
     referenced = referenced_keys()
     catalog_keys = set(strings)
@@ -128,6 +139,15 @@ def validate_key_coverage(strings: dict[str, Any]) -> None:
     )
     require(not missing, f"Missing localization keys: {missing}")
     require(not stale, f"Stale localization keys: {stale}")
+
+
+def validate_internal_key_coverage(strings: dict[str, Any]) -> None:
+    referenced = referenced_internal_keys()
+    catalog_keys = set(strings)
+    missing = sorted(referenced - catalog_keys)
+    stale = sorted(catalog_keys - referenced)
+    require(not missing, f"Missing internal localization keys: {missing}")
+    require(not stale, f"Stale internal localization keys: {stale}")
 
 
 def _swift_string_literals(source: str) -> Iterator[tuple[int, str]]:
@@ -196,11 +216,14 @@ def validate_project_regions() -> None:
 
 def main() -> int:
     strings = load_and_validate_catalog()
+    internal_strings = load_and_validate_catalog(INTERNAL_CATALOG)
     validate_key_coverage(strings)
+    validate_internal_key_coverage(internal_strings)
     validate_no_shipped_hangul()
     validate_project_regions()
     print(
-        f"Validated {len(strings)} macOS localization keys across "
+        f"Validated {len(strings)} production and {len(internal_strings)} internal "
+        f"macOS localization keys across "
         f"{', '.join(SUPPORTED_LOCALES)}."
     )
     return 0

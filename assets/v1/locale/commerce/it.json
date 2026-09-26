@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Axolotl stellare",
+    "description": "Questo axolotl ha riportato a casa una stella smarrita e la stringe forte anche mentre dorme.",
+    "iap_description": "Un axolotl abbraccia una stella nel sonno."
+  },
+  "character_guinea_pig": {
+    "display_name": "Cucciolo di porcellino d'India",
+    "description": "Ha dimenticato dove ha nascosto la merenda. A giudicare da quelle guance piene, non può essere lontana.",
+    "iap_description": "Ha nascosto la merenda e scordato il posto."
+  },
+  "character_monkey": {
+    "display_name": "Scimmietta",
+    "description": "È venuta a condividere una banana. Dice di averne dato un solo morso per strada… allora perché ne manca metà?",
+    "iap_description": "Ha portato una banana. Perché ne manca metà?"
+  },
+  "character_chinchilla": {
+    "display_name": "Cucciolo di cincillà",
+    "description": "Appena uscito dal bagno di sabbia, è venuto a giocare. Prima di salutare, deve sfoggiare quel pelo soffice.",
+    "iap_description": "Fresco dal bagno di sabbia e morbidissimo."
+  },
+  "character_otter": {
+    "display_name": "Cucciolo di lontra",
+    "description": "È venuta a mostrare la sua conchiglia preferita. Puoi guardarla, ma se la prendi metterà il broncio.",
+    "iap_description": "Guarda la sua conchiglia, ma non prenderla."
+  },
+  "character_pig": {
+    "display_name": "Maialino",
+    "description": "Ha seguito il profumo degli spuntini e ha deciso di restare. Ora pensa che questa sia casa sua.",
+    "iap_description": "Ha seguito il profumo e si è trasferito."
+  },
+  "character_tree": {
+    "display_name": "Alberello",
+    "description": "Un alberello è uscito a fare una passeggiata. Quando gli hanno detto di riposarsi, ha iniziato a scegliere dove mettere radici.",
+    "iap_description": "A passeggio, cerca dove mettere radici."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Fumetto con coniglietto rosa",
+    "description": "Un fumetto rosa decorato con un coniglietto.",
+    "iap_description": "Un fumetto rosa decorato con un coniglietto."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Fumetto del pulcino burro",
+    "description": "Un fumetto giallo burro decorato con un pulcino.",
+    "iap_description": "Fumetto giallo burro con un pulcino."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Fumetto con gatto stellato",
+    "description": "Un fumetto viola intenso decorato con un gatto stellato.",
+    "iap_description": "Fumetto viola con un gatto stellato."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Cuore rimbalzante",
+    "description": "Un cuore da lanciare che rimbalza mentre vola.",
+    "iap_description": "Un cuore giocattolo che rimbalza in volo."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Mini cannone",
+    "description": "Un mini cannone da lanciare che spara un proiettile con la miccia accesa.",
+    "iap_description": "Un mini cannone con proiettile a miccia."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Paperella stridente",
+    "description": "Una papera che lancia una papera. Probabilmente non è una lite di famiglia.",
+    "iap_description": "Una papera lancia una papera. Niente liti."
+  },
+  "throwable_snowflake": {
+    "display_name": "Fiocco di neve",
+    "description": "Un fiocco di neve che all'impatto si disperde in minuscoli frammenti di cristallo.",
+    "iap_description": "All’impatto si sparge in piccoli cristalli."
+  },
+  "throwable_baseball": {
+    "display_name": "Palla da baseball",
+    "description": "Una palla con cuciture rosse che si schiaccia all'impatto e rimbalza via.",
+    "iap_description": "Cuciture rosse, si schiaccia e rimbalza."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Palla Wakku",
+    "description": "Crunch! Goditi il suono croccante della Palla Wakku che va in mille pezzi.",
+    "iap_description": "Crunch! La palla Wakku va in mille pezzi."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Biscotto morbido Dubai",
+    "description": "Il guscio al cacao e il ripieno verde si schiacciano con un crunch davvero appagante.",
+    "iap_description": "Guscio al cacao, ripieno verde e un crunch."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Mini peperone del porcellino",
+    "description": "Uno spuntino conservato con cura. Se lo raccogli entro tre secondi dopo averlo lanciato, va bene, no?",
+    "iap_description": "Merenda al sicuro. Regola dei 3 secondi!"
+  },
+  "throwable_banana": {
+    "display_name": "Banana della scimmietta",
+    "description": "La scimmietta ha condiviso questa banana. Non abbiamo ancora avuto modo di chiederle se l'ha fatto apposta.",
+    "iap_description": "Una banana condivisa. A quanto pare."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Sabbia da bagno del cincillà",
+    "description": "È la sabbia da bagno del cincillà. Lanciarla probabilmente non significa che dovresti lavarti.",
+    "iap_description": "Sabbia da bagno, non un invito a lavarti."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Sfera dell'axolotl stellare",
+    "description": "Luce stellare racchiusa in una piccola sfera. Qualcuno ha controllato se in cielo manca una stella?",
+    "iap_description": "Luce stellare. Manca una stella in cielo?"
+  },
+  "throwable_clam": {
+    "display_name": "Conchiglia della lontra",
+    "description": "La conchiglia che la lontra portava ovunque. Dentro non c'è una perla, solo un po' di attaccamento.",
+    "iap_description": "Niente perla, solo tanto attaccamento."
+  },
+  "throwable_pork": {
+    "display_name": "Carne del maialino",
+    "description": "Uno schiaffo bello deciso! A proposito, qualcuno ha visto il maialino della porta accanto ultimamente?",
+    "iap_description": "Splat! Dov’è il maialino dei vicini?"
+  },
+  "throwable_timber": {
+    "display_name": "Mini albero dell'alberello",
+    "description": "Un albero lancia un alberello. Forse dovremmo prima controllare l'albero genealogico.",
+    "iap_description": "Un albero lancia un altro. Sono parenti?"
+  },
+  "character_shiba": {
+    "display_name": "Shiba Inu",
+    "description": "Abbiamo già fatto una passeggiata. Lo Shiba si rifiuta di riconoscere questo fatto.",
+    "iap_description": "Già portato a spasso. Lo Shiba nega tutto."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Pallina da tennis",
+    "description": "Abbiamo scelto qualcuno per lanciarla. Stiamo ancora cercando qualcuno che la riporti.",
+    "iap_description": "C’è chi lancia. Chi la riporta?"
+  },
+  "character_duck": {
+    "display_name": "Papera",
+    "description": "Esperta nello scansare le responsabilità. Le zampe da papera lo dimostrano.",
+    "iap_description": "Scansa ogni colpa sulle sue zampe da papera."
+  },
+  "character_poop": {
+    "display_name": "Cacca",
+    "description": "Non sappiamo chi l'abbia chiamata, ma eccola qui.",
+    "iap_description": "Non sappiamo chi l’ha chiamata, ma eccola."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Palla di carta igienica",
+    "description": "Nessuno sa se sia carta igienica usata. Schivala e basta!",
+    "iap_description": "Usata o no? Nessuno lo sa. Schivala!"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Dicevano che non era piccante. Non hanno mai detto secondo chi.",
+    "iap_description": "Dicevano fosse poco piccante. Secondo chi?"
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Spiedino di eomuk",
+    "description": "Doveva essere mangiato. Perché lo agiti in quel modo?",
+    "iap_description": "Era da mangiare. Perché lo agiti?"
+  },
+  "character_quokka": {
+    "display_name": "Quokka",
+    "description": "Sorride sempre. Sì, è proprio lui che ha appena lanciato quella foglia.",
+    "iap_description": "Sorride ancora dopo aver lanciato la foglia."
+  },
+  "throwable_leaf": {
+    "display_name": "Foglia",
+    "description": "È il pranzo al sacco del quokka. Non gli abbiamo chiesto se potevamo lanciarlo.",
+    "iap_description": "Pranzo del quokka, lanciato senza permesso."
+  }
+}

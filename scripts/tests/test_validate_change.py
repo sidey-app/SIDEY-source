@@ -92,14 +92,57 @@ class GateTests(unittest.TestCase):
                 [".github/workflows/macos-build-and-tests.yml"],
             )
 
-    def test_shared_localization_source_owns_only_generated_windows_mirrors(self):
-        source = "assets/v1/ui-localizations.json"
-        mirror = "windows/src/Sidey.App/Langs/ko-KR.json"
-        self.assertEqual(validate_paths("shared/localization", [source, mirror]), "shared")
-        for paths in ([mirror], [source, "windows/src/Sidey.App/MainWindow.xaml"]):
+    def test_shared_localization_source_owns_only_required_platform_paths(self):
+        sources = [
+            "assets/v1/locale/client/ko.json",
+            "assets/v1/locale/commerce/ko.json",
+            "assets/v1/locale/internal/ko.json",
+        ]
+        mirrors = [
+            "windows/src/Sidey.App/Langs/ko-KR.json",
+            "windows/src/Sidey.App/InternalLangs/ko-KR.json",
+            "macos/SIDEY/Resources/Localizable.xcstrings",
+            "macos/SIDEY/Resources/InternalLocalizable.xcstrings",
+            "macos/SIDEY/Resources/Commerce/commerce-localizations.json",
+            "macos/SIDEYAppStore.storekit",
+        ]
+        adapter = "scripts/macos/sync_commerce_localizations.py"
+        self.assertEqual(
+            validate_paths(
+                "shared/localization",
+                [*sources, *mirrors, adapter],
+            ),
+            "shared",
+        )
+        for paths in (
+            [mirrors[0]],
+            [mirrors[1]],
+            [sources[0], "windows/src/Sidey.App/MainWindow.xaml"],
+        ):
             with self.subTest(paths=paths):
                 with self.assertRaisesRegex(WorkflowError, "platform boundary"):
                     validate_paths("shared/localization", paths)
+
+    def test_one_time_locale_source_split_can_update_both_native_consumers(self):
+        source = "assets/v1/locale/client/ko.json"
+        legacy_source = "assets/v1/commerce-localizations.json"
+        consumers = [
+            "macos/SIDEY/Domain/L10n.swift",
+            "windows/src/Sidey.Core/Localization/I18n.cs",
+        ]
+
+        self.assertEqual(
+            validate_paths(
+                "shared/locale-source-split",
+                [source, legacy_source, *consumers],
+            ),
+            "shared",
+        )
+        with self.assertRaisesRegex(WorkflowError, "platform boundary"):
+            validate_paths(
+                "shared/locale-source-split",
+                [source, *consumers],
+            )
 
     def test_renamed_platform_workflows_keep_their_ownership(self):
         expected_platforms = {

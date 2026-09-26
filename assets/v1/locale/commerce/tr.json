@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Yıldız Işığı Aksolotlu",
+    "description": "Bu aksolotl yolunu kaybetmiş bir yıldızı eve getirdi ve uyurken bile ona sımsıkı sarılıyor.",
+    "iap_description": "Kayıp bir yıldıza uykusunda bile sarılıyor."
+  },
+  "character_guinea_pig": {
+    "display_name": "Yavru Gine Domuzu",
+    "description": "Atıştırmalığını nereye sakladığını unuttu. O dolu yanaklara bakılırsa çok uzakta olamaz.",
+    "iap_description": "Atıştırmalığını nereye sakladığını unuttu."
+  },
+  "character_monkey": {
+    "display_name": "Yavru Maymun",
+    "description": "Bir muz paylaşmaya geldi. Yolda yalnızca bir ısırık aldığını söylüyor… öyleyse yarısı neden yok?",
+    "iap_description": "Bir muz paylaşmaya geldi."
+  },
+  "character_chinchilla": {
+    "display_name": "Yavru Çinçilla",
+    "description": "Kum banyosundan yeni çıkıp oynamaya geldi. Selam vermeden önce kabarık kürkünü göstermesi gerekiyor.",
+    "iap_description": "Kum banyosundan yeni çıkıp oynamaya geldi."
+  },
+  "character_otter": {
+    "display_name": "Yavru Su Samuru",
+    "description": "En sevdiği deniz kabuğunu göstermeye geldi. Bakabilirsiniz ama elinden alırsanız küser.",
+    "iap_description": "En sevdiği deniz kabuğunu göstermeye geldi."
+  },
+  "character_pig": {
+    "display_name": "Yavru Domuz",
+    "description": "Atıştırmalık kokusunu izleyip kalmaya karar verdi. Artık burayı evi sanıyor.",
+    "iap_description": "Atıştırmalık kokusunu izleyip yerleşti."
+  },
+  "character_tree": {
+    "display_name": "Küçük Ağaç",
+    "description": "Küçük bir ağaç yürüyüşe çıktı. Biraz dinlenmesi söylenince kök salacağı yeri seçmeye başladı.",
+    "iap_description": "Küçük bir ağaç yürüyüşe çıktı."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Pembe Tavşan Balonu",
+    "description": "Tavşan süslemeli pembe bir konuşma balonu.",
+    "iap_description": "Tavşan süslemeli pembe bir konuşma balonu."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Tereyağı Sarısı Civciv Balonu",
+    "description": "Civciv süslemeli tereyağı sarısı bir konuşma balonu.",
+    "iap_description": "Civciv süslemeli tereyağı sarısı balon."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Yıldızlı Kedi Balonu",
+    "description": "Yıldızlı kedi süslemeli koyu mor bir konuşma balonu.",
+    "iap_description": "Yıldızlı kedi süslemeli koyu mor balon."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Zıplayan Kalp",
+    "description": "Havada uçarken zıplayan, fırlatılabilir bir kalp.",
+    "iap_description": "Uçarken zıplayan, fırlatılabilir kalp."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Mini Top",
+    "description": "Yanan fitilli bir mermi atan, fırlatılabilir mini bir top.",
+    "iap_description": "Yanan fitilli mermi atan mini top."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Gıcırdayan Ördek",
+    "description": "Ördek atan bir ördek. Muhtemelen bir aile kavgası değildir.",
+    "iap_description": "Ördek atan bir ördek."
+  },
+  "throwable_snowflake": {
+    "display_name": "Kar Tanesi",
+    "description": "Çarpınca küçük kristal parçalarına dağılan bir kar tanesi.",
+    "iap_description": "Çarpınca kristallere dağılan kar tanesi."
+  },
+  "throwable_baseball": {
+    "display_name": "Beyzbol Topu",
+    "description": "Çarpınca ezilip sekerek uzaklaşan, kırmızı dikişli bir top.",
+    "iap_description": "Çarpınca ezilip seken kırmızı dikişli top."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Wakku Topu",
+    "description": "Çat! Wakku Topu parçalara ayrılırken çıkan çıtır sesin tadını çıkarın.",
+    "iap_description": "Çat! Wakku Topu parçalara ayrılıyor."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Dubai çikolata yumuşak bisküvi",
+    "description": "Kakaolu kabuğu ve yeşil dolgusu, insanın hoşuna giden çıtır bir sesle ezilir.",
+    "iap_description": "Kakaolu kabuk ve çıtır yeşil dolgu."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Gine Domuzunun Mini Biberi",
+    "description": "Özenle saklanmış bir atıştırmalık. Fırlattıktan sonra üç saniye içinde yerden alırsanız sorun olmaz, değil mi?",
+    "iap_description": "Özenle saklanmış bir atıştırmalık."
+  },
+  "throwable_banana": {
+    "display_name": "Maymunun Muzu",
+    "description": "Maymun bu muzu paylaştı. Bunu isteyerek yapıp yapmadığını henüz soramadık.",
+    "iap_description": "Maymun bu muzu paylaştı."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Çinçillanın Kum Kesesi",
+    "description": "Bu, Çinçillanın banyo kumu. Onu fırlatması herhâlde yıkanmanız gerektiğine dair bir ima değildir.",
+    "iap_description": "Bu, Çinçillanın banyo kumu."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Aksolotlun yıldız küresi",
+    "description": "Küçük bir küreye doldurulmuş yıldız ışığı. Gökyüzünden bir yıldız eksilmiş mi diye bakan oldu mu?",
+    "iap_description": "Küçük bir küreye doldurulmuş yıldız ışığı."
+  },
+  "throwable_clam": {
+    "display_name": "Su Samurunun Deniz Kabuğu",
+    "description": "Su samurunun her yere taşıdığı deniz kabuğu. İçinde inci yok, yalnızca biraz bağ kalmış.",
+    "iap_description": "Su samurunun her yere taşıdığı deniz kabuğu."
+  },
+  "throwable_pork": {
+    "display_name": "Yavru Domuzun Domuz Eti",
+    "description": "Tok ve tatmin edici bir şaplak! Bu arada, son zamanlarda komşu domuzu gören oldu mu?",
+    "iap_description": "Tok ve tatmin edici bir şaplak!"
+  },
+  "throwable_timber": {
+    "display_name": "Küçük Ağacın Minik Ağacı",
+    "description": "Bir ağaç, minik bir ağaç fırlatıyor. Belki önce soy ağacına bakmalıyız.",
+    "iap_description": "Bir ağaç, minik bir ağaç fırlatıyor."
+  },
+  "character_shiba": {
+    "display_name": "Shiba Inu",
+    "description": "Zaten yürüyüşe çıktık. Shiba bu gerçeği kabul etmeyi reddediyor.",
+    "iap_description": "Zaten yürüyüşe çıktık."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Tenis Topu",
+    "description": "Topu atacak birini seçtik. Getirecek birini hâlâ arıyoruz.",
+    "iap_description": "Topu atacak birini seçtik."
+  },
+  "character_duck": {
+    "display_name": "Ördek",
+    "description": "Sorumluluktan sıyrılma konusunda uzman. Ördek ayakları da bunun kanıtı.",
+    "iap_description": "Sorumluluktan sıyrılma konusunda uzman."
+  },
+  "character_poop": {
+    "display_name": "Kaka",
+    "description": "Kimin çağırdığını bilmiyoruz ama işte burada.",
+    "iap_description": "Kimin çağırdığını bilmiyoruz ama işte burada."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Tuvalet Kâğıdı Topu",
+    "description": "Tuvalet kâğıdının kullanılmış olup olmadığını kimse bilmiyor. Siz en iyisi kaçın!",
+    "iap_description": "Kullanılmış mı? En iyisi kaçın!"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Acısız olduğunu söylediler. Kimin ölçüsüne göre olduğunu söylemediler.",
+    "iap_description": "Acısız olduğunu söylediler."
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Kore Eomuk Şişi",
+    "description": "Yenmek içindi. Neden etrafta sallıyorsunuz?",
+    "iap_description": "Yenmek içindi. Neden etrafta sallıyorsunuz?"
+  },
+  "character_quokka": {
+    "display_name": "Quokka",
+    "description": "Her zaman gülümsüyor. Evet, o yaprağı az önce atan da bu.",
+    "iap_description": "Her zaman gülümsüyor."
+  },
+  "throwable_leaf": {
+    "display_name": "Yaprak",
+    "description": "Quokka'nın paket öğle yemeği. Fırlatmamızda sakınca olup olmadığını sormadık.",
+    "iap_description": "Quokka'nın paket öğle yemeği."
+  }
+}

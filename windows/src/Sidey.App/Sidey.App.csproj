@@ -18,7 +18,7 @@
     <IncludeAllContentForSelfExtract>false</IncludeAllContentForSelfExtract>
     <PublishSingleFile>false</PublishSingleFile>
     <PublishTrimmed>false</PublishTrimmed>
-    <SatelliteResourceLanguages>en-US;ko-KR;ja-JP;zh-CN;zh-TW;uk-UA;ru-RU</SatelliteResourceLanguages>
+    <SatelliteResourceLanguages>bg-BG;cs-CZ;de-DE;en-US;es-ES;fr-FR;he-IL;it-IT;ja-JP;ko-KR;nl-BE;nl-NL;pl-PL;pt-BR;pt-PT;ro-RO;ru-RU;sr-Cyrl-RS;sr-Latn-RS;tr-TR;uk-UA;zh-CN;zh-TW</SatelliteResourceLanguages>
     <AssemblyName>SIDEY.Host</AssemblyName>
     <AssemblyTitle>SIDEY</AssemblyTitle>
     <Product>SIDEY</Product>
@@ -39,6 +39,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="Langs\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="InternalLangs\*.json" Condition="'$(Configuration)' == 'Debug'">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>

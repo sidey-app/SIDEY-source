@@ -52,7 +52,7 @@ public sealed class AtomicPreferencesStore : IPreferencesStore
         }
         catch (JsonException exception)
         {
-            throw new InvalidDataException(I18n.Get("preferences.readFailed"), exception);
+            throw new InvalidDataException(I18n.Get("settings.storage.read_failed"), exception);
         }
         finally
         {
@@ -69,7 +69,7 @@ public sealed class AtomicPreferencesStore : IPreferencesStore
         try
         {
             string directory = Path.GetDirectoryName(_path)
-                ?? throw new InvalidOperationException(I18n.Get("preferences.invalidFolder"));
+                ?? throw new InvalidOperationException(I18n.Get("settings.storage.folder_invalid"));
             Directory.CreateDirectory(directory);
             string temporaryPath = Path.Combine(
                 directory,

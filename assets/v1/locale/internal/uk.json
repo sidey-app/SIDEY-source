@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Знову відкрийте програму за допомогою scripts/macos/open_current.sh або зберіть і запустіть її в Xcode.",
+          "unverified_source": "Не вдалося перевірити, що цю програму зібрано з поточного вихідного коду."
+        }
+      },
+      "common": {
+        "quit": "Вийти"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Задайте SIDEY_SUPABASE_URL і SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Для Sidey-dev потрібні URL-адреса SIDEY-staging і publishable key.",
+          "production_backend_in_development": "Sidey-dev не може підключатися до продукційного проєкту Supabase.",
+          "secret_key_not_allowed": "Supabase secret key або service-role key не можна використовувати в клієнті.",
+          "unsupported_realtime_protocol": "Налаштування протоколу SIDEY у реальному часі містить непідтримуване значення."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Незафіксовані зміни"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Перевірка магазину · Не вдалося створити знімок",
+          "ownership": {
+            "$value": "Володіння",
+            "all": "Обидва",
+            "character": "Лише персонаж",
+            "keepsake": "Лише улюблена річ",
+            "none": "Немає"
+          },
+          "product": "Товар",
+          "purchase_disabled": "На цьому екрані перевірки справжні покупки не здійснюються.",
+          "window": {
+            "title": "Sidey-dev · Перевірка магазину · Без справжніх покупок"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Локальний попередній перегляд із 12 персонажами запущено, оскільки не задано змінні середовища сервера."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "Рендерер показників не працює.",
+          "not_started": "Рендерер показників не запущено."
+        },
+        "export": {
+          "action": "Експортувати поточні показники JSON",
+          "failed": "Не вдалося експортувати показники: {0}",
+          "path": "Шлях експорту: {0}",
+          "success": "Поточні показники JSON експортовано. Результат ручної перевірки залишається not_run.",
+          "tooltip": "Зберегти поточні показники швидкодії рендерера у форматі JSON."
+        },
+        "preview_notice": "Внутрішній режим показників рендерера лише з хом’ячком. Ручну перевірку ще не зафіксовано.",
+        "samples": {
+          "empty": "Немає зразків показників"
+        },
+        "summary": "Минуло {0:F0} с · Зразків: {1} · Найдовший кадр: {2:F2} мс · Робочий набір: {3:F1} МБ (пік: {4:F1} МБ) · GDI: {5} · USER: {6}",
+        "title": "Внутрішні показники рендерера"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Для перевизначення Supabase потрібні URL-адреса HTTPS (або HTTP для localhost) і публічний ключ. Секретні ключі та ключі service-role заборонено."
+        }
+      }
+    }
+  }
+}

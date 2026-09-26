@@ -67,7 +67,7 @@ class ScreenshotTransport(FakeTransport):
 def desired_with_test_screenshots(root: Path) -> DesiredState:
     desired = load_desired_state(
         ROOT / "release" / "app-store-localizations.json",
-        ROOT / "assets" / "v1" / "commerce-localizations.json",
+        ROOT / "assets" / "v1" / "locale" / "commerce",
         ROOT / "assets" / "v1" / "commerce-catalog.json",
     )
     manifest = deepcopy(desired.manifest)

@@ -21,12 +21,12 @@
           "locale": "en_US"
         },
         {
-          "description": "迷子の星を抱いて眠るウーパールーパーです。",
+          "description": "迷子の星をひとつ連れてきました。眠るときもぎゅっと抱いているそうです。",
           "displayName": "星明かりのウーパールーパー",
           "locale": "ja"
         },
         {
-          "description": "抱著迷路小星星入睡的六角恐龍。",
+          "description": "牠帶回了一顆迷路的小星星，聽說連睡覺時也會緊緊抱著。",
           "displayName": "星光六角恐龍",
           "locale": "zh_Hant"
         }
@@ -66,12 +66,12 @@
           "locale": "en_US"
         },
         {
-          "description": "おやつの隠し場所を忘れた、ほっぺがパンパンの子。",
+          "description": "おやつを隠した場所を忘れました。ほっぺがパンパンなので、遠くはなさそうです。",
           "displayName": "こどもモルモット",
           "locale": "ja"
         },
         {
-          "description": "忘了零食藏哪裡，臉頰卻還鼓鼓的。",
+          "description": "牠忘了把零食藏在哪裡。看牠臉頰鼓鼓的，應該不會太遠。",
           "displayName": "天竺鼠寶寶",
           "locale": "zh_Hant"
         }
@@ -111,12 +111,12 @@
           "locale": "en_US"
         },
         {
-          "description": "バナナを分けに来ました。残りはなぜか半分です。",
+          "description": "バナナを分けに来ました。途中でひと口だけ食べたそうですが…半分しかありませんね？",
           "displayName": "こざる",
           "locale": "ja"
         },
         {
-          "description": "帶香蕉來分享，怎麼只剩一半了？",
+          "description": "牠帶香蕉來跟大家分享。牠說路上只吃了一口……怎麼只剩一半了？",
           "displayName": "小猴子",
           "locale": "zh_Hant"
         }
@@ -201,12 +201,12 @@
           "locale": "en_US"
         },
         {
-          "description": "砂浴び帰りで、ふわふわの毛が自慢です。",
+          "description": "砂浴びを終えて遊びに来ました。あいさつより先に、ふわふわの毛を自慢します。",
           "displayName": "こどもチンチラ",
           "locale": "ja"
         },
         {
-          "description": "剛做完沙浴，急著炫耀蓬鬆的毛。",
+          "description": "牠做完沙浴來玩。還沒打招呼，就先炫耀蓬鬆的毛。",
           "displayName": "龍貓寶寶",
           "locale": "zh_Hant"
         }
@@ -248,8 +248,8 @@
           "locale": "ja"
         },
         {
-          "description": "帶有兔兔裝飾的粉紅色對話框。",
-          "displayName": "粉紅兔兔對話框",
+          "description": "帶有兔兔裝飾的粉紅色訊息泡泡。",
+          "displayName": "粉紅兔兔訊息泡泡",
           "locale": "zh_Hant"
         }
       ],
@@ -278,8 +278,8 @@
           "locale": "ja"
         },
         {
-          "description": "帶有小雞裝飾的奶油色對話框。",
-          "displayName": "奶油小雞對話框",
+          "description": "帶有小雞裝飾的奶油色訊息泡泡。",
+          "displayName": "奶油小雞訊息泡泡",
           "locale": "zh_Hant"
         }
       ],
@@ -308,8 +308,8 @@
           "locale": "ja"
         },
         {
-          "description": "帶有星空貓裝飾的藍紫色對話框。",
-          "displayName": "星空貓咪對話框",
+          "description": "帶有星空貓裝飾的藍紫色訊息泡泡。",
+          "displayName": "星空貓咪訊息泡泡",
           "locale": "zh_Hant"
         }
       ],
@@ -333,12 +333,12 @@
           "locale": "en_US"
         },
         {
-          "description": "ぴょんぴょん弾みながら飛んでいくハートです。",
+          "description": "ぴょんぴょん弾みながら飛んでいくハートの投げアイテムです。",
           "displayName": "はずむハート",
           "locale": "ja"
         },
         {
-          "description": "一路彈跳飛出去的愛心投擲物。",
+          "description": "會一路彈跳飛出去的愛心玩具。",
           "displayName": "彈跳愛心",
           "locale": "zh_Hant"
         }
@@ -363,12 +363,12 @@
           "locale": "en_US"
         },
         {
-          "description": "導火線つきの弾を撃つミニ大砲です。",
+          "description": "導火線つきの弾を撃つ、ミニ大砲の投げアイテムです。",
           "displayName": "ミニ大砲",
           "locale": "ja"
         },
         {
-          "description": "發射引信砲彈的迷你大砲投擲物。",
+          "description": "會發射引信砲彈的迷你大砲玩具。",
           "displayName": "迷你大砲",
           "locale": "zh_Hant"
         }
@@ -393,12 +393,12 @@
           "locale": "en_US"
         },
         {
-          "description": "アヒルがアヒルを投げます。家庭の事情ではなさそう。",
+          "description": "アヒルがアヒルを投げます。家族げんかではなさそうです。",
           "displayName": "キュッキュッアヒル",
           "locale": "ja"
         },
         {
-          "description": "鴨子丟鴨子，看來不是家庭糾紛。",
+          "description": "鴨子丟出另一隻鴨子。看來應該不是家庭糾紛。",
           "displayName": "吱吱小鴨",
           "locale": "zh_Hant"
         }
@@ -423,12 +423,12 @@
           "locale": "en_US"
         },
         {
-          "description": "お気に入りの貝は見てもいいけど、持ち去り禁止です。",
+          "description": "お気に入りの貝を見せに来ました。見るのはいいけれど、持っていくとすねます。",
           "displayName": "こどもカワウソ",
           "locale": "ja"
         },
         {
-          "description": "可以欣賞牠的寶貝貝殼，但別拿走。",
+          "description": "牠來展示最喜歡的貝殼。看看沒關係，但拿走的話牠會鬧彆扭。",
           "displayName": "水獺寶寶",
           "locale": "zh_Hant"
         }
@@ -453,12 +453,12 @@
           "locale": "en_US"
         },
         {
-          "description": "おやつの匂いを追って、そのまま居つきました。",
+          "description": "おやつの匂いを追ってきて、そのまま居つきました。もうここを自分の家だと思っています。",
           "displayName": "こぶた",
           "locale": "ja"
         },
         {
-          "description": "循著零食香味而來，乾脆住下來了。",
+          "description": "牠循著零食香味而來，結果就住下來了。現在已經把這裡當成自己家。",
           "displayName": "小豬寶寶",
           "locale": "zh_Hant"
         }
@@ -483,12 +483,12 @@
           "locale": "en_US"
         },
         {
-          "description": "散歩の途中で、根を下ろす場所を探しています。",
+          "description": "散歩に出てきた小さな木です。少し休んでと言ったら、根を下ろす場所を選び始めました。",
           "displayName": "小さな木",
           "locale": "ja"
         },
         {
-          "description": "出門散步，卻開始挑選落地生根的地方。",
+          "description": "這棵小樹出門散步。叫牠休息一下，牠卻開始挑選要落地生根的地方。",
           "displayName": "小樹",
           "locale": "zh_Hant"
         }
@@ -528,7 +528,7 @@
           "locale": "en_US"
         },
         {
-          "description": "当たると小さな結晶のかけらになって散ります。",
+          "description": "当たると小さな結晶のかけらになって散らばる雪の結晶です。",
           "displayName": "雪の結晶",
           "locale": "ja"
         },
@@ -558,7 +558,7 @@
           "locale": "en_US"
         },
         {
-          "description": "赤い縫い目のボールが、つぶれて弾みます。",
+          "description": "赤い縫い目のボールが、ぺちゃんとつぶれて弾みます。",
           "displayName": "野球ボール",
           "locale": "ja"
         },
@@ -578,7 +578,7 @@
       "internalID": "01000000-0000-4000-8000-000000000016",
       "localizations": [
         {
-          "description": "와그작! 왁뿌볼이 조각조각 부서지는 바삭한 소리를 느껴보세요.",
+          "description": "와그작! 왁뿌볼이 조각조각 부서지는 바삭한 소리를 느껴 보세요.",
           "displayName": "왁뿌볼",
           "locale": "ko_KR"
         },
@@ -588,12 +588,12 @@
           "locale": "en_US"
         },
         {
-          "description": "ザクザク！かけらに砕ける軽快な音を楽しめます。",
+          "description": "ザクザク！ワックボールがかけらに砕ける、軽快な音を楽しんでください。",
           "displayName": "ワックボール",
           "locale": "ja"
         },
         {
-          "description": "喀嚓！享受碎成小塊的酥脆聲響。",
+          "description": "喀嚓！感受 Wakku 球碎成一小塊一小塊的酥脆聲響。",
           "displayName": "Wakku 球",
           "locale": "zh_Hant"
         }
@@ -614,17 +614,17 @@
         },
         {
           "description": "A cocoa shell with a crisp green filling.",
-          "displayName": "Dujjonku",
+          "displayName": "Dubai Chocolate Chewy Cookie",
           "locale": "en_US"
         },
         {
-          "description": "ココアの皮と緑の中身がつぶれてサクッと鳴ります。",
-          "displayName": "ドゥチョンク",
+          "description": "ココアの皮と緑の中身がつぶれて、サクッと音を立てます。",
+          "displayName": "ドバイチョコもちもちクッキー",
           "locale": "ja"
         },
         {
-          "description": "可可外皮和綠色內餡壓下時會發出脆響。",
-          "displayName": "Dujjonku",
+          "description": "可可外皮和綠色內餡被壓下時，會發出酥脆的聲響。",
+          "displayName": "杜拜巧克力軟餅乾",
           "locale": "zh_Hant"
         }
       ],
@@ -651,12 +651,12 @@
           "locale": "en_US"
         },
         {
-          "description": "大事なおやつ。投げても3秒以内なら大丈夫ですよね？",
+          "description": "大切に取っておいたおやつです。投げたあとも3秒以内に拾えば大丈夫ですよね？",
           "displayName": "モルモットのミニパプリカ",
           "locale": "ja"
         },
         {
-          "description": "珍藏的零食，丟出後三秒內撿起來就沒關係吧？",
+          "description": "這是牠珍藏的點心。丟出去後，只要三秒內撿起來就沒關係吧？",
           "displayName": "天竺鼠的迷你甜椒",
           "locale": "zh_Hant"
         }
@@ -681,12 +681,12 @@
           "locale": "en_US"
         },
         {
-          "description": "こざるが譲ったバナナ。本当に譲ったかは未確認です。",
+          "description": "こざるが譲ってくれたバナナです。本当に譲ってくれたのかは、まだ聞けていません。",
           "displayName": "こざるのバナナ",
           "locale": "ja"
         },
         {
-          "description": "小猴子拿來分享的香蕉。是不是自願的還沒問。",
+          "description": "這是小猴子拿來分享的香蕉。至於牠是不是真的自願，還沒來得及問。",
           "displayName": "小猴子的香蕉",
           "locale": "zh_Hant"
         }
@@ -711,12 +711,12 @@
           "locale": "en_US"
         },
         {
-          "description": "砂浴び用の砂。洗ってという意味では…たぶんありません。",
+          "description": "チンチラの砂浴び用の砂です。洗ってほしくて投げるわけでは…たぶんありません。",
           "displayName": "チンチラの砂袋",
           "locale": "ja"
         },
         {
-          "description": "龍貓的浴沙。丟這個應該不是叫你洗澡。",
+          "description": "這是龍貓洗澡用的沙。把它丟出去……應該不是在叫你洗澡。",
           "displayName": "龍貓的浴沙袋",
           "locale": "zh_Hant"
         }
@@ -741,12 +741,12 @@
           "locale": "en_US"
         },
         {
-          "description": "星明かりを丸めました。空の星がひとつ減ったとか？",
+          "description": "星明かりをぎゅっと丸めました。空の星がひとつ減ったそうですが？",
           "displayName": "星明かりのウーパールーパーの星玉",
           "locale": "ja"
         },
         {
-          "description": "把星光揉成一團。天空是不是少了一顆星？",
+          "description": "把星光用力揉成一團。聽說天空少了一顆星，是這顆嗎？",
           "displayName": "星光六角恐龍的星光球",
           "locale": "zh_Hant"
         }
@@ -771,12 +771,12 @@
           "locale": "en_US"
         },
         {
-          "description": "大事にしていた貝。真珠はなく、未練は少しあります。",
+          "description": "カワウソが大事に抱えていた貝です。真珠はないけれど、未練は少しあります。",
           "displayName": "カワウソの貝",
           "locale": "ja"
         },
         {
-          "description": "沒有珍珠，只有水獺的一點依依不捨。",
+          "description": "這是水獺一直抱在懷裡的貝殼。裡面沒有珍珠，只有一點依依不捨。",
           "displayName": "水獺的貝殼",
           "locale": "zh_Hant"
         }
@@ -816,12 +816,12 @@
           "locale": "en_US"
         },
         {
-          "description": "ぺちっ！そういえば隣のぶたさんを見ませんね…？",
+          "description": "ぺちっ！ところで、お隣のぶたさんをここ数日見かけませんね…？",
           "displayName": "こぶたの豚肉",
           "locale": "ja"
         },
         {
-          "description": "啪！話說隔壁的小豬是不是好幾天沒出現了？",
+          "description": "紮實的一聲啪！話說回來，隔壁的小豬是不是好幾天沒出現了……？",
           "displayName": "小豬的豬肉",
           "locale": "zh_Hant"
         }
@@ -861,12 +861,12 @@
           "locale": "en_US"
         },
         {
-          "description": "木が小さな木を投げます。まず家系図を確認しましょう。",
+          "description": "木が小さな木を投げます。まずは家系図から確認してみましょうか。",
           "displayName": "小さな木のちび木",
           "locale": "ja"
         },
         {
-          "description": "樹丟出一棵小樹。先查查族譜吧。",
+          "description": "樹丟出一棵小樹。要不要先從族譜開始查起？",
           "displayName": "小樹的小小樹",
           "locale": "zh_Hant"
         }
@@ -891,12 +891,12 @@
           "locale": "en_US"
         },
         {
-          "description": "散歩は済みました。柴犬は認めていません。",
+          "description": "散歩はもう行きました。柴犬はその事実を認めていません。",
           "displayName": "柴犬",
           "locale": "ja"
         },
         {
-          "description": "已經散步回來了，但柴犬拒絕承認。",
+          "description": "已經散步回來了，但柴犬拒絕承認這件事。",
           "displayName": "柴犬",
           "locale": "zh_Hant"
         }
@@ -921,12 +921,12 @@
           "locale": "en_US"
         },
         {
-          "description": "投げる人は決まりました。拾う人はまだです。",
+          "description": "投げる人は決まりました。拾ってくる人はまだ決まっていません。",
           "displayName": "テニスボール",
           "locale": "ja"
         },
         {
-          "description": "負責丟的人選好了，撿球的人還沒。",
+          "description": "負責丟的人已經選好了，負責撿回來的人還沒決定。",
           "displayName": "網球",
           "locale": "zh_Hant"
         }
@@ -951,12 +951,12 @@
           "locale": "en_US"
         },
         {
-          "description": "知らんぷりなら得意です。本物のアヒルですから。",
+          "description": "知らんぷりなら得意です。何しろ本物のアヒルの足がありますから。",
           "displayName": "アヒル",
           "locale": "ja"
         },
         {
-          "description": "很會裝傻，畢竟牠真的有一雙鴨掌。",
+          "description": "牠最會裝傻推託了，畢竟牠真的有一雙鴨掌。",
           "displayName": "鴨子",
           "locale": "zh_Hant"
         }
@@ -981,12 +981,12 @@
           "locale": "en_US"
         },
         {
-          "description": "誰に呼ばれたかは不明ですが、とりあえず出ました。",
+          "description": "誰に呼ばれたのかはわかりませんが、とりあえず出てきました。",
           "displayName": "うんち",
           "locale": "ja"
         },
         {
-          "description": "不知道是誰叫牠，總之先出來了。",
+          "description": "不知道是誰叫牠，總之牠先出來了。",
           "displayName": "便便",
           "locale": "zh_Hant"
         }
@@ -1011,12 +1011,12 @@
           "locale": "en_US"
         },
         {
-          "description": "使用済みかは不明です。とにかく避けて！",
+          "description": "使用済みのトイレットペーパーかどうかは不明です。とにかく避けて！",
           "displayName": "ティッシュのかたまり",
           "locale": "ja"
         },
         {
-          "description": "不知道是不是用過的，總之快閃！",
+          "description": "不知道是不是用過的衛生紙，總之先閃開！",
           "displayName": "衛生紙團",
           "locale": "zh_Hant"
         }
@@ -1031,7 +1031,7 @@
       "displayPrice": "1100",
       "localizations": [
         {
-          "description": "순한맛이라더니요. 누구 기준인지는 안 알려줬어요.",
+          "description": "순한 맛이라더니요. 누구 기준인지는 안 알려줬어요.",
           "displayName": "떡볶이",
           "locale": "ko_KR"
         },
@@ -1041,12 +1041,12 @@
           "locale": "en_US"
         },
         {
-          "description": "甘口だそうです。誰にとってかは教えてくれません。",
+          "description": "甘口だと聞きました。誰にとっての甘口かは教えてくれませんでした。",
           "displayName": "トッポッキ",
           "locale": "ja"
         },
         {
-          "description": "說是微辣，卻沒說是以誰的標準。",
+          "description": "聽說是微辣，但沒人告訴我們這是以誰的標準。",
           "displayName": "辣炒年糕",
           "locale": "zh_Hant"
         }
@@ -1071,13 +1071,13 @@
           "locale": "en_US"
         },
         {
-          "description": "食べてほしくて渡したのに、なぜ振り回すの？",
+          "description": "食べてほしくて渡したのに、どうして振り回しているんですか？",
           "displayName": "オムク串（練り天）",
           "locale": "ja"
         },
         {
-          "description": "是給你吃的，為什麼揮來揮去？",
-          "displayName": "魚板串",
+          "description": "這是用魚漿做來吃的，怎麼拿來揮來揮去？",
+          "displayName": "韓式魚板串",
           "locale": "zh_Hant"
         }
       ]
@@ -1101,12 +1101,12 @@
           "locale": "en_US"
         },
         {
-          "description": "いつも笑顔。さっき葉っぱを投げたのもこの子です。",
+          "description": "いつも笑顔です。さっき葉っぱを投げたのもこの子です。",
           "displayName": "クオッカ",
           "locale": "ja"
         },
         {
-          "description": "總是在笑，剛才丟葉子的也是牠。",
+          "description": "牠總是在笑。剛才丟出那片葉子的也是牠。",
           "displayName": "短尾矮袋鼠",
           "locale": "zh_Hant"
         }
@@ -1131,12 +1131,12 @@
           "locale": "en_US"
         },
         {
-          "description": "クオッカのお弁当。投げていいかは聞いていません。",
+          "description": "クオッカのお弁当です。投げてもいいかは聞いていません。",
           "displayName": "葉っぱ",
           "locale": "ja"
         },
         {
-          "description": "短尾矮袋鼠的便當。沒問過能不能丟。",
+          "description": "這是短尾矮袋鼠的便當。我們沒問過能不能把它丟出去。",
           "displayName": "葉子",
           "locale": "zh_Hant"
         }

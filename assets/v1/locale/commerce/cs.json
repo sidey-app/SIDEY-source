@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Hvězdný axolotl",
+    "description": "Přinesl domů ztracenou hvězdičku. Dokonce i ve spánku ji pevně objímá.",
+    "iap_description": "Objímá ztracenou hvězdičku i ve spánku."
+  },
+  "character_guinea_pig": {
+    "display_name": "Morčátko",
+    "description": "Zapomnělo, kam si schovalo svačinu. Podle plných tvářiček ale nebude daleko.",
+    "iap_description": "Svačinu schovalo tak dobře, až ji ztratilo."
+  },
+  "character_monkey": {
+    "display_name": "Opičátko",
+    "description": "Přišlo se rozdělit o banán. Cestou si prý jen jednou kouslo… tak proč chybí půlka?",
+    "iap_description": "Přineslo banán. Proč půlka chybí?"
+  },
+  "character_chinchilla": {
+    "display_name": "Činčilátko",
+    "description": "Po písečné koupeli si přišlo hrát. Než pozdraví, musí se pochlubit hebkým kožíškem.",
+    "iap_description": "Po písečné koupeli je ještě hebčí."
+  },
+  "character_otter": {
+    "display_name": "Vydřátko",
+    "description": "Přišlo ukázat svou oblíbenou mušli. Dívat se můžete, ale jestli ji vezmete, urazí se.",
+    "iap_description": "Jeho oblíbená mušle je jen na dívání."
+  },
+  "character_pig": {
+    "display_name": "Prasátko",
+    "description": "Šlo za vůní svačiny a rozhodlo se zůstat. Teď si myslí, že je tady doma.",
+    "iap_description": "Šlo za vůní svačiny a rovnou se zabydlelo."
+  },
+  "character_tree": {
+    "display_name": "Stromeček",
+    "description": "Malý strom vyrazil na procházku. Když měl chvíli odpočívat, začal si vybírat, kde zapustí kořeny.",
+    "iap_description": "Na procházce hledá místo k zapuštění kořenů."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Růžová králičí bublina",
+    "description": "Růžová bublina zprávy s králičí ozdobou.",
+    "iap_description": "Růžová bublina zprávy s králičí ozdobou."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Máslová kuřecí bublina",
+    "description": "Máslově žlutá bublina zprávy s kuřecí ozdobou.",
+    "iap_description": "Máslově žlutá bublina s kuřátkem."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Hvězdná kočičí bublina",
+    "description": "Tmavě fialová bublina zprávy s ozdobou hvězdné kočky.",
+    "iap_description": "Fialová bublina s hvězdnou kočkou."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Skákavé srdce",
+    "description": "Srdce, které při letu vesele poskakuje.",
+    "iap_description": "Srdce, které při letu vesele poskakuje."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Miniaturní dělo",
+    "description": "Malé dělo, které vystřeluje kouli se zapáleným knotem.",
+    "iap_description": "Mini dělo s koulí a hořícím knotem."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Pískací kačenka",
+    "description": "Kachna hází kachnu. Rodinná hádka to snad není.",
+    "iap_description": "Kachna hází kachnu. Rodinná hádka to není."
+  },
+  "throwable_snowflake": {
+    "display_name": "Sněhová vločka",
+    "description": "Sněhová vločka, která se po zásahu rozprskne na drobné krystalky.",
+    "iap_description": "Po zásahu se rozprskne na malé krystalky."
+  },
+  "throwable_baseball": {
+    "display_name": "Baseballový míček",
+    "description": "Míček s červenými švy, který se při zásahu zmáčkne a odskočí.",
+    "iap_description": "Po zásahu se zmáčkne a odskočí."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Wakku míček",
+    "description": "Křup! Poslechněte si křupavý zvuk, se kterým se Wakku míček rozpadne na kousky.",
+    "iap_description": "Křup! Wakku míček se rozpadne na kousky."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Dubajská čokoládová sušenka",
+    "description": "Kakaová slupka a zelená náplň se zmáčknou s příjemným křupnutím.",
+    "iap_description": "Kakaová slupka, zelená náplň a křupnutí."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Mini paprika morčátka",
+    "description": "Pečlivě schovaná svačina. Když ji po hodu do tří sekund zvednete, nic se nestane, že?",
+    "iap_description": "Schovaná svačina. Platí pravidlo tří sekund!"
+  },
+  "throwable_banana": {
+    "display_name": "Opičí banán",
+    "description": "Opice se o tenhle banán podělila. Jestli to udělala schválně, jsme se ještě nestihli zeptat.",
+    "iap_description": "Banán na dělení. Aspoň to opice tvrdí."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Pytlík s pískem činčily",
+    "description": "Písek na koupání činčily. Když ho po vás hodí, nejspíš tím nenaznačuje, že se máte umýt.",
+    "iap_description": "Písek do koupele, ne narážka na mytí."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Hvězdná koule axolotla",
+    "description": "Hvězdné světlo zmáčknuté do malé koule. Nechybí teď náhodou jedna hvězda na obloze?",
+    "iap_description": "Zmáčknuté hvězdné světlo. Chybí hvězda?"
+  },
+  "throwable_clam": {
+    "display_name": "Vydří mušle",
+    "description": "Mušle, kterou vydra nosila všude s sebou. Perla v ní není, jen trocha citové vazby.",
+    "iap_description": "Bez perly, ale s trochou citové vazby."
+  },
+  "throwable_pork": {
+    "display_name": "Vepřové prasátka",
+    "description": "Pěkně masité plácnutí! Mimochodem, neviděl někdo v poslední době prasátko odvedle?",
+    "iap_description": "Plác! Kam se podělo prasátko odvedle?"
+  },
+  "throwable_timber": {
+    "display_name": "Malý strom stromečku",
+    "description": "Strom hází malý strom. Možná bychom měli nejdřív zkontrolovat rodokmen.",
+    "iap_description": "Strom hází strom. Radši ověřte rodokmen."
+  },
+  "character_shiba": {
+    "display_name": "Šiba inu",
+    "description": "Na procházce už jsme byli. Šiba tuhle skutečnost odmítá uznat.",
+    "iap_description": "Procházka byla. Šiba všechno popírá."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Tenisový míček",
+    "description": "Kdo bude házet, už je jasné. Ještě hledáme někoho, kdo míček přinese.",
+    "iap_description": "Házení je zajištěné. Kdo míček přinese?"
+  },
+  "character_duck": {
+    "display_name": "Kachna",
+    "description": "Mistryně v uhýbání odpovědnosti. Kachní nohy má jako důkaz.",
+    "iap_description": "Uhýbá odpovědnosti na kachních nohou."
+  },
+  "character_poop": {
+    "display_name": "Hovínko",
+    "description": "Nevíme, kdo volal, ale už je tady.",
+    "iap_description": "Nevíme, kdo volal, ale už je tady."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Kulička z papíru",
+    "description": "Nikdo neví, jestli je ten papír použitý. Raději uhněte!",
+    "iap_description": "Použitý, nebo ne? Raději uhněte!"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Prý je jen mírně pálivé. Neřekli ale, podle koho.",
+    "iap_description": "Prý mírné. Ale podle koho?"
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Špíz s korejským eomukem",
+    "description": "To bylo k jídlu. Proč s tím máváte?",
+    "iap_description": "To bylo k jídlu. Proč s tím máváte?"
+  },
+  "character_quokka": {
+    "display_name": "Kvoka",
+    "description": "Pořád se usmívá. Ano, právě ona hodila ten list.",
+    "iap_description": "Pořád se usmívá, i po hození listu."
+  },
+  "throwable_leaf": {
+    "display_name": "List",
+    "description": "Svačina, kterou si kvoka zabalila s sebou. Jestli se s ní smí házet, jsme se nezeptali.",
+    "iap_description": "Svačina kvoky, hozená bez dovolení."
+  }
+}

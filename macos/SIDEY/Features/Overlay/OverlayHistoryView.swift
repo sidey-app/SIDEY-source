@@ -152,7 +152,7 @@ struct OverlayHistoryView: View {
             HStack(spacing: 8) {
                 ProgressView()
                     .controlSize(.small)
-                Text(L10n.text("history.older.loading"))
+                Text(L10n.text("history.load_more.loading"))
             }
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -160,7 +160,7 @@ struct OverlayHistoryView: View {
             .padding(.vertical, 8)
         case .failed(let message):
             VStack(spacing: 6) {
-                Text(L10n.text("history.older.load_failed"))
+                Text(L10n.text("history.load_more.failed"))
                     .font(.caption.weight(.semibold))
                 Text(message)
                     .font(.caption2)

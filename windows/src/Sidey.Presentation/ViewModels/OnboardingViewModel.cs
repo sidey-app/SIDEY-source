@@ -77,7 +77,7 @@ public sealed partial class OnboardingViewModel : ObservableObject, IDisposable
     public bool IsGoogleChecking => _state.GoogleAuthentication == GoogleAuthenticationState.Checking;
     public bool CanBegin => !IsWorking
         && _state.GoogleAuthentication is GoogleAuthenticationState.Required or GoogleAuthenticationState.Verified;
-    public string BeginLabel => I18n.Get(_state.GoogleVerified ? "onboarding.getStarted" : "onboarding.googleContinue");
+    public string BeginLabel => I18n.Get(_state.GoogleVerified ? "onboarding.auth.start" : "onboarding.auth.google.continue");
 
     public bool IsLanding => Step == 0;
 
@@ -112,8 +112,8 @@ public sealed partial class OnboardingViewModel : ObservableObject, IDisposable
         && !string.IsNullOrWhiteSpace(InviteCode);
 
     public string ConnectionText => IsConnected
-        ? I18n.Get("onboarding.serverConnected")
-        : I18n.Get("onboarding.serverConnecting");
+        ? I18n.Get("onboarding.connection.connected")
+        : I18n.Get("onboarding.connection.connecting");
 
     public void ApplyState(CoordinatorState state)
     {

@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Riaprila con scripts/macos/open_current.sh oppure compilala ed eseguila da Xcode.",
+          "unverified_source": "Non è stato possibile verificare che questa app sia stata compilata dal codice sorgente corrente."
+        }
+      },
+      "common": {
+        "quit": "Esci"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Imposta SIDEY_SUPABASE_URL e SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Sidey-dev richiede l’URL SIDEY-staging e una publishable key.",
+          "production_backend_in_development": "Sidey-dev non può connettersi al progetto Supabase di produzione.",
+          "secret_key_not_allowed": "Non è possibile usare una Supabase secret key o una service-role key nel client.",
+          "unsupported_realtime_protocol": "L’impostazione del protocollo in tempo reale di SIDEY contiene un valore non supportato."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Modifiche non sottoposte a commit"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Revisione dello Store · Acquisizione non riuscita",
+          "ownership": {
+            "$value": "Proprietà",
+            "all": "Entrambi",
+            "character": "Solo personaggio",
+            "keepsake": "Solo oggetto caro",
+            "none": "Nessuno"
+          },
+          "product": "Prodotto",
+          "purchase_disabled": "Questa schermata di revisione non effettua mai acquisti reali.",
+          "window": {
+            "title": "Sidey-dev · Revisione dello Store · Nessun acquisto reale"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "È in esecuzione un'anteprima locale con 12 personaggi perché le variabili di ambiente del server non sono configurate."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "Il renderer delle metriche non è in esecuzione.",
+          "not_started": "Il renderer delle metriche non è stato avviato."
+        },
+        "export": {
+          "action": "Esporta il JSON delle metriche correnti",
+          "failed": "Esportazione delle metriche non riuscita: {0}",
+          "path": "Percorso di esportazione: {0}",
+          "success": "JSON delle metriche correnti esportato. I risultati manuali restano not_run.",
+          "tooltip": "Salva come JSON le metriche correnti delle prestazioni di rendering."
+        },
+        "preview_notice": "Modalità interna delle metriche del renderer limitata al criceto. La verifica manuale non è stata registrata.",
+        "samples": {
+          "empty": "Nessun campione di metriche"
+        },
+        "summary": "Tempo trascorso {0:F0}s · {1} campioni · frame massimo {2:F2}ms · working set {3:F1}MB (picco {4:F1}MB) · GDI {5} · USER {6}",
+        "title": "Metriche interne del renderer"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Un override di Supabase richiede un URL HTTPS (o HTTP localhost) e una chiave pubblicabile. Le chiavi secret e service-role non sono consentite."
+        }
+      }
+    }
+  }
+}

@@ -95,7 +95,7 @@ internal sealed class WindowsUpdateServiceAdapter : IUpdateService
             || string.IsNullOrWhiteSpace(update.UpdateVersion)
             || string.IsNullOrWhiteSpace(update.UpdateTag))
         {
-            throw new InvalidDataException(I18n.Get("update.missingInstaller"));
+            throw new InvalidDataException(I18n.Get("update.install.missing"));
         }
 
         var manifest = new WindowsUpdateManifest(

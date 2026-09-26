@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "星光六角恐龍",
+    "description": "牠帶回了一顆迷路的小星星，聽說連睡覺時也會緊緊抱著。",
+    "iap_description": "牠帶回了一顆迷路的小星星，聽說連睡覺時也會緊緊抱著。"
+  },
+  "character_guinea_pig": {
+    "display_name": "天竺鼠寶寶",
+    "description": "牠忘了把零食藏在哪裡。看牠臉頰鼓鼓的，應該不會太遠。",
+    "iap_description": "牠忘了把零食藏在哪裡。看牠臉頰鼓鼓的，應該不會太遠。"
+  },
+  "character_monkey": {
+    "display_name": "小猴子",
+    "description": "牠帶香蕉來跟大家分享。牠說路上只吃了一口……怎麼只剩一半了？",
+    "iap_description": "牠帶香蕉來跟大家分享。牠說路上只吃了一口……怎麼只剩一半了？"
+  },
+  "character_chinchilla": {
+    "display_name": "龍貓寶寶",
+    "description": "牠做完沙浴來玩。還沒打招呼，就先炫耀蓬鬆的毛。",
+    "iap_description": "牠做完沙浴來玩。還沒打招呼，就先炫耀蓬鬆的毛。"
+  },
+  "character_otter": {
+    "display_name": "水獺寶寶",
+    "description": "牠來展示最喜歡的貝殼。看看沒關係，但拿走的話牠會鬧彆扭。",
+    "iap_description": "牠來展示最喜歡的貝殼。看看沒關係，但拿走的話牠會鬧彆扭。"
+  },
+  "character_pig": {
+    "display_name": "小豬寶寶",
+    "description": "牠循著零食香味而來，結果就住下來了。現在已經把這裡當成自己家。",
+    "iap_description": "牠循著零食香味而來，結果就住下來了。現在已經把這裡當成自己家。"
+  },
+  "character_tree": {
+    "display_name": "小樹",
+    "description": "這棵小樹出門散步。叫牠休息一下，牠卻開始挑選要落地生根的地方。",
+    "iap_description": "這棵小樹出門散步。叫牠休息一下，牠卻開始挑選要落地生根的地方。"
+  },
+  "bubble_bunny_pink": {
+    "display_name": "粉紅兔兔訊息泡泡",
+    "description": "帶有兔兔裝飾的粉紅色訊息泡泡。",
+    "iap_description": "帶有兔兔裝飾的粉紅色訊息泡泡。"
+  },
+  "bubble_butter_chick": {
+    "display_name": "奶油小雞訊息泡泡",
+    "description": "帶有小雞裝飾的奶油色訊息泡泡。",
+    "iap_description": "帶有小雞裝飾的奶油色訊息泡泡。"
+  },
+  "bubble_starry_cat": {
+    "display_name": "星空貓咪訊息泡泡",
+    "description": "帶有星空貓裝飾的藍紫色訊息泡泡。",
+    "iap_description": "帶有星空貓裝飾的藍紫色訊息泡泡。"
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "彈跳愛心",
+    "description": "會一路彈跳飛出去的愛心玩具。",
+    "iap_description": "會一路彈跳飛出去的愛心玩具。"
+  },
+  "throwable_toy_cannon": {
+    "display_name": "迷你大砲",
+    "description": "會發射引信砲彈的迷你大砲玩具。",
+    "iap_description": "會發射引信砲彈的迷你大砲玩具。"
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "吱吱小鴨",
+    "description": "鴨子丟出另一隻鴨子。看來應該不是家庭糾紛。",
+    "iap_description": "鴨子丟出另一隻鴨子。看來應該不是家庭糾紛。"
+  },
+  "throwable_snowflake": {
+    "display_name": "雪花",
+    "description": "命中後會散成細小結晶碎片的雪花。",
+    "iap_description": "命中後會散成細小結晶碎片的雪花。"
+  },
+  "throwable_baseball": {
+    "display_name": "棒球",
+    "description": "帶紅色縫線的球，壓扁後又會彈起。",
+    "iap_description": "帶紅色縫線的球，壓扁後又會彈起。"
+  },
+  "throwable_wakkuball": {
+    "display_name": "Wakku 球",
+    "description": "喀嚓！感受 Wakku 球碎成一小塊一小塊的酥脆聲響。",
+    "iap_description": "喀嚓！感受 Wakku 球碎成一小塊一小塊的酥脆聲響。"
+  },
+  "throwable_dujjonku": {
+    "display_name": "杜拜巧克力軟餅乾",
+    "description": "可可外皮和綠色內餡被壓下時，會發出酥脆的聲響。",
+    "iap_description": "可可外皮和綠色內餡被壓下時，會發出酥脆的聲響。"
+  },
+  "throwable_mini_paprika": {
+    "display_name": "天竺鼠的迷你甜椒",
+    "description": "這是牠珍藏的點心。丟出去後，只要三秒內撿起來就沒關係吧？",
+    "iap_description": "這是牠珍藏的點心。丟出去後，只要三秒內撿起來就沒關係吧？"
+  },
+  "throwable_banana": {
+    "display_name": "小猴子的香蕉",
+    "description": "這是小猴子拿來分享的香蕉。至於牠是不是真的自願，還沒來得及問。",
+    "iap_description": "這是小猴子拿來分享的香蕉。至於牠是不是真的自願，還沒來得及問。"
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "龍貓的浴沙袋",
+    "description": "這是龍貓洗澡用的沙。把它丟出去……應該不是在叫你洗澡。",
+    "iap_description": "這是龍貓洗澡用的沙。把它丟出去……應該不是在叫你洗澡。"
+  },
+  "throwable_starlight_orb": {
+    "display_name": "星光六角恐龍的星光球",
+    "description": "把星光用力揉成一團。聽說天空少了一顆星，是這顆嗎？",
+    "iap_description": "把星光用力揉成一團。聽說天空少了一顆星，是這顆嗎？"
+  },
+  "throwable_clam": {
+    "display_name": "水獺的貝殼",
+    "description": "這是水獺一直抱在懷裡的貝殼。裡面沒有珍珠，只有一點依依不捨。",
+    "iap_description": "這是水獺一直抱在懷裡的貝殼。裡面沒有珍珠，只有一點依依不捨。"
+  },
+  "throwable_pork": {
+    "display_name": "小豬的豬肉",
+    "description": "紮實的一聲啪！話說回來，隔壁的小豬是不是好幾天沒出現了……？",
+    "iap_description": "紮實的一聲啪！話說回來，隔壁的小豬是不是好幾天沒出現了……？"
+  },
+  "throwable_timber": {
+    "display_name": "小樹的小小樹",
+    "description": "樹丟出一棵小樹。要不要先從族譜開始查起？",
+    "iap_description": "樹丟出一棵小樹。要不要先從族譜開始查起？"
+  },
+  "character_shiba": {
+    "display_name": "柴犬",
+    "description": "已經散步回來了，但柴犬拒絕承認這件事。",
+    "iap_description": "已經散步回來了，但柴犬拒絕承認這件事。"
+  },
+  "throwable_tennis_ball": {
+    "display_name": "網球",
+    "description": "負責丟的人已經選好了，負責撿回來的人還沒決定。",
+    "iap_description": "負責丟的人已經選好了，負責撿回來的人還沒決定。"
+  },
+  "character_duck": {
+    "display_name": "鴨子",
+    "description": "牠最會裝傻推託了，畢竟牠真的有一雙鴨掌。",
+    "iap_description": "牠最會裝傻推託了，畢竟牠真的有一雙鴨掌。"
+  },
+  "character_poop": {
+    "display_name": "便便",
+    "description": "不知道是誰叫牠，總之牠先出來了。",
+    "iap_description": "不知道是誰叫牠，總之牠先出來了。"
+  },
+  "throwable_tissue_ball": {
+    "display_name": "衛生紙團",
+    "description": "不知道是不是用過的衛生紙，總之先閃開！",
+    "iap_description": "不知道是不是用過的衛生紙，總之先閃開！"
+  },
+  "character_tteokbokki": {
+    "display_name": "辣炒年糕",
+    "description": "聽說是微辣，但沒人告訴我們這是以誰的標準。",
+    "iap_description": "聽說是微辣，但沒人告訴我們這是以誰的標準。"
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "韓式魚板串",
+    "description": "這是用魚漿做來吃的，怎麼拿來揮來揮去？",
+    "iap_description": "這是用魚漿做來吃的，怎麼拿來揮來揮去？"
+  },
+  "character_quokka": {
+    "display_name": "短尾矮袋鼠",
+    "description": "牠總是在笑。剛才丟出那片葉子的也是牠。",
+    "iap_description": "牠總是在笑。剛才丟出那片葉子的也是牠。"
+  },
+  "throwable_leaf": {
+    "display_name": "葉子",
+    "description": "這是短尾矮袋鼠的便當。我們沒問過能不能把它丟出去。",
+    "iap_description": "這是短尾矮袋鼠的便當。我們沒問過能不能把它丟出去。"
+  }
+}

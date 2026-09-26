@@ -96,7 +96,7 @@ struct ErrorBanner: View {
             Spacer()
             Button(action: onDismiss) { Image(systemName: "xmark") }
                 .buttonStyle(.plain)
-                .accessibilityLabel("common.dismiss")
+                .accessibilityLabel("common.close")
         }
         .padding(16)
         .frame(maxWidth: 620)
@@ -116,7 +116,7 @@ struct SuccessBanner: View {
             Spacer()
             Button(action: onDismiss) { Image(systemName: "xmark") }
                 .buttonStyle(.plain)
-                .accessibilityLabel("common.dismiss")
+                .accessibilityLabel("common.close")
         }
         .padding(16)
         .frame(maxWidth: 620)

@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "请使用 scripts/macos/open_current.sh 重新打开，或在 Xcode 中构建并运行。",
+          "unverified_source": "无法确认此 App 是否由当前源代码构建。"
+        }
+      },
+      "common": {
+        "quit": "退出"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "请同时设置 SIDEY_SUPABASE_URL 和 SIDEY_SUPABASE_PUBLISHABLE_KEY。",
+          "missing_development_configuration": "Sidey-dev 需要 SIDEY-staging URL 和 publishable key。",
+          "production_backend_in_development": "Sidey-dev 无法连接到生产环境的 Supabase 项目。",
+          "secret_key_not_allowed": "客户端不能使用 Supabase secret 或 service-role 密钥。",
+          "unsupported_realtime_protocol": "SIDEY 实时协议设置中包含不受支持的值。"
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "未提交的更改"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "商店检查 · 截取失败",
+          "ownership": {
+            "$value": "拥有状态",
+            "all": "两者",
+            "character": "仅角色",
+            "keepsake": "仅珍藏物",
+            "none": "未拥有"
+          },
+          "product": "商品",
+          "purchase_disabled": "此检查屏幕不会进行实际购买。",
+          "window": {
+            "title": "Sidey-dev · 商店检查 · 不会实际购买"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "由于未设置后端服务器环境变量，当前正在以包含 12 个角色的本地预览模式运行。"
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "指标渲染器未在运行。",
+          "not_started": "指标渲染器尚未启动。"
+        },
+        "export": {
+          "action": "导出当前指标 JSON",
+          "failed": "导出指标失败: {0}",
+          "path": "导出路径: {0}",
+          "success": "当前指标 JSON 已导出，手动结果仍为 not_run。",
+          "tooltip": "将当前渲染性能指标保存为 JSON。"
+        },
+        "preview_notice": "内部仓鼠限定渲染指标模式，尚未记录手动验证结果。",
+        "samples": {
+          "empty": "没有指标样本"
+        },
+        "summary": "用时 {0:F0} 秒 · {1} 个样本 · 最大帧耗时 {2:F2} 毫秒 · 工作集 {3:F1} MB (峰值 {4:F1} MB) · GDI {5} · USER {6}",
+        "title": "内部渲染指标"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Supabase 覆盖配置需要 HTTPS URL (localhost 可使用 HTTP) 和发布密钥。不得使用 secret 或 service-role 密钥。"
+        }
+      }
+    }
+  }
+}

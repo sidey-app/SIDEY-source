@@ -91,7 +91,7 @@ public sealed class WindowsMonitorService : IMonitorService
         IReadOnlyList<WindowsMonitorInfo> monitors = GetAll();
         if (monitors.Count == 0)
         {
-            throw new InvalidOperationException(I18n.Get("platform.noMonitor"));
+            throw new InvalidOperationException(I18n.Get("settings.placement.monitor.unavailable"));
         }
 
         return identifier is not null

@@ -320,7 +320,7 @@ public sealed class MainWindowViewModelTests
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("fr-FR");
             Sidey.Core.Localization.I18n.SetLanguage(language);
             Assert.Equal(language, Sidey.Core.Localization.I18n.Culture.Name);
-            string text = Sidey.Core.Localization.I18n.Format("metrics.summary", 1, 2, 3.5, 4.5, 5.5, 6, 7);
+            string text = Sidey.Core.Localization.I18n.Format("renderer_metrics.summary", 1, 2, 3.5, 4.5, 5.5, 6, 7);
             Assert.Contains(expected, text, StringComparison.Ordinal);
             Assert.DoesNotContain(unexpected, text, StringComparison.Ordinal);
             Assert.Equal("fr-FR", System.Globalization.CultureInfo.CurrentCulture.Name);
@@ -359,21 +359,18 @@ public sealed class MainWindowViewModelTests
             var history = new HistoryWindowViewModel(coordinator);
             await history.ActivateAsync();
 
-            foreach (string language in new[]
-            {
-                "ko-KR", "en-US", "ja-JP", "zh-CN", "zh-TW", "uk-UA", "ru-RU", "ko-KR",
-            })
+            foreach (string language in Sidey.Core.Localization.I18n.SupportedLanguages.Append("ko-KR"))
             {
                 Sidey.Core.Localization.I18n.SetLanguage(language);
                 main.RefreshLocalizedText();
                 history.RefreshLocalizedText();
                 string display = daysAgo switch
                 {
-                    0 => Sidey.Core.Localization.I18n.Format("settings.updateCheckedToday", timestamp.ToString("t", systemCulture)),
-                    1 => Sidey.Core.Localization.I18n.Format("settings.updateCheckedYesterday", timestamp.ToString("t", systemCulture)),
+                    0 => Sidey.Core.Localization.I18n.Format("settings.update.last_checked.today", timestamp.ToString("t", systemCulture)),
+                    1 => Sidey.Core.Localization.I18n.Format("settings.update.last_checked.yesterday", timestamp.ToString("t", systemCulture)),
                     _ => timestamp.ToString("g", systemCulture),
                 };
-                Assert.Equal(Sidey.Core.Localization.I18n.Format("settings.updateLastChecked", display), main.LastUpdateCheckText);
+                Assert.Equal(Sidey.Core.Localization.I18n.Format("settings.update.last_checked.value", display), main.LastUpdateCheckText);
                 Assert.Equal(messageTimestamp.ToString("g", systemCulture), Assert.Single(history.Items).LocalTimeText);
                 Assert.Same(systemCulture, CultureInfo.CurrentCulture);
             }
@@ -402,10 +399,7 @@ public sealed class MainWindowViewModelTests
         string previous = Sidey.Core.Localization.I18n.Language;
         try
         {
-            foreach (string language in new[]
-            {
-                "en-US", "ja-JP", "zh-CN", "zh-TW", "uk-UA", "ru-RU", "ko-KR",
-            })
+            foreach (string language in Sidey.Core.Localization.I18n.SupportedLanguages.Skip(1).Append("ko-KR"))
             {
                 Sidey.Core.Localization.I18n.SetLanguage(language);
                 viewModel.RefreshLocalizedText();
@@ -415,11 +409,11 @@ public sealed class MainWindowViewModelTests
                 Assert.All(viewModel.StoreProducts, item =>
                 {
                     Assert.False(string.IsNullOrWhiteSpace(item.Description));
-                    Assert.DoesNotContain("store.productDescriptions.", item.Description, StringComparison.Ordinal);
-                    Assert.DoesNotContain("store.product.", item.DisplayName, StringComparison.Ordinal);
+                    Assert.DoesNotContain("store.catalog.", item.Description, StringComparison.Ordinal);
+                    Assert.DoesNotContain("store.catalog.", item.DisplayName, StringComparison.Ordinal);
                 });
                 Assert.Equal(PixelCharacterCatalog.Get(character.Id).DisplayName, character.DisplayName);
-                Assert.Equal(Sidey.Core.Localization.I18n.Get("profile.defaultBubble"), bubble.DisplayName);
+                Assert.Equal(Sidey.Core.Localization.I18n.Get("profile.cosmetics.bubble.default"), bubble.DisplayName);
                 Assert.Equal("draft", viewModel.Nickname);
                 Assert.Equal("ABCDEF", viewModel.InviteCode);
                 Assert.Equal("room draft", viewModel.CreateRoomName);
@@ -430,14 +424,12 @@ public sealed class MainWindowViewModelTests
         finally { Sidey.Core.Localization.I18n.SetLanguage(previous); }
     }
 
+    public static IEnumerable<object[]> SupportedLanguageSelections =>
+        Sidey.Core.Localization.I18n.SupportedLanguages
+            .Select((language, index) => new object[] { index, language });
+
     [Theory]
-    [InlineData(0, "ko-KR")]
-    [InlineData(1, "en-US")]
-    [InlineData(2, "ja-JP")]
-    [InlineData(3, "zh-CN")]
-    [InlineData(4, "zh-TW")]
-    [InlineData(5, "uk-UA")]
-    [InlineData(6, "ru-RU")]
+    [MemberData(nameof(SupportedLanguageSelections))]
     public void LanguageSelectionIsRestoredWithoutSavingAndPersistsUserChoice(int index, string language)
     {
         (FakeSideyCoordinator coordinator, CoordinatorState state) = CreateRoomState();
@@ -500,7 +492,7 @@ public sealed class MainWindowViewModelTests
 
         viewModel.BeginHotkeyRecording(GlobalHotkeyAction.ToggleOverlay);
         Assert.True(viewModel.IsHotkeyRecording(GlobalHotkeyAction.ToggleOverlay));
-        Assert.Contains(I18n.Get("settings.hotkeyRecording"), viewModel.OverlayHotkeyAccessibleName, StringComparison.Ordinal);
+        Assert.Contains(I18n.Get("settings.shortcuts.recorder.recording"), viewModel.OverlayHotkeyAccessibleName, StringComparison.Ordinal);
         viewModel.AssignGlobalHotkey(
             GlobalHotkeyAction.ToggleOverlay,
             GlobalHotkeyBinding.FromLegacy(GlobalHotkeyKey.I));

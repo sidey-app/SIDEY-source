@@ -28,7 +28,7 @@
             PointerReleased="OnDragGripPointerReleased"
             PointerCanceled="OnDragGripPointerCanceled"
             PointerCaptureLost="OnDragGripPointerCanceled"
-            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=composer.dragTooltip}, Mode=OneWay}">
+            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=composer.drag.tooltip}, Mode=OneWay}">
           <Canvas Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
             <Ellipse Width="2" Height="2" Canvas.Left="0" Canvas.Top="0" Fill="#888888" />
             <Ellipse Width="2" Height="2" Canvas.Left="5" Canvas.Top="0" Fill="#888888" />
@@ -51,7 +51,7 @@
             Background="Transparent"
             BorderThickness="0"
             IsEnabled="{Binding CanCompose}"
-            PlaceholderText="{Binding Value, Source={i18n:I18n Key=composer.placeholder}, Mode=OneWay}"
+            PlaceholderText="{Binding Value, Source={i18n:I18n Key=composer.message.placeholder}, Mode=OneWay}"
             PreviewKeyDown="OnMessageInputPreviewKeyDown"
             Text="{Binding Draft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             TextWrapping="Wrap"
@@ -76,7 +76,7 @@
             BorderThickness="0"
             Command="{Binding SendCommand}"
             IsTabStop="False"
-            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=composer.sendTooltip}, Mode=OneWay}">
+            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=message.send.accessibility}, Mode=OneWay}">
           <SymbolIcon Symbol="Send" />
         </Button>
 

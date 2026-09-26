@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Open it again with scripts/macos/open_current.sh, or build and run it from Xcode.",
+          "unverified_source": "Couldn’t verify that this app was built from the current source."
+        }
+      },
+      "common": {
+        "quit": "Quit"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Set both SIDEY_SUPABASE_URL and SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Sidey-dev requires the SIDEY-staging URL and publishable key.",
+          "production_backend_in_development": "Sidey-dev can’t connect to the production Supabase project.",
+          "secret_key_not_allowed": "A Supabase secret or service-role key can’t be used in the client.",
+          "unsupported_realtime_protocol": "The SIDEY real-time protocol setting contains an unsupported value."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Uncommitted changes"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Store review · Capture failed",
+          "ownership": {
+            "$value": "Ownership",
+            "all": "Both",
+            "character": "Character only",
+            "keepsake": "Keepsake only",
+            "none": "None"
+          },
+          "product": "Product",
+          "purchase_disabled": "This review screen never makes real purchases.",
+          "window": {
+            "title": "Sidey-dev · Store review · No real purchases"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Running a local preview with 12 characters because server environment variables are not configured."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "The metrics renderer is not running.",
+          "not_started": "The metrics renderer has not started."
+        },
+        "export": {
+          "action": "Export current metrics JSON",
+          "failed": "Metrics export failed: {0}",
+          "path": "Export path: {0}",
+          "success": "Current metrics JSON exported. Manual results remain not_run.",
+          "tooltip": "Save current rendering performance metrics as JSON."
+        },
+        "preview_notice": "Internal hamster-limited renderer metrics mode. Manual verification has not been recorded.",
+        "samples": {
+          "empty": "No metric samples"
+        },
+        "summary": "Elapsed {0:F0}s · {1} samples · max frame {2:F2}ms · working set {3:F1}MB (peak {4:F1}MB) · GDI {5} · USER {6}",
+        "title": "Internal renderer metrics"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "A Supabase override requires an HTTPS (or localhost HTTP) URL and publishable key. Secret and service-role keys are forbidden."
+        }
+      }
+    }
+  }
+}

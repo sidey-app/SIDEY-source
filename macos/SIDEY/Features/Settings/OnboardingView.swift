@@ -73,7 +73,7 @@ struct OnboardingView: View {
 
     private var profileStep: some View {
         VStack(alignment: .leading, spacing: 22) {
-            Text("onboarding.profile.character.title")
+            Text("onboarding.character.label")
                 .font(.title2.bold())
             CharacterSelectionGrid(
                 maximumColumns: 4,
@@ -193,8 +193,8 @@ struct OnboardingView: View {
         var id: String { rawValue }
         var title: LocalizedStringResource {
             self == .create
-                ? "onboarding.group.path.create"
-                : "onboarding.group.path.join"
+                ? "groups.create.action"
+                : "groups.action.join_by_code"
         }
     }
 }
@@ -203,12 +203,12 @@ extension GroupOperation {
     var localizedCreateButtonTitle: LocalizedStringResource {
         self == .creating
             ? "groups.operation.creating"
-            : "groups.operation.create"
+            : "groups.create.action"
     }
 
     var localizedJoinButtonTitle: LocalizedStringResource {
         self == .joining
             ? "groups.operation.joining"
-            : "groups.operation.join"
+            : "groups.action.join_by_code"
     }
 }

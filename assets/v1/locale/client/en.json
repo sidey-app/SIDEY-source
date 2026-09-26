@@ -1,0 +1,1630 @@
+{
+  "character": {
+    "pixel_cat": {
+      "display_name": "Kitten"
+    },
+    "pixel_hamster": {
+      "display_name": "Baby Hamster"
+    },
+    "pixel_penguin": {
+      "display_name": "Baby Penguin"
+    },
+    "pixel_puppy": {
+      "display_name": "Puppy"
+    },
+    "pixel_rabbit": {
+      "display_name": "Bunny"
+    },
+    "unknown": {
+      "display_name": "Character"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "continue": "Continue",
+    "me": "Me",
+    "next": "Next",
+    "save": "Save"
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "Join with code"
+    },
+    "collapse": "Collapse group",
+    "create": {
+      "action": "Create group",
+      "name": {
+        "placeholder": "New group name"
+      }
+    },
+    "delete": {
+      "action": "Delete group"
+    },
+    "expand": "Expand group",
+    "member": {
+      "remove": {
+        "action": "Remove"
+      }
+    },
+    "rename": {
+      "action": "Rename",
+      "name_placeholder": "Group name, 1–20 characters"
+    },
+    "room_name": {
+      "label": "Group name"
+    }
+  },
+  "history": {
+    "load_more": {
+      "failed": "Couldn’t load earlier messages",
+      "loading": "Loading earlier messages…"
+    },
+    "loading": "Loading recent messages…"
+  },
+  "message": {
+    "send": {
+      "accessibility": "Send message"
+    }
+  },
+  "onboarding": {
+    "character": {
+      "label": "My character"
+    },
+    "group": {
+      "create": {
+        "description": "Create a group."
+      },
+      "description": "Create a group or join with an invite code to bring your pixel world to life.",
+      "title": "Start a group with friends"
+    },
+    "step": {
+      "group": "Group",
+      "profile": "Profile"
+    }
+  },
+  "platforms": {
+    "macos": {
+      "account": {
+        "delete": {
+          "failed": "Couldn’t delete your account. Try again."
+        }
+      },
+      "account_delete": {
+        "error": {
+          "request_failed": "Couldn’t complete the account deletion request. Try again."
+        }
+      },
+      "app": {
+        "settings": {
+          "navigation_label": "App settings"
+        }
+      },
+      "apple_auth": {
+        "error": {
+          "missing_authorization_code": "We couldn’t complete Sign in with Apple. Try again.",
+          "missing_identity_token": "We couldn’t complete Sign in with Apple. Try again.",
+          "missing_request_nonce": "We couldn’t complete Sign in with Apple. Try again."
+        }
+      },
+      "auth": {
+        "apple": {
+          "description": "Sign in with Apple is required in the App Store version to restore purchases and protect your account.",
+          "title": "Sign in with Apple",
+          "verifying": "Verifying sign-in"
+        },
+        "apple_sign_in": {
+          "failed": "Couldn’t sign in with Apple. Try again."
+        }
+      },
+      "backend": {
+        "connect": {
+          "failed_detail": "Couldn’t connect to the server. Check your internet connection and try again. (%@)"
+        },
+        "connection": {
+          "connecting": "Connecting",
+          "failed": "Connection error",
+          "idle": "Waiting",
+          "online": "Connected"
+        },
+        "error": {
+          "already_member": "You’ve already joined this group.",
+          "authentication_required": "Sign in again to continue.",
+          "current_user_unavailable": "We couldn’t verify your sign-in. Sign in again.",
+          "generic": "Couldn’t complete the request. Try again later.",
+          "invalid_invite_code": "Check the invite code and try again.",
+          "invalid_message": "Enter a message with no more than 200 characters and 3 lines.",
+          "invalid_profile": "Enter a nickname of 2–8 characters without line breaks.",
+          "invalid_room_name": "Enter a group name of 1–20 characters without line breaks.",
+          "invalid_timestamp": "Couldn’t read the message details. Try again later.",
+          "invite_rate_limited": "Too many invite code attempts. Try again in 10 minutes.",
+          "malformed_response": "Couldn’t complete the request. Try again later.",
+          "member_limit_reached": {
+            "one": "This group is already full with %lld member.",
+            "other": "This group is already full with %lld members."
+          },
+          "member_not_found": "Couldn’t find the member to remove.",
+          "membership_required": "Only members of this group can do that.",
+          "message_receive_failed": "Couldn’t receive a message. Try again later.",
+          "no_active_room": "Choose a group before sending a message.",
+          "owner_cannot_remove_self": "The group owner can’t remove themselves.",
+          "owner_required": "Only the group owner can do that.",
+          "profile_required": "Save your profile first.",
+          "realtime_unavailable": "The server connection is still being prepared. Try again shortly.",
+          "room_limit_reached": "Each person can use up to 5 groups.",
+          "room_resync_failed": "Couldn’t load the group’s latest state. Try again later.",
+          "session_recovery_failed": "Couldn’t restore your previous sign-in. No new account was created. Sign in again or contact support.",
+          "stale_realtime_epoch": "Group access changed. Reconnect to continue."
+        },
+        "realtime_recovery_failed": "Couldn’t reconnect to the server. Try again shortly. (%@)"
+      },
+      "commerce": {
+        "character": {
+          "equip": {
+            "failed": "Couldn’t equip the character. Try again. (%@)",
+            "success": "Equipped %@."
+          }
+        },
+        "equipment": {
+          "success": {
+            "default_bubble": "Equipped the default speech bubble.",
+            "default_character": "Equipped the default character.",
+            "default_throwable": "Equipped the default soft ball.",
+            "named": "Equipped %@."
+          }
+        },
+        "error": {
+          "catalog_unavailable": "Couldn’t load the store. Try again later."
+        },
+        "kind": {
+          "bubble": "Speech bubbles",
+          "character": "Characters",
+          "throwable": "Tossable toys"
+        }
+      },
+      "common": {
+        "retry": "Try again"
+      },
+      "composer": {
+        "drag": {
+          "accessibility": "Move message input handle",
+          "tooltip": "Move message input"
+        }
+      },
+      "connection": {
+        "state": {
+          "connecting": "Connecting…",
+          "failed": "Connection error",
+          "idle": "Idle",
+          "online": "Connected"
+        }
+      },
+      "firebase": {
+        "auth": {
+          "error": {
+            "account_mismatch": "Your signed-in account changed. Sign in again.",
+            "invalid_rollout_lease_claim": "We couldn’t verify your sign-in for the server connection. Sign in again.",
+            "invalid_session_claim": "We couldn’t verify your sign-in. Sign in again.",
+            "login_mismatch": "Your sign-in doesn’t match the current account. Sign in again.",
+            "malformed_account_identifier": "We couldn’t verify your account. Sign in again.",
+            "rollout_lease_expired": "Your sign-in expired. Sign in again.",
+            "rollout_lease_mismatch": "Your current sign-in can’t connect to the server. Sign in again.",
+            "session_mismatch": "Your sign-in doesn’t match the current account. Sign in again.",
+            "token_refresh_validation_failed": "We couldn’t verify your sign-in. Sign in again."
+          }
+        },
+        "bootstrap": {
+          "error": {
+            "authentication_required": "Your sign-in expired. Sign in again.",
+            "grant_not_converged": "The server connection is still being prepared. Try again shortly.",
+            "invalid_argument": "Couldn’t connect to the server. Try again later.",
+            "invalid_http_response": "Couldn’t connect to the server. Try again later.",
+            "malformed_success": "Couldn’t connect to the server. Try again later.",
+            "method_not_allowed": "This version can’t connect to the server. Update the app.",
+            "missing_access_token": "Your sign-in expired. Sign in again.",
+            "rate_limited": "Too many connection attempts. Try again shortly.",
+            "rollout_disabled": "Can’t connect to the server right now. The app will keep trying automatically.",
+            "unavailable": "Couldn’t connect to the server. Try again later.",
+            "unexpected_contract": "This version can’t connect to the server. Update the app."
+          }
+        },
+        "chat": {
+          "error": {
+            "authentication_expired": "Your sign-in expired. Sign in again.",
+            "invalid_message": "Check the message and send it again.",
+            "permission_denied": "You don’t have permission to send messages in this group.",
+            "rate_limited": "You’re sending messages too quickly.",
+            "state_conflict": "Couldn’t send the message. Try again shortly."
+          }
+        },
+        "configuration": {
+          "error": {
+            "invalid_plist": "Couldn’t read the app connection settings. Reinstall the app.",
+            "missing_plist": "The app connection settings are missing. Reinstall the app.",
+            "sdk_app_unavailable": "Couldn’t start the app connection. Reopen the app.",
+            "sdk_options_unavailable": "Couldn’t prepare the app connection. Reopen the app.",
+            "unexpected_app": "The app connection settings are incorrect. Reinstall the app.",
+            "unexpected_bundle": "The app connection settings are incorrect. Reinstall the app.",
+            "unexpected_database": "The app connection settings are incorrect. Reinstall the app.",
+            "unexpected_project": "The app connection settings are incorrect. Reinstall the app."
+          }
+        },
+        "production": {
+          "error": {
+            "app_version_unavailable": "Couldn’t check the app version, so the server connection can’t start. Reopen the app.",
+            "duplicate_wire_code": "A problem with the app data is blocking the server connection. Reinstall the app."
+          }
+        },
+        "transport": {
+          "error": {
+            "access_grant_closed": "Group access is still being checked. Try again shortly.",
+            "listener_failed": "The message connection ended. Reconnect to continue.",
+            "live_listener_unavailable": "Couldn’t prepare the message connection. Reconnect shortly.",
+            "reconciliation_failed": "Couldn’t check the latest group state. Try again shortly.",
+            "room_not_authorized": "We couldn’t verify access to this group. Reconnect to continue.",
+            "shut_down": "The server connection ended. Reconnect to continue."
+          }
+        }
+      },
+      "group": {
+        "create": {
+          "in_progress": "Creating…",
+          "keychain_warning": "The group was created, but the invite code couldn’t be saved to Keychain. Save the code shown now somewhere safe.",
+          "realtime_grant_pending": "The group was created, but the server connection couldn’t be completed. Check again shortly. (%@)"
+        },
+        "delete": {
+          "success": "Deleted the “%@” group."
+        },
+        "join": {
+          "in_progress": "Joining…",
+          "keychain_warning": "You joined the group, but the invite code couldn’t be saved to Keychain. Save the code you received somewhere safe.",
+          "realtime_grant_pending": "You joined the group, but the server connection couldn’t be completed. Check again shortly. (%@)"
+        },
+        "leave": {
+          "confirmation": {
+            "last_member": "Because you’re the last member, the group and all messages will be permanently deleted and can’t be recovered.",
+            "member": "You’ll no longer be able to access the group or its existing messages.",
+            "owner_transfer": "Ownership will transfer to the earliest remaining member, and you’ll no longer be able to access the group or its existing messages."
+          },
+          "success": "Left the “%@” group."
+        },
+        "name": {
+          "unknown": "Group"
+        },
+        "remove_member": {
+          "success": "Removed %@ from the group."
+        },
+        "rename": {
+          "success": "Renamed the group."
+        },
+        "switch": {
+          "failed": "Couldn’t switch groups. Try again. (%@)"
+        }
+      },
+      "groups": {
+        "active": "Active",
+        "create": {
+          "invite_code": {
+            "description": "Only friends who receive this code can join the group.",
+            "title": "New invite code"
+          },
+          "name": {
+            "description": "Enter a 1–20 character name to create a group."
+          },
+          "subtitle": "Create a group and share its invite code with friends."
+        },
+        "current": {
+          "empty": {
+            "description": "Create a new group or enter an invite code from a friend.",
+            "title": "No groups yet"
+          },
+          "subtitle": {
+            "one": "Manage the groups you share with friends. Each group can have up to %lld member.",
+            "other": "Manage the groups you share with friends. Each group can have up to %lld members."
+          },
+          "title": "Your groups"
+        },
+        "delete": {
+          "confirmation_title": "Delete the “%@” group?",
+          "message": "The group and all its messages will be permanently deleted and cannot be recovered."
+        },
+        "invite_code": {
+          "copy": {
+            "action": "Copy invite code",
+            "complete": "Copied",
+            "help": "Copy the invite code stored in this device’s Keychain."
+          },
+          "rotate": {
+            "$value": "Replace invite code",
+            "help": "Revoke the potentially exposed code and issue one new 128-bit code."
+          }
+        },
+        "join": {
+          "invite_code": {
+            "description": "Enter an invite code to check whether you can join and whether the group has space.",
+            "placeholder": "Invite code",
+            "title": "Invite code"
+          },
+          "subtitle": "Join a group with an invite code from a friend."
+        },
+        "leave": {
+          "action": "Leave group",
+          "confirmation_title": "Leave the “%@” group?",
+          "message": {
+            "last_owner": "Because you are the last member, the group and all messages will be permanently deleted and cannot be recovered.",
+            "member": "You will no longer be able to access the group or its existing messages.",
+            "owner_transfer": "Ownership will transfer to the remaining member who joined first, and you will no longer be able to access the group or its existing messages."
+          }
+        },
+        "management": {
+          "navigation_label": "Groups"
+        },
+        "member": {
+          "owner": "Owner",
+          "remove": {
+            "confirmation_title": "Remove %@?",
+            "message": "This member will no longer be able to access the group or its existing messages.",
+            "title": "Remove member"
+          }
+        },
+        "members": {
+          "empty": "No members to show."
+        },
+        "operation": {
+          "creating": "Creating…",
+          "joining": "Joining…",
+          "select": "Switch to group",
+          "switching": "Switching groups…"
+        },
+        "room": {
+          "summary": {
+            "invite_ready": {
+              "one": "%1$lld/%2$lld member · Invite code %3$@",
+              "other": "%1$lld/%2$lld members · Invite code %3$@"
+            },
+            "invite_rotation_required": {
+              "one": "%1$lld/%2$lld member · Invite code must be replaced",
+              "other": "%1$lld/%2$lld members · Invite code must be replaced"
+            }
+          }
+        }
+      },
+      "history": {
+        "close": {
+          "accessibility": "Close recent messages"
+        },
+        "empty": {
+          "description": "Recent messages from this group will appear here.",
+          "title": "No messages yet"
+        },
+        "error": {
+          "load_failed": "Couldn’t load recent messages"
+        },
+        "older": {
+          "exhausted": {
+            "one": "You’ve seen all messages from the last %lld day.",
+            "other": "You’ve seen all messages from the last %lld days."
+          }
+        },
+        "retention_notice": {
+          "one": "Messages are automatically deleted after %lld day.",
+          "other": "Messages are automatically deleted after %lld days."
+        },
+        "title": "Recent messages",
+        "window": {
+          "title": "%@ · Recent messages"
+        }
+      },
+      "invite": {
+        "error": {
+          "backend_unavailable": "Couldn’t check the invite code right now. Try again shortly.",
+          "clipboard_failed": "Couldn’t copy the invite code. Try again.",
+          "not_stored_on_device": "The invite code isn’t stored on this device. Create a new code or ask the owner for one.",
+          "read_failed": "Couldn’t read the invite code. Try again. (%@)",
+          "revoked": "The previous invite code for this group has been revoked. The group owner must issue a new one."
+        },
+        "rotate": {
+          "keychain_warning": "A new code was issued, but it couldn’t be saved to Keychain. Save the code shown now somewhere safe.",
+          "success": "Issued a new invite code."
+        }
+      },
+      "keychain": {
+        "error": {
+          "status": "Keychain error %lld"
+        },
+        "operation_reason": "Securely access your sign-in information and group invite codes.",
+        "transition": {
+          "message": "The app uses macOS Keychain to securely store and retrieve your sign-in information and group invite codes.",
+          "migration_explanation": "The first time the app loads information saved by an earlier version, macOS may ask for your Mac login password. To avoid being asked again, select “Always Allow” in the macOS dialog that follows. If you select “Allow,” the dialog may appear several more times or appear again the next time you open the app, depending on the saved information.",
+          "privacy_explanation": "The app doesn’t see or store the password you enter.",
+          "quit": "Quit SIDEY"
+        }
+      },
+      "landing": {
+        "accessibility": {
+          "ready": "SIDEY start screen",
+          "restoring": "SIDEY is restoring your previous sign-in"
+        },
+        "status": {
+          "ready": "Click to get started.",
+          "restoring": "Restoring your previous sign-in…"
+        },
+        "tagline": "Your friends have arrived at the edge of your screen."
+      },
+      "launch_at_login": {
+        "update_failed": "Couldn’t change the Open at Login setting. Try again. (%@)"
+      },
+      "message": {
+        "composer": {
+          "placeholder": "Enter a message"
+        },
+        "delivery": {
+          "failed": "Failed to send",
+          "pending": "Sending"
+        },
+        "error": {
+          "realtime_disconnected": "The server connection ended. Reconnect before sending a message.",
+          "wait_for_group_switch": "Wait for the group switch to finish before sending."
+        },
+        "retention_sync_failed": "Couldn’t apply the message retention setting. Try again. (%@)",
+        "send": {
+          "failed": "Couldn’t send the message. Try again. (%@)"
+        }
+      },
+      "mutation": {
+        "post_commit_sync_failed": "The change was saved, but the screen couldn’t be refreshed. Check again shortly. (%@)",
+        "realtime_recovering": "Your changes were saved. Reconnecting to the server…"
+      },
+      "onboarding": {
+        "group": {
+          "invite_code": {
+            "placeholder": "Invite code from a friend"
+          },
+          "member_limit": {
+            "one": "A group can have up to %lld member.",
+            "other": "A group can have up to %lld members."
+          },
+          "path": {
+            "accessibility": "Choose how to join a group"
+          }
+        },
+        "profile": {
+          "description": "Change this anytime in Settings.",
+          "nickname": {
+            "placeholder": "Nickname, 2–8 characters"
+          },
+          "title": "Choose your name"
+        }
+      },
+      "overlay": {
+        "span": {
+          "full": "Full"
+        }
+      },
+      "pixel_world": {
+        "doze_label": "Zzz",
+        "interaction": {
+          "throw": "Click a friend to throw the default soft ball.",
+          "tree": "Right-click the tree to stop or start walking."
+        },
+        "nickname": {
+          "current_user": "%@ · You"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Choose the pixel character that represents you on your friends’ screens.",
+          "selection": {
+            "accessibility": "Character selection"
+          },
+          "state": {
+            "equipping": "Equipping"
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "description": "Choose a speech bubble you own. It applies to all your groups immediately.",
+            "selection": {
+              "accessibility": "Speech bubble selection"
+            }
+          },
+          "character": {
+            "description": "Choose a character you own. It applies to all your groups immediately.",
+            "selection": {
+              "accessibility": "Character selection"
+            }
+          },
+          "default_bubble": "Default bubble",
+          "default_throwable": "Default soft ball",
+          "hint": {
+            "current": "Currently in use",
+            "select": "Applies to all your groups immediately"
+          },
+          "throwable": {
+            "description": "Choose a tossable toy you own. It applies to all your groups immediately.",
+            "selection": {
+              "accessibility": "Tossable toy selection"
+            }
+          }
+        },
+        "current_user": {
+          "badge": "You"
+        },
+        "duplicates_allowed": "You can use the same character or nickname as another member of the group.",
+        "error": {
+          "character_not_owned": "Select a character you own for your profile."
+        },
+        "nickname": {
+          "description": "The name your friends see in pixel worlds and messages · 2–8 characters",
+          "save": "Update nickname",
+          "unknown": "Friend",
+          "unknown_friend": "Unknown friend",
+          "unknown_member": "Member"
+        },
+        "onboarding": {
+          "next_hint": "After saving your profile, create a group or join one with an invite code."
+        },
+        "selection": {
+          "state": {
+            "not_selected": "Not selected",
+            "selected": "Selected"
+          }
+        },
+        "subtitle": "Set the name and character your friends will see.",
+        "success": {
+          "nickname_updated": "Updated your nickname.",
+          "saved": "Saved your profile."
+        }
+      },
+      "realtime": {
+        "kill_switch": {
+          "error": {
+            "legacy_connection_creation_failed": "Couldn’t connect to the server. Try again shortly.",
+            "legacy_connection_recovery_failed": "Couldn’t reconnect to the server. Try again shortly."
+          },
+          "transition_failed": "Couldn’t connect to the server. Reconnect shortly. (%@)"
+        },
+        "rollout": {
+          "error": {
+            "cache_unavailable": "Couldn’t save the server connection state. Reopen the app.",
+            "contract_mismatch": "This version can’t connect to the server. Update the app.",
+            "enabled_policy_unavailable": "Couldn’t connect to the server. Try again later.",
+            "malformed_response": "Couldn’t connect to the server. Try again later."
+          }
+        }
+      },
+      "settings": {
+        "account": {
+          "delete": {
+            "authentication_notice": "Enter “DELETE,” then sign in with Apple again to delete the account immediately.",
+            "confirmation_phrase": "DELETE",
+            "description": "This deletes your profile, messages, and information about the groups you joined. Purchase records may be kept separately from your account where required for accounting and fraud prevention.",
+            "placeholder": "Type “DELETE” to confirm",
+            "reveal": "Delete account…",
+            "title": "Delete account"
+          },
+          "privacy_policy": "Privacy policy",
+          "restore_purchases": "Restore Purchases",
+          "subtitle": "Manage account data and in-app purchases.",
+          "terms": "Terms of service",
+          "title": "Account & privacy"
+        },
+        "display": {
+          "offline_members": {
+            "description": "Show offline friends as sleeping characters with a red status dot.",
+            "title": "Show offline members"
+          },
+          "quiet_mode": {
+            "description": "Hide message bubbles and typing indicators while keeping connection status and unread counts."
+          },
+          "subtitle": "Control how friends’ status and messages appear on screen.",
+          "throw_guard": {
+            "description": "When off, click a friend’s character to throw immediately. When on, double-right-click your character first, then click a friend’s character within 10 seconds.",
+            "title": "Right-click twice before throwing"
+          }
+        },
+        "general": {
+          "overlay_visible": {
+            "description": "Show your friends’ pixel world along the selected screen edge."
+          },
+          "subtitle": "Configure the app’s basic display and startup behavior."
+        },
+        "placement": {
+          "edge": {
+            "description": "Choose the screen edge where characters walk.",
+            "picker": "Edge",
+            "title": "Edge"
+          },
+          "monitor": {
+            "description": "Choose the display for the pixel world. Move the message input separately using its left handle.",
+            "picker": "Display",
+            "title": "Display"
+          },
+          "span": {
+            "description": "Choose how much of the selected edge the world occupies.",
+            "full": "Full",
+            "half": "1/2",
+            "picker": "Length",
+            "third": "1/3",
+            "title": "World length"
+          },
+          "subtitle": "Choose the display and position for your pixel characters.",
+          "title": "World placement"
+        },
+        "shortcuts": {
+          "key": {
+            "picker": "Key"
+          },
+          "restore_default": {
+            "accessibility": "Restore default shortcut",
+            "help": "Restore default shortcut"
+          },
+          "subtitle": "Choose at least one modifier and a letter or number key. Changes apply immediately.",
+          "title": "Global shortcuts"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Play a sound when a character in the current group is hit by a tossable toy.",
+            "title": "Character sound effects"
+          },
+          "subtitle": "Configure character sound effects."
+        }
+      },
+      "shortcut": {
+        "action": {
+          "composer": "Open or close message input",
+          "history": "Open recent messages",
+          "overlay": "Show or hide overlay",
+          "quiet_mode": "Quiet mode"
+        },
+        "error": {
+          "duplicate": "Already used by “%@.” The existing shortcut will be kept.",
+          "modifier_required": "Select at least one modifier key. The existing shortcut will be kept.",
+          "new_binding_registration_failed": "Couldn’t register the new shortcut, so the existing shortcut will be kept.",
+          "new_binding_used_by_other_app": "This combination is used by another app. The existing shortcut will be kept.",
+          "registration_failed": "Couldn’t register the shortcut. Choose another shortcut.",
+          "used_by_other_app": "This shortcut is used by another app. Choose another shortcut or check the conflicting app’s settings."
+        },
+        "modifier": {
+          "command": "Command",
+          "control": "Control",
+          "option": "Option",
+          "shift": "Shift"
+        },
+        "status": {
+          "change_failed": "Change failed",
+          "unavailable": "Shortcut unavailable"
+        }
+      },
+      "status": {
+        "icon": {
+          "unread": {
+            "accessibility": "%@, unread messages"
+          }
+        },
+        "menu": {
+          "active_group": "Active group",
+          "compose": "New message…",
+          "group_settings": "Group settings…",
+          "history": "Recent messages…",
+          "no_connected_groups": "No groups joined",
+          "overlay": {
+            "hide": "Hide overlay",
+            "show": "Show overlay"
+          },
+          "quiet_mode": "Quiet mode",
+          "quit": "Quit %@",
+          "settings": "Settings…",
+          "store": "Store…"
+        },
+        "room": {
+          "unread_count": " (%@)"
+        },
+        "tooltip": {
+          "unread": "%@ · Unread messages"
+        }
+      },
+      "store": {
+        "coming_soon": {
+          "badge": "Coming soon",
+          "detail": "The store is getting ready. See you soon.",
+          "product": {
+            "accessibility": "%@, coming soon"
+          }
+        },
+        "empty": {
+          "description": "Try changing the product type or owned filter.",
+          "title": "No matching products"
+        },
+        "error": {
+          "auto_equip_failed": "Your purchase was completed, but the item couldn’t be equipped automatically. Equip it manually in Profile.",
+          "auto_equip_realtime_grant_pending": "The item is equipped. If it doesn’t appear right away, check again shortly. (%@)",
+          "entitlements_reconcile_failed": "Couldn’t verify your in-app purchases. Try Restore Purchases again.",
+          "equipment_realtime_grant_pending": "The item is equipped. If it doesn’t appear right away, check again shortly. (%@)",
+          "equipment_update_failed": "Couldn’t update the equipped item.",
+          "product_unavailable": "This product isn’t available on the App Store.",
+          "products_load_failed": "Couldn’t load App Store products. Try again later.",
+          "purchase_failed": "Couldn’t complete the purchase of %@. Try again later.",
+          "purchase_pending": "Purchase approval is pending. The item will appear automatically after approval.",
+          "purchase_status_failed": "Couldn’t confirm the purchase. Check again shortly.",
+          "server_rejected": "Couldn’t verify your in-app purchases. Try Restore Purchases again.",
+          "transaction_update_failed": "Couldn’t apply your purchase. Try Restore Purchases again.",
+          "unknown_result": "Couldn’t confirm the purchase result. Check again shortly.",
+          "unverified_transaction": "The purchase couldn’t be verified, so it wasn’t applied. Try Restore Purchases again.",
+          "verifier_not_configured": "Purchases can’t be verified right now. Try again later."
+        },
+        "filter": {
+          "hide_owned": "Hide owned",
+          "kind": {
+            "$value": "Product type",
+            "accessibility": "Store product type"
+          },
+          "menu": "Sort & filter"
+        },
+        "footer": {
+          "app_store": {
+            "entitlement": "In-app purchases are processed by the App Store. You can use an item as soon as your purchase is confirmed.",
+            "headline": "Prices are shown and purchases are processed by the App Store.",
+            "refund": "Refunds and billing inquiries follow Apple’s App Store policies and procedures."
+          },
+          "coming_soon": "The store is coming soon. Keep using items you already own.",
+          "direct": {
+            "entitlement": "Displayed prices include tax. You can use customization items as soon as payment is confirmed.",
+            "refund": "Change-of-mind refunds aren’t available after access begins. Full refunds are provided where legally required, including non-delivery, mismatch, duplicate, or unauthorized payment."
+          }
+        },
+        "kind": {
+          "bubble": "Speech bubble",
+          "character": "Character",
+          "keepsake": "Keepsake",
+          "throwable": "Tossable toy"
+        },
+        "navigation_label": "Customize & shop",
+        "preview": {
+          "accessibility": "%@ preview",
+          "character_interaction_hint": "Click the other character to try throwing %@. Double-click a character to see its pop-up reaction.",
+          "default_throwable": "Default soft ball",
+          "double_click_hint": "Double-click a character to see its pop-up reaction.",
+          "member": {
+            "dubu": "Dubu",
+            "moka": "Moka"
+          },
+          "message": {
+            "left": "Any dinner ideas?",
+            "right": "How about spicy chicken stew?"
+          },
+          "reduce_motion_hint": "Reduce Motion is on, so a still scene is shown.",
+          "sound": {
+            "off": "Turn off preview sound",
+            "on": "Turn on preview sound"
+          },
+          "tree_toggle_hint": "Right-click the tree to stop it, then right-click again to make it walk."
+        },
+        "price": {
+          "loading": {
+            "$value": "Loading the price…",
+            "short": "Checking price"
+          },
+          "required": "Price check required",
+          "retry": "Check price again",
+          "unavailable": {
+            "$value": "The App Store price is unavailable.",
+            "short": "Price unavailable"
+          }
+        },
+        "processing": "Processing",
+        "product": {
+          "detail": {
+            "close": "Close product details",
+            "hint": "View details"
+          },
+          "equipped": "Equipped",
+          "preview": {
+            "hint": "Preview details"
+          },
+          "processing": {
+            "accessibility": "Processing %@"
+          },
+          "sold_separately": "Sold separately",
+          "status": {
+            "accessibility": "%@, %@"
+          },
+          "unavailable": {
+            "detail": "This product isn’t available for purchase yet."
+          }
+        },
+        "purchase": {
+          "accessibility": "Buy %@ for %@",
+          "action": "Buy %@ · %@",
+          "available": "Available",
+          "confirming": "Confirming",
+          "error": "Error",
+          "opening_checkout": "Opening purchase…",
+          "owned": "Owned",
+          "refunded": "Refunded",
+          "success": "%@ purchased.",
+          "unavailable": "Currently unavailable"
+        },
+        "purchase_and_equip": {
+          "success": "%@ purchased and equipped."
+        },
+        "restore": {
+          "action": "Restore Purchases",
+          "failed": "Couldn’t restore purchases. Try again.",
+          "success": "Purchases restored."
+        },
+        "sort": {
+          "price_ascending": "Price: low to high",
+          "price_descending": "Price: high to low"
+        },
+        "status": {
+          "retry": "Check status again"
+        },
+        "subtitle": "Choose characters, speech bubbles, and tossable toys.",
+        "title": "Customize & shop"
+      },
+      "tree_movement": {
+        "error": {
+          "save_failed": "Couldn’t save the tree movement setting. Try again."
+        }
+      }
+    },
+    "windows": {
+      "accessibility": {
+        "motion": {
+          "disabled": "Animation effects are turned off in Windows."
+        }
+      },
+      "account": {
+        "delete": {
+          "confirmation": {
+            "action": "Delete account",
+            "message": "Your profile and information about the groups you’ve joined will be permanently deleted, and your purchase history will be unlinked from your account.",
+            "title": "Delete your account?"
+          },
+          "description": "Permanently delete your account and associated personal data.",
+          "final_confirmation": {
+            "message": "Your deleted account and data cannot be restored.",
+            "title": "Permanently delete your account?"
+          },
+          "title": "Delete account"
+        },
+        "description": "Sign out or manage your account.",
+        "sign_out": {
+          "confirmation": {
+            "action": "Sign out",
+            "message": "This signs you out on this PC only. You'll need to sign in with Google to use the app again.",
+            "title": "Sign out?"
+          },
+          "description": "Sign out on this PC only.",
+          "title": "Sign out"
+        },
+        "title": "Account"
+      },
+      "app": {
+        "info": {
+          "description": "View version and support information.",
+          "navigation_label": "About",
+          "title": "About"
+        },
+        "launch": {
+          "failed": "An error occurred while starting SIDEY. Close the app and try again."
+        },
+        "startup": {
+          "error": {
+            "title": "SIDEY startup error"
+          },
+          "failed": "SIDEY couldn’t start.",
+          "failed_with_log": "SIDEY couldn’t start.\n\nDiagnostic log: {0}",
+          "runtime_missing": "Some SIDEY files are missing. Reinstall the app."
+        }
+      },
+      "auth": {
+        "google": {
+          "already_linked": "This Google account is already linked to the current profile. Your profile and data were not changed.",
+          "cancelled": "Google sign-in was canceled or couldn’t be completed. Try again.",
+          "identity_changed": "This Google account doesn’t match the one linked to the current account. Your profile and data weren’t changed.",
+          "link_expired": "The Google sign-in request expired. Cancel sign-in and try again.",
+          "required": "Connect your Google account to continue.",
+          "sign_in_complete": "Google sign-in is complete. Close the sign-in tab in your browser."
+        },
+        "request": {
+          "failed": "Couldn’t sign in. Try again later. (Error code: {0})"
+        },
+        "response": {
+          "empty": "Couldn’t complete sign-in. Try again."
+        },
+        "session": {
+          "expired": "Your sign-in expired. Sign in again.",
+          "replace_blocked": "This PC already has sign-in information. Restart the app, then sign in again.",
+          "restore_failed": "Couldn’t restore your sign-in. No new account was created. Sign in again.",
+          "stored_invalid": "Couldn’t read your saved sign-in. Sign in again.",
+          "values_missing": "Couldn’t complete sign-in. Try again."
+        }
+      },
+      "common": {
+        "back": "Back",
+        "delete": "Delete",
+        "friend": "Friend",
+        "skip": "Skip"
+      },
+      "composer": {
+        "drag": {
+          "tooltip": "Drag to move the input window"
+        },
+        "group": {
+          "required": "Set up your profile and choose a group to send a message."
+        },
+        "message": {
+          "placeholder": "Type a message…"
+        },
+        "window": {
+          "title": "SIDEY message"
+        }
+      },
+      "connection": {
+        "configuration": {
+          "not_configured": "Required server connection settings are missing. Reinstall the app."
+        },
+        "error": {
+          "access_required": "Your account or group access couldn’t be verified. Select Reconnect under Server connection. If the same message keeps appearing, contact us with a diagnostic log.",
+          "busy": "Many people are connecting right now, so the connection is taking longer than usual. The app will keep trying automatically. If it is still not connected after a few minutes, contact us with a diagnostic log.",
+          "configuration_unavailable": "The server connection can’t start right now. Wait a moment, then select Reconnect under Server connection. If the same problem continues, contact us with a diagnostic log.",
+          "network_unavailable": "Couldn’t connect to the server. Check your internet connection, then select Reconnect under Server connection. If other sites work but this continues, contact us with a diagnostic log.",
+          "secure_connection_failed": "Couldn’t create a secure connection. Check that the Windows date and time are correct, then reconnect. If this continues, contact us with a diagnostic log.",
+          "service_unavailable": "Couldn’t connect to the server. The app will keep trying automatically. If it still isn’t connected after a few minutes, select Reconnect under Server connection. If that doesn’t help, contact us with a diagnostic log."
+        },
+        "group_resync_failed": "Couldn’t load the latest group state. Reconnect to continue. ({0})",
+        "group_revision_missing": "The group connection changed. Reconnect to continue.",
+        "notice": {
+          "connected": "Connected to the server.",
+          "reconnecting": "Reconnecting to the server."
+        },
+        "retry": {
+          "action": "Reconnect"
+        },
+        "server": {
+          "not_configured": "Required server connection settings are missing. Reinstall the app."
+        },
+        "state": {
+          "connected": "Connected",
+          "disconnected": "Not connected",
+          "reconnecting": "Connecting"
+        },
+        "unavailable": "Couldn’t connect to the server. Try again shortly."
+      },
+      "external_link": {
+        "open": {
+          "failed": "Couldn’t open the page in your default browser."
+        }
+      },
+      "groups": {
+        "create": {
+          "description": "Create a group and share the invite code with your friends.",
+          "in_progress": "Creating…",
+          "result_missing": "Couldn’t finish creating the group. Try again.",
+          "success": {
+            "default": "Group created."
+          },
+          "tooltip": "Create a group with this name."
+        },
+        "delete": {
+          "confirmation": {
+            "message": "This group and all its messages will be permanently deleted. This can't be undone.",
+            "title": "Delete ‘{0}’?"
+          },
+          "final_confirmation": {
+            "message": "‘{0}’ and all its messages will be permanently deleted now.",
+            "title": "Permanently delete this group?"
+          },
+          "success": "Group deleted.",
+          "tooltip": "Permanently delete this group."
+        },
+        "description": "Manage the groups you share with friends. Up to 12 people can join each group.",
+        "empty": {
+          "description": "Create a new group or enter an invite code from a friend.",
+          "title": "No groups yet"
+        },
+        "error": {
+          "not_found": "Group not found."
+        },
+        "invite": {
+          "code": {
+            "label": "Invite code",
+            "missing": "No invite code is stored on this device.",
+            "replaced": "The invite code stored on this device was replaced. Ask the owner for a new code.",
+            "revoked": "The previous invite code was revoked. The owner must issue a new code."
+          },
+          "copy": {
+            "action": "Copy invite code",
+            "complete": "Copied"
+          },
+          "rotate": {
+            "action": "Issue new invite code",
+            "code_missing": "The new invite code is empty.",
+            "confirmation": {
+              "action": "Create new code",
+              "message": "The existing code will be revoked immediately. This cannot be undone.",
+              "title": "Create a new invite code?"
+            },
+            "success": "A new invite code has been created and saved securely on this device."
+          }
+        },
+        "join": {
+          "description": "Enter an invite code from a friend to join a group.",
+          "failed": "Couldn’t join the group. Check the invite code and try again. ({0})",
+          "in_progress": "Joining…",
+          "result_missing": "Couldn’t load the group you joined. Try again.",
+          "room_id_missing": "Couldn’t finish joining the group. Try again.",
+          "success": {
+            "default": "Joined group."
+          },
+          "tooltip": "Join the group with this invite code."
+        },
+        "leave": {
+          "action": "Leave group",
+          "confirmation": {
+            "action": "Leave",
+            "member_message": "You will no longer be able to access this group or its recent messages.",
+            "owner_message": "The earliest remaining member will become the owner. If no members remain, the group will be deleted.",
+            "title": "Leave ‘{0}’?"
+          },
+          "success": "Left group.",
+          "tooltip": "Leave this group."
+        },
+        "member": {
+          "remove": {
+            "confirmation": {
+              "message": "This member will no longer be able to access the group or its recent messages.",
+              "title": "Remove ‘{0}’?"
+            },
+            "success": "Member removed.",
+            "tooltip": "Remove this member from the group."
+          }
+        },
+        "navigation_label": "Groups",
+        "operation": {
+          "busy": "Try again after the other group operation finishes."
+        },
+        "refresh": {
+          "failed": "Couldn’t refresh the group information. Try again later. ({0})"
+        },
+        "rename": {
+          "success": "Group renamed.",
+          "title": "Rename group",
+          "tooltip": "Rename the group."
+        },
+        "state": {
+          "active": "Active"
+        },
+        "summary": {
+          "invite_ready": "{0}/12 members · Invite code {1}",
+          "invite_rotation_required": "{0}/12 members · New invite code required"
+        },
+        "switch": {
+          "action": "Switch to group",
+          "in_progress": "Connecting…",
+          "success": "Active group changed.",
+          "tooltip": "Show this group on your screen."
+        },
+        "title": "Your groups"
+      },
+      "history": {
+        "empty": {
+          "description": "Recent messages from this group will appear here.",
+          "title": "No messages yet."
+        },
+        "group": {
+          "none": "No active group",
+          "required": "Join a group to see recent messages."
+        },
+        "load": {
+          "initial_failed": "Couldn’t load recent messages",
+          "retry": "Try again"
+        },
+        "pagination": {
+          "exhausted": "You’ve reached the end of the last 3 days"
+        },
+        "recent": {
+          "title": "Recent messages"
+        },
+        "retention": {
+          "notice": "Messages are automatically deleted after 3 days.",
+          "reload_failed": "Couldn’t reload older messages. Try again shortly. ({0})"
+        },
+        "scroll": {
+          "latest": "Jump to latest messages"
+        },
+        "user": {
+          "unknown": "Unknown member"
+        },
+        "window": {
+          "always_on_top": {
+            "disable": "Turn off always on top",
+            "disable_shortcut": "Turn off always on top (Alt+Down arrow)",
+            "enable": "Always on top",
+            "enable_shortcut": "Always on top (Alt+Up arrow)"
+          },
+          "title": "SIDEY · Recent messages"
+        }
+      },
+      "legal": {
+        "description": "Review the terms and policies.",
+        "privacy": {
+          "action": "View privacy policy"
+        },
+        "refund": {
+          "action": "View cancellation and refund policy"
+        },
+        "terms": {
+          "action": "View terms"
+        },
+        "title": "Policies"
+      },
+      "message": {
+        "delivery": {
+          "recheck_failed": "Couldn’t confirm that the message was sent. Check again shortly. ({0})"
+        },
+        "send": {
+          "failed": "Couldn’t send the message. Try again. ({0})",
+          "rate_limited": "You're sending messages too quickly."
+        }
+      },
+      "onboarding": {
+        "auth": {
+          "google": {
+            "cancel": "Cancel sign-in",
+            "continue": "Continue with Google",
+            "description": "Connect your Google account to continue. Your existing profile, groups, and chat history are preserved.",
+            "pending": "Complete Google sign-in in your browser."
+          },
+          "start": "Get started"
+        },
+        "complete": {
+          "description": "Create or join a group anytime in Settings.",
+          "title": "You’re ready to go"
+        },
+        "connection": {
+          "connected": "Connected to the server",
+          "connecting": "Connecting to the server…"
+        },
+        "group": {
+          "invite_code": {
+            "label": "Invite code",
+            "member_limit": "Each group can have up to 12 people.",
+            "placeholder": "Code from a friend",
+            "required": "Enter an invite code."
+          },
+          "join": {
+            "action": "Join"
+          },
+          "name": {
+            "placeholder": "e.g. Our Hangout"
+          },
+          "path": {
+            "label": "How would you like to get started?"
+          }
+        },
+        "launch": {
+          "action": "Start"
+        },
+        "profile": {
+          "description": "Change it anytime in Settings.",
+          "title": "Choose your name"
+        },
+        "step": {
+          "complete": "Done"
+        },
+        "tagline": "Keep your friends by your side."
+      },
+      "overlay": {
+        "current_user": "{0} · Me"
+      },
+      "platform": {
+        "requirements": {
+          "description": "SIDEY requires Windows 10 1809 (build 17763) or later on x64.",
+          "title": "Unsupported Windows version",
+          "window_title": "SIDEY — Unsupported Windows"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Choose the pixel character that represents you on your friends’ screens.",
+          "save": {
+            "success": "Character changed."
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "default": "Default speech bubble",
+            "description": "Choose a bubble you own. It will be used in all your groups.",
+            "title": "Speech bubble"
+          },
+          "equipped": "Equipped",
+          "save": {
+            "success": "Your new look is ready."
+          },
+          "throwable": {
+            "default": "Default soft ball",
+            "description": "Choose a tossable toy you own. It will be used in all your groups.",
+            "title": "Tossable toy"
+          }
+        },
+        "description": "Set the name and character your friends see.",
+        "duplicates": {
+          "notice": "It's fine to use the same name or character as a friend."
+        },
+        "nickname": {
+          "description": "The name your friends see on screen and in messages · 2–8 characters",
+          "save": {
+            "action": "Change nickname",
+            "tooltip": "Save the changed nickname."
+          }
+        },
+        "save": {
+          "success": "Profile saved."
+        }
+      },
+      "settings": {
+        "display": {
+          "description": "Adjust how friend status and messages appear.",
+          "offline_members": {
+            "description": "Show offline friends as sleeping characters with a red status dot.",
+            "title": "Show offline members",
+            "tooltip": "Toggle offline members"
+          },
+          "quiet_mode": {
+            "description": "Hide message bubbles and typing indicators while keeping unread counts.",
+            "tooltip": "Toggle quiet mode"
+          },
+          "throw_guard": {
+            "description": "When off, click a friend to throw. When on, double right-click your character to enable throwing for 10 seconds.",
+            "title": "Double right-click to throw",
+            "tooltip": "Require a double right-click on your character before throwing"
+          }
+        },
+        "general": {
+          "description": "Choose how the app appears and when it starts."
+        },
+        "language": {
+          "description": "Choose the language used in the app. Changes take effect immediately.",
+          "title": "Language"
+        },
+        "navigation_label": "Settings",
+        "overlay": {
+          "description": "Show your friends’ pixel world along the selected screen edge.",
+          "tooltip": "Toggle the pixel world"
+        },
+        "placement": {
+          "description": "Choose where your characters appear.",
+          "edge": {
+            "description": "Choose the screen edge where characters walk.",
+            "title": "Edge",
+            "tooltip": "Screen edge for the pixel world"
+          },
+          "monitor": {
+            "description": "Choose the display for the pixel world and message input.",
+            "title": "Monitor",
+            "tooltip": "Monitor for the pixel world and message input",
+            "unavailable": "No display is available."
+          },
+          "span": {
+            "description": "Choose how much of the screen edge your characters can explore.",
+            "full": "Entire edge",
+            "title": "Roaming area",
+            "tooltip": "Screen range occupied by the pixel world"
+          },
+          "title": "Character placement"
+        },
+        "save": {
+          "failed": "Couldn’t save your settings. Try again. ({0})"
+        },
+        "shortcuts": {
+          "action": {
+            "composer": "Open or close message input",
+            "history": "Open or close recent messages",
+            "overlay": "Toggle overlay",
+            "quiet_mode": "Toggle quiet mode"
+          },
+          "description": "Select a shortcut, then press the key combination you want. Assigning a combination already in use swaps the two shortcuts.",
+          "error": {
+            "already_registered": "This shortcut is already in use by the system or another app.",
+            "availability_unverified": "Couldn’t verify whether this shortcut is available.",
+            "in_app_conflict": "Another app shortcut uses this combination. Saving will swap the two shortcuts.",
+            "invalid": "Invalid shortcut",
+            "modifier_required": "A shortcut must start with Win, Ctrl, Alt, or Shift.",
+            "system_conflict": "This shortcut is already in use as a system shortcut."
+          },
+          "recorder": {
+            "empty": "Press a key combination to change this shortcut.",
+            "help": "Select, then press a modifier key and another key. Press Esc to cancel.",
+            "recording": "Press a shortcut…",
+            "reset": "Reset"
+          },
+          "title": "Keyboard shortcuts"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Play sound effects when characters in the current group are hit.",
+            "title": "Character sound effects"
+          },
+          "description": "Adjust character sound effects.",
+          "mute": "Mute",
+          "unmute": "Unmute",
+          "volume": "Volume"
+        },
+        "storage": {
+          "folder_invalid": "Couldn’t open the settings folder. Restart the app.",
+          "read_failed": "Couldn’t read your saved settings. Restart the app."
+        },
+        "theme": {
+          "dark": "Dark",
+          "description": "Choose the app’s light, dark, or system theme.",
+          "light": "Light",
+          "system": "Windows default",
+          "title": "Theme"
+        },
+        "update": {
+          "check": {
+            "action": "Check for updates"
+          },
+          "check_now": {
+            "tooltip": "Check for a newer version."
+          },
+          "description": "Check for a newer version.",
+          "last_checked": {
+            "never": "Last checked: never",
+            "today": "Today at {0}",
+            "value": "Last checked: {0}",
+            "yesterday": "Yesterday at {0}"
+          },
+          "release_notes": {
+            "action": "Update details"
+          },
+          "title": "Updates"
+        }
+      },
+      "store": {
+        "auth": {
+          "google": {
+            "failed": "Couldn’t start linking the Google account."
+          }
+        },
+        "availability": {
+          "coming_soon": {
+            "description": "The store currently offers previews only. Purchasing is not available yet.",
+            "title": "Not available to buy yet"
+          }
+        },
+        "checkout": {
+          "opening": "Opening checkout…"
+        },
+        "description": "See your characters, speech bubbles, and tossable toys in action.",
+        "empty": {
+          "description": "Try a different search or change your filters.",
+          "title": "Nothing found"
+        },
+        "filter": {
+          "hide_owned": "Hide owned",
+          "menu": "Sort & filter",
+          "reset": "Reset all",
+          "search": {
+            "label": "Search",
+            "placeholder": "Search names or descriptions"
+          }
+        },
+        "kind": {
+          "bubble": "Speech bubbles",
+          "character": "Characters",
+          "keepsake": "Keepsake",
+          "throwable": "Tossable toys"
+        },
+        "navigation_label": "Customize & shop",
+        "preview": {
+          "member": {
+            "dubu": "Tofu",
+            "moka": "Mocha"
+          },
+          "message": {
+            "left": "What's for dinner?",
+            "right": "How about pizza?"
+          },
+          "open": "Preview",
+          "sound": {
+            "off": "Mute preview sound",
+            "on": "Enable preview sound"
+          },
+          "tree_movement_hint": "Right-click the tree to stop it. Right-click again to let it walk.",
+          "unavailable": "Couldn’t load the preview."
+        },
+        "price": {
+          "krw": "₩{0:N0}"
+        },
+        "product": {
+          "sold_separately": "Sold separately from the character"
+        },
+        "purchase": {
+          "action": "Buy for {0}",
+          "confirming": "Confirming payment…",
+          "failed": "We couldn't confirm your purchase. Check again in a moment.",
+          "owned": "Owned",
+          "success": "Purchase completed.",
+          "timeout": "Payment confirmation timed out. Reopen the store to check its status.",
+          "unavailable": "Purchases are currently unavailable. Try again shortly."
+        },
+        "sort": {
+          "price_ascending": "Price: low to high",
+          "price_descending": "Price: high to low"
+        },
+        "status": {
+          "retry": "Try again",
+          "unavailable": "We couldn't load the shop. Try again in a moment."
+        },
+        "title": "Customize & shop"
+      },
+      "support": {
+        "diagnostics": {
+          "description": "Log files are compressed and saved to your Desktop. Sharing them with us can help us fix errors.",
+          "export": {
+            "action": "Export",
+            "failed": "Couldn’t export diagnostic data.",
+            "success": "Diagnostic data was saved to your Desktop."
+          },
+          "title": "Export diagnostic data"
+        },
+        "feedback": {
+          "action": "Send feedback",
+          "description": "Open a GitHub issue if something isn’t working or you need help.",
+          "title": "Feedback"
+        }
+      },
+      "tray": {
+        "app": {
+          "exit": "Exit"
+        },
+        "connection": {
+          "error": {
+            "message": "Select Reconnect under Server connection. If it still can’t connect, contact us with a diagnostic log.",
+            "title": "SIDEY server connection error"
+          }
+        },
+        "group": {
+          "active": "Active group"
+        },
+        "groups": {
+          "empty": "No connected groups",
+          "open": "Group settings…"
+        },
+        "history": {
+          "open": "Recent messages…"
+        },
+        "message": {
+          "compose": "Compose message…"
+        },
+        "overlay": {
+          "hide": "Hide overlay"
+        },
+        "quiet_mode": {
+          "toggle": "Quiet mode"
+        },
+        "settings": {
+          "open": "Settings…"
+        },
+        "shortcuts": {
+          "registration_failed": "These shortcuts are unavailable: {0}. Another app may be using them. Use the tray menu instead."
+        },
+        "start": {
+          "failed": "The tray icon couldn’t start. Closing the window will exit SIDEY."
+        },
+        "store": {
+          "open": "Store…"
+        },
+        "unread": {
+          "tooltip": "SIDEY · {0} unread messages"
+        },
+        "update": {
+          "available": "An update is available. {0}",
+          "check": "Check for updates…",
+          "check_failed": "Couldn't check for updates. Try again shortly.",
+          "installed": "SIDEY was updated to {0}. Click to see what changed.",
+          "latest": "You're using the latest version."
+        }
+      },
+      "update": {
+        "available": "SIDEY {0} is available.",
+        "checking": "Checking for updates...",
+        "download": {
+          "hash_mismatch": "We couldn't verify the update file. Download it again.",
+          "in_progress": "Downloading update…",
+          "progress": "Downloading update… ({0}%)"
+        },
+        "failed": "The update couldn’t be completed. Try again shortly.",
+        "install": {
+          "cancelled": "Update installation canceled.",
+          "invalid": "Couldn’t verify the update installation details. Try again later.",
+          "launch_failed": "Couldn’t open the installer. Select Check for updates to try again.",
+          "launched": "Download complete. The installer has been opened.",
+          "missing": "The update can’t be installed right now. Try again later."
+        },
+        "latest": "You’re using the latest version.",
+        "metadata": {
+          "invalid": "Couldn’t verify the update information. Try again later."
+        },
+        "not_published": "The new update isn’t available yet. Check again later.",
+        "prompt": {
+          "download": "Download",
+          "later": "Later",
+          "message": "Download SIDEY {0}?",
+          "title": "An update is available"
+        },
+        "release_notes": {
+          "open_failed": "Couldn’t open the update details. Try again. ({0})"
+        }
+      },
+      "validation": {
+        "message": {
+          "length": "Enter a message with 1–200 characters."
+        },
+        "nickname": {
+          "length": "Enter a nickname with 2–8 characters."
+        },
+        "room_name": {
+          "length": "Enter a group name with 1–20 characters."
+        }
+      }
+    }
+  },
+  "profile": {
+    "applying": "Applying",
+    "character": {
+      "label": "Character"
+    },
+    "nickname": {
+      "label": "Nickname",
+      "placeholder": "2–8 characters"
+    },
+    "title": "My profile"
+  },
+  "settings": {
+    "display": {
+      "quiet_mode": {
+        "title": "Quiet mode"
+      }
+    },
+    "overlay": {
+      "title": "Show pixel world"
+    },
+    "placement": {
+      "edge": {
+        "bottom": "Bottom",
+        "left": "Left",
+        "right": "Right",
+        "top": "Top"
+      }
+    },
+    "section": {
+      "display": {
+        "title": "Display"
+      },
+      "general": {
+        "title": "General"
+      },
+      "sound": {
+        "title": "Sound"
+      }
+    },
+    "window": {
+      "title": "SIDEY settings"
+    },
+    "startup": {
+      "title": "Start at sign-in",
+      "description": "The app starts automatically when you sign in."
+    }
+  },
+  "store": {
+    "sort": {
+      "catalog": "Default",
+      "label": "Sort"
+    }
+  }
+}

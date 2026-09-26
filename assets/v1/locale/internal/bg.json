@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Отворете приложението отново чрез scripts/macos/open_current.sh или го компилирайте и стартирайте от Xcode.",
+          "unverified_source": "Не можа да се потвърди, че приложението е компилирано от текущия изходен код."
+        }
+      },
+      "common": {
+        "quit": "Изход"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Задайте както SIDEY_SUPABASE_URL, така и SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Sidey-dev изисква URL адреса и публичния ключ за SIDEY-staging.",
+          "production_backend_in_development": "Sidey-dev не може да се свърже с производствения проект на Supabase.",
+          "secret_key_not_allowed": "В клиента не може да се използва таен ключ или ключ за служебна роля на Supabase.",
+          "unsupported_realtime_protocol": "Настройката на SIDEY за протокола в реално време съдържа неподдържана стойност."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Непотвърдени промени"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Преглед на магазина · Неуспешно заснемане",
+          "ownership": {
+            "$value": "Собственост",
+            "all": "И двете",
+            "character": "Само персонаж",
+            "keepsake": "Само любим предмет",
+            "none": "Няма"
+          },
+          "product": "Продукт",
+          "purchase_disabled": "Този екран за преглед никога не извършва реални покупки.",
+          "window": {
+            "title": "Sidey-dev · Преглед на магазина · Без реални покупки"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Изпълнява се локален преглед с 12 персонажа, защото променливите на средата за сървъра не са зададени."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "Модулът за измерване на рендирането не работи.",
+          "not_started": "Модулът за измерване на рендирането не е стартиран."
+        },
+        "export": {
+          "action": "Експортиране на текущите показатели като JSON",
+          "failed": "Неуспешно експортиране на показателите: {0}",
+          "path": "Път за експортиране: {0}",
+          "success": "Текущите показатели са експортирани като JSON. Резултатът от ръчната проверка остава със състояние not_run.",
+          "tooltip": "Записване на текущите показатели за производителността при рендиране в JSON файл."
+        },
+        "preview_notice": "Вътрешен режим за измерване на рендирането само с хамстер. Резултатът от ръчната проверка още не е записан.",
+        "samples": {
+          "empty": "Няма извадки с показатели"
+        },
+        "summary": "Изминало време: {0:F0} с · Извадки: {1} · Най-дълъг кадър: {2:F2} мс · Работен набор: {3:F1} МБ (макс.: {4:F1} МБ) · GDI: {5} · USER: {6}",
+        "title": "Вътрешни показатели за рендиране"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "За замяна на конфигурацията на Supabase са необходими HTTPS URL адрес (или HTTP адрес за localhost) и publishable key. Не се допускат secret key и service-role key."
+        }
+      }
+    }
+  }
+}

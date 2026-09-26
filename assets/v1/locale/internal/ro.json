@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Redeschideți aplicația cu scripts/macos/open_current.sh sau compilați-o și rulați-o din Xcode.",
+          "unverified_source": "Nu s-a putut verifica dacă această aplicație a fost compilată din sursa curentă."
+        }
+      },
+      "common": {
+        "quit": "Închideți"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Setați atât SIDEY_SUPABASE_URL, cât și SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Sidey-dev necesită URL-ul SIDEY-staging și un publishable key.",
+          "production_backend_in_development": "Sidey-dev nu se poate conecta la proiectul Supabase de producție.",
+          "secret_key_not_allowed": "Un Supabase secret key sau service-role key nu poate fi utilizat în client.",
+          "unsupported_realtime_protocol": "Setarea protocolului SIDEY în timp real conține o valoare neacceptată."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Modificări neconfirmate"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Examinare magazin · Capturarea nu a reușit",
+          "ownership": {
+            "$value": "Deținere",
+            "all": "Ambele",
+            "character": "Doar personajul",
+            "keepsake": "Doar obiectul drag",
+            "none": "Niciunul"
+          },
+          "product": "Produs",
+          "purchase_disabled": "Acest ecran de examinare nu efectuează niciodată achiziții reale.",
+          "window": {
+            "title": "Sidey-dev · Examinare magazin · Fără achiziții reale"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Previzualizarea locală cu 12 personaje rulează deoarece lipsesc variabilele de mediu ale serverului."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "Motorul de randare pentru metrici nu rulează.",
+          "not_started": "Motorul de randare pentru metrici nu a pornit."
+        },
+        "export": {
+          "action": "Exportați metricile curente ca JSON",
+          "failed": "Exportul metricilor nu a reușit: {0}",
+          "path": "Calea de export: {0}",
+          "success": "Metricile curente au fost exportate ca JSON. Rezultatele manuale rămân not_run.",
+          "tooltip": "Salvați metricile curente de performanță a randării ca JSON."
+        },
+        "preview_notice": "Mod intern de măsurare a randării, limitat la hamster. Verificarea manuală nu a fost înregistrată.",
+        "samples": {
+          "empty": "Nicio mostră de metrici"
+        },
+        "summary": "Timp scurs {0:F0} s · {1} mostre · cadru maxim {2:F2} ms · set de lucru {3:F1} MB (vârf {4:F1} MB) · GDI {5} · USER {6}",
+        "title": "Metrici interne de randare"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Suprascrierea Supabase trebuie să includă un URL HTTPS (sau localhost prin HTTP) și o cheie publicabilă. Cheile secret și service-role nu sunt permise."
+        }
+      }
+    }
+  }
+}

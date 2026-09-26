@@ -18,12 +18,19 @@ except ModuleNotFoundError:  # Support `python -m scripts...` package imports.
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path("assets/v1/ui-localizations.json")
-SCHEMA = 1
-CANONICAL_LOCALES = ("ko", "en", "ja", "zh-Hans", "zh-Hant", "uk", "ru")
+LOCALE_ROOT = Path("assets/v1/locale/client")
+INTERNAL_LOCALE_ROOT = Path("assets/v1/locale/internal")
+SCHEMA = 2
+CANONICAL_LOCALES = (
+    "ko", "en", "ja", "zh-Hans", "zh-Hant", "uk", "ru",
+    "it", "pt-PT", "es", "cs", "tr", "ro", "bg", "pt-BR",
+    "sr-Cyrl", "pl", "sr-Latn", "nl-BE", "fr", "nl", "he", "de",
+)
 CONSUMERS = {
     "macos": {
         "locales": {"ko": "ko", "en": "en", "ja": "ja", "zh-Hant": "zh-Hant"},
         "output": Path("macos/SIDEY/Resources/Localizable.xcstrings"),
+        "internal_output": Path("macos/SIDEY/Resources/InternalLocalizable.xcstrings"),
     },
     "windows": {
         "locales": {
@@ -34,11 +41,35 @@ CONSUMERS = {
             "zh-Hant": "zh-TW",
             "uk": "uk-UA",
             "ru": "ru-RU",
+            "it": "it-IT",
+            "pt-PT": "pt-PT",
+            "es": "es-ES",
+            "cs": "cs-CZ",
+            "tr": "tr-TR",
+            "ro": "ro-RO",
+            "bg": "bg-BG",
+            "pt-BR": "pt-BR",
+            "sr-Cyrl": "sr-Cyrl-RS",
+            "pl": "pl-PL",
+            "sr-Latn": "sr-Latn-RS",
+            "nl-BE": "nl-BE",
+            "fr": "fr-FR",
+            "nl": "nl-NL",
+            "he": "he-IL",
+            "de": "de-DE",
         },
         "output": Path("windows/src/Sidey.App/Langs"),
+        "internal_output": Path("windows/src/Sidey.App/InternalLangs"),
     },
 }
-SEMANTIC_KEY = re.compile(r"^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$")
+SEMANTIC_KEY = re.compile(r"^[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+$")
+NESTED_KEY_SEGMENT = re.compile(r"^[a-z][a-z0-9_]*$")
+WINDOWS_NONFUNCTIONAL_ROOTS = frozenset(
+    {
+        "about", "backend", "dialogs", "error", "launcher", "navigation",
+        "preferences", "preview", "unsupported", "window",
+    }
+)
 PRINTF_TOKEN = re.compile(r"%(?:(?P<position>[1-9][0-9]*)\$)?(?P<kind>lld|ld|d|@)")
 DOTNET_TOKEN = re.compile(r"\{(?P<position>[0-9]+)(?::(?P<format>[^{}]+))?\}")
 HANGUL = re.compile(r"[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af]")
@@ -58,6 +89,279 @@ def read_json(path: Path) -> Any:
         return output
 
     return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=reject_duplicates)
+
+
+def _mac_localization(value: Any, label: str) -> dict[str, Any]:
+    if isinstance(value, str) and value:
+        return {"stringUnit": {"state": "translated", "value": value}}
+    if (
+        isinstance(value, dict)
+        and tuple(value) == ("one", "other")
+        and all(isinstance(item, str) and item for item in value.values())
+    ):
+        return {
+            "variations": {
+                "plural": {
+                    category: {
+                        "stringUnit": {
+                            "state": "translated",
+                            "value": value[category],
+                        }
+                    }
+                    for category in ("one", "other")
+                }
+            }
+        }
+    raise LocalizationError(f"{label}: macOS value must be a string or one/other plural")
+
+
+def flatten_locale_tree(value: Any, label: str, consumer: str) -> dict[str, Any]:
+    """Flatten nested locale objects while preserving explicit prefix values."""
+
+    if not isinstance(value, dict):
+        raise LocalizationError(f"{label}: localization section must be an object")
+    output: dict[str, Any] = {}
+
+    def add(path: str, raw: Any) -> None:
+        if not path:
+            raise LocalizationError(f"{label}: root value is not allowed")
+        if path in output:
+            raise LocalizationError(f"{label}: duplicate localization key: {path}")
+        if consumer == "macos":
+            output[path] = _mac_localization(raw, f"{label}.{path}")
+        elif isinstance(raw, str) and raw:
+            output[path] = raw
+        else:
+            raise LocalizationError(f"{label}.{path}: value must be a non-empty string")
+
+    def visit(node: Any, prefix: str) -> None:
+        if consumer == "macos" and isinstance(node, dict) and set(node) == {"one", "other"}:
+            add(prefix, node)
+            return
+        if not isinstance(node, dict):
+            add(prefix, node)
+            return
+        if not node and prefix:
+            raise LocalizationError(f"{label}.{prefix}: empty object is not allowed")
+        if "$value" in node:
+            add(prefix, node["$value"])
+        for key, child in node.items():
+            if key == "$value":
+                continue
+            if (
+                not isinstance(key, str)
+                or NESTED_KEY_SEGMENT.fullmatch(key) is None
+                or key == "platforms"
+            ):
+                raise LocalizationError(f"{label}: invalid nested key: {key!r}")
+            path = f"{prefix}.{key}" if prefix else key
+            visit(child, path)
+
+    visit(value, "")
+    return output
+
+
+def read_source(
+    metadata_path: Path | None = None,
+    locale_root: Path | None = None,
+) -> dict[str, Any]:
+    """Load nested per-locale client files into the validated consumer model."""
+
+    metadata_path = metadata_path or ROOT / SOURCE
+    locale_root = locale_root or ROOT / LOCALE_ROOT
+    metadata = read_json(metadata_path)
+    if not isinstance(metadata, dict) or set(metadata) != {
+        "schema",
+        "canonical_locales",
+        "consumers",
+    }:
+        raise LocalizationError("UI localization metadata has unknown or missing keys")
+    if metadata["schema"] != SCHEMA:
+        raise LocalizationError(f"Unsupported UI localization schema: {metadata['schema']}")
+    if tuple(metadata["canonical_locales"]) != CANONICAL_LOCALES:
+        raise LocalizationError("Canonical locale set or order differs")
+    expected_consumers = {
+        "macos": {"locales": list(CONSUMERS["macos"]["locales"])},
+        "windows": {"locales": list(CONSUMERS["windows"]["locales"])},
+    }
+    if metadata["consumers"] != expected_consumers:
+        raise LocalizationError("Consumer locale contract differs")
+
+    expected_files = {locale_root / f"{locale}.json" for locale in CANONICAL_LOCALES}
+    actual_files = set(locale_root.glob("*.json")) if locale_root.is_dir() else set()
+    if actual_files != expected_files:
+        missing = sorted(path.name for path in expected_files - actual_files)
+        extra = sorted(path.name for path in actual_files - expected_files)
+        raise LocalizationError(
+            f"Client locale files differ: missing={missing}, extra={extra}"
+        )
+
+    shared_by_locale: dict[str, dict[str, Any]] = {}
+    platform_by_locale: dict[str, dict[str, dict[str, Any]]] = {}
+    for locale in CANONICAL_LOCALES:
+        document = read_json(locale_root / f"{locale}.json")
+        if not isinstance(document, dict) or "platforms" not in document:
+            raise LocalizationError(f"{locale}: locale file must contain platforms")
+        shared_by_locale[locale] = flatten_locale_tree(
+            {key: value for key, value in document.items() if key != "platforms"},
+            locale,
+            "shared",
+        )
+        platforms = document["platforms"]
+        if (
+            not isinstance(platforms, dict)
+            or set(platforms) != set(CONSUMERS)
+        ):
+            raise LocalizationError(
+                f"{locale}: every client locale must contain all platforms"
+            )
+        windows = platforms.get("windows", {})
+        nonfunctional_roots = WINDOWS_NONFUNCTIONAL_ROOTS & set(windows)
+        if nonfunctional_roots:
+            raise LocalizationError(
+                f"{locale}: Windows localization uses nonfunctional roots: "
+                f"{sorted(nonfunctional_roots)}"
+            )
+        platform_by_locale[locale] = {
+            consumer: flatten_locale_tree(
+                platforms[consumer],
+                f"{locale}.platforms.{consumer}",
+                consumer,
+            )
+            for consumer in platforms
+        }
+
+    shared_keys = tuple(shared_by_locale[CANONICAL_LOCALES[0]])
+    for locale in CANONICAL_LOCALES[1:]:
+        if tuple(shared_by_locale[locale]) != shared_keys:
+            raise LocalizationError(f"{locale}: shared key set or order differs")
+
+    source: dict[str, Any] = {
+        **metadata,
+        "shared": {
+            key: {
+                "localizations": {
+                    locale: shared_by_locale[locale][key]
+                    for locale in CANONICAL_LOCALES
+                }
+            }
+            for key in shared_keys
+        },
+    }
+    for consumer in CONSUMERS:
+        locales = tuple(CONSUMERS[consumer]["locales"])
+        keys = tuple(platform_by_locale[locales[0]][consumer])
+        available_locales = tuple(
+            locale
+            for locale in CANONICAL_LOCALES
+            if consumer in platform_by_locale[locale]
+        )
+        for locale in available_locales[1:]:
+            if tuple(platform_by_locale[locale][consumer]) != keys:
+                raise LocalizationError(
+                    f"{locale}: {consumer} key set or order differs"
+                )
+        for locale in available_locales:
+            if locale in locales:
+                continue
+            for key in keys:
+                validate_localizations(
+                    {
+                        "localizations": {
+                            locales[0]: platform_by_locale[locales[0]][consumer][key],
+                            locale: platform_by_locale[locale][consumer][key],
+                        }
+                    },
+                    (locales[0], locale),
+                    f"{locale}.optional.{consumer}.{key}",
+                    consumer,
+                )
+        source[consumer] = {
+            key: {
+                "localizations": {
+                    locale: platform_by_locale[locale][consumer][key]
+                    for locale in locales
+                }
+            }
+            for key in keys
+        }
+    return source
+
+
+def read_internal_source(locale_root: Path | None = None) -> dict[str, Any]:
+    """Load development-only localizations kept out of production catalogs."""
+
+    locale_root = locale_root or ROOT / INTERNAL_LOCALE_ROOT
+    expected_files = {locale_root / f"{locale}.json" for locale in CANONICAL_LOCALES}
+    actual_files = set(locale_root.glob("*.json")) if locale_root.is_dir() else set()
+    if actual_files != expected_files:
+        missing = sorted(path.name for path in expected_files - actual_files)
+        extra = sorted(path.name for path in actual_files - expected_files)
+        raise LocalizationError(
+            f"Internal locale files differ: missing={missing}, extra={extra}"
+        )
+
+    by_locale: dict[str, dict[str, dict[str, Any]]] = {}
+    for locale in CANONICAL_LOCALES:
+        document = read_json(locale_root / f"{locale}.json")
+        if not isinstance(document, dict) or set(document) != {"platforms"}:
+            raise LocalizationError(f"{locale}: internal locale file must contain platforms")
+        platforms = document["platforms"]
+        if (
+            not isinstance(platforms, dict)
+            or set(platforms) != set(CONSUMERS)
+        ):
+            raise LocalizationError(
+                f"{locale}: every internal locale must contain all platforms"
+            )
+        by_locale[locale] = {
+            consumer: flatten_locale_tree(
+                platforms[consumer],
+                f"{locale}.internal.{consumer}",
+                consumer,
+            )
+            for consumer in platforms
+        }
+
+    source: dict[str, Any] = {}
+    for consumer in CONSUMERS:
+        locales = tuple(CONSUMERS[consumer]["locales"])
+        keys = tuple(by_locale[locales[0]][consumer])
+        available_locales = tuple(
+            locale
+            for locale in CANONICAL_LOCALES
+            if consumer in by_locale[locale]
+        )
+        for locale in available_locales[1:]:
+            if tuple(by_locale[locale][consumer]) != keys:
+                raise LocalizationError(
+                    f"{locale}: internal {consumer} key set or order differs"
+                )
+        for locale in available_locales:
+            if locale in locales:
+                continue
+            for key in keys:
+                validate_localizations(
+                    {
+                        "localizations": {
+                            locales[0]: by_locale[locales[0]][consumer][key],
+                            locale: by_locale[locale][consumer][key],
+                        }
+                    },
+                    (locales[0], locale),
+                    f"{locale}.optional.internal.{consumer}.{key}",
+                    consumer,
+                )
+        source[consumer] = {
+            key: {
+                "localizations": {
+                    locale: by_locale[locale][consumer][key]
+                    for locale in locales
+                }
+            }
+            for key in keys
+        }
+    return source
 
 
 def json_bytes(value: Any) -> bytes:
@@ -211,14 +515,23 @@ def validate_source(source: Any) -> None:
         raise LocalizationError("Localization sections must be objects")
     if set(sections["shared"]) & (set(sections["macos"]) | set(sections["windows"])):
         raise LocalizationError("Shared output keys must not be duplicated by platform sections")
-    commerce_keys = set(next(iter(commerce_windows_overlays().values())))
-    duplicated_commerce = commerce_keys & (
+    macos_commerce_keys = set(next(iter(commerce_macos_overlays().values())))
+    duplicated_macos_commerce = macos_commerce_keys & (
+        set(sections["shared"]) | set(sections["macos"])
+    )
+    if duplicated_macos_commerce:
+        raise LocalizationError(
+            f"macOS commerce keys must be owned by the commerce source: "
+            f"{sorted(duplicated_macos_commerce)}"
+        )
+    windows_commerce_keys = set(next(iter(commerce_windows_overlays().values())))
+    duplicated_windows_commerce = windows_commerce_keys & (
         set(sections["shared"]) | set(sections["windows"])
     )
-    if duplicated_commerce:
+    if duplicated_windows_commerce:
         raise LocalizationError(
             f"Windows commerce keys must be owned by the commerce source: "
-            f"{sorted(duplicated_commerce)}"
+            f"{sorted(duplicated_windows_commerce)}"
         )
     for key, entry in sections["shared"].items():
         if SEMANTIC_KEY.fullmatch(key) is None:
@@ -234,13 +547,41 @@ def validate_source(source: Any) -> None:
         validate_localizations(entry, tuple(CONSUMERS["windows"]["locales"]), f"windows.{key}", "windows")
 
 
+def validate_internal_source(source: Any, production: dict[str, Any]) -> None:
+    if not isinstance(source, dict) or set(source) != set(CONSUMERS):
+        raise LocalizationError("Internal localization source must contain macos and windows")
+    for consumer in CONSUMERS:
+        section = source[consumer]
+        if not isinstance(section, dict) or not section:
+            raise LocalizationError(f"Internal {consumer} localization section must not be empty")
+        duplicated = set(section) & (set(production["shared"]) | set(production[consumer]))
+        if duplicated:
+            raise LocalizationError(
+                f"Internal {consumer} keys duplicate production keys: {sorted(duplicated)}"
+            )
+        locales = tuple(CONSUMERS[consumer]["locales"])
+        for key, entry in section.items():
+            if SEMANTIC_KEY.fullmatch(key) is None:
+                raise LocalizationError(f"Invalid internal {consumer} output key: {key}")
+            validate_localizations(
+                entry,
+                locales,
+                f"internal.{consumer}.{key}",
+                consumer,
+            )
+
+
 def mac_shared_localization(value: str) -> dict[str, Any]:
     return {"stringUnit": {"state": "translated", "value": value}}
 
 
-def render_macos(source: dict[str, Any]) -> bytes:
+def render_macos(
+    source: dict[str, Any],
+    commerce_overlays: dict[str, dict[str, str]] | None = None,
+) -> bytes:
     strings: dict[str, Any] = {}
     locale_map = CONSUMERS["macos"]["locales"]
+    commerce_overlays = commerce_overlays or commerce_macos_overlays()
     for key, entry in source["shared"].items():
         strings[key] = {
             "extractionState": "manual",
@@ -255,6 +596,16 @@ def render_macos(source: dict[str, Any]) -> bytes:
             "localizations": {
                 locale_map[canonical_locale]: localization
                 for canonical_locale, localization in entry["localizations"].items()
+            },
+        }
+    for key in commerce_overlays[next(iter(locale_map))]:
+        strings[key] = {
+            "extractionState": "manual",
+            "localizations": {
+                output_locale: mac_shared_localization(
+                    commerce_overlays[canonical_locale][key]
+                )
+                for canonical_locale, output_locale in locale_map.items()
             },
         }
     return json_bytes({"sourceLanguage": "en", "strings": dict(sorted(strings.items())), "version": "1.0"})
@@ -275,9 +626,15 @@ def assign_nested(root: dict[str, Any], dotted_key: str, value: str) -> None:
     current[parts[-1]] = value
 
 
+def commerce_macos_overlays() -> dict[str, dict[str, str]]:
+    catalog = commerce.read_json(commerce.ROOT / commerce.CATALOG)
+    source = commerce.read_source()
+    return commerce.macos_character_overlays(catalog, source)
+
+
 def commerce_windows_overlays() -> dict[str, dict[str, str]]:
     catalog = commerce.read_json(commerce.ROOT / commerce.CATALOG)
-    source = commerce.read_json(commerce.ROOT / commerce.LOCALIZATIONS)
+    source = commerce.read_source()
     return commerce.windows_overlays(catalog, source)
 
 
@@ -300,13 +657,57 @@ def render_windows(
     return rendered
 
 
-def expected_outputs(source: dict[str, Any], consumer: str, output_root: Path) -> dict[Path, bytes]:
+def render_internal_macos(source: dict[str, Any]) -> bytes:
+    locale_map = CONSUMERS["macos"]["locales"]
+    strings = {
+        key: {
+            "extractionState": "manual",
+            "localizations": {
+                locale_map[canonical_locale]: localization
+                for canonical_locale, localization in entry["localizations"].items()
+            },
+        }
+        for key, entry in source["macos"].items()
+    }
+    return json_bytes(
+        {"sourceLanguage": "en", "strings": dict(sorted(strings.items())), "version": "1.0"}
+    )
+
+
+def render_internal_windows(source: dict[str, Any]) -> dict[str, bytes]:
+    rendered: dict[str, bytes] = {}
+    for canonical_locale, output_locale in CONSUMERS["windows"]["locales"].items():
+        catalog: dict[str, Any] = {}
+        for key, entry in source["windows"].items():
+            assign_nested(catalog, key, entry["localizations"][canonical_locale])
+        rendered[f"{output_locale}.json"] = json_bytes(catalog)
+    return rendered
+
+
+def expected_outputs(
+    source: dict[str, Any],
+    consumer: str,
+    output_root: Path,
+    internal_source: dict[str, Any] | None = None,
+) -> dict[Path, bytes]:
+    internal_source = internal_source or read_internal_source()
+    validate_internal_source(internal_source, source)
     outputs: dict[Path, bytes] = {}
     if consumer in {"macos", "all"}:
         outputs[output_root / CONSUMERS["macos"]["output"]] = render_macos(source)
+        outputs[output_root / CONSUMERS["macos"]["internal_output"]] = render_internal_macos(
+            internal_source
+        )
     if consumer in {"windows", "all"}:
         directory = output_root / CONSUMERS["windows"]["output"]
         outputs.update({directory / name: data for name, data in render_windows(source).items()})
+        internal_directory = output_root / CONSUMERS["windows"]["internal_output"]
+        outputs.update(
+            {
+                internal_directory / name: data
+                for name, data in render_internal_windows(internal_source).items()
+            }
+        )
     return outputs
 
 
@@ -318,13 +719,16 @@ def write_outputs(outputs: dict[Path, bytes]) -> None:
 
 def check_outputs(outputs: dict[Path, bytes]) -> list[Path]:
     stale = [path for path, data in outputs.items() if not path.is_file() or path.read_bytes() != data]
-    expected_windows = {
-        path for path in outputs if path.parent.name == CONSUMERS["windows"]["output"].name
-    }
-    if expected_windows:
-        directory = next(iter(expected_windows)).parent
-        if directory.is_dir():
-            stale.extend(sorted(set(directory.glob("*.json")) - expected_windows))
+    for output_key in ("output", "internal_output"):
+        expected_windows = {
+            path
+            for path in outputs
+            if path.parent.name == CONSUMERS["windows"][output_key].name
+        }
+        if expected_windows:
+            directory = next(iter(expected_windows)).parent
+            if directory.is_dir():
+                stale.extend(sorted(set(directory.glob("*.json")) - expected_windows))
     return stale
 
 
@@ -335,15 +739,23 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     action.add_argument("--write", action="store_true")
     action.add_argument("--check", action="store_true")
     parser.add_argument("--source", type=Path, default=ROOT / SOURCE)
+    parser.add_argument("--locale-root", type=Path, default=ROOT / LOCALE_ROOT)
+    parser.add_argument(
+        "--internal-locale-root",
+        type=Path,
+        default=ROOT / INTERNAL_LOCALE_ROOT,
+    )
     parser.add_argument("--output-root", type=Path, default=ROOT)
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv or sys.argv[1:])
-    source = read_json(args.source)
+    source = read_source(args.source, args.locale_root)
+    internal_source = read_internal_source(args.internal_locale_root)
     validate_source(source)
-    outputs = expected_outputs(source, args.consumer, args.output_root)
+    validate_internal_source(internal_source, source)
+    outputs = expected_outputs(source, args.consumer, args.output_root, internal_source)
     if args.write:
         write_outputs(outputs)
         return 0

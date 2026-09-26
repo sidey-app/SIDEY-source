@@ -162,7 +162,7 @@ final class PixelHamsterAssetTests: XCTestCase {
         )
         XCTAssertEqual(
             PixelCharacterCatalog.definition(for: PixelCharacterCatalog.legacyPixelKoalaID).displayName,
-            L10n.text("character.pixel_chinchilla.name")
+            L10n.text("character.pixel_chinchilla.display_name")
         )
         XCTAssertTrue(PixelCharacterCatalog.free.allSatisfy { !$0.mirrorsToMovementDirection })
         XCTAssertEqual(PixelSparkleEffect.starlight.ambientDelay, 1.0...1.4)
@@ -181,7 +181,7 @@ final class PixelHamsterAssetTests: XCTestCase {
         XCTAssertEqual(PixelCharacterCatalog.canonicalID(for: "unknown"), "pixel_hamster")
         XCTAssertEqual(
             PixelCharacterCatalog.definition(for: "unknown").displayName,
-            L10n.text("character.pixel_hamster.name")
+            L10n.text("character.pixel_hamster.display_name")
         )
         for character in PixelCharacterCatalog.all {
             XCTAssertEqual(character.frames, .standard)

@@ -22,7 +22,6 @@ struct PixelCharacterDefinition: Equatable, Identifiable, Sendable {
     let resourceDirectory: String
     let previewFrame: Int
     let frames: PixelCharacterFrameContract
-    let paletteDescription: String
     let entitlementKey: String?
     let mirrorsToMovementDirection: Bool
     let sparkleEffect: PixelSparkleEffect?
@@ -128,161 +127,149 @@ enum PixelCharacterCatalog {
     static let all: [PixelCharacterDefinition] = [
         PixelCharacterDefinition(
             id: pixelHamsterID,
-            displayName: L10n.text("character.pixel_hamster.name"),
+            displayName: L10n.text("character.pixel_hamster.display_name"),
             resourceName: "pixel_hamster",
             resourceDirectory: "Characters/PixelHamster",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_hamster.palette"),
             entitlementKey: nil,
             mirrorsToMovementDirection: false,
             sparkleEffect: nil
         ),
         PixelCharacterDefinition(
             id: "pixel_cat",
-            displayName: L10n.text("character.pixel_cat.name"),
+            displayName: L10n.text("character.pixel_cat.display_name"),
             resourceName: "pixel_cat",
             resourceDirectory: "Characters/PixelCat",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_cat.palette"),
             entitlementKey: nil,
             mirrorsToMovementDirection: false,
             sparkleEffect: nil
         ),
         PixelCharacterDefinition(
             id: "pixel_puppy",
-            displayName: L10n.text("character.pixel_puppy.name"),
+            displayName: L10n.text("character.pixel_puppy.display_name"),
             resourceName: "pixel_puppy",
             resourceDirectory: "Characters/PixelPuppy",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_puppy.palette"),
             entitlementKey: nil,
             mirrorsToMovementDirection: false,
             sparkleEffect: nil
         ),
         PixelCharacterDefinition(
             id: "pixel_rabbit",
-            displayName: L10n.text("character.pixel_rabbit.name"),
+            displayName: L10n.text("character.pixel_rabbit.display_name"),
             resourceName: "pixel_rabbit",
             resourceDirectory: "Characters/PixelRabbit",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_rabbit.palette"),
             entitlementKey: nil,
             mirrorsToMovementDirection: false,
             sparkleEffect: nil
         ),
         PixelCharacterDefinition(
             id: "pixel_penguin",
-            displayName: L10n.text("character.pixel_penguin.name"),
+            displayName: L10n.text("character.pixel_penguin.display_name"),
             resourceName: "pixel_penguin",
             resourceDirectory: "Characters/PixelPenguin",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_penguin.palette"),
             entitlementKey: nil,
             mirrorsToMovementDirection: false,
             sparkleEffect: nil
         ),
         PixelCharacterDefinition(
             id: pixelGuineaPigID,
-            displayName: L10n.text("character.pixel_guinea_pig.name"),
+            displayName: L10n.text("character.pixel_guinea_pig.display_name"),
             resourceName: "pixel_guinea_pig",
             resourceDirectory: "Characters/PixelGuineaPig",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_guinea_pig.palette"),
             entitlementKey: guineaPigEntitlementKey,
             mirrorsToMovementDirection: true,
             sparkleEffect: nil
         ),
         PixelCharacterDefinition(
             id: pixelMonkeyID,
-            displayName: L10n.text("character.pixel_monkey.name"),
+            displayName: L10n.text("character.pixel_monkey.display_name"),
             resourceName: "pixel_monkey",
             resourceDirectory: "Characters/PixelMonkey",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_monkey.palette"),
             entitlementKey: monkeyEntitlementKey,
             mirrorsToMovementDirection: false,
             sparkleEffect: nil
         ),
         PixelCharacterDefinition(
             id: pixelChinchillaID,
-            displayName: L10n.text("character.pixel_chinchilla.name"),
+            displayName: L10n.text("character.pixel_chinchilla.display_name"),
             resourceName: "pixel_chinchilla",
             resourceDirectory: "Characters/PixelChinchilla",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_chinchilla.palette"),
             entitlementKey: chinchillaEntitlementKey,
             mirrorsToMovementDirection: false,
             sparkleEffect: nil
         ),
         PixelCharacterDefinition(
             id: pixelStarlightUpalupaID,
-            displayName: L10n.text("character.pixel_starlight_upalupa.name"),
+            displayName: L10n.text("character.pixel_starlight_upalupa.display_name"),
             resourceName: "pixel_starlight_upalupa",
             resourceDirectory: "Characters/PixelStarlightUpalupa",
             previewFrame: 0,
             frames: .standard,
-            paletteDescription: L10n.text("character.pixel_starlight_upalupa.palette"),
             entitlementKey: starlightUpalupaEntitlementKey,
             mirrorsToMovementDirection: true,
             sparkleEffect: .starlight
         ),
         PixelCharacterDefinition(
-            id: "pixel_otter", displayName: L10n.text("character.pixel_otter.name"),
+            id: "pixel_otter", displayName: L10n.text("character.pixel_otter.display_name"),
             resourceName: "pixel_otter", resourceDirectory: "Characters/PixelOtter",
             previewFrame: 0, frames: .standard,
-            paletteDescription: L10n.text("character.pixel_otter.palette"),
             entitlementKey: "character:pixel_otter", mirrorsToMovementDirection: false, sparkleEffect: nil
         ),
         PixelCharacterDefinition(
-            id: "pixel_pig", displayName: L10n.text("character.pixel_pig.name"),
+            id: "pixel_pig", displayName: L10n.text("character.pixel_pig.display_name"),
             resourceName: "pixel_pig", resourceDirectory: "Characters/PixelPig",
             previewFrame: 0, frames: .standard,
-            paletteDescription: L10n.text("character.pixel_pig.palette"),
             entitlementKey: "character:pixel_pig", mirrorsToMovementDirection: false, sparkleEffect: nil
         ),
         PixelCharacterDefinition(
-            id: "pixel_tree", displayName: L10n.text("character.pixel_tree.name"),
+            id: "pixel_tree", displayName: L10n.text("character.pixel_tree.display_name"),
             resourceName: "pixel_tree", resourceDirectory: "Characters/PixelTree",
             previewFrame: 0, frames: .standard,
-            paletteDescription: L10n.text("character.pixel_tree.palette"),
             entitlementKey: "character:pixel_tree", mirrorsToMovementDirection: false, sparkleEffect: nil
         ),
         PixelCharacterDefinition(
-            id: "pixel_shiba", displayName: L10n.text("character.pixel_shiba.name"),
+            id: "pixel_shiba", displayName: L10n.text("character.pixel_shiba.display_name"),
             resourceName: "pixel_shiba", resourceDirectory: "Characters/PixelShiba",
-            previewFrame: 0, frames: .standard, paletteDescription: "",
+            previewFrame: 0, frames: .standard,
             entitlementKey: "character:pixel_shiba", mirrorsToMovementDirection: false, sparkleEffect: nil
         ),
         PixelCharacterDefinition(
-            id: "pixel_duck", displayName: L10n.text("character.pixel_duck.name"),
+            id: "pixel_duck", displayName: L10n.text("character.pixel_duck.display_name"),
             resourceName: "pixel_duck", resourceDirectory: "Characters/PixelDuck",
-            previewFrame: 0, frames: .standard, paletteDescription: "",
+            previewFrame: 0, frames: .standard,
             entitlementKey: "character:pixel_duck", mirrorsToMovementDirection: false, sparkleEffect: nil
         ),
         PixelCharacterDefinition(
-            id: "pixel_poop", displayName: L10n.text("character.pixel_poop.name"),
+            id: "pixel_poop", displayName: L10n.text("character.pixel_poop.display_name"),
             resourceName: "pixel_poop", resourceDirectory: "Characters/PixelPoop",
-            previewFrame: 0, frames: .standard, paletteDescription: "",
+            previewFrame: 0, frames: .standard,
             entitlementKey: "character:pixel_poop", mirrorsToMovementDirection: false, sparkleEffect: nil
         ),
         PixelCharacterDefinition(
-            id: "pixel_tteokbokki", displayName: L10n.text("character.pixel_tteokbokki.name"),
+            id: "pixel_tteokbokki", displayName: L10n.text("character.pixel_tteokbokki.display_name"),
             resourceName: "pixel_tteokbokki", resourceDirectory: "Characters/PixelTteokbokki",
-            previewFrame: 0, frames: .standard, paletteDescription: "",
+            previewFrame: 0, frames: .standard,
             entitlementKey: "character:pixel_tteokbokki", mirrorsToMovementDirection: false, sparkleEffect: nil
         ),
         PixelCharacterDefinition(
-            id: "pixel_quokka", displayName: L10n.text("character.pixel_quokka.name"),
+            id: "pixel_quokka", displayName: L10n.text("character.pixel_quokka.display_name"),
             resourceName: "pixel_quokka", resourceDirectory: "Characters/PixelQuokka",
-            previewFrame: 0, frames: .standard, paletteDescription: "",
+            previewFrame: 0, frames: .standard,
             entitlementKey: "character:pixel_quokka", mirrorsToMovementDirection: false, sparkleEffect: nil
         )
     ]

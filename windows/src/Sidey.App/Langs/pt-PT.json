@@ -1,0 +1,951 @@
+{
+  "accessibility": {
+    "motion": {
+      "disabled": "Os efeitos de animação estão desativados no Windows."
+    }
+  },
+  "account": {
+    "delete": {
+      "confirmation": {
+        "action": "Eliminar conta",
+        "message": "O seu perfil e as informações sobre os grupos a que aderiu serão eliminados permanentemente, e o histórico de compras será desassociado da sua conta.",
+        "title": "Eliminar a sua conta?"
+      },
+      "description": "Elimina permanentemente a sua conta e os dados pessoais associados.",
+      "final_confirmation": {
+        "message": "Não é possível recuperar a conta nem os dados eliminados.",
+        "title": "Eliminar permanentemente a sua conta?"
+      },
+      "title": "Eliminar conta"
+    },
+    "description": "Termine sessão ou faça a gestão da sua conta.",
+    "sign_out": {
+      "confirmation": {
+        "action": "Terminar sessão",
+        "message": "A sessão será terminada apenas neste PC. Terá de iniciar sessão com o Google para voltar a utilizar a aplicação.",
+        "title": "Terminar sessão?"
+      },
+      "description": "Termine a sessão apenas neste PC.",
+      "title": "Terminar sessão"
+    },
+    "title": "Conta"
+  },
+  "app": {
+    "info": {
+      "description": "Consulte a versão e as informações de suporte.",
+      "navigation_label": "Acerca de",
+      "title": "Acerca de"
+    },
+    "launch": {
+      "failed": "Ocorreu um erro ao iniciar o SIDEY. Feche a aplicação e tente novamente."
+    },
+    "startup": {
+      "error": {
+        "title": "Erro de arranque do SIDEY"
+      },
+      "failed": "Não foi possível iniciar o SIDEY.",
+      "failed_with_log": "Não foi possível iniciar o SIDEY.\n\nRegisto de diagnóstico: {0}",
+      "runtime_missing": "Faltam alguns ficheiros do SIDEY. Reinstale a aplicação."
+    }
+  },
+  "auth": {
+    "google": {
+      "already_linked": "Esta conta Google já está associada ao perfil atual. O perfil e os dados não foram alterados.",
+      "cancelled": "O início de sessão com o Google foi cancelado ou não foi concluído. Tente novamente.",
+      "identity_changed": "Esta conta Google não corresponde à conta associada à conta atual. O perfil e os dados não foram alterados.",
+      "link_expired": "O pedido de início de sessão com o Google expirou. Cancele o início de sessão e tente novamente.",
+      "required": "Associe a sua conta Google para continuar.",
+      "sign_in_complete": "O início de sessão com o Google foi concluído. Feche o separador de início de sessão no browser."
+    },
+    "request": {
+      "failed": "Não foi possível iniciar sessão. Tente novamente mais tarde. (Código de erro: {0})"
+    },
+    "response": {
+      "empty": "Não foi possível concluir o início de sessão. Tente novamente."
+    },
+    "session": {
+      "expired": "A sua sessão expirou. Inicie sessão novamente.",
+      "replace_blocked": "Este PC já contém informações de início de sessão. Reinicie a aplicação e volte a iniciar sessão.",
+      "restore_failed": "Não foi possível restaurar o início de sessão. Não foi criada nenhuma conta nova. Inicie sessão novamente.",
+      "stored_invalid": "Não foi possível ler as informações de início de sessão guardadas. Inicie sessão novamente.",
+      "values_missing": "Não foi possível concluir o início de sessão. Tente novamente."
+    }
+  },
+  "character": {
+    "pixel_cat": {
+      "display_name": "Gatinho"
+    },
+    "pixel_chinchilla": {
+      "display_name": "Chinchila bebé"
+    },
+    "pixel_duck": {
+      "display_name": "Pato"
+    },
+    "pixel_guinea_pig": {
+      "display_name": "Porquinho-da-índia bebé"
+    },
+    "pixel_hamster": {
+      "display_name": "Hamster bebé"
+    },
+    "pixel_monkey": {
+      "display_name": "Macaquinho"
+    },
+    "pixel_otter": {
+      "display_name": "Lontra bebé"
+    },
+    "pixel_penguin": {
+      "display_name": "Pinguim bebé"
+    },
+    "pixel_pig": {
+      "display_name": "Porquinho"
+    },
+    "pixel_poop": {
+      "display_name": "Cocó"
+    },
+    "pixel_puppy": {
+      "display_name": "Cachorrinho"
+    },
+    "pixel_quokka": {
+      "display_name": "Quokka"
+    },
+    "pixel_rabbit": {
+      "display_name": "Coelhinho"
+    },
+    "pixel_shiba": {
+      "display_name": "Shiba inu"
+    },
+    "pixel_starlight_upalupa": {
+      "display_name": "Axolote estrelado"
+    },
+    "pixel_tree": {
+      "display_name": "Arvorezinha"
+    },
+    "pixel_tteokbokki": {
+      "display_name": "Tteokbokki"
+    },
+    "unknown": {
+      "display_name": "Personagem"
+    }
+  },
+  "common": {
+    "back": "Anterior",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "continue": "Continuar",
+    "delete": "Eliminar",
+    "friend": "Amigo",
+    "me": "Eu",
+    "next": "Seguinte",
+    "save": "Guardar",
+    "skip": "Ignorar"
+  },
+  "composer": {
+    "drag": {
+      "tooltip": "Arraste para mover a janela de escrita"
+    },
+    "group": {
+      "required": "Configure o seu perfil e escolha um grupo para enviar uma mensagem."
+    },
+    "message": {
+      "placeholder": "Escreva uma mensagem…"
+    },
+    "window": {
+      "title": "Mensagem do SIDEY"
+    }
+  },
+  "connection": {
+    "configuration": {
+      "not_configured": "Faltam as definições necessárias para a ligação ao servidor. Reinstale a aplicação."
+    },
+    "error": {
+      "access_required": "Não foi possível verificar o acesso à sua conta ou ao grupo. Selecione Voltar a ligar em Ligação ao servidor. Se a mensagem continuar a aparecer, contacte-nos e anexe um registo de diagnóstico.",
+      "busy": "Há muitas pessoas a estabelecer ligação, pelo que está a demorar mais do que o habitual. A aplicação continuará a tentar automaticamente. Se continuar sem ligação após alguns minutos, contacte-nos e anexe um registo de diagnóstico.",
+      "configuration_unavailable": "Não é possível iniciar a ligação ao servidor neste momento. Aguarde um pouco e selecione Voltar a ligar em Ligação ao servidor. Se o problema persistir, contacte-nos e anexe um registo de diagnóstico.",
+      "network_unavailable": "Não foi possível ligar ao servidor. Verifique a ligação à Internet e selecione Voltar a ligar em Ligação ao servidor. Se conseguir abrir outros sites mas o problema persistir, contacte-nos e anexe um registo de diagnóstico.",
+      "secure_connection_failed": "Não foi possível estabelecer uma ligação segura. Verifique se a data e a hora do Windows estão corretas e volte a ligar. Se o problema persistir, contacte-nos e anexe um registo de diagnóstico.",
+      "service_unavailable": "Não foi possível ligar ao servidor. A aplicação continuará a tentar automaticamente. Se continuar sem ligação após alguns minutos, selecione Voltar a ligar em Ligação ao servidor. Se não resultar, contacte-nos e anexe um registo de diagnóstico."
+    },
+    "group_resync_failed": "Não foi possível carregar o estado mais recente do grupo. Volte a ligar para continuar. ({0})",
+    "group_revision_missing": "A ligação ao grupo foi alterada. Volte a ligar para continuar.",
+    "notice": {
+      "connected": "Ligado ao servidor.",
+      "reconnecting": "A voltar a ligar ao servidor."
+    },
+    "retry": {
+      "action": "Voltar a ligar"
+    },
+    "server": {
+      "not_configured": "Faltam as definições necessárias para a ligação ao servidor. Reinstale a aplicação."
+    },
+    "state": {
+      "connected": "Ligado",
+      "disconnected": "Não ligado",
+      "reconnecting": "A ligar"
+    },
+    "unavailable": "Não foi possível ligar ao servidor. Tente novamente dentro de momentos."
+  },
+  "external_link": {
+    "open": {
+      "failed": "Não foi possível abrir a página no browser predefinido."
+    }
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "Entrar com código"
+    },
+    "collapse": "Recolher grupo",
+    "create": {
+      "action": "Criar grupo",
+      "description": "Crie um grupo e partilhe o código de convite com os seus amigos.",
+      "in_progress": "A criar…",
+      "name": {
+        "placeholder": "Nome do novo grupo"
+      },
+      "result_missing": "Não foi possível criar o grupo. Tente novamente.",
+      "success": {
+        "default": "Grupo criado."
+      },
+      "tooltip": "Crie um grupo com este nome."
+    },
+    "delete": {
+      "action": "Eliminar grupo",
+      "confirmation": {
+        "message": "Todas as pessoas serão removidas do grupo e as mensagens serão eliminadas. Não é possível anular esta ação.",
+        "title": "Eliminar «{0}»?"
+      },
+      "final_confirmation": {
+        "message": "«{0}» e todas as mensagens serão agora eliminados permanentemente.",
+        "title": "Eliminar permanentemente este grupo?"
+      },
+      "success": "Grupo eliminado.",
+      "tooltip": "Elimine permanentemente este grupo."
+    },
+    "description": "Faça a gestão dos grupos que partilha com amigos. Cada grupo pode ter até 12 pessoas.",
+    "empty": {
+      "description": "Crie um novo grupo ou introduza um código de convite recebido de um amigo.",
+      "title": "Ainda não há grupos"
+    },
+    "error": {
+      "not_found": "Grupo não encontrado."
+    },
+    "expand": "Expandir grupo",
+    "invite": {
+      "code": {
+        "label": "Código de convite",
+        "missing": "Não existe nenhum código de convite guardado neste dispositivo.",
+        "replaced": "O código de convite guardado neste dispositivo foi substituído. Peça um código novo ao proprietário.",
+        "revoked": "O código de convite anterior foi revogado. O proprietário tem de emitir um código novo."
+      },
+      "copy": {
+        "action": "Copiar código de convite",
+        "complete": "Copiado"
+      },
+      "rotate": {
+        "action": "Emitir novo código de convite",
+        "code_missing": "O novo código de convite está vazio.",
+        "confirmation": {
+          "action": "Criar novo código",
+          "message": "O código existente será revogado imediatamente. Não é possível anular esta ação.",
+          "title": "Criar um novo código de convite?"
+        },
+        "success": "Foi criado um novo código de convite e guardado em segurança neste dispositivo."
+      }
+    },
+    "join": {
+      "description": "Introduza o código de convite de um amigo para entrar num grupo.",
+      "failed": "Não foi possível entrar no grupo. Verifique o código de convite e tente novamente. ({0})",
+      "in_progress": "A entrar…",
+      "result_missing": "Não foi possível carregar o grupo em que entrou. Tente novamente.",
+      "room_id_missing": "Não foi possível concluir a entrada no grupo. Tente novamente.",
+      "success": {
+        "default": "Entrou no grupo."
+      },
+      "tooltip": "Entre no grupo associado a este código de convite."
+    },
+    "leave": {
+      "action": "Sair do grupo",
+      "confirmation": {
+        "action": "Sair",
+        "member_message": "Deixará de poder aceder a este grupo ou às mensagens recentes.",
+        "owner_message": "O membro restante que tenha entrado primeiro passará a ser o proprietário. Se não restarem membros, o grupo será eliminado.",
+        "title": "Sair de «{0}»?"
+      },
+      "success": "Saiu do grupo.",
+      "tooltip": "Saia deste grupo."
+    },
+    "member": {
+      "remove": {
+        "action": "Remover",
+        "confirmation": {
+          "message": "Este membro deixará de poder aceder ao grupo ou ao histórico de mensagens.",
+          "title": "Remover «{0}»?"
+        },
+        "success": "Membro removido.",
+        "tooltip": "Remova este membro do grupo."
+      }
+    },
+    "navigation_label": "Grupos",
+    "operation": {
+      "busy": "Tente novamente depois de terminar a outra operação do grupo."
+    },
+    "refresh": {
+      "failed": "Não foi possível atualizar as informações do grupo. Tente novamente mais tarde. ({0})"
+    },
+    "rename": {
+      "action": "Mudar o nome",
+      "name_placeholder": "Nome do grupo, 1–20 carateres",
+      "success": "O nome do grupo foi alterado.",
+      "title": "Mudar o nome do grupo",
+      "tooltip": "Mude o nome do grupo."
+    },
+    "room_name": {
+      "label": "Nome do grupo"
+    },
+    "state": {
+      "active": "Ativo"
+    },
+    "summary": {
+      "invite_ready": "{0}/12 membros · Código de convite {1}",
+      "invite_rotation_required": "{0}/12 membros · É necessário um novo código de convite"
+    },
+    "switch": {
+      "action": "Mudar para o grupo",
+      "in_progress": "A ligar…",
+      "success": "O grupo ativo foi alterado.",
+      "tooltip": "Mostre este grupo no ecrã."
+    },
+    "title": "Os seus grupos"
+  },
+  "history": {
+    "empty": {
+      "description": "As mensagens recentes deste grupo serão apresentadas aqui.",
+      "title": "Ainda não há mensagens."
+    },
+    "group": {
+      "none": "Nenhum grupo ativo",
+      "required": "Entre num grupo para ver as mensagens recentes."
+    },
+    "load": {
+      "initial_failed": "Não foi possível carregar o histórico de mensagens",
+      "retry": "Tentar novamente"
+    },
+    "load_more": {
+      "failed": "Não foi possível carregar as mensagens anteriores",
+      "loading": "A carregar mensagens anteriores…"
+    },
+    "loading": "A carregar mensagens recentes…",
+    "pagination": {
+      "exhausted": "Já viu todo o histórico dos últimos 3 dias"
+    },
+    "recent": {
+      "title": "Mensagens recentes"
+    },
+    "retention": {
+      "notice": "As mensagens são eliminadas automaticamente após 3 dias.",
+      "reload_failed": "Não foi possível recarregar as mensagens anteriores. Tente novamente dentro de momentos. ({0})"
+    },
+    "scroll": {
+      "latest": "Ir para as mensagens mais recentes"
+    },
+    "user": {
+      "unknown": "Membro desconhecido"
+    },
+    "window": {
+      "always_on_top": {
+        "disable": "Desativar Sempre visível",
+        "disable_shortcut": "Desativar Sempre visível (Alt+Seta para Baixo)",
+        "enable": "Sempre visível",
+        "enable_shortcut": "Sempre visível (Alt+Seta para Cima)"
+      },
+      "title": "Histórico de mensagens do SIDEY"
+    }
+  },
+  "legal": {
+    "description": "Consulte os termos e as políticas.",
+    "privacy": {
+      "action": "Ver política de privacidade"
+    },
+    "refund": {
+      "action": "Ver política de cancelamento e reembolso"
+    },
+    "terms": {
+      "action": "Ver termos"
+    },
+    "title": "Políticas"
+  },
+  "message": {
+    "delivery": {
+      "recheck_failed": "Não foi possível confirmar o envio da mensagem. Verifique novamente dentro de momentos. ({0})"
+    },
+    "send": {
+      "accessibility": "Enviar mensagem",
+      "failed": "Não foi possível enviar a mensagem. Tente novamente. ({0})",
+      "rate_limited": "Está a enviar mensagens demasiado depressa."
+    }
+  },
+  "onboarding": {
+    "auth": {
+      "google": {
+        "cancel": "Cancelar início de sessão",
+        "continue": "Continuar com o Google",
+        "description": "Associe a sua conta Google para continuar. O perfil, os grupos e o histórico de conversas existentes serão mantidos.",
+        "pending": "Conclua o início de sessão com o Google no browser."
+      },
+      "start": "Começar"
+    },
+    "character": {
+      "label": "A minha personagem"
+    },
+    "complete": {
+      "description": "Pode criar ou entrar num grupo em qualquer altura nas Definições.",
+      "title": "Está tudo pronto"
+    },
+    "connection": {
+      "connected": "Ligado ao servidor",
+      "connecting": "A ligar ao servidor…"
+    },
+    "group": {
+      "create": {
+        "description": "Crie um grupo."
+      },
+      "description": "Crie um grupo ou entre com um código de convite para apresentar o seu mundo de píxeis.",
+      "invite_code": {
+        "label": "Código de convite",
+        "member_limit": "Cada grupo pode ter até 12 pessoas.",
+        "placeholder": "Código de um amigo",
+        "required": "Introduza um código de convite."
+      },
+      "join": {
+        "action": "Entrar"
+      },
+      "name": {
+        "placeholder": "por exemplo, O nosso cantinho"
+      },
+      "path": {
+        "label": "Como gostaria de começar?"
+      },
+      "title": "Crie um grupo com os seus amigos"
+    },
+    "launch": {
+      "action": "Iniciar"
+    },
+    "profile": {
+      "description": "Pode alterar esta opção em qualquer altura nas Definições.",
+      "title": "Escolha o seu nome"
+    },
+    "step": {
+      "complete": "Concluído",
+      "group": "Grupo",
+      "profile": "Perfil"
+    },
+    "tagline": "Mantenha os seus amigos por perto."
+  },
+  "overlay": {
+    "current_user": "{0} · Eu"
+  },
+  "platform": {
+    "requirements": {
+      "description": "O SIDEY requer o Windows 10 1809 (compilação 17763) ou posterior num PC x64.",
+      "title": "Versão do Windows não suportada",
+      "window_title": "SIDEY — Windows não suportado"
+    }
+  },
+  "profile": {
+    "applying": "A aplicar",
+    "character": {
+      "description": "Escolha a personagem em píxeis que o representa nos ecrãs dos seus amigos.",
+      "label": "Personagem",
+      "save": {
+        "success": "A personagem foi alterada."
+      }
+    },
+    "cosmetics": {
+      "bubble": {
+        "default": "Balão de conversa predefinido",
+        "description": "Escolha um dos seus balões. Será utilizado em todos os seus grupos.",
+        "title": "Balão de conversa"
+      },
+      "equipped": "Equipado",
+      "save": {
+        "success": "O seu novo visual está pronto."
+      },
+      "throwable": {
+        "default": "Bola macia predefinida",
+        "description": "Escolha um dos seus brinquedos. Será utilizado em todos os seus grupos.",
+        "title": "Brinquedo para atirar"
+      }
+    },
+    "description": "Defina o nome e a personagem que os seus amigos veem.",
+    "duplicates": {
+      "notice": "Pode utilizar o mesmo nome ou personagem que um amigo."
+    },
+    "nickname": {
+      "description": "O nome que os seus amigos veem no ecrã e nas mensagens · 2–8 carateres",
+      "label": "Alcunha",
+      "placeholder": "2–8 carateres",
+      "save": {
+        "action": "Alterar alcunha",
+        "tooltip": "Guardar a alcunha alterada."
+      }
+    },
+    "save": {
+      "success": "Perfil guardado."
+    },
+    "title": "O meu perfil"
+  },
+  "settings": {
+    "display": {
+      "description": "Ajuste a forma como o estado dos amigos e as mensagens são apresentados.",
+      "offline_members": {
+        "description": "Mostre os amigos offline como personagens a dormir com um ponto de estado vermelho.",
+        "title": "Mostrar membros offline",
+        "tooltip": "Mostrar ou ocultar membros offline"
+      },
+      "quiet_mode": {
+        "description": "Oculte os balões de mensagens e os indicadores de escrita, mantendo a contagem de mensagens não lidas.",
+        "title": "Modo discreto",
+        "tooltip": "Ativar ou desativar o modo discreto"
+      },
+      "throw_guard": {
+        "description": "Quando estiver desativado, clique num amigo para atirar. Quando estiver ativado, faça duplo clique com o botão direito do rato na sua personagem para permitir lançamentos durante 10 segundos.",
+        "title": "Duplo clique com o botão direito para atirar",
+        "tooltip": "Exigir um duplo clique com o botão direito do rato na sua personagem antes de atirar"
+      }
+    },
+    "general": {
+      "description": "Escolha o aspeto da aplicação e quando é iniciada."
+    },
+    "language": {
+      "description": "Escolha o idioma utilizado na aplicação. As alterações são aplicadas imediatamente.",
+      "title": "Idioma"
+    },
+    "navigation_label": "Definições",
+    "overlay": {
+      "description": "Mostre o mundo de píxeis dos seus amigos ao longo da margem selecionada do ecrã.",
+      "title": "Mostrar mundo de píxeis",
+      "tooltip": "Mostrar ou ocultar o mundo de píxeis"
+    },
+    "placement": {
+      "description": "Escolha onde as personagens são apresentadas.",
+      "edge": {
+        "bottom": "Inferior",
+        "description": "Escolha a margem do ecrã por onde as personagens caminham.",
+        "left": "Esquerda",
+        "right": "Direita",
+        "title": "Margem",
+        "tooltip": "Margem do ecrã para o mundo de píxeis",
+        "top": "Superior"
+      },
+      "monitor": {
+        "description": "Escolha o ecrã para o mundo de píxeis e a composição de mensagens.",
+        "title": "Monitor",
+        "tooltip": "Monitor para o mundo de píxeis e a composição de mensagens",
+        "unavailable": "Não há nenhum ecrã disponível."
+      },
+      "span": {
+        "description": "Escolha quanto da margem do ecrã as personagens podem explorar.",
+        "full": "Margem completa",
+        "title": "Área de movimento",
+        "tooltip": "Intervalo do ecrã ocupado pelo mundo de píxeis"
+      },
+      "title": "Posição das personagens"
+    },
+    "save": {
+      "failed": "Não foi possível guardar as definições. Tente novamente. ({0})"
+    },
+    "section": {
+      "display": {
+        "title": "Apresentação"
+      },
+      "general": {
+        "title": "Geral"
+      },
+      "sound": {
+        "title": "Som"
+      }
+    },
+    "shortcuts": {
+      "action": {
+        "composer": "Abrir ou fechar a introdução de mensagens",
+        "history": "Abrir ou fechar o histórico recente",
+        "overlay": "Ativar ou desativar a sobreposição",
+        "quiet_mode": "Ativar ou desativar o modo discreto"
+      },
+      "description": "Selecione um atalho e prima a combinação de teclas pretendida. Se atribuir uma combinação já utilizada, os dois atalhos trocam de posição.",
+      "error": {
+        "already_registered": "Este atalho já está a ser utilizado pelo sistema ou por outra aplicação.",
+        "availability_unverified": "Não foi possível verificar se este atalho está disponível.",
+        "in_app_conflict": "Outro atalho da aplicação utiliza esta combinação. Ao guardar, os dois atalhos trocam de posição.",
+        "invalid": "Atalho inválido",
+        "modifier_required": "Um atalho tem de começar por Win, Ctrl, Alt ou Shift.",
+        "system_conflict": "Este atalho já está a ser utilizado como atalho do sistema."
+      },
+      "recorder": {
+        "empty": "Prima uma combinação de teclas para alterar este atalho.",
+        "help": "Selecione e, em seguida, prima uma tecla modificadora e outra tecla. Prima Esc para cancelar.",
+        "recording": "Prima um atalho…",
+        "reset": "Repor"
+      },
+      "title": "Atalhos de teclado"
+    },
+    "sound": {
+      "character_effects": {
+        "description": "Reproduza efeitos sonoros quando as personagens do grupo atual são atingidas.",
+        "title": "Efeitos sonoros das personagens"
+      },
+      "description": "Ajuste os efeitos sonoros das personagens.",
+      "mute": "Desativar som",
+      "unmute": "Ativar som",
+      "volume": "Volume"
+    },
+    "startup": {
+      "description": "A aplicação é iniciada automaticamente quando inicia sessão.",
+      "title": "Iniciar ao iniciar sessão"
+    },
+    "storage": {
+      "folder_invalid": "Não foi possível abrir a pasta de definições. Reinicie a aplicação.",
+      "read_failed": "Não foi possível ler as definições guardadas. Reinicie a aplicação."
+    },
+    "theme": {
+      "dark": "Escuro",
+      "description": "Escolha o tema claro, escuro ou do sistema para a aplicação.",
+      "light": "Claro",
+      "system": "Predefinição do Windows",
+      "title": "Tema"
+    },
+    "update": {
+      "check": {
+        "action": "Procurar atualizações"
+      },
+      "check_now": {
+        "tooltip": "Procurar uma versão mais recente."
+      },
+      "description": "Procurar uma versão mais recente.",
+      "last_checked": {
+        "never": "Última verificação: nunca",
+        "today": "Hoje às {0}",
+        "value": "Última verificação: {0}",
+        "yesterday": "Ontem às {0}"
+      },
+      "release_notes": {
+        "action": "Detalhes da atualização"
+      },
+      "title": "Atualizações"
+    },
+    "window": {
+      "title": "Definições do SIDEY"
+    }
+  },
+  "store": {
+    "auth": {
+      "google": {
+        "failed": "Não foi possível iniciar a associação da conta Google."
+      }
+    },
+    "availability": {
+      "coming_soon": {
+        "description": "Atualmente, a loja apresenta apenas pré-visualizações. Ainda não é possível comprar.",
+        "title": "Ainda não disponível para compra"
+      }
+    },
+    "catalog": {
+      "bubble_bunny_pink": {
+        "description": "Um balão de conversa rosa decorado com um coelhinho.",
+        "name": "Balão de coelhinho rosa"
+      },
+      "bubble_butter_chick": {
+        "description": "Um balão de conversa amarelo-manteiga decorado com um pintainho.",
+        "name": "Balão de pintainho-manteiga"
+      },
+      "bubble_starry_cat": {
+        "description": "Um balão de conversa violeta-escuro decorado com um gato estrelado.",
+        "name": "Balão de gato estrelado"
+      },
+      "character_chinchilla": {
+        "description": "Acabada de sair do banho de areia, veio brincar. Antes de cumprimentar, tem de exibir aquele pelo fofo."
+      },
+      "character_duck": {
+        "description": "Especialista em fugir às responsabilidades. Tem patas de pato para o provar."
+      },
+      "character_guinea_pig": {
+        "description": "Esqueceu-se de onde escondeu o lanche. A julgar pelas bochechas cheias, não deve estar longe."
+      },
+      "character_monkey": {
+        "description": "Veio partilhar uma banana. Diz que só deu uma dentada pelo caminho… então porque falta metade?"
+      },
+      "character_otter": {
+        "description": "Veio mostrar a sua amêijoa preferida. Pode ver, mas fará beicinho se lha tirar."
+      },
+      "character_pig": {
+        "description": "Seguiu o cheiro dos petiscos e decidiu ficar. Agora acha que esta é a sua casa."
+      },
+      "character_poop": {
+        "description": "Não sabemos quem chamou, mas aqui está."
+      },
+      "character_quokka": {
+        "description": "Sempre a sorrir. Sim, foi este que acabou de atirar aquela folha."
+      },
+      "character_shiba": {
+        "description": "Já fomos passear. O shiba recusa-se a reconhecer esse facto."
+      },
+      "character_starlight_upalupa": {
+        "description": "Este axolote levou uma estrela perdida para casa e abraça-a com força, mesmo enquanto dorme."
+      },
+      "character_tree": {
+        "description": "Uma arvorezinha saiu para passear. Quando lhe disseram para descansar, começou a escolher onde criar raízes."
+      },
+      "character_tteokbokki": {
+        "description": "Disseram que era pouco picante. Nunca disseram para quem."
+      },
+      "throwable_banana": {
+        "description": "O macaquinho partilhou esta banana. Ainda não tivemos oportunidade de perguntar se foi de propósito.",
+        "name": "Banana do macaquinho"
+      },
+      "throwable_baseball": {
+        "description": "Uma bola com costuras vermelhas que se achata com o impacto e salta para longe.",
+        "name": "Bola de basebol"
+      },
+      "throwable_bouncy_heart": {
+        "description": "Um coração para atirar que salta enquanto voa.",
+        "name": "Coração saltitante"
+      },
+      "throwable_clam": {
+        "description": "A amêijoa que a lontra levava para todo o lado. Não há nenhuma pérola lá dentro, apenas algum apego.",
+        "name": "Amêijoa da lontra"
+      },
+      "throwable_dujjonku": {
+        "description": "A cobertura de cacau e o recheio verde achatam-se com um estalido muito satisfatório.",
+        "name": "Bolacha macia do Dubai"
+      },
+      "throwable_dust_bath_pouch": {
+        "description": "É a areia de banho da chinchila. Atirá-la provavelmente não é uma indireta para tomar banho.",
+        "name": "Saco de areia da chinchila"
+      },
+      "throwable_fish_cake_skewer": {
+        "description": "Era para comer. Porque está a agitá-lo dessa forma?",
+        "name": "Espeto de pasta de peixe"
+      },
+      "throwable_leaf": {
+        "description": "É o almoço para levar do quokka. Não perguntámos se podíamos atirá-lo.",
+        "name": "Folha"
+      },
+      "throwable_mini_paprika": {
+        "description": "Um lanche guardado com muito cuidado. Se o apanhar nos três segundos após o lançamento, não faz mal, pois não?",
+        "name": "Mini-pimento do porquinho"
+      },
+      "throwable_pork": {
+        "description": "Uma palmada bem sólida! Já agora, alguém viu o porquinho do lado ultimamente?",
+        "name": "Carne do porquinho"
+      },
+      "throwable_snowflake": {
+        "description": "Um floco de neve que se desfaz em pequenos cristais com o impacto.",
+        "name": "Floco de neve"
+      },
+      "throwable_squeaky_duck": {
+        "description": "Um pato a atirar outro pato. Provavelmente não é uma discussão de família.",
+        "name": "Patinho de borracha"
+      },
+      "throwable_starlight_orb": {
+        "description": "Luz das estrelas concentrada num pequeno orbe. Alguém verificou se falta uma estrela no céu?",
+        "name": "Orbe estrelado do axolote"
+      },
+      "throwable_tennis_ball": {
+        "description": "Escolhemos alguém para a atirar. Ainda procuramos alguém para a ir buscar.",
+        "name": "Bola de ténis"
+      },
+      "throwable_timber": {
+        "description": "Uma árvore atira uma arvorezinha. Talvez seja melhor verificar primeiro a árvore genealógica.",
+        "name": "Miniárvore da arvorezinha"
+      },
+      "throwable_tissue_ball": {
+        "description": "Ninguém sabe se é papel higiénico usado. É melhor desviar-se!",
+        "name": "Bola de papel higiénico"
+      },
+      "throwable_toy_cannon": {
+        "description": "Um minicanhão para atirar que dispara um projétil com o rastilho aceso.",
+        "name": "Minicanhão"
+      },
+      "throwable_wakkuball": {
+        "description": "Croc! Desfrute do som estaladiço da Bola Wakku a partir-se em pedaços.",
+        "name": "Bola Wakku"
+      }
+    },
+    "checkout": {
+      "opening": "A abrir a página de pagamento…"
+    },
+    "description": "Veja as suas personagens, balões de conversa e brinquedos em ação.",
+    "empty": {
+      "description": "Tente outra pesquisa ou altere os filtros.",
+      "title": "Nenhum resultado"
+    },
+    "filter": {
+      "hide_owned": "Ocultar os que já possui",
+      "menu": "Ordenar e filtrar",
+      "reset": "Repor tudo",
+      "search": {
+        "label": "Pesquisar",
+        "placeholder": "Pesquisar nomes ou descrições"
+      }
+    },
+    "kind": {
+      "bubble": "Balões de conversa",
+      "character": "Personagens",
+      "keepsake": "Objeto querido",
+      "throwable": "Brinquedos para atirar"
+    },
+    "navigation_label": "Personalizar e comprar",
+    "preview": {
+      "member": {
+        "dubu": "Tofu",
+        "moka": "Moka"
+      },
+      "message": {
+        "left": "O que há para o jantar?",
+        "right": "Que tal piza?"
+      },
+      "open": "Pré-visualização",
+      "sound": {
+        "off": "Desativar som da pré-visualização",
+        "on": "Ativar som da pré-visualização"
+      },
+      "tree_movement_hint": "Clique com o botão direito do rato na árvore para a parar. Volte a clicar com o botão direito para a deixar andar.",
+      "unavailable": "Não foi possível carregar a pré-visualização."
+    },
+    "price": {
+      "krw": "{0:N0} ₩"
+    },
+    "product": {
+      "sold_separately": "Vendido separadamente da personagem"
+    },
+    "purchase": {
+      "action": "Comprar por {0}",
+      "confirming": "A confirmar pagamento…",
+      "failed": "Não foi possível confirmar a sua compra. Verifique novamente dentro de momentos.",
+      "owned": "Já adquirido",
+      "success": "Compra concluída.",
+      "timeout": "A confirmação do pagamento expirou. Volte a abrir a loja para verificar o estado.",
+      "unavailable": "As compras não estão disponíveis neste momento. Tente novamente dentro de momentos."
+    },
+    "sort": {
+      "catalog": "Predefinido",
+      "label": "Ordenar",
+      "price_ascending": "Preço mais baixo primeiro",
+      "price_descending": "Preço mais alto primeiro"
+    },
+    "status": {
+      "retry": "Tentar novamente",
+      "unavailable": "Não foi possível carregar a loja. Tente novamente dentro de momentos."
+    },
+    "title": "Personalizar e comprar"
+  },
+  "support": {
+    "diagnostics": {
+      "description": "Os ficheiros de registo são comprimidos e guardados no Ambiente de Trabalho. Partilhá-los connosco pode ajudar-nos a corrigir erros.",
+      "export": {
+        "action": "Exportar",
+        "failed": "Não foi possível exportar os dados de diagnóstico.",
+        "success": "Os dados de diagnóstico foram guardados no Ambiente de Trabalho."
+      },
+      "title": "Exportar dados de diagnóstico"
+    },
+    "feedback": {
+      "action": "Enviar comentários",
+      "description": "Crie um pedido no GitHub se algo não funcionar ou se precisar de ajuda.",
+      "title": "Comentários"
+    }
+  },
+  "tray": {
+    "app": {
+      "exit": "Sair"
+    },
+    "connection": {
+      "error": {
+        "message": "Selecione Voltar a ligar em Ligação ao servidor. Se continuar sem ligação, contacte-nos e anexe um registo de diagnóstico.",
+        "title": "Erro de ligação do SIDEY ao servidor"
+      }
+    },
+    "group": {
+      "active": "Grupo ativo"
+    },
+    "groups": {
+      "empty": "Nenhum grupo ligado",
+      "open": "Definições do grupo…"
+    },
+    "history": {
+      "open": "Histórico recente…"
+    },
+    "message": {
+      "compose": "Escrever mensagem…"
+    },
+    "overlay": {
+      "hide": "Ocultar sobreposição"
+    },
+    "quiet_mode": {
+      "toggle": "Modo discreto"
+    },
+    "settings": {
+      "open": "Definições…"
+    },
+    "shortcuts": {
+      "registration_failed": "Estes atalhos não estão disponíveis: {0}. Outra aplicação poderá estar a utilizá-los. Utilize o menu da área de notificação."
+    },
+    "start": {
+      "failed": "Não foi possível iniciar o ícone da área de notificação. Fechar a janela irá terminar o SIDEY."
+    },
+    "store": {
+      "open": "Loja…"
+    },
+    "unread": {
+      "tooltip": "SIDEY · {0} mensagens não lidas"
+    },
+    "update": {
+      "available": "Está disponível uma atualização. {0}",
+      "check": "Procurar atualizações…",
+      "check_failed": "Não foi possível procurar atualizações. Tente novamente dentro de momentos.",
+      "installed": "O SIDEY foi atualizado para a versão {0}. Clique para ver as alterações.",
+      "latest": "Está a utilizar a versão mais recente."
+    }
+  },
+  "update": {
+    "available": "O SIDEY {0} está disponível.",
+    "checking": "A procurar atualizações…",
+    "download": {
+      "hash_mismatch": "Não foi possível verificar o ficheiro de atualização. Transfira-o novamente.",
+      "in_progress": "A transferir atualização…",
+      "progress": "A transferir atualização… ({0}%)"
+    },
+    "failed": "Não foi possível concluir a atualização. Tente novamente dentro de momentos.",
+    "install": {
+      "cancelled": "A instalação da atualização foi cancelada.",
+      "invalid": "Não foi possível verificar os detalhes de instalação da atualização. Tente novamente mais tarde.",
+      "launch_failed": "Não foi possível abrir o programa de instalação. Selecione Procurar atualizações para tentar novamente.",
+      "launched": "Transferência concluída. O programa de instalação foi aberto.",
+      "missing": "Não é possível instalar a atualização neste momento. Tente novamente mais tarde."
+    },
+    "latest": "Está a utilizar a versão mais recente.",
+    "metadata": {
+      "invalid": "Não foi possível verificar as informações da atualização. Tente novamente mais tarde."
+    },
+    "not_published": "A nova atualização ainda não está disponível. Volte a verificar mais tarde.",
+    "prompt": {
+      "download": "Transferir",
+      "later": "Mais tarde",
+      "message": "Transferir o SIDEY {0}?",
+      "title": "Está disponível uma atualização"
+    },
+    "release_notes": {
+      "open_failed": "Não foi possível abrir os detalhes da atualização. Tente novamente. ({0})"
+    }
+  },
+  "validation": {
+    "message": {
+      "length": "Introduza uma mensagem com 1–200 carateres."
+    },
+    "nickname": {
+      "length": "Introduza uma alcunha com 2–8 carateres."
+    },
+    "room_name": {
+      "length": "Introduza um nome de grupo com 1–20 carateres."
+    }
+  }
+}

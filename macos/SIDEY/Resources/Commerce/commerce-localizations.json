@@ -13,23 +13,19 @@
       "localizations": {
         "ko": {
           "display_name": "별빛 우파루파",
-          "iap_description": "길 잃은 별 하나를 데려왔어요. 잘 때도 품에 꼭 안고 잔대요.",
-          "marketing_description": "길 잃은 별 하나를 데려왔어요. 잘 때도 품에 꼭 안고 잔대요."
+          "description": "길 잃은 별 하나를 데려왔어요. 잘 때도 품에 꼭 안고 잔대요."
         },
         "en": {
           "display_name": "Starlight Axolotl",
-          "iap_description": "An axolotl who hugs a lost star to sleep.",
-          "marketing_description": "This axolotl brought home a lost star and hugs it tight even while sleeping."
+          "description": "This axolotl brought home a lost star and hugs it tight even while sleeping."
         },
         "ja": {
           "display_name": "星明かりのウーパールーパー",
-          "iap_description": "迷子の星を抱いて眠るウーパールーパーです。",
-          "marketing_description": "迷子の星をひとつ連れてきました。眠るときもぎゅっと抱いているそうです。"
+          "description": "迷子の星をひとつ連れてきました。眠るときもぎゅっと抱いているそうです。"
         },
         "zh-Hant": {
           "display_name": "星光六角恐龍",
-          "iap_description": "抱著迷路小星星入睡的六角恐龍。",
-          "marketing_description": "牠帶回了一顆迷路的小星星，聽說連睡覺時也會緊緊抱著。"
+          "description": "牠帶回了一顆迷路的小星星，聽說連睡覺時也會緊緊抱著。"
         }
       }
     },
@@ -39,23 +35,19 @@
       "localizations": {
         "ko": {
           "display_name": "아기 기니피그",
-          "iap_description": "간식을 숨긴 곳을 잊어버렸어요. 볼이 빵빵한 걸 보니 멀리 있진 않네요.",
-          "marketing_description": "간식을 숨긴 곳을 잊어버렸어요. 볼이 빵빵한 걸 보니 멀리 있진 않네요."
+          "description": "간식을 숨긴 곳을 잊어버렸어요. 볼이 빵빵한 걸 보니 멀리 있진 않네요."
         },
         "en": {
           "display_name": "Baby Guinea Pig",
-          "iap_description": "A forgetful snack hoarder with full cheeks.",
-          "marketing_description": "It forgot where it hid its snack. Judging by those full cheeks, it can't be far away."
+          "description": "It forgot where it hid its snack. Judging by those full cheeks, it can't be far away."
         },
         "ja": {
           "display_name": "こどもモルモット",
-          "iap_description": "おやつの隠し場所を忘れた、ほっぺがパンパンの子。",
-          "marketing_description": "おやつを隠した場所を忘れました。ほっぺがパンパンなので、遠くはなさそうです。"
+          "description": "おやつを隠した場所を忘れました。ほっぺがパンパンなので、遠くはなさそうです。"
         },
         "zh-Hant": {
           "display_name": "天竺鼠寶寶",
-          "iap_description": "忘了零食藏哪裡，臉頰卻還鼓鼓的。",
-          "marketing_description": "牠忘了把零食藏在哪裡。看牠臉頰鼓鼓的，應該不會太遠。"
+          "description": "牠忘了把零食藏在哪裡。看牠臉頰鼓鼓的，應該不會太遠。"
         }
       }
     },
@@ -65,23 +57,19 @@
       "localizations": {
         "ko": {
           "display_name": "아기 원숭이",
-          "iap_description": "바나나를 나눠 주러 왔어요. 오는 길에 한 입만 먹었다는데… 반쪽이네요?",
-          "marketing_description": "바나나를 나눠 주러 왔어요. 오는 길에 한 입만 먹었다는데… 반쪽이네요?"
+          "description": "바나나를 나눠 주러 왔어요. 오는 길에 한 입만 먹었다는데… 반쪽이네요?"
         },
         "en": {
           "display_name": "Baby Monkey",
-          "iap_description": "Came to share a banana. Why is half gone?",
-          "marketing_description": "It came to share a banana. It says it only took one bite on the way… so why is half gone?"
+          "description": "It came to share a banana. It says it only took one bite on the way… so why is half gone?"
         },
         "ja": {
           "display_name": "こざる",
-          "iap_description": "バナナを分けに来ました。残りはなぜか半分です。",
-          "marketing_description": "バナナを分けに来ました。途中でひと口だけ食べたそうですが…半分しかありませんね？"
+          "description": "バナナを分けに来ました。途中でひと口だけ食べたそうですが…半分しかありませんね？"
         },
         "zh-Hant": {
           "display_name": "小猴子",
-          "iap_description": "帶香蕉來分享，怎麼只剩一半了？",
-          "marketing_description": "牠帶香蕉來跟大家分享。牠說路上只吃了一口……怎麼只剩一半了？"
+          "description": "牠帶香蕉來跟大家分享。牠說路上只吃了一口……怎麼只剩一半了？"
         }
       }
     },
@@ -91,23 +79,19 @@
       "localizations": {
         "ko": {
           "display_name": "아기 친칠라",
-          "iap_description": "모래 목욕을 마치고 놀러 왔어요. 인사보다 먼저 뽀송한 털 자랑부터 해요.",
-          "marketing_description": "모래 목욕을 마치고 놀러 왔어요. 인사보다 먼저 뽀송한 털 자랑부터 해요."
+          "description": "모래 목욕을 마치고 놀러 왔어요. 인사보다 먼저 뽀송한 털 자랑부터 해요."
         },
         "en": {
           "display_name": "Baby Chinchilla",
-          "iap_description": "Fresh from a sand bath and extra fluffy.",
-          "marketing_description": "Fresh from a sand bath, it came to play. Before saying hello, it has to show off that fluffy fur."
+          "description": "Fresh from a sand bath, it came to play. Before saying hello, it has to show off that fluffy fur."
         },
         "ja": {
           "display_name": "こどもチンチラ",
-          "iap_description": "砂浴び帰りで、ふわふわの毛が自慢です。",
-          "marketing_description": "砂浴びを終えて遊びに来ました。あいさつより先に、ふわふわの毛を自慢します。"
+          "description": "砂浴びを終えて遊びに来ました。あいさつより先に、ふわふわの毛を自慢します。"
         },
         "zh-Hant": {
           "display_name": "龍貓寶寶",
-          "iap_description": "剛做完沙浴，急著炫耀蓬鬆的毛。",
-          "marketing_description": "牠做完沙浴來玩。還沒打招呼，就先炫耀蓬鬆的毛。"
+          "description": "牠做完沙浴來玩。還沒打招呼，就先炫耀蓬鬆的毛。"
         }
       }
     },
@@ -117,23 +101,19 @@
       "localizations": {
         "ko": {
           "display_name": "아기 수달",
-          "iap_description": "마음에 드는 조개를 보여 주러 왔어요. 구경은 되지만 가져가면 삐져요.",
-          "marketing_description": "마음에 드는 조개를 보여 주러 왔어요. 구경은 되지만 가져가면 삐져요."
+          "description": "마음에 드는 조개를 보여 주러 왔어요. 구경은 되지만 가져가면 삐져요."
         },
         "en": {
           "display_name": "Baby Otter",
-          "iap_description": "Admire its favorite clam, but don't take it.",
-          "marketing_description": "It came to show off its favorite clam. You can look, but it will sulk if you take it."
+          "description": "It came to show off its favorite clam. You can look, but it will sulk if you take it."
         },
         "ja": {
           "display_name": "こどもカワウソ",
-          "iap_description": "お気に入りの貝は見てもいいけど、持ち去り禁止です。",
-          "marketing_description": "お気に入りの貝を見せに来ました。見るのはいいけれど、持っていくとすねます。"
+          "description": "お気に入りの貝を見せに来ました。見るのはいいけれど、持っていくとすねます。"
         },
         "zh-Hant": {
           "display_name": "水獺寶寶",
-          "iap_description": "可以欣賞牠的寶貝貝殼，但別拿走。",
-          "marketing_description": "牠來展示最喜歡的貝殼。看看沒關係，但拿走的話牠會鬧彆扭。"
+          "description": "牠來展示最喜歡的貝殼。看看沒關係，但拿走的話牠會鬧彆扭。"
         }
       }
     },
@@ -143,23 +123,19 @@
       "localizations": {
         "ko": {
           "display_name": "아기 돼지",
-          "iap_description": "간식 냄새를 따라왔다가 눌러앉았어요. 이제 여기가 자기 집인 줄 알아요.",
-          "marketing_description": "간식 냄새를 따라왔다가 눌러앉았어요. 이제 여기가 자기 집인 줄 알아요."
+          "description": "간식 냄새를 따라왔다가 눌러앉았어요. 이제 여기가 자기 집인 줄 알아요."
         },
         "en": {
           "display_name": "Baby Pig",
-          "iap_description": "Followed a snack scent and moved right in.",
-          "marketing_description": "It followed the smell of snacks and decided to stay. Now it thinks this is home."
+          "description": "It followed the smell of snacks and decided to stay. Now it thinks this is home."
         },
         "ja": {
           "display_name": "こぶた",
-          "iap_description": "おやつの匂いを追って、そのまま居つきました。",
-          "marketing_description": "おやつの匂いを追ってきて、そのまま居つきました。もうここを自分の家だと思っています。"
+          "description": "おやつの匂いを追ってきて、そのまま居つきました。もうここを自分の家だと思っています。"
         },
         "zh-Hant": {
           "display_name": "小豬寶寶",
-          "iap_description": "循著零食香味而來，乾脆住下來了。",
-          "marketing_description": "牠循著零食香味而來，結果就住下來了。現在已經把這裡當成自己家。"
+          "description": "牠循著零食香味而來，結果就住下來了。現在已經把這裡當成自己家。"
         }
       }
     },
@@ -169,23 +145,19 @@
       "localizations": {
         "ko": {
           "display_name": "나무",
-          "iap_description": "산책 나온 작은 나무예요. 잠깐 쉬랬더니 뿌리내릴 자리를 고르고 있어요.",
-          "marketing_description": "산책 나온 작은 나무예요. 잠깐 쉬랬더니 뿌리내릴 자리를 고르고 있어요."
+          "description": "산책 나온 작은 나무예요. 잠깐 쉬랬더니 뿌리내릴 자리를 고르고 있어요."
         },
         "en": {
           "display_name": "Little Tree",
-          "iap_description": "Out for a walk and scouting a place to root.",
-          "marketing_description": "A little tree went out for a walk. Told to take a break, it started choosing where to put down roots."
+          "description": "A little tree went out for a walk. Told to take a break, it started choosing where to put down roots."
         },
         "ja": {
           "display_name": "小さな木",
-          "iap_description": "散歩の途中で、根を下ろす場所を探しています。",
-          "marketing_description": "散歩に出てきた小さな木です。少し休んでと言ったら、根を下ろす場所を選び始めました。"
+          "description": "散歩に出てきた小さな木です。少し休んでと言ったら、根を下ろす場所を選び始めました。"
         },
         "zh-Hant": {
           "display_name": "小樹",
-          "iap_description": "出門散步，卻開始挑選落地生根的地方。",
-          "marketing_description": "這棵小樹出門散步。叫牠休息一下，牠卻開始挑選要落地生根的地方。"
+          "description": "這棵小樹出門散步。叫牠休息一下，牠卻開始挑選要落地生根的地方。"
         }
       }
     },
@@ -195,23 +167,19 @@
       "localizations": {
         "ko": {
           "display_name": "핑크 토끼 말풍선",
-          "iap_description": "토끼 장식이 있는 분홍 말풍선",
-          "marketing_description": "토끼 장식이 있는 분홍 말풍선"
+          "description": "토끼 장식이 있는 분홍 말풍선"
         },
         "en": {
           "display_name": "Pink Bunny Bubble",
-          "iap_description": "A pink speech bubble with a bunny decoration.",
-          "marketing_description": "A pink speech bubble with a bunny decoration."
+          "description": "A pink speech bubble with a bunny decoration."
         },
         "ja": {
           "display_name": "ピンクうさぎの吹き出し",
-          "iap_description": "うさぎの飾りがついたピンクの吹き出しです。",
-          "marketing_description": "うさぎの飾りがついたピンクの吹き出しです。"
+          "description": "うさぎの飾りがついたピンクの吹き出しです。"
         },
         "zh-Hant": {
-          "display_name": "粉紅兔兔對話框",
-          "iap_description": "帶有兔兔裝飾的粉紅色對話框。",
-          "marketing_description": "帶有兔兔裝飾的粉紅色對話框。"
+          "display_name": "粉紅兔兔訊息泡泡",
+          "description": "帶有兔兔裝飾的粉紅色訊息泡泡。"
         }
       }
     },
@@ -221,23 +189,19 @@
       "localizations": {
         "ko": {
           "display_name": "버터 병아리 말풍선",
-          "iap_description": "병아리 장식이 있는 버터색 말풍선",
-          "marketing_description": "병아리 장식이 있는 버터색 말풍선"
+          "description": "병아리 장식이 있는 버터색 말풍선"
         },
         "en": {
           "display_name": "Butter Chick Bubble",
-          "iap_description": "A butter-yellow bubble with a little chick.",
-          "marketing_description": "A butter-yellow speech bubble with a chick decoration."
+          "description": "A butter-yellow speech bubble with a chick decoration."
         },
         "ja": {
           "display_name": "バターひよこの吹き出し",
-          "iap_description": "ひよこの飾りがついたバター色の吹き出しです。",
-          "marketing_description": "ひよこの飾りがついたバター色の吹き出しです。"
+          "description": "ひよこの飾りがついたバター色の吹き出しです。"
         },
         "zh-Hant": {
-          "display_name": "奶油小雞對話框",
-          "iap_description": "帶有小雞裝飾的奶油色對話框。",
-          "marketing_description": "帶有小雞裝飾的奶油色對話框。"
+          "display_name": "奶油小雞訊息泡泡",
+          "description": "帶有小雞裝飾的奶油色訊息泡泡。"
         }
       }
     },
@@ -247,23 +211,19 @@
       "localizations": {
         "ko": {
           "display_name": "별밤 고양이 말풍선",
-          "iap_description": "별고양이 장식이 있는 남보라 말풍선",
-          "marketing_description": "별고양이 장식이 있는 남보라 말풍선"
+          "description": "별고양이 장식이 있는 남보라 말풍선"
         },
         "en": {
           "display_name": "Starry Cat Bubble",
-          "iap_description": "A violet bubble with a starry cat decoration.",
-          "marketing_description": "A deep violet speech bubble with a starry cat decoration."
+          "description": "A deep violet speech bubble with a starry cat decoration."
         },
         "ja": {
           "display_name": "星空ねこの吹き出し",
-          "iap_description": "星ねこの飾りがついた青紫色の吹き出しです。",
-          "marketing_description": "星ねこの飾りがついた青紫色の吹き出しです。"
+          "description": "星ねこの飾りがついた青紫色の吹き出しです。"
         },
         "zh-Hant": {
-          "display_name": "星空貓咪對話框",
-          "iap_description": "帶有星空貓裝飾的藍紫色對話框。",
-          "marketing_description": "帶有星空貓裝飾的藍紫色對話框。"
+          "display_name": "星空貓咪訊息泡泡",
+          "description": "帶有星空貓裝飾的藍紫色訊息泡泡。"
         }
       }
     },
@@ -273,23 +233,19 @@
       "localizations": {
         "ko": {
           "display_name": "통통 하트",
-          "iap_description": "통통 튀며 날아가는 하트 투척물",
-          "marketing_description": "통통 튀며 날아가는 하트 투척물"
+          "description": "통통 튀며 날아가는 하트 투척물"
         },
         "en": {
           "display_name": "Bouncy Heart",
-          "iap_description": "A throwable heart that bounces as it flies.",
-          "marketing_description": "A throwable heart that bounces as it flies."
+          "description": "A throwable heart that bounces as it flies."
         },
         "ja": {
           "display_name": "はずむハート",
-          "iap_description": "ぴょんぴょん弾みながら飛んでいくハートです。",
-          "marketing_description": "ぴょんぴょん弾みながら飛んでいくハートの投げアイテムです。"
+          "description": "ぴょんぴょん弾みながら飛んでいくハートの投げアイテムです。"
         },
         "zh-Hant": {
           "display_name": "彈跳愛心",
-          "iap_description": "一路彈跳飛出去的愛心投擲物。",
-          "marketing_description": "一路彈跳飛出去的愛心投擲物。"
+          "description": "會一路彈跳飛出去的愛心玩具。"
         }
       }
     },
@@ -299,23 +255,19 @@
       "localizations": {
         "ko": {
           "display_name": "미니 대포",
-          "iap_description": "심지탄을 쏘는 미니 대포 투척물",
-          "marketing_description": "심지탄을 쏘는 미니 대포 투척물"
+          "description": "심지탄을 쏘는 미니 대포 투척물"
         },
         "en": {
           "display_name": "Mini Cannon",
-          "iap_description": "A mini cannon that fires a fuse-lit shell.",
-          "marketing_description": "A mini cannon throwable that fires a fuse-lit shell."
+          "description": "A mini cannon throwable that fires a fuse-lit shell."
         },
         "ja": {
           "display_name": "ミニ大砲",
-          "iap_description": "導火線つきの弾を撃つミニ大砲です。",
-          "marketing_description": "導火線つきの弾を撃つ、ミニ大砲の投げアイテムです。"
+          "description": "導火線つきの弾を撃つ、ミニ大砲の投げアイテムです。"
         },
         "zh-Hant": {
           "display_name": "迷你大砲",
-          "iap_description": "發射引信砲彈的迷你大砲投擲物。",
-          "marketing_description": "發射引信砲彈的迷你大砲投擲物。"
+          "description": "會發射引信砲彈的迷你大砲玩具。"
         }
       }
     },
@@ -325,23 +277,19 @@
       "localizations": {
         "ko": {
           "display_name": "삑삑 오리",
-          "iap_description": "오리가 오리를 던져요. 가족 문제는 아닌 것 같아요.",
-          "marketing_description": "오리가 오리를 던져요. 가족 문제는 아닌 것 같아요."
+          "description": "오리가 오리를 던져요. 가족 문제는 아닌 것 같아요."
         },
         "en": {
           "display_name": "Squeaky Duck",
-          "iap_description": "A duck throwing a duck. Not a family dispute.",
-          "marketing_description": "A duck throwing a duck. It probably isn't a family dispute."
+          "description": "A duck throwing a duck. It probably isn't a family dispute."
         },
         "ja": {
           "display_name": "キュッキュッアヒル",
-          "iap_description": "アヒルがアヒルを投げます。家庭の事情ではなさそう。",
-          "marketing_description": "アヒルがアヒルを投げます。家庭の事情ではなさそうです。"
+          "description": "アヒルがアヒルを投げます。家族げんかではなさそうです。"
         },
         "zh-Hant": {
           "display_name": "吱吱小鴨",
-          "iap_description": "鴨子丟鴨子，看來不是家庭糾紛。",
-          "marketing_description": "鴨子丟出另一隻鴨子。看來應該不是家庭糾紛。"
+          "description": "鴨子丟出另一隻鴨子。看來應該不是家庭糾紛。"
         }
       }
     },
@@ -351,23 +299,19 @@
       "localizations": {
         "ko": {
           "display_name": "눈송이",
-          "iap_description": "맞으면 작은 결정 조각으로 흩어지는 눈송이예요.",
-          "marketing_description": "맞으면 작은 결정 조각으로 흩어지는 눈송이예요."
+          "description": "맞으면 작은 결정 조각으로 흩어지는 눈송이예요."
         },
         "en": {
           "display_name": "Snowflake",
-          "iap_description": "A snowflake that scatters into tiny crystals.",
-          "marketing_description": "A snowflake that scatters into tiny crystal shards on impact."
+          "description": "A snowflake that scatters into tiny crystal shards on impact."
         },
         "ja": {
           "display_name": "雪の結晶",
-          "iap_description": "当たると小さな結晶のかけらになって散ります。",
-          "marketing_description": "当たると小さな結晶のかけらになって散らばる雪の結晶です。"
+          "description": "当たると小さな結晶のかけらになって散らばる雪の結晶です。"
         },
         "zh-Hant": {
           "display_name": "雪花",
-          "iap_description": "命中後會散成細小結晶碎片的雪花。",
-          "marketing_description": "命中後會散成細小結晶碎片的雪花。"
+          "description": "命中後會散成細小結晶碎片的雪花。"
         }
       }
     },
@@ -377,23 +321,19 @@
       "localizations": {
         "ko": {
           "display_name": "야구공",
-          "iap_description": "붉은 실밥이 있는 공이 눌렸다 튕겨요.",
-          "marketing_description": "붉은 실밥이 있는 공이 눌렸다 튕겨요."
+          "description": "붉은 실밥이 있는 공이 눌렸다 튕겨요."
         },
         "en": {
           "display_name": "Baseball",
-          "iap_description": "Red stitches, a little squash, and a bounce.",
-          "marketing_description": "A red-stitched ball that squashes on impact and bounces away."
+          "description": "A red-stitched ball that squashes on impact and bounces away."
         },
         "ja": {
           "display_name": "野球ボール",
-          "iap_description": "赤い縫い目のボールが、つぶれて弾みます。",
-          "marketing_description": "赤い縫い目のボールが、ぺちゃんとつぶれて弾みます。"
+          "description": "赤い縫い目のボールが、ぺちゃんとつぶれて弾みます。"
         },
         "zh-Hant": {
           "display_name": "棒球",
-          "iap_description": "帶紅色縫線的球，壓扁後又會彈起。",
-          "marketing_description": "帶紅色縫線的球，壓扁後又會彈起。"
+          "description": "帶紅色縫線的球，壓扁後又會彈起。"
         }
       }
     },
@@ -403,23 +343,19 @@
       "localizations": {
         "ko": {
           "display_name": "왁뿌볼",
-          "iap_description": "와그작! 왁뿌볼이 조각조각 부서지는 바삭한 소리를 느껴보세요.",
-          "marketing_description": "와그작! 왁뿌볼이 조각조각 부서지는 바삭한 소리를 느껴보세요."
+          "description": "와그작! 왁뿌볼이 조각조각 부서지는 바삭한 소리를 느껴 보세요."
         },
         "en": {
           "display_name": "Wakku Ball",
-          "iap_description": "Crunch! A ball that shatters into pieces.",
-          "marketing_description": "Crunch! Enjoy the crisp sound as the Wakku Ball shatters into pieces."
+          "description": "Crunch! Enjoy the crisp sound as the Wakku Ball shatters into pieces."
         },
         "ja": {
           "display_name": "ワックボール",
-          "iap_description": "ザクザク！かけらに砕ける軽快な音を楽しめます。",
-          "marketing_description": "ザクザク！ワックボールがかけらに砕ける、軽快な音を楽しんでください。"
+          "description": "ザクザク！ワックボールがかけらに砕ける、軽快な音を楽しんでください。"
         },
         "zh-Hant": {
           "display_name": "Wakku 球",
-          "iap_description": "喀嚓！享受碎成小塊的酥脆聲響。",
-          "marketing_description": "喀嚓！感受 Wakku 球碎成一小塊一小塊的酥脆聲響。"
+          "description": "喀嚓！感受 Wakku 球碎成一小塊一小塊的酥脆聲響。"
         }
       }
     },
@@ -429,23 +365,19 @@
       "localizations": {
         "ko": {
           "display_name": "두쫀쿠",
-          "iap_description": "코코아 겉피와 초록색 속이 눌리며 바삭한 소리가 나요.",
-          "marketing_description": "코코아 겉피와 초록색 속이 눌리며 바삭한 소리가 나요."
+          "description": "코코아 겉피와 초록색 속이 눌리며 바삭한 소리가 나요."
         },
         "en": {
-          "display_name": "Dujjonku",
-          "iap_description": "A cocoa shell with a crisp green filling.",
-          "marketing_description": "Its cocoa shell and green filling squash with a satisfying crunch."
+          "display_name": "Dubai Chocolate Chewy Cookie",
+          "description": "Its cocoa shell and green filling squash with a satisfying crunch."
         },
         "ja": {
-          "display_name": "ドゥチョンク",
-          "iap_description": "ココアの皮と緑の中身がつぶれてサクッと鳴ります。",
-          "marketing_description": "ココアの皮と緑の中身がつぶれて、サクッと音を立てます。"
+          "display_name": "ドバイチョコもちもちクッキー",
+          "description": "ココアの皮と緑の中身がつぶれて、サクッと音を立てます。"
         },
         "zh-Hant": {
-          "display_name": "Dujjonku",
-          "iap_description": "可可外皮和綠色內餡壓下時會發出脆響。",
-          "marketing_description": "可可外皮和綠色內餡被壓下時，會發出酥脆的聲響。"
+          "display_name": "杜拜巧克力軟餅乾",
+          "description": "可可外皮和綠色內餡被壓下時，會發出酥脆的聲響。"
         }
       }
     },
@@ -455,23 +387,19 @@
       "localizations": {
         "ko": {
           "display_name": "기니피그의 미니 파프리카",
-          "iap_description": "아껴 둔 간식이에요. 던진 뒤엔 3초 안에 주우면 괜찮겠죠?",
-          "marketing_description": "아껴 둔 간식이에요. 던진 뒤엔 3초 안에 주우면 괜찮겠죠?"
+          "description": "아껴 둔 간식이에요. 던진 뒤엔 3초 안에 주우면 괜찮겠죠?"
         },
         "en": {
           "display_name": "Guinea Pig's Mini Pepper",
-          "iap_description": "A saved snack. Three-second rule applies!",
-          "marketing_description": "A carefully saved snack. If you pick it up within three seconds after throwing it, that's fine, right?"
+          "description": "A carefully saved snack. If you pick it up within three seconds after throwing it, that's fine, right?"
         },
         "ja": {
           "display_name": "モルモットのミニパプリカ",
-          "iap_description": "大事なおやつ。投げても3秒以内なら大丈夫ですよね？",
-          "marketing_description": "大切に取っておいたおやつです。投げたあとも3秒以内に拾えば大丈夫ですよね？"
+          "description": "大切に取っておいたおやつです。投げたあとも3秒以内に拾えば大丈夫ですよね？"
         },
         "zh-Hant": {
           "display_name": "天竺鼠的迷你甜椒",
-          "iap_description": "珍藏的零食，丟出後三秒內撿起來就沒關係吧？",
-          "marketing_description": "這是牠珍藏的點心。丟出去後，只要三秒內撿起來就沒關係吧？"
+          "description": "這是牠珍藏的點心。丟出去後，只要三秒內撿起來就沒關係吧？"
         }
       }
     },
@@ -481,23 +409,19 @@
       "localizations": {
         "ko": {
           "display_name": "원숭이의 바나나",
-          "iap_description": "원숭이가 양보한 바나나예요. 양보한 게 맞는지는 아직 못 물어봤어요.",
-          "marketing_description": "원숭이가 양보한 바나나예요. 양보한 게 맞는지는 아직 못 물어봤어요."
+          "description": "원숭이가 양보한 바나나예요. 양보한 게 맞는지는 아직 못 물어봤어요."
         },
         "en": {
           "display_name": "Monkey's Banana",
-          "iap_description": "A banana the monkey shared. Allegedly.",
-          "marketing_description": "The monkey shared this banana. We haven't had a chance to ask whether that was intentional."
+          "description": "The monkey shared this banana. We haven't had a chance to ask whether that was intentional."
         },
         "ja": {
           "display_name": "こざるのバナナ",
-          "iap_description": "こざるが譲ったバナナ。本当に譲ったかは未確認です。",
-          "marketing_description": "こざるが譲ってくれたバナナです。本当に譲ってくれたのかは、まだ聞けていません。"
+          "description": "こざるが譲ってくれたバナナです。本当に譲ってくれたのかは、まだ聞けていません。"
         },
         "zh-Hant": {
           "display_name": "小猴子的香蕉",
-          "iap_description": "小猴子拿來分享的香蕉。是不是自願的還沒問。",
-          "marketing_description": "這是小猴子拿來分享的香蕉。至於牠是不是真的自願，還沒來得及問。"
+          "description": "這是小猴子拿來分享的香蕉。至於牠是不是真的自願，還沒來得及問。"
         }
       }
     },
@@ -507,23 +431,19 @@
       "localizations": {
         "ko": {
           "display_name": "친칠라의 모래주머니",
-          "iap_description": "친칠라의 목욕 모래예요. 씻으라고 던지는 건… 아마 아닐 거예요.",
-          "marketing_description": "친칠라의 목욕 모래예요. 씻으라고 던지는 건… 아마 아닐 거예요."
+          "description": "친칠라의 목욕 모래예요. 씻으라고 던지는 건… 아마 아닐 거예요."
         },
         "en": {
           "display_name": "Chinchilla's Sand Pouch",
-          "iap_description": "Bath sand. Probably not a hint to wash up.",
-          "marketing_description": "It's the chinchilla's bath sand. Throwing it probably isn't a hint that you need a wash."
+          "description": "It's the chinchilla's bath sand. Throwing it probably isn't a hint that you need a wash."
         },
         "ja": {
           "display_name": "チンチラの砂袋",
-          "iap_description": "砂浴び用の砂。洗ってという意味では…たぶんありません。",
-          "marketing_description": "チンチラの砂浴び用の砂です。洗ってほしくて投げるわけでは…たぶんありません。"
+          "description": "チンチラの砂浴び用の砂です。洗ってほしくて投げるわけでは…たぶんありません。"
         },
         "zh-Hant": {
           "display_name": "龍貓的浴沙袋",
-          "iap_description": "龍貓的浴沙。丟這個應該不是叫你洗澡。",
-          "marketing_description": "這是龍貓洗澡用的沙。把它丟出去……應該不是在叫你洗澡。"
+          "description": "這是龍貓洗澡用的沙。把它丟出去……應該不是在叫你洗澡。"
         }
       }
     },
@@ -533,23 +453,19 @@
       "localizations": {
         "ko": {
           "display_name": "별빛 우파루파의 별빛 구슬",
-          "iap_description": "별빛을 꾹꾹 뭉쳤어요. 하늘에서 별 하나가 없어졌다는데요?",
-          "marketing_description": "별빛을 꾹꾹 뭉쳤어요. 하늘에서 별 하나가 없어졌다는데요?"
+          "description": "별빛을 꾹꾹 뭉쳤어요. 하늘에서 별 하나가 없어졌다는데요?"
         },
         "en": {
           "display_name": "Starlight Axolotl's Star Orb",
-          "iap_description": "Packed starlight. Is the sky missing a star?",
-          "marketing_description": "Starlight packed into a little orb. Has anyone checked whether the sky is missing a star?"
+          "description": "Starlight packed into a little orb. Has anyone checked whether the sky is missing a star?"
         },
         "ja": {
           "display_name": "星明かりのウーパールーパーの星玉",
-          "iap_description": "星明かりを丸めました。空の星がひとつ減ったとか？",
-          "marketing_description": "星明かりをぎゅっと丸めました。空の星がひとつ減ったそうですが？"
+          "description": "星明かりをぎゅっと丸めました。空の星がひとつ減ったそうですが？"
         },
         "zh-Hant": {
           "display_name": "星光六角恐龍的星光球",
-          "iap_description": "把星光揉成一團。天空是不是少了一顆星？",
-          "marketing_description": "把星光用力揉成一團。聽說天空少了一顆星，是這顆嗎？"
+          "description": "把星光用力揉成一團。聽說天空少了一顆星，是這顆嗎？"
         }
       }
     },
@@ -559,23 +475,19 @@
       "localizations": {
         "ko": {
           "display_name": "수달의 조개",
-          "iap_description": "수달이 품고 다니던 조개예요. 진주는 없고, 미련은 좀 있어요.",
-          "marketing_description": "수달이 품고 다니던 조개예요. 진주는 없고, 미련은 좀 있어요."
+          "description": "수달이 품고 다니던 조개예요. 진주는 없고, 미련은 좀 있어요."
         },
         "en": {
           "display_name": "Otter's Clam",
-          "iap_description": "No pearl inside, only lingering attachment.",
-          "marketing_description": "The clam the otter carried everywhere. There's no pearl inside, just some lingering attachment."
+          "description": "The clam the otter carried everywhere. There's no pearl inside, just some lingering attachment."
         },
         "ja": {
           "display_name": "カワウソの貝",
-          "iap_description": "大事にしていた貝。真珠はなく、未練は少しあります。",
-          "marketing_description": "カワウソが大事に抱えていた貝です。真珠はないけれど、未練は少しあります。"
+          "description": "カワウソが大事に抱えていた貝です。真珠はないけれど、未練は少しあります。"
         },
         "zh-Hant": {
           "display_name": "水獺的貝殼",
-          "iap_description": "沒有珍珠，只有水獺的一點依依不捨。",
-          "marketing_description": "這是水獺一直抱在懷裡的貝殼。裡面沒有珍珠，只有一點依依不捨。"
+          "description": "這是水獺一直抱在懷裡的貝殼。裡面沒有珍珠，只有一點依依不捨。"
         }
       }
     },
@@ -585,23 +497,19 @@
       "localizations": {
         "ko": {
           "display_name": "아기 돼지의 돼지고기",
-          "iap_description": "찰진 촵! 근데 옆집 꿀꿀이가 며칠 전부터 안 보이던데…?",
-          "marketing_description": "찰진 촵! 근데 옆집 꿀꿀이가 며칠 전부터 안 보이던데…?"
+          "description": "찰진 촵! 근데 옆집 꿀꿀이가 며칠 전부터 안 보이던데…?"
         },
         "en": {
           "display_name": "Baby Pig's Pork",
-          "iap_description": "Slap! Has anyone seen the pig next door?",
-          "marketing_description": "A satisfyingly solid slap! By the way, has anyone seen the pig next door lately?"
+          "description": "A satisfyingly solid slap! By the way, has anyone seen the pig next door lately?"
         },
         "ja": {
           "display_name": "こぶたの豚肉",
-          "iap_description": "ぺちっ！そういえば隣のぶたさんを見ませんね…？",
-          "marketing_description": "ぺちっ！ところで、お隣のぶたさんをここ数日見かけませんね…？"
+          "description": "ぺちっ！ところで、お隣のぶたさんをここ数日見かけませんね…？"
         },
         "zh-Hant": {
           "display_name": "小豬的豬肉",
-          "iap_description": "啪！話說隔壁的小豬是不是好幾天沒出現了？",
-          "marketing_description": "紮實的一聲啪！話說回來，隔壁的小豬是不是好幾天沒出現了……？"
+          "description": "紮實的一聲啪！話說回來，隔壁的小豬是不是好幾天沒出現了……？"
         }
       }
     },
@@ -611,23 +519,19 @@
       "localizations": {
         "ko": {
           "display_name": "나무의 작은 나무",
-          "iap_description": "나무가 작은 나무를 던져요. 일단 족보부터 확인해 볼까요?",
-          "marketing_description": "나무가 작은 나무를 던져요. 일단 족보부터 확인해 볼까요?"
+          "description": "나무가 작은 나무를 던져요. 일단 족보부터 확인해 볼까요?"
         },
         "en": {
           "display_name": "Little Tree's Tiny Tree",
-          "iap_description": "A tree throws a tree. Check the family tree.",
-          "marketing_description": "A tree throws a tiny tree. Perhaps we should check the family tree first."
+          "description": "A tree throws a tiny tree. Perhaps we should check the family tree first."
         },
         "ja": {
           "display_name": "小さな木のちび木",
-          "iap_description": "木が小さな木を投げます。まず家系図を確認しましょう。",
-          "marketing_description": "木が小さな木を投げます。まずは家系図から確認してみましょうか。"
+          "description": "木が小さな木を投げます。まずは家系図から確認してみましょうか。"
         },
         "zh-Hant": {
           "display_name": "小樹的小小樹",
-          "iap_description": "樹丟出一棵小樹。先查查族譜吧。",
-          "marketing_description": "樹丟出一棵小樹。要不要先從族譜開始查起？"
+          "description": "樹丟出一棵小樹。要不要先從族譜開始查起？"
         }
       }
     },
@@ -637,23 +541,19 @@
       "localizations": {
         "ko": {
           "display_name": "시바견",
-          "iap_description": "산책은 다녀왔어요. 시바는 그 사실을 인정하지 않아요.",
-          "marketing_description": "산책은 다녀왔어요. 시바는 그 사실을 인정하지 않아요."
+          "description": "산책은 다녀왔어요. 시바는 그 사실을 인정하지 않아요."
         },
         "en": {
           "display_name": "Shiba Inu",
-          "iap_description": "Already walked. The Shiba denies everything.",
-          "marketing_description": "We already went for a walk. The Shiba refuses to acknowledge that fact."
+          "description": "We already went for a walk. The Shiba refuses to acknowledge that fact."
         },
         "ja": {
           "display_name": "柴犬",
-          "iap_description": "散歩は済みました。柴犬は認めていません。",
-          "marketing_description": "散歩はもう行きました。柴犬はその事実を認めていません。"
+          "description": "散歩はもう行きました。柴犬はその事実を認めていません。"
         },
         "zh-Hant": {
           "display_name": "柴犬",
-          "iap_description": "已經散步回來了，但柴犬拒絕承認。",
-          "marketing_description": "已經散步回來了，但柴犬拒絕承認這件事。"
+          "description": "已經散步回來了，但柴犬拒絕承認這件事。"
         }
       }
     },
@@ -663,23 +563,19 @@
       "localizations": {
         "ko": {
           "display_name": "테니스공",
-          "iap_description": "던질 사람은 정했어요. 주워 올 사람은 아직이요.",
-          "marketing_description": "던질 사람은 정했어요. 주워 올 사람은 아직이요."
+          "description": "던질 사람은 정했어요. 주워 올 사람은 아직이요."
         },
         "en": {
           "display_name": "Tennis Ball",
-          "iap_description": "The thrower is set. Who will fetch it?",
-          "marketing_description": "We picked someone to throw it. We're still looking for someone to fetch it."
+          "description": "We picked someone to throw it. We're still looking for someone to fetch it."
         },
         "ja": {
           "display_name": "テニスボール",
-          "iap_description": "投げる人は決まりました。拾う人はまだです。",
-          "marketing_description": "投げる人は決まりました。拾ってくる人はまだ決まっていません。"
+          "description": "投げる人は決まりました。拾ってくる人はまだ決まっていません。"
         },
         "zh-Hant": {
           "display_name": "網球",
-          "iap_description": "負責丟的人選好了，撿球的人還沒。",
-          "marketing_description": "負責丟的人已經選好了，負責撿回來的人還沒決定。"
+          "description": "負責丟的人已經選好了，負責撿回來的人還沒決定。"
         }
       }
     },
@@ -689,23 +585,19 @@
       "localizations": {
         "ko": {
           "display_name": "오리",
-          "iap_description": "오리발 내미는 데는 자신 있어요. 진짜 오리발이거든요.",
-          "marketing_description": "오리발 내미는 데는 자신 있어요. 진짜 오리발이거든요."
+          "description": "오리발 내미는 데는 자신 있어요. 진짜 오리발이거든요."
         },
         "en": {
           "display_name": "Duck",
-          "iap_description": "An expert at ducking blame—with duck feet.",
-          "marketing_description": "An expert at ducking responsibility. It has the duck feet to prove it."
+          "description": "An expert at ducking responsibility. It has the duck feet to prove it."
         },
         "ja": {
           "display_name": "アヒル",
-          "iap_description": "知らんぷりなら得意です。本物のアヒルですから。",
-          "marketing_description": "知らんぷりなら得意です。何しろ本物のアヒルの足がありますから。"
+          "description": "知らんぷりなら得意です。何しろ本物のアヒルの足がありますから。"
         },
         "zh-Hant": {
           "display_name": "鴨子",
-          "iap_description": "很會裝傻，畢竟牠真的有一雙鴨掌。",
-          "marketing_description": "牠最會裝傻推託了，畢竟牠真的有一雙鴨掌。"
+          "description": "牠最會裝傻推託了，畢竟牠真的有一雙鴨掌。"
         }
       }
     },
@@ -715,23 +607,19 @@
       "localizations": {
         "ko": {
           "display_name": "똥",
-          "iap_description": "누가 불렀는지는 모르겠지만, 일단 나왔어요.",
-          "marketing_description": "누가 불렀는지는 모르겠지만, 일단 나왔어요."
+          "description": "누가 불렀는지는 모르겠지만, 일단 나왔어요."
         },
         "en": {
           "display_name": "Poop",
-          "iap_description": "Not sure who called, but here it is.",
-          "marketing_description": "Not sure who called, but here it is."
+          "description": "Not sure who called, but here it is."
         },
         "ja": {
           "display_name": "うんち",
-          "iap_description": "誰に呼ばれたかは不明ですが、とりあえず出ました。",
-          "marketing_description": "誰に呼ばれたのかはわかりませんが、とりあえず出てきました。"
+          "description": "誰に呼ばれたのかはわかりませんが、とりあえず出てきました。"
         },
         "zh-Hant": {
           "display_name": "便便",
-          "iap_description": "不知道是誰叫牠，總之先出來了。",
-          "marketing_description": "不知道是誰叫牠，總之牠先出來了。"
+          "description": "不知道是誰叫牠，總之牠先出來了。"
         }
       }
     },
@@ -741,23 +629,19 @@
       "localizations": {
         "ko": {
           "display_name": "휴지 뭉치",
-          "iap_description": "똥휴지인지 아닌지는 모르겠어요. 일단 피하세요!",
-          "marketing_description": "똥휴지인지 아닌지는 모르겠어요. 일단 피하세요!"
+          "description": "똥휴지인지 아닌지는 모르겠어요. 일단 피하세요!"
         },
         "en": {
           "display_name": "Tissue Ball",
-          "iap_description": "Used or not? No one knows. Just dodge it!",
-          "marketing_description": "No one knows whether it's used toilet paper. Just dodge it!"
+          "description": "No one knows whether it's used toilet paper. Just dodge it!"
         },
         "ja": {
           "display_name": "ティッシュのかたまり",
-          "iap_description": "使用済みかは不明です。とにかく避けて！",
-          "marketing_description": "使用済みのトイレットペーパーかは不明です。とにかく避けて！"
+          "description": "使用済みのトイレットペーパーかどうかは不明です。とにかく避けて！"
         },
         "zh-Hant": {
           "display_name": "衛生紙團",
-          "iap_description": "不知道是不是用過的，總之快閃！",
-          "marketing_description": "不知道是不是用過的衛生紙，總之先閃開！"
+          "description": "不知道是不是用過的衛生紙，總之先閃開！"
         }
       }
     },
@@ -767,23 +651,19 @@
       "localizations": {
         "ko": {
           "display_name": "떡볶이",
-          "iap_description": "순한맛이라더니요. 누구 기준인지는 안 알려줬어요.",
-          "marketing_description": "순한맛이라더니요. 누구 기준인지는 안 알려줬어요."
+          "description": "순한 맛이라더니요. 누구 기준인지는 안 알려줬어요."
         },
         "en": {
           "display_name": "Tteokbokki",
-          "iap_description": "They said mild. They never said for whom.",
-          "marketing_description": "They said it was mild. They never said whose idea of mild they meant."
+          "description": "They said it was mild. They never said whose idea of mild they meant."
         },
         "ja": {
           "display_name": "トッポッキ",
-          "iap_description": "甘口だそうです。誰にとってかは教えてくれません。",
-          "marketing_description": "甘口だと聞きました。誰にとっての甘口かは教えてくれませんでした。"
+          "description": "甘口だと聞きました。誰にとっての甘口かは教えてくれませんでした。"
         },
         "zh-Hant": {
           "display_name": "辣炒年糕",
-          "iap_description": "說是微辣，卻沒說是以誰的標準。",
-          "marketing_description": "聽說是微辣，但沒人告訴我們這是以誰的標準。"
+          "description": "聽說是微辣，但沒人告訴我們這是以誰的標準。"
         }
       }
     },
@@ -793,23 +673,19 @@
       "localizations": {
         "ko": {
           "display_name": "어묵꼬치",
-          "iap_description": "드시라고 드린 건데 왜 휘두르세요?",
-          "marketing_description": "드시라고 드린 건데 왜 휘두르세요?"
+          "description": "드시라고 드린 건데 왜 휘두르세요?"
         },
         "en": {
           "display_name": "Fish Cake Skewer",
-          "iap_description": "It was for eating. Why are you swinging it?",
-          "marketing_description": "That was meant for eating. Why are you swinging it around?"
+          "description": "That was meant for eating. Why are you swinging it around?"
         },
         "ja": {
           "display_name": "オムク串（練り天）",
-          "iap_description": "食べてほしくて渡したのに、なぜ振り回すの？",
-          "marketing_description": "食べてほしくて渡したのに、どうして振り回しているんですか？"
+          "description": "食べてほしくて渡したのに、どうして振り回しているんですか？"
         },
         "zh-Hant": {
-          "display_name": "魚板串",
-          "iap_description": "是給你吃的，為什麼揮來揮去？",
-          "marketing_description": "這是給你吃的，為什麼拿來揮來揮去？"
+          "display_name": "韓式魚板串",
+          "description": "這是用魚漿做來吃的，怎麼拿來揮來揮去？"
         }
       }
     },
@@ -819,23 +695,19 @@
       "localizations": {
         "ko": {
           "display_name": "쿼카",
-          "iap_description": "항상 웃고 있어요. 방금 잎사귀를 던진 것도 얘예요.",
-          "marketing_description": "항상 웃고 있어요. 방금 잎사귀를 던진 것도 얘예요."
+          "description": "항상 웃고 있어요. 방금 잎사귀를 던진 것도 얘예요."
         },
         "en": {
           "display_name": "Quokka",
-          "iap_description": "Still smiling after throwing that leaf.",
-          "marketing_description": "Always smiling. Yes, this is the one who just threw that leaf."
+          "description": "Always smiling. Yes, this is the one who just threw that leaf."
         },
         "ja": {
           "display_name": "クオッカ",
-          "iap_description": "いつも笑顔。さっき葉っぱを投げたのもこの子です。",
-          "marketing_description": "いつも笑顔です。さっき葉っぱを投げたのもこの子です。"
+          "description": "いつも笑顔です。さっき葉っぱを投げたのもこの子です。"
         },
         "zh-Hant": {
           "display_name": "短尾矮袋鼠",
-          "iap_description": "總是在笑，剛才丟葉子的也是牠。",
-          "marketing_description": "牠總是在笑。剛才丟出那片葉子的也是牠。"
+          "description": "牠總是在笑。剛才丟出那片葉子的也是牠。"
         }
       }
     },
@@ -845,23 +717,19 @@
       "localizations": {
         "ko": {
           "display_name": "잎사귀",
-          "iap_description": "쿼카의 도시락이에요. 던져도 되는지는 안 물어봤어요.",
-          "marketing_description": "쿼카의 도시락이에요. 던져도 되는지는 안 물어봤어요."
+          "description": "쿼카의 도시락이에요. 던져도 되는지는 안 물어봤어요."
         },
         "en": {
           "display_name": "Leaf",
-          "iap_description": "Quokka's lunch. Thrown without asking.",
-          "marketing_description": "It's the quokka's packed lunch. We didn't ask whether it was okay to throw it."
+          "description": "It's the quokka's packed lunch. We didn't ask whether it was okay to throw it."
         },
         "ja": {
           "display_name": "葉っぱ",
-          "iap_description": "クオッカのお弁当。投げていいかは聞いていません。",
-          "marketing_description": "クオッカのお弁当です。投げてもいいかは聞いていません。"
+          "description": "クオッカのお弁当です。投げてもいいかは聞いていません。"
         },
         "zh-Hant": {
           "display_name": "葉子",
-          "iap_description": "短尾矮袋鼠的便當。沒問過能不能丟。",
-          "marketing_description": "這是短尾矮袋鼠的便當。我們沒問過能不能把它丟出去。"
+          "description": "這是短尾矮袋鼠的便當。我們沒問過能不能把它丟出去。"
         }
       }
     }

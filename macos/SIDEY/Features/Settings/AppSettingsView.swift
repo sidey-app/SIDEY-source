@@ -53,12 +53,12 @@ struct AppSettingsView: View {
                 .textSelection(.enabled)
             #endif
             SettingsSection(
-                title: "settings.general.title",
+                title: "settings.section.general.title",
                 subtitle: "settings.general.subtitle",
                 systemImage: "gearshape"
             ) {
                 SettingsToggleRow(
-                    title: "settings.general.overlay_visible.title",
+                    title: "settings.overlay.title",
                     description: "settings.general.overlay_visible.description",
                     isOn: Binding(
                         get: { model.overlayVisible },
@@ -67,8 +67,8 @@ struct AppSettingsView: View {
                 )
                 Divider()
                 SettingsToggleRow(
-                    title: "settings.general.launch_at_login.title",
-                    description: "settings.general.launch_at_login.description",
+                    title: "settings.startup.title",
+                    description: "settings.startup.description",
                     isOn: Binding(
                         get: { model.launchAtLogin },
                         set: { actions.onLaunchAtLoginChanged($0) }
@@ -77,7 +77,7 @@ struct AppSettingsView: View {
             }
 
             SettingsSection(
-                title: "settings.display.title",
+                title: "settings.section.display.title",
                 subtitle: "settings.display.subtitle",
                 systemImage: "eye"
             ) {
@@ -130,7 +130,7 @@ struct AppSettingsView: View {
             }
 
             SettingsSection(
-                title: "settings.sound.title",
+                title: "settings.section.sound.title",
                 subtitle: "settings.sound.subtitle",
                 systemImage: "speaker.wave.2"
             ) {
@@ -297,7 +297,7 @@ struct AppSettingsView: View {
 
     private var debugBuildStamp: String {
         let dirtySuffix = SideyBuildStamp.dirty
-            ? " · \(L10n.text("debug.build.dirty"))"
+            ? " · \(InternalL10n.text("debug.build.dirty"))"
             : ""
         return "\(SideyBuildStamp.target) · \(SideyBuildStamp.commit.prefix(8))\(dirtySuffix)"
     }
@@ -363,10 +363,10 @@ private struct GlobalShortcutEditor: View {
 private extension GlobalShortcutAction {
     var localizedTitle: LocalizedStringResource {
         switch self {
-        case .toggleQuietMode: "settings.shortcuts.quiet_mode"
-        case .toggleComposer: "settings.shortcuts.composer"
-        case .openHistory: "settings.shortcuts.history"
-        case .toggleOverlay: "settings.shortcuts.overlay"
+        case .toggleQuietMode: "shortcut.action.quiet_mode"
+        case .toggleComposer: "shortcut.action.composer"
+        case .openHistory: "shortcut.action.history"
+        case .toggleOverlay: "shortcut.action.overlay"
         }
     }
 }
@@ -374,10 +374,10 @@ private extension GlobalShortcutAction {
 private extension GlobalShortcutModifier {
     var localizedTitle: LocalizedStringResource {
         switch self {
-        case .control: "settings.shortcuts.modifier.control"
-        case .option: "settings.shortcuts.modifier.option"
-        case .shift: "settings.shortcuts.modifier.shift"
-        case .command: "settings.shortcuts.modifier.command"
+        case .control: "shortcut.modifier.control"
+        case .option: "shortcut.modifier.option"
+        case .shift: "shortcut.modifier.shift"
+        case .command: "shortcut.modifier.command"
         }
     }
 }

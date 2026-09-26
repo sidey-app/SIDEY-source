@@ -139,17 +139,17 @@ public sealed partial class WindowsUpdateService
         catch (HttpRequestException exception) when (exception.StatusCode == HttpStatusCode.NotFound)
         {
             throw new InvalidOperationException(
-                I18n.Get("update.notPublished"),
+                I18n.Get("update.not_published"),
                 exception);
         }
         if (manifest is null)
         {
-            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+            throw new InvalidDataException(I18n.Get("update.metadata.invalid"));
         }
         string channel = manifest.Channel ?? string.Empty;
         if (channel is not ("alpha" or "production"))
         {
-            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+            throw new InvalidDataException(I18n.Get("update.metadata.invalid"));
         }
 
         Uri legacyInstallerUri = ValidateInstallerMetadata(
@@ -170,7 +170,7 @@ public sealed partial class WindowsUpdateService
             && manifest.UpdateSha256 is not null;
         if (hasAnyUpdateField != hasAllUpdateFields)
         {
-            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+            throw new InvalidDataException(I18n.Get("update.metadata.invalid"));
         }
 
         string productVersion;
@@ -186,7 +186,7 @@ public sealed partial class WindowsUpdateService
             string expectedReleaseVersion = ResolveReleaseVersion(productVersion, updateVersion);
             if (updateTag != $"windows-v{expectedReleaseVersion}")
             {
-                throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+                throw new InvalidDataException(I18n.Get("update.metadata.invalid"));
             }
             installerUri = ValidateInstallerMetadata(
                 updateVersion,
@@ -197,7 +197,7 @@ public sealed partial class WindowsUpdateService
             sha256 = manifest.UpdateSha256!.ToLowerInvariant();
             if (productVersion != manifest.Version)
             {
-                throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+                throw new InvalidDataException(I18n.Get("update.metadata.invalid"));
             }
             _ = ParsedVersion.Parse(productVersion);
         }
@@ -236,14 +236,14 @@ public sealed partial class WindowsUpdateService
             || !tag.StartsWith("windows-v", StringComparison.Ordinal)
             || !Sha256Pattern().IsMatch(sha256 ?? string.Empty))
         {
-            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+            throw new InvalidDataException(I18n.Get("update.metadata.invalid"));
         }
         _ = ParsedVersion.Parse(version);
         string releaseVersion = tag["windows-v".Length..];
         _ = ParsedVersion.Parse(releaseVersion);
         if (versionNamesAsset && tag != $"windows-v{version}")
         {
-            throw new InvalidDataException(I18n.Get("update.invalidManifest"));
+            throw new InvalidDataException(I18n.Get("update.metadata.invalid"));
         }
 
         var expectedInstallerUri = new Uri(
@@ -252,7 +252,7 @@ public sealed partial class WindowsUpdateService
         if (!Uri.TryCreate(installerUrl, UriKind.Absolute, out Uri? parsedInstallerUri)
             || parsedInstallerUri != expectedInstallerUri)
         {
-            throw new InvalidDataException(I18n.Get("update.invalidInstaller"));
+            throw new InvalidDataException(I18n.Get("update.install.invalid"));
         }
         return parsedInstallerUri;
     }
@@ -336,7 +336,7 @@ public sealed partial class WindowsUpdateService
             if (!StringComparer.OrdinalIgnoreCase.Equals(actualHash, manifest.Sha256))
             {
                 throw new InvalidDataException(
-                    I18n.Get("update.hashMismatch"));
+                    I18n.Get("update.download.hash_mismatch"));
             }
 
             File.Move(partialPath, installerPath, overwrite: true);

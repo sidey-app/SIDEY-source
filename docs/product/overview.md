@@ -25,6 +25,11 @@ macOS client는 한국어, 영어, 일본어와 번체 중국어(`zh-Hant`)를 �
 사용한다. 번체 중국어는 대만식 표현을 기준으로 하되 홍콩과 마카오에서도 이해할 수
 있는 중립 표현을 사용하며 별도 `zh-Hant-HK` catalog는 두지 않는다.
 
+Windows client는 앱 설정에서 언어를 선택하며, 지원 범위는
+[`assets/v1/ui-localizations.json`](../../assets/v1/ui-localizations.json)의 Windows
+locale 목록을 따른다. Windows 전용 언어를 추가해도 macOS catalog의 지원 범위는
+늘어나지 않는다.
+
 날짜, 시간, 숫자와 StoreKit 가격은 현재 locale의 형식을 사용한다. 닉네임, 그룹명과
 메시지 본문처럼 사용자가 만든 데이터는 번역하거나 기존 저장값을 바꾸지 않는다.
 

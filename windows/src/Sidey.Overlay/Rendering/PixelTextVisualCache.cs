@@ -160,7 +160,7 @@ internal sealed class PixelTextVisualCache : IDisposable
                 : null;
             var key = new VisualKey(
                 member.IsCurrentUser
-                    ? I18n.Format("overlay.currentUser", member.Nickname)
+                    ? I18n.Format("overlay.current_user", member.Nickname)
                     : member.Nickname,
                 member.Presence,
                 olderBubble,

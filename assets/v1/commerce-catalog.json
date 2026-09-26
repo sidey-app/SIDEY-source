@@ -255,7 +255,7 @@
   {
     "id": "throwable_wakkuball",
     "name": "왁뿌볼",
-    "description": "와그작! 왁뿌볼이 조각조각 부서지는 바삭한 소리를 느껴보세요.",
+    "description": "와그작! 왁뿌볼이 조각조각 부서지는 바삭한 소리를 느껴 보세요.",
     "kind": "throwable",
     "item_id": "throwable_wakkuball",
     "character_id": null,
@@ -483,7 +483,7 @@
   {
     "id": "character_tteokbokki",
     "name": "떡볶이",
-    "description": "순한맛이라더니요. 누구 기준인지는 안 알려줬어요.",
+    "description": "순한 맛이라더니요. 누구 기준인지는 안 알려줬어요.",
     "kind": "character",
     "item_id": "pixel_tteokbokki",
     "character_id": "pixel_tteokbokki",

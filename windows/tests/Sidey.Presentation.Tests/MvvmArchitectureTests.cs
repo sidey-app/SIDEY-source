@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Xml.Linq;
+using Sidey.Core.Localization;
 using Sidey.Presentation.ViewModels;
 
 namespace Sidey.Presentation.Tests;
@@ -82,6 +83,26 @@ public sealed class MvvmArchitectureTests
             view.Descendants().Attributes(),
             attribute => attribute.Name.LocalName == "Command"
                 && attribute.Value == $"{{Binding {commandName}}}");
+    }
+
+    [Fact]
+    public void LanguagePickerHasOneDistinctLabelForEverySupportedCatalog()
+    {
+        var view = XDocument.Load(RepositoryPath(
+            "windows", "src", "Sidey.App", "Views", "MainWindow.xaml"));
+        XElement picker = Assert.Single(
+            view.Descendants(),
+            element => element.Name.LocalName == "ComboBox"
+                && element.Attributes().Any(attribute =>
+                    attribute.Name.LocalName == "Name"
+                    && attribute.Value == "LanguageComboBox"));
+        string[] labels = [.. picker.Elements()
+            .Where(element => element.Name.LocalName == "ComboBoxItem")
+            .Select(element => element.Attribute("Content")?.Value ?? string.Empty)];
+
+        Assert.Equal(I18n.SupportedLanguages.Count, labels.Length);
+        Assert.All(labels, label => Assert.False(string.IsNullOrWhiteSpace(label)));
+        Assert.Equal(labels.Length, labels.Distinct(StringComparer.Ordinal).Count());
     }
 
     [Fact]
@@ -324,7 +345,7 @@ public sealed class MvvmArchitectureTests
             layout.Descendants(),
             element => element.Name.LocalName == "TextBlock"
                 && element.Attribute("Text")?.Value
-                    == "{Binding Value, Source={i18n:I18n Key=settings.characterSounds}, Mode=OneWay}");
+                    == "{Binding Value, Source={i18n:I18n Key=settings.sound.character_effects.title}, Mode=OneWay}");
 
         Assert.Equal("{StaticResource SideySettingsRowTitleStyle}", title.Attribute("Style")?.Value);
         XElement titleStyle = Assert.Single(
@@ -341,7 +362,7 @@ public sealed class MvvmArchitectureTests
             layout.Descendants(),
             element => element.Name.LocalName == "TextBlock"
                 && element.Attribute("Text")?.Value
-                    == "{Binding Value, Source={i18n:I18n Key=settings.characterSoundsDescription}, Mode=OneWay}");
+                    == "{Binding Value, Source={i18n:I18n Key=settings.sound.character_effects.description}, Mode=OneWay}");
         Assert.Equal("{StaticResource SideySettingsRowDescriptionStyle}", description.Attribute("Style")?.Value);
         XElement descriptionStyle = Assert.Single(
             view.Descendants(),
@@ -377,8 +398,8 @@ public sealed class MvvmArchitectureTests
             "profile.title",
             "groups.title",
             "store.title",
-            "settings.generalTitle",
-            "about.title",
+            "settings.section.general.title",
+            "app.info.title",
         ];
 
         foreach (string key in expectedTitleKeys)
@@ -409,7 +430,7 @@ public sealed class MvvmArchitectureTests
         XElement description = Assert.Single(
             landing.Descendants(),
             element => element.Attribute("Text")?.Value.Contains(
-                "Key=onboarding.googleDescription",
+                "Key=onboarding.auth.google.description",
                 StringComparison.Ordinal) == true);
 
         Assert.Equal(
@@ -458,7 +479,7 @@ public sealed class MvvmArchitectureTests
         Assert.Contains(
             updateSection.Descendants(),
             element => element.Attribute("Text")?.Value
-                == "{Binding Value, Source={i18n:I18n Key=settings.updateTitle}, Mode=OneWay}");
+                == "{Binding Value, Source={i18n:I18n Key=settings.update.title}, Mode=OneWay}");
     }
 
     [Theory]

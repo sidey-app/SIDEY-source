@@ -1,0 +1,1630 @@
+{
+  "character": {
+    "pixel_cat": {
+      "display_name": "Koťátko"
+    },
+    "pixel_hamster": {
+      "display_name": "Křeček"
+    },
+    "pixel_penguin": {
+      "display_name": "Tučňáček"
+    },
+    "pixel_puppy": {
+      "display_name": "Štěně"
+    },
+    "pixel_rabbit": {
+      "display_name": "Králíček"
+    },
+    "unknown": {
+      "display_name": "Postavička"
+    }
+  },
+  "common": {
+    "cancel": "Zrušit",
+    "close": "Zavřít",
+    "continue": "Pokračovat",
+    "me": "Já",
+    "next": "Další",
+    "save": "Uložit"
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "Připojit se pomocí kódu"
+    },
+    "collapse": "Sbalit skupinu",
+    "create": {
+      "action": "Vytvořit skupinu",
+      "name": {
+        "placeholder": "Název nové skupiny"
+      }
+    },
+    "delete": {
+      "action": "Odstranit skupinu"
+    },
+    "expand": "Rozbalit skupinu",
+    "member": {
+      "remove": {
+        "action": "Odebrat"
+      }
+    },
+    "rename": {
+      "action": "Přejmenovat",
+      "name_placeholder": "Název skupiny, 1–20 znaků"
+    },
+    "room_name": {
+      "label": "Název skupiny"
+    }
+  },
+  "history": {
+    "load_more": {
+      "failed": "Předchozí zprávy se nepodařilo načíst",
+      "loading": "Načítání předchozích zpráv…"
+    },
+    "loading": "Načítání nedávných zpráv…"
+  },
+  "message": {
+    "send": {
+      "accessibility": "Odeslat zprávu"
+    }
+  },
+  "onboarding": {
+    "character": {
+      "label": "Moje postavička"
+    },
+    "group": {
+      "create": {
+        "description": "Vytvořte si vlastní skupinu."
+      },
+      "description": "Vytvořte skupinu nebo se připojte pomocí kódu pozvánky a oživte svůj pixelový svět.",
+      "title": "Založte skupinu s přáteli"
+    },
+    "step": {
+      "group": "Skupina",
+      "profile": "Profil"
+    }
+  },
+  "platforms": {
+    "macos": {
+      "account": {
+        "delete": {
+          "failed": "Účet se nepodařilo odstranit. Zkuste to znovu."
+        }
+      },
+      "account_delete": {
+        "error": {
+          "request_failed": "Žádost o odstranění účtu se nepodařilo dokončit. Zkuste to znovu."
+        }
+      },
+      "app": {
+        "settings": {
+          "navigation_label": "Nastavení aplikace"
+        }
+      },
+      "apple_auth": {
+        "error": {
+          "missing_authorization_code": "Přihlášení přes Apple se nepodařilo dokončit. Zkuste to znovu.",
+          "missing_identity_token": "Přihlášení přes Apple se nepodařilo dokončit. Zkuste to znovu.",
+          "missing_request_nonce": "Přihlášení přes Apple se nepodařilo dokončit. Zkuste to znovu."
+        }
+      },
+      "auth": {
+        "apple": {
+          "description": "Ve verzi z App Storu je přihlášení přes Apple nutné k obnovení nákupů a ochraně účtu.",
+          "title": "Přihlásit se přes Apple",
+          "verifying": "Ověřování přihlášení"
+        },
+        "apple_sign_in": {
+          "failed": "Přihlášení přes Apple se nepodařilo. Zkuste to znovu."
+        }
+      },
+      "backend": {
+        "connect": {
+          "failed_detail": "K serveru se nepodařilo připojit. Zkontrolujte připojení k internetu a zkuste to znovu. (%@)"
+        },
+        "connection": {
+          "connecting": "Připojování",
+          "failed": "Chyba připojení",
+          "idle": "Čekání",
+          "online": "Připojeno"
+        },
+        "error": {
+          "already_member": "K této skupině už jste se připojili.",
+          "authentication_required": "Pokračujte opětovným přihlášením.",
+          "current_user_unavailable": "Přihlášení se nepodařilo ověřit. Přihlaste se znovu.",
+          "generic": "Požadavek se nepodařilo dokončit. Zkuste to později.",
+          "invalid_invite_code": "Zkontrolujte kód pozvánky a zkuste to znovu.",
+          "invalid_message": "Zadejte zprávu o nejvýše 200 znacích a 3 řádcích.",
+          "invalid_profile": "Zadejte přezdívku o 2–8 znacích bez zalomení řádku.",
+          "invalid_room_name": "Zadejte název skupiny o 1–20 znacích bez zalomení řádku.",
+          "invalid_timestamp": "Podrobnosti zprávy se nepodařilo načíst. Zkuste to později.",
+          "invite_rate_limited": "Příliš mnoho pokusů s kódem pozvánky. Zkuste to znovu za 10 minut.",
+          "malformed_response": "Požadavek se nepodařilo dokončit. Zkuste to později.",
+          "member_limit_reached": {
+            "one": "Tato skupina je už plná a má %lld člena.",
+            "other": "Tato skupina je už plná a má %lld členů."
+          },
+          "member_not_found": "Člena, kterého chcete odebrat, se nepodařilo najít.",
+          "membership_required": "Tuto akci mohou provést jen členové skupiny.",
+          "message_receive_failed": "Zprávu se nepodařilo přijmout. Zkuste to později.",
+          "no_active_room": "Před odesláním zprávy vyberte skupinu.",
+          "owner_cannot_remove_self": "Vlastník skupiny nemůže odebrat sám sebe.",
+          "owner_required": "Tuto akci může provést jen vlastník skupiny.",
+          "profile_required": "Nejdřív uložte profil.",
+          "realtime_unavailable": "Připojení k serveru se stále připravuje. Zkuste to za chvíli.",
+          "room_limit_reached": "Každý může používat nejvýše 5 skupin.",
+          "room_resync_failed": "Nejnovější stav skupiny se nepodařilo načíst. Zkuste to později.",
+          "session_recovery_failed": "Předchozí přihlášení se nepodařilo obnovit. Nebyl vytvořen nový účet. Přihlaste se znovu nebo kontaktujte podporu.",
+          "stale_realtime_epoch": "Přístup ke skupině se změnil. Pokračujte opětovným připojením."
+        },
+        "realtime_recovery_failed": "K serveru se nepodařilo znovu připojit. Zkuste to za chvíli. (%@)"
+      },
+      "commerce": {
+        "character": {
+          "equip": {
+            "failed": "Postavičku se nepodařilo vybrat. Zkuste to znovu. (%@)",
+            "success": "Používá se %@."
+          }
+        },
+        "equipment": {
+          "success": {
+            "default_bubble": "Používá se výchozí bublina zprávy.",
+            "default_character": "Používá se výchozí postavička.",
+            "default_throwable": "Používá se výchozí měkký míček.",
+            "named": "Používá se %@."
+          }
+        },
+        "error": {
+          "catalog_unavailable": "Obchod se nepodařilo načíst. Zkuste to později."
+        },
+        "kind": {
+          "bubble": "Bubliny zpráv",
+          "character": "Postavičky",
+          "throwable": "Házecí hračky"
+        }
+      },
+      "common": {
+        "retry": "Zkusit znovu"
+      },
+      "composer": {
+        "drag": {
+          "accessibility": "Úchyt pro přesunutí pole zprávy",
+          "tooltip": "Přesunout pole zprávy"
+        }
+      },
+      "connection": {
+        "state": {
+          "connecting": "Připojování…",
+          "failed": "Chyba připojení",
+          "idle": "Nečinné",
+          "online": "Připojeno"
+        }
+      },
+      "firebase": {
+        "auth": {
+          "error": {
+            "account_mismatch": "Přihlášený účet se změnil. Přihlaste se znovu.",
+            "invalid_rollout_lease_claim": "Přihlášení pro připojení k serveru se nepodařilo ověřit. Přihlaste se znovu.",
+            "invalid_session_claim": "Přihlášení se nepodařilo ověřit. Přihlaste se znovu.",
+            "login_mismatch": "Přihlášení neodpovídá aktuálnímu účtu. Přihlaste se znovu.",
+            "malformed_account_identifier": "Účet se nepodařilo ověřit. Přihlaste se znovu.",
+            "rollout_lease_expired": "Platnost přihlášení vypršela. Přihlaste se znovu.",
+            "rollout_lease_mismatch": "S aktuálním přihlášením se nelze připojit k serveru. Přihlaste se znovu.",
+            "session_mismatch": "Přihlášení neodpovídá aktuálnímu účtu. Přihlaste se znovu.",
+            "token_refresh_validation_failed": "Přihlášení se nepodařilo ověřit. Přihlaste se znovu."
+          }
+        },
+        "bootstrap": {
+          "error": {
+            "authentication_required": "Platnost přihlášení vypršela. Přihlaste se znovu.",
+            "grant_not_converged": "Připojení k serveru se stále připravuje. Zkuste to za chvíli.",
+            "invalid_argument": "K serveru se nepodařilo připojit. Zkuste to později.",
+            "invalid_http_response": "K serveru se nepodařilo připojit. Zkuste to později.",
+            "malformed_success": "K serveru se nepodařilo připojit. Zkuste to později.",
+            "method_not_allowed": "Tato verze se nemůže připojit k serveru. Aktualizujte aplikaci.",
+            "missing_access_token": "Platnost přihlášení vypršela. Přihlaste se znovu.",
+            "rate_limited": "Příliš mnoho pokusů o připojení. Zkuste to za chvíli.",
+            "rollout_disabled": "K serveru se teď nelze připojit. Aplikace to bude dál zkoušet automaticky.",
+            "unavailable": "K serveru se nepodařilo připojit. Zkuste to později.",
+            "unexpected_contract": "Tato verze se nemůže připojit k serveru. Aktualizujte aplikaci."
+          }
+        },
+        "chat": {
+          "error": {
+            "authentication_expired": "Platnost přihlášení vypršela. Přihlaste se znovu.",
+            "invalid_message": "Zkontrolujte zprávu a odešlete ji znovu.",
+            "permission_denied": "Nemáte oprávnění posílat zprávy do této skupiny.",
+            "rate_limited": "Posíláte zprávy příliš rychle.",
+            "state_conflict": "Zprávu se nepodařilo odeslat. Zkuste to za chvíli."
+          }
+        },
+        "configuration": {
+          "error": {
+            "invalid_plist": "Nastavení připojení aplikace se nepodařilo načíst. Nainstalujte aplikaci znovu.",
+            "missing_plist": "Nastavení připojení aplikace chybí. Nainstalujte aplikaci znovu.",
+            "sdk_app_unavailable": "Připojení aplikace se nepodařilo spustit. Otevřete aplikaci znovu.",
+            "sdk_options_unavailable": "Připojení aplikace se nepodařilo připravit. Otevřete aplikaci znovu.",
+            "unexpected_app": "Nastavení připojení aplikace není správné. Nainstalujte aplikaci znovu.",
+            "unexpected_bundle": "Nastavení připojení aplikace není správné. Nainstalujte aplikaci znovu.",
+            "unexpected_database": "Nastavení připojení aplikace není správné. Nainstalujte aplikaci znovu.",
+            "unexpected_project": "Nastavení připojení aplikace není správné. Nainstalujte aplikaci znovu."
+          }
+        },
+        "production": {
+          "error": {
+            "app_version_unavailable": "Verzi aplikace se nepodařilo ověřit, takže připojení k serveru nelze zahájit. Otevřete aplikaci znovu.",
+            "duplicate_wire_code": "Připojení k serveru blokuje problém s daty aplikace. Nainstalujte aplikaci znovu."
+          }
+        },
+        "transport": {
+          "error": {
+            "access_grant_closed": "Přístup ke skupině se stále ověřuje. Zkuste to za chvíli.",
+            "listener_failed": "Připojení pro zprávy bylo ukončeno. Pokračujte opětovným připojením.",
+            "live_listener_unavailable": "Připojení pro zprávy se nepodařilo připravit. Za chvíli se připojte znovu.",
+            "reconciliation_failed": "Nejnovější stav skupiny se nepodařilo ověřit. Zkuste to za chvíli.",
+            "room_not_authorized": "Přístup k této skupině se nepodařilo ověřit. Pokračujte opětovným připojením.",
+            "shut_down": "Připojení k serveru bylo ukončeno. Pokračujte opětovným připojením."
+          }
+        }
+      },
+      "group": {
+        "create": {
+          "in_progress": "Vytváření…",
+          "keychain_warning": "Skupina byla vytvořena, ale kód pozvánky se nepodařilo uložit do Klíčenky. Zobrazený kód si uložte na bezpečné místo.",
+          "realtime_grant_pending": "Skupina byla vytvořena, ale připojení k serveru se nepodařilo dokončit. Za chvíli stav zkontrolujte. (%@)"
+        },
+        "delete": {
+          "success": "Skupina „%@“ byla odstraněna."
+        },
+        "join": {
+          "in_progress": "Připojování…",
+          "keychain_warning": "Připojili jste se ke skupině, ale kód pozvánky se nepodařilo uložit do Klíčenky. Přijatý kód si uložte na bezpečné místo.",
+          "realtime_grant_pending": "Připojili jste se ke skupině, ale připojení k serveru se nepodařilo dokončit. Za chvíli stav zkontrolujte. (%@)"
+        },
+        "leave": {
+          "confirmation": {
+            "last_member": "Protože jste poslední člen, skupina a všechny zprávy budou trvale odstraněny a nebude možné je obnovit.",
+            "member": "Ke skupině ani jejím stávajícím zprávám už nebudete mít přístup.",
+            "owner_transfer": "Vlastnictví přejde na člena, který se připojil jako první, a ke skupině ani jejím stávajícím zprávám už nebudete mít přístup."
+          },
+          "success": "Opustili jste skupinu „%@“."
+        },
+        "name": {
+          "unknown": "Skupina"
+        },
+        "remove_member": {
+          "success": "Člen %@ byl odebrán ze skupiny."
+        },
+        "rename": {
+          "success": "Skupina byla přejmenována."
+        },
+        "switch": {
+          "failed": "Skupinu se nepodařilo přepnout. Zkuste to znovu. (%@)"
+        }
+      },
+      "groups": {
+        "active": "Aktivní",
+        "create": {
+          "invite_code": {
+            "description": "Ke skupině se mohou připojit jen přátelé, kteří dostanou tento kód.",
+            "title": "Nový kód pozvánky"
+          },
+          "name": {
+            "description": "Zadejte název o 1–20 znacích a vytvořte skupinu."
+          },
+          "subtitle": "Vytvořte skupinu a sdílejte její kód pozvánky s přáteli."
+        },
+        "current": {
+          "empty": {
+            "description": "Vytvořte novou skupinu nebo zadejte kód pozvánky od přítele.",
+            "title": "Zatím žádné skupiny"
+          },
+          "subtitle": {
+            "one": "Spravujte skupiny, které sdílíte s přáteli. Každá skupina může mít až %lld člena.",
+            "other": "Spravujte skupiny, které sdílíte s přáteli. Každá skupina může mít až %lld členů."
+          },
+          "title": "Vaše skupiny"
+        },
+        "delete": {
+          "confirmation_title": "Odstranit skupinu „%@“?",
+          "message": "Skupina a všechny její zprávy budou trvale odstraněny a nebude možné je obnovit."
+        },
+        "invite_code": {
+          "copy": {
+            "action": "Kopírovat kód pozvánky",
+            "complete": "Zkopírováno",
+            "help": "Zkopírovat kód pozvánky uložený v Klíčence tohoto zařízení."
+          },
+          "rotate": {
+            "$value": "Nahradit kód pozvánky",
+            "help": "Zrušit kód, který mohl být vyzrazen, a vydat nový 128bitový kód."
+          }
+        },
+        "join": {
+          "invite_code": {
+            "description": "Zadejte kód pozvánky a ověřte, zda se můžete připojit a zda je ve skupině místo.",
+            "placeholder": "Kód pozvánky",
+            "title": "Kód pozvánky"
+          },
+          "subtitle": "Připojte se ke skupině pomocí kódu pozvánky od přítele."
+        },
+        "leave": {
+          "action": "Opustit skupinu",
+          "confirmation_title": "Opustit skupinu „%@“?",
+          "message": {
+            "last_owner": "Protože jste poslední člen, skupina a všechny zprávy budou trvale odstraněny a nebude možné je obnovit.",
+            "member": "Ke skupině ani jejím stávajícím zprávám už nebudete mít přístup.",
+            "owner_transfer": "Vlastnictví přejde na zbývajícího člena, který se připojil jako první, a ke skupině ani jejím stávajícím zprávám už nebudete mít přístup."
+          }
+        },
+        "management": {
+          "navigation_label": "Skupiny"
+        },
+        "member": {
+          "owner": "Vlastník",
+          "remove": {
+            "confirmation_title": "Odebrat %@?",
+            "message": "Tento člen už nebude mít přístup ke skupině ani jejím stávajícím zprávám.",
+            "title": "Odebrat člena"
+          }
+        },
+        "members": {
+          "empty": "Žádní členové k zobrazení."
+        },
+        "operation": {
+          "creating": "Vytváření…",
+          "joining": "Připojování…",
+          "select": "Přepnout na skupinu",
+          "switching": "Přepínání skupiny…"
+        },
+        "room": {
+          "summary": {
+            "invite_ready": {
+              "one": "%1$lld/%2$lld člen · Kód pozvánky %3$@",
+              "other": "%1$lld/%2$lld členů · Kód pozvánky %3$@"
+            },
+            "invite_rotation_required": {
+              "one": "%1$lld/%2$lld člen · Kód pozvánky je potřeba nahradit",
+              "other": "%1$lld/%2$lld členů · Kód pozvánky je potřeba nahradit"
+            }
+          }
+        }
+      },
+      "history": {
+        "close": {
+          "accessibility": "Zavřít nedávné zprávy"
+        },
+        "empty": {
+          "description": "Tady se zobrazí nedávné zprávy z této skupiny.",
+          "title": "Zatím žádné zprávy"
+        },
+        "error": {
+          "load_failed": "Nedávné zprávy se nepodařilo načíst"
+        },
+        "older": {
+          "exhausted": {
+            "one": "Viděli jste všechny zprávy za poslední %lld den.",
+            "other": "Viděli jste všechny zprávy za posledních %lld dnů."
+          }
+        },
+        "retention_notice": {
+          "one": "Zprávy se automaticky odstraní po %lld dni.",
+          "other": "Zprávy se automaticky odstraní po %lld dnech."
+        },
+        "title": "Nedávné zprávy",
+        "window": {
+          "title": "%@ · Nedávné zprávy"
+        }
+      },
+      "invite": {
+        "error": {
+          "backend_unavailable": "Kód pozvánky teď nelze ověřit. Zkuste to za chvíli.",
+          "clipboard_failed": "Kód pozvánky se nepodařilo zkopírovat. Zkuste to znovu.",
+          "not_stored_on_device": "Kód pozvánky není na tomto zařízení uložený. Vytvořte nový nebo o něj požádejte vlastníka.",
+          "read_failed": "Kód pozvánky se nepodařilo načíst. Zkuste to znovu. (%@)",
+          "revoked": "Předchozí kód pozvánky pro tuto skupinu byl zrušen. Vlastník skupiny musí vydat nový."
+        },
+        "rotate": {
+          "keychain_warning": "Byl vydán nový kód, ale nepodařilo se ho uložit do Klíčenky. Zobrazený kód si uložte na bezpečné místo.",
+          "success": "Byl vydán nový kód pozvánky."
+        }
+      },
+      "keychain": {
+        "error": {
+          "status": "Chyba Klíčenky %lld"
+        },
+        "operation_reason": "Bezpečný přístup k přihlašovacím údajům a kódům pozvánek do skupin.",
+        "transition": {
+          "message": "Aplikace používá Klíčenku macOS k bezpečnému ukládání a načítání přihlašovacích údajů a kódů pozvánek do skupin.",
+          "migration_explanation": "Při prvním načtení údajů uložených starší verzí může macOS požádat o přihlašovací heslo k Macu. Pokud nechcete být dotazováni znovu, vyberte v následujícím dialogu macOS možnost „Vždy povolit“. Pokud vyberete „Povolit“, může se dialog podle uložených údajů zobrazit ještě několikrát nebo při příštím otevření aplikace.",
+          "privacy_explanation": "Aplikace zadané heslo nevidí ani neukládá.",
+          "quit": "Ukončit SIDEY"
+        }
+      },
+      "landing": {
+        "accessibility": {
+          "ready": "Úvodní obrazovka SIDEY",
+          "restoring": "SIDEY obnovuje předchozí přihlášení"
+        },
+        "status": {
+          "ready": "Začněte kliknutím.",
+          "restoring": "Obnovování předchozího přihlášení…"
+        },
+        "tagline": "Vaši přátelé dorazili na okraj obrazovky."
+      },
+      "launch_at_login": {
+        "update_failed": "Nastavení „Otevřít při přihlášení“ se nepodařilo změnit. Zkuste to znovu. (%@)"
+      },
+      "message": {
+        "composer": {
+          "placeholder": "Napište zprávu"
+        },
+        "delivery": {
+          "failed": "Odeslání se nezdařilo",
+          "pending": "Odesílání"
+        },
+        "error": {
+          "realtime_disconnected": "Připojení k serveru bylo ukončeno. Před odesláním zprávy se znovu připojte.",
+          "wait_for_group_switch": "Před odesláním počkejte na dokončení přepnutí skupiny."
+        },
+        "retention_sync_failed": "Nastavení uchovávání zpráv se nepodařilo použít. Zkuste to znovu. (%@)",
+        "send": {
+          "failed": "Zprávu se nepodařilo odeslat. Zkuste to znovu. (%@)"
+        }
+      },
+      "mutation": {
+        "post_commit_sync_failed": "Změna byla uložena, ale obrazovku se nepodařilo aktualizovat. Za chvíli ji zkontrolujte. (%@)",
+        "realtime_recovering": "Změny byly uloženy. Opětovné připojování k serveru…"
+      },
+      "onboarding": {
+        "group": {
+          "invite_code": {
+            "placeholder": "Kód pozvánky od přítele"
+          },
+          "member_limit": {
+            "one": "Skupina může mít až %lld člena.",
+            "other": "Skupina může mít až %lld členů."
+          },
+          "path": {
+            "accessibility": "Zvolte, jak chcete začít"
+          }
+        },
+        "profile": {
+          "description": "Toto můžete kdykoli změnit v Nastavení.",
+          "nickname": {
+            "placeholder": "Přezdívka, 2–8 znaků"
+          },
+          "title": "Zvolte si jméno"
+        }
+      },
+      "overlay": {
+        "span": {
+          "full": "Celý"
+        }
+      },
+      "pixel_world": {
+        "doze_label": "Zzz",
+        "interaction": {
+          "throw": "Kliknutím na přítele hodíte výchozí měkký míček.",
+          "tree": "Kliknutím pravým tlačítkem strom zastavíte nebo znovu rozpohybujete."
+        },
+        "nickname": {
+          "current_user": "%@ · Vy"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Vyberte pixelovou postavičku, která vás bude představovat na obrazovkách přátel.",
+          "selection": {
+            "accessibility": "Výběr postavičky"
+          },
+          "state": {
+            "equipping": "Nastavování"
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "description": "Vyberte bublinu zprávy, kterou máte. Okamžitě se použije ve všech vašich skupinách.",
+            "selection": {
+              "accessibility": "Výběr bubliny zprávy"
+            }
+          },
+          "character": {
+            "description": "Vyberte postavičku, kterou máte. Okamžitě se použije ve všech vašich skupinách.",
+            "selection": {
+              "accessibility": "Výběr postavičky"
+            }
+          },
+          "default_bubble": "Výchozí bublina",
+          "default_throwable": "Výchozí měkký míček",
+          "hint": {
+            "current": "Právě se používá",
+            "select": "Okamžitě se použije ve všech vašich skupinách"
+          },
+          "throwable": {
+            "description": "Vyberte házecí hračku, kterou máte. Okamžitě se použije ve všech vašich skupinách.",
+            "selection": {
+              "accessibility": "Výběr házecí hračky"
+            }
+          }
+        },
+        "current_user": {
+          "badge": "Vy"
+        },
+        "duplicates_allowed": "Můžete používat stejnou postavičku nebo přezdívku jako jiný člen skupiny.",
+        "error": {
+          "character_not_owned": "Vyberte do profilu postavičku, kterou máte."
+        },
+        "nickname": {
+          "description": "Jméno, které přátelé uvidí v pixelových světech a zprávách · 2–8 znaků",
+          "save": "Změnit přezdívku",
+          "unknown": "Přítel",
+          "unknown_friend": "Neznámý přítel",
+          "unknown_member": "Člen"
+        },
+        "onboarding": {
+          "next_hint": "Po uložení profilu vytvořte skupinu nebo se k některé připojte pomocí kódu pozvánky."
+        },
+        "selection": {
+          "state": {
+            "not_selected": "Nevybráno",
+            "selected": "Vybráno"
+          }
+        },
+        "subtitle": "Nastavte jméno a postavičku, které uvidí vaši přátelé.",
+        "success": {
+          "nickname_updated": "Přezdívka byla změněna.",
+          "saved": "Profil byl uložen."
+        }
+      },
+      "realtime": {
+        "kill_switch": {
+          "error": {
+            "legacy_connection_creation_failed": "Teď se nejde připojit. Zkuste to za chvíli znovu.",
+            "legacy_connection_recovery_failed": "K serveru se nepodařilo znovu připojit. Zkuste to za chvíli."
+          },
+          "transition_failed": "K serveru se nepodařilo připojit. Za chvíli se připojte znovu. (%@)"
+        },
+        "rollout": {
+          "error": {
+            "cache_unavailable": "Stav připojení k serveru se nepodařilo uložit. Otevřete aplikaci znovu.",
+            "contract_mismatch": "Tato verze se nemůže připojit k serveru. Aktualizujte aplikaci.",
+            "enabled_policy_unavailable": "K serveru se nepodařilo připojit. Zkuste to později.",
+            "malformed_response": "K serveru se nepodařilo připojit. Zkuste to později."
+          }
+        }
+      },
+      "settings": {
+        "account": {
+          "delete": {
+            "authentication_notice": "Zadejte „DELETE“ a potom se znovu přihlaste přes Apple. Účet se ihned odstraní.",
+            "confirmation_phrase": "DELETE",
+            "description": "Tím se odstraní váš profil, zprávy a údaje o skupinách, ke kterým jste se připojili. Záznamy o nákupech mohou být kvůli účetnictví a prevenci podvodů uchovávány odděleně od účtu.",
+            "placeholder": "Potvrďte zadáním „DELETE“",
+            "reveal": "Odstranit účet…",
+            "title": "Odstranit účet"
+          },
+          "privacy_policy": "Zásady ochrany soukromí",
+          "restore_purchases": "Obnovit nákupy",
+          "subtitle": "Spravujte údaje účtu a nákupy v aplikaci.",
+          "terms": "Podmínky použití",
+          "title": "Účet a soukromí"
+        },
+        "display": {
+          "offline_members": {
+            "description": "Zobrazit offline přátele jako spící postavičky s červeným stavovým bodem.",
+            "title": "Zobrazovat offline členy"
+          },
+          "quiet_mode": {
+            "description": "Skrýt bubliny zpráv a indikátory psaní, ale zachovat stav připojení a počet nepřečtených zpráv."
+          },
+          "subtitle": "Nastavte, jak se na obrazovce zobrazují stav přátel a zprávy.",
+          "throw_guard": {
+            "description": "Když je tato možnost vypnutá, kliknutím na postavičku přítele hned hodíte hračku. Když je zapnutá, dvakrát klikněte pravým tlačítkem na svou postavičku a potom do 10 sekund na postavičku přítele.",
+            "title": "Před hodem dvakrát kliknout pravým tlačítkem"
+          }
+        },
+        "general": {
+          "overlay_visible": {
+            "description": "Zobrazit pixelový svět přátel podél vybraného okraje obrazovky."
+          },
+          "subtitle": "Nastavte základní vzhled a spouštění aplikace."
+        },
+        "placement": {
+          "edge": {
+            "description": "Zvolte okraj obrazovky, podél kterého budou postavičky chodit.",
+            "picker": "Okraj",
+            "title": "Okraj"
+          },
+          "monitor": {
+            "description": "Zvolte monitor pro pixelový svět. Pole zprávy můžete přesunout samostatně pomocí úchytu vlevo.",
+            "picker": "Zobrazení",
+            "title": "Zobrazení"
+          },
+          "span": {
+            "description": "Zvolte, jak velkou část vybraného okraje svět zabírá.",
+            "full": "Celý",
+            "half": "1/2",
+            "picker": "Délka",
+            "third": "1/3",
+            "title": "Délka světa"
+          },
+          "subtitle": "Zvolte monitor a umístění pixelových postaviček.",
+          "title": "Umístění světa"
+        },
+        "shortcuts": {
+          "key": {
+            "picker": "Klávesa"
+          },
+          "restore_default": {
+            "accessibility": "Obnovit výchozí zkratku",
+            "help": "Obnovit výchozí zkratku"
+          },
+          "subtitle": "Zvolte alespoň jednu modifikační klávesu a klávesu s písmenem nebo číslem. Změny se projeví okamžitě.",
+          "title": "Globální klávesové zkratky"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Přehrát zvuk, když házecí hračka zasáhne postavičku v aktuální skupině.",
+            "title": "Zvukové efekty postaviček"
+          },
+          "subtitle": "Nastavte zvukové efekty postaviček."
+        }
+      },
+      "shortcut": {
+        "action": {
+          "composer": "Otevřít nebo zavřít pole zprávy",
+          "history": "Otevřít nedávné zprávy",
+          "overlay": "Zobrazit nebo skrýt pixelový svět",
+          "quiet_mode": "Tichý režim"
+        },
+        "error": {
+          "duplicate": "Už ji používá „%@“. Stávající zkratka zůstane zachována.",
+          "modifier_required": "Vyberte alespoň jednu modifikační klávesu. Stávající zkratka zůstane zachována.",
+          "new_binding_registration_failed": "Novou zkratku se nepodařilo zaregistrovat, proto zůstane zachována stávající.",
+          "new_binding_used_by_other_app": "Tuto kombinaci používá jiná aplikace. Stávající zkratka zůstane zachována.",
+          "registration_failed": "Zkratku se nepodařilo zaregistrovat. Vyberte jinou.",
+          "used_by_other_app": "Tuto zkratku používá jiná aplikace. Vyberte jinou nebo zkontrolujte nastavení dané aplikace."
+        },
+        "modifier": {
+          "command": "Command",
+          "control": "Control",
+          "option": "Option",
+          "shift": "Shift"
+        },
+        "status": {
+          "change_failed": "Změna se nezdařila",
+          "unavailable": "Zkratka není dostupná"
+        }
+      },
+      "status": {
+        "icon": {
+          "unread": {
+            "accessibility": "%@, nepřečtené zprávy"
+          }
+        },
+        "menu": {
+          "active_group": "Aktivní skupina",
+          "compose": "Nová zpráva…",
+          "group_settings": "Nastavení skupin…",
+          "history": "Nedávné zprávy…",
+          "no_connected_groups": "Nejste v žádné skupině",
+          "overlay": {
+            "hide": "Skrýt překryvnou vrstvu",
+            "show": "Zobrazit pixelový svět"
+          },
+          "quiet_mode": "Tichý režim",
+          "quit": "Ukončit %@",
+          "settings": "Nastavení…",
+          "store": "Obchod…"
+        },
+        "room": {
+          "unread_count": " (%@)"
+        },
+        "tooltip": {
+          "unread": "%@ · Nepřečtené zprávy"
+        }
+      },
+      "store": {
+        "coming_soon": {
+          "badge": "Již brzy",
+          "detail": "Obchod se připravuje. Brzy bude dostupný.",
+          "product": {
+            "accessibility": "%@, již brzy"
+          }
+        },
+        "empty": {
+          "description": "Zkuste změnit typ produktu nebo filtr položek, které máte.",
+          "title": "Žádné odpovídající produkty"
+        },
+        "error": {
+          "auto_equip_failed": "Nákup byl dokončen, ale položku se nepodařilo automaticky nastavit. Nastavte ji ručně v Profilu.",
+          "auto_equip_realtime_grant_pending": "Položka se používá. Pokud se hned nezobrazí, za chvíli to zkontrolujte. (%@)",
+          "entitlements_reconcile_failed": "Nákupy v aplikaci se nepodařilo ověřit. Znovu použijte možnost Obnovit nákupy.",
+          "equipment_realtime_grant_pending": "Položka se používá. Pokud se hned nezobrazí, za chvíli to zkontrolujte. (%@)",
+          "equipment_update_failed": "Používanou položku se nepodařilo aktualizovat.",
+          "product_unavailable": "Tento produkt není v App Storu dostupný.",
+          "products_load_failed": "Produkty z App Storu se nepodařilo načíst. Zkuste to později.",
+          "purchase_failed": "Nákup položky %@ se nepodařilo dokončit. Zkuste to později.",
+          "purchase_pending": "Nákup čeká na schválení. Po schválení se položka zobrazí automaticky.",
+          "purchase_status_failed": "Nákup se nepodařilo potvrdit. Za chvíli to zkontrolujte.",
+          "server_rejected": "Nákupy v aplikaci se nepodařilo ověřit. Znovu použijte možnost Obnovit nákupy.",
+          "transaction_update_failed": "Nákup se nepodařilo použít. Znovu použijte možnost Obnovit nákupy.",
+          "unknown_result": "Výsledek nákupu se nepodařilo potvrdit. Za chvíli to zkontrolujte.",
+          "unverified_transaction": "Nákup se nepodařilo ověřit, proto nebyl použit. Znovu použijte možnost Obnovit nákupy.",
+          "verifier_not_configured": "Nákupy teď nelze ověřit. Zkuste to později."
+        },
+        "filter": {
+          "hide_owned": "Skrýt položky, které máte",
+          "kind": {
+            "$value": "Typ produktu",
+            "accessibility": "Typ produktu v obchodě"
+          },
+          "menu": "Řazení a filtry"
+        },
+        "footer": {
+          "app_store": {
+            "entitlement": "Nákupy v aplikaci zpracovává App Store. Položku můžete použít hned po potvrzení nákupu.",
+            "headline": "Ceny zobrazuje a nákupy zpracovává App Store.",
+            "refund": "Vrácení peněz a dotazy k platbám se řídí zásadami a postupy společnosti Apple pro App Store."
+          },
+          "coming_soon": "Obchod bude dostupný brzy. Položky, které už máte, můžete dál používat.",
+          "direct": {
+            "entitlement": "Zobrazené ceny zahrnují daň. Položky vzhledu můžete použít hned po potvrzení platby.",
+            "refund": "Po zpřístupnění položky nelze vrátit peníze jen kvůli změně rozhodnutí. Plná částka se vrací v zákonem stanovených případech, například při nedodání, nesouladu, duplicitní nebo neoprávněné platbě."
+          }
+        },
+        "kind": {
+          "bubble": "Bublina zprávy",
+          "character": "Postavička",
+          "keepsake": "Oblíbený předmět",
+          "throwable": "Házecí hračka"
+        },
+        "navigation_label": "Vzhled a obchod",
+        "preview": {
+          "accessibility": "Náhled položky %@",
+          "character_interaction_hint": "Kliknutím na druhou postavičku zkuste hodit %@. Dvojitým kliknutím na postavičku zobrazíte její reakci v bublině.",
+          "default_throwable": "Výchozí měkký míček",
+          "double_click_hint": "Dvojitým kliknutím na postavičku zobrazíte její reakci v bublině.",
+          "member": {
+            "dubu": "Dubu",
+            "moka": "Moka"
+          },
+          "message": {
+            "left": "Co bude k večeři?",
+            "right": "Co třeba pikantní kuřecí guláš?"
+          },
+          "reduce_motion_hint": "Je zapnuté omezení pohybu, proto se zobrazuje statická scéna.",
+          "sound": {
+            "off": "Vypnout zvuk náhledu",
+            "on": "Zapnout zvuk náhledu"
+          },
+          "tree_toggle_hint": "Kliknutím pravým tlačítkem strom zastavíte. Dalším kliknutím ho znovu rozpohybujete."
+        },
+        "price": {
+          "loading": {
+            "$value": "Načítání ceny…",
+            "short": "Ověřování ceny"
+          },
+          "required": "Je nutné ověřit cenu",
+          "retry": "Znovu ověřit cenu",
+          "unavailable": {
+            "$value": "Cena v App Storu není dostupná.",
+            "short": "Cena není dostupná"
+          }
+        },
+        "processing": "Zpracovávání",
+        "product": {
+          "detail": {
+            "close": "Zavřít podrobnosti produktu",
+            "hint": "Zobrazit podrobnosti"
+          },
+          "equipped": "Používá se",
+          "preview": {
+            "hint": "Zobrazit náhled"
+          },
+          "processing": {
+            "accessibility": "Zpracovává se %@"
+          },
+          "sold_separately": "Prodává se samostatně",
+          "status": {
+            "accessibility": "%@, %@"
+          },
+          "unavailable": {
+            "detail": "Tento produkt zatím nelze koupit."
+          }
+        },
+        "purchase": {
+          "accessibility": "Koupit %@ za %@",
+          "action": "Koupit %@ · %@",
+          "available": "Dostupné",
+          "confirming": "Potvrzování",
+          "error": "Chyba",
+          "opening_checkout": "Otevírání nákupu…",
+          "owned": "Už máte",
+          "refunded": "Peníze byly vráceny",
+          "success": "Položka %@ byla zakoupena.",
+          "unavailable": "Momentálně nedostupné"
+        },
+        "purchase_and_equip": {
+          "success": "Položka %@ byla zakoupena a nastavena."
+        },
+        "restore": {
+          "action": "Obnovit nákupy",
+          "failed": "Nákupy se nepodařilo obnovit. Zkuste to znovu.",
+          "success": "Nákupy byly obnoveny."
+        },
+        "sort": {
+          "price_ascending": "Cena: od nejnižší po nejvyšší",
+          "price_descending": "Cena: od nejvyšší po nejnižší"
+        },
+        "status": {
+          "retry": "Znovu zkontrolovat stav"
+        },
+        "subtitle": "Vyberte si postavičky, bubliny zpráv a házecí hračky.",
+        "title": "Vzhled a obchod"
+      },
+      "tree_movement": {
+        "error": {
+          "save_failed": "Nastavení pohybu stromu se nepodařilo uložit. Zkuste to znovu."
+        }
+      }
+    },
+    "windows": {
+      "accessibility": {
+        "motion": {
+          "disabled": "Animační efekty jsou ve Windows vypnuté."
+        }
+      },
+      "account": {
+        "delete": {
+          "confirmation": {
+            "action": "Odstranit účet",
+            "message": "Váš profil a údaje o členství ve skupinách budou trvale odstraněny a historie nákupů se od účtu odpojí.",
+            "title": "Odstranit účet?"
+          },
+          "description": "Trvale odstranit účet a související osobní údaje.",
+          "final_confirmation": {
+            "message": "Odstraněný účet ani jeho data nelze obnovit.",
+            "title": "Trvale odstranit účet?"
+          },
+          "title": "Odstranit účet"
+        },
+        "description": "Odhlaste se nebo spravujte svůj účet.",
+        "sign_out": {
+          "confirmation": {
+            "action": "Odhlásit se",
+            "message": "Odhlásíte se jen na tomto počítači. Pokud budete chtít pokračovat, budete se muset znovu přihlásit přes Google.",
+            "title": "Odhlásit se?"
+          },
+          "description": "Odhlásit se na tomto počítači.",
+          "title": "Odhlásit se"
+        },
+        "title": "Účet"
+      },
+      "app": {
+        "info": {
+          "description": "Zobrazte verzi aplikace a informace o podpoře.",
+          "navigation_label": "O aplikaci",
+          "title": "O aplikaci"
+        },
+        "launch": {
+          "failed": "Při spouštění došlo k chybě. Zavřete aplikaci a zkuste to znovu."
+        },
+        "startup": {
+          "error": {
+            "title": "Chyba při spuštění"
+          },
+          "failed": "Aplikaci se nepodařilo spustit.",
+          "failed_with_log": "Aplikaci se nepodařilo spustit.\n\nDiagnostický protokol: {0}",
+          "runtime_missing": "Některé soubory aplikace chybí. Nainstalujte aplikaci znovu."
+        }
+      },
+      "auth": {
+        "google": {
+          "already_linked": "Tento účet Google je už propojený s jiným profilem. Aktuální profil ani data se nezměnily.",
+          "cancelled": "Přihlášení přes Google bylo zrušeno nebo se ho nepodařilo dokončit. Zkuste to znovu.",
+          "identity_changed": "Tento účet Google neodpovídá aktuálnímu účtu. Vaše stávající data se nezměnila.",
+          "link_expired": "Platnost žádosti o přihlášení přes Google vypršela. Zrušte přihlašování a zkuste to znovu.",
+          "required": "Pokud chcete pokračovat, propojte účet Google.",
+          "sign_in_complete": "Přihlášení přes Google je hotové. Kartu přihlášení v prohlížeči můžete zavřít."
+        },
+        "request": {
+          "failed": "Nepodařilo se přihlásit. Zkuste to později. (Kód chyby: {0})"
+        },
+        "response": {
+          "empty": "Přihlášení se nepodařilo dokončit. Zkuste to znovu."
+        },
+        "session": {
+          "expired": "Platnost přihlášení vypršela. Přihlaste se znovu.",
+          "replace_blocked": "Na tomto počítači už jsou uložené přihlašovací údaje. Restartujte aplikaci a přihlaste se znovu.",
+          "restore_failed": "Přihlášení se nepodařilo obnovit. Nebyl vytvořen žádný nový účet. Přihlaste se znovu.",
+          "stored_invalid": "Uložené přihlašovací údaje se nepodařilo přečíst. Přihlaste se znovu.",
+          "values_missing": "Přihlášení se nepodařilo dokončit. Zkuste to znovu."
+        }
+      },
+      "common": {
+        "back": "Zpět",
+        "delete": "Odstranit",
+        "friend": "Přítel",
+        "skip": "Přeskočit"
+      },
+      "composer": {
+        "drag": {
+          "tooltip": "Přetažením přesuňte vstupní okno"
+        },
+        "group": {
+          "required": "Nejdřív nastavte profil a vyberte skupinu. Potom můžete poslat zprávu."
+        },
+        "message": {
+          "placeholder": "Napište zprávu…"
+        },
+        "window": {
+          "title": "Zpráva"
+        }
+      },
+      "connection": {
+        "configuration": {
+          "not_configured": "Chybí požadované nastavení připojení. Nainstalujte aplikaci znovu."
+        },
+        "error": {
+          "access_required": "Je potřeba znovu ověřit přístup k vašemu účtu nebo skupině. V části Připojení vyberte Znovu připojit. Pokud se zpráva zobrazuje opakovaně, pošlete nám diagnostický protokol.",
+          "busy": "Právě se připojuje hodně lidí, takže to trvá déle než obvykle. Aplikace to bude automaticky zkoušet dál. Pokud se ani za několik minut nepřipojí, pošlete nám diagnostický protokol.",
+          "configuration_unavailable": "Připojení teď nejde zahájit. Chvíli počkejte a v části Připojení vyberte Znovu připojit. Pokud problém přetrvává, pošlete nám diagnostický protokol.",
+          "network_unavailable": "K serveru se nepodařilo připojit. Zkontrolujte připojení k internetu a v části Připojení vyberte Znovu připojit. Pokud jiné weby fungují, ale problém přetrvává, pošlete nám diagnostický protokol.",
+          "secure_connection_failed": "Nepodařilo se navázat zabezpečené připojení. Zkontrolujte datum a čas ve Windows a připojte se znovu. Pokud problém přetrvává, pošlete nám diagnostický protokol.",
+          "service_unavailable": "Server neodpověděl očekávaným způsobem. Aplikace to bude automaticky zkoušet dál. Pokud se ani za několik minut nepřipojí, v části Připojení vyberte Znovu připojit. Pokud to nepomůže, pošlete nám diagnostický protokol."
+        },
+        "group_resync_failed": "Nejnovější stav skupiny se nepodařilo načíst. Připojte se znovu. ({0})",
+        "group_revision_missing": "Přístup k této skupině se změnil. Připojte se znovu.",
+        "notice": {
+          "connected": "Připojeno k serveru.",
+          "reconnecting": "Probíhá opětovné připojení k serveru."
+        },
+        "retry": {
+          "action": "Znovu připojit"
+        },
+        "server": {
+          "not_configured": "Server je dočasně nedostupný. Zkuste to později."
+        },
+        "state": {
+          "connected": "Připojeno",
+          "disconnected": "Nepřipojeno",
+          "reconnecting": "Připojování"
+        },
+        "unavailable": "Teď se nejde připojit. Zkuste to za chvíli znovu."
+      },
+      "external_link": {
+        "open": {
+          "failed": "Stránku se nepodařilo otevřít ve výchozím prohlížeči."
+        }
+      },
+      "groups": {
+        "create": {
+          "description": "Vytvořte skupinu a sdílejte kód pozvánky s přáteli.",
+          "in_progress": "Vytváření…",
+          "result_missing": "Vytvoření skupiny se nepodařilo dokončit. Zkuste to znovu.",
+          "success": {
+            "default": "Skupina byla vytvořena."
+          },
+          "tooltip": "Vytvořit skupinu s tímto názvem."
+        },
+        "delete": {
+          "confirmation": {
+            "message": "Tímto odeberete všechny členy a odstraníte zprávy skupiny. Tuto akci nejde vrátit zpět.",
+            "title": "Odstranit skupinu „{0}“?"
+          },
+          "final_confirmation": {
+            "message": "Skupina „{0}“ a všechny její zprávy se trvale odstraní.",
+            "title": "Trvale odstranit tuto skupinu?"
+          },
+          "success": "Skupina byla odstraněna.",
+          "tooltip": "Trvale odstranit tuto skupinu."
+        },
+        "description": "Vyberte skupinu, která se zobrazí na obrazovce, a spravujte její členy. Každá skupina může mít až 12 členů.",
+        "empty": {
+          "description": "Vytvořte skupinu nebo zadejte kód pozvánky od přítele.",
+          "title": "Zatím žádné skupiny"
+        },
+        "error": {
+          "not_found": "Skupina nebyla nalezena."
+        },
+        "invite": {
+          "code": {
+            "label": "Kód pozvánky",
+            "missing": "Na tomto zařízení není uložený žádný kód pozvánky.",
+            "replaced": "Kód pozvánky uložený na tomto zařízení byl nahrazen. Požádejte vlastníka o nový kód.",
+            "revoked": "Platnost předchozího kódu pozvánky byla zrušena. Vlastník musí vytvořit nový kód."
+          },
+          "copy": {
+            "action": "Kopírovat kód pozvánky",
+            "complete": "Zkopírováno"
+          },
+          "rotate": {
+            "action": "Vytvořit nový kód pozvánky",
+            "code_missing": "Nový kód pozvánky je prázdný.",
+            "confirmation": {
+              "action": "Vytvořit nový kód",
+              "message": "Platnost stávajícího kódu bude okamžitě zrušena. Tuto akci nejde vrátit zpět.",
+              "title": "Vytvořit nový kód pozvánky?"
+            },
+            "success": "Nový kód pozvánky byl vytvořen a bezpečně uložen na tomto zařízení."
+          }
+        },
+        "join": {
+          "description": "Zadejte kód od přítele a připojte se k jeho skupině.",
+          "failed": "Ke skupině se nepodařilo připojit. Zkontrolujte kód pozvánky a zkuste to znovu. ({0})",
+          "in_progress": "Připojování…",
+          "result_missing": "Skupinu, ke které jste se připojili, se nepodařilo načíst. Zkuste to znovu.",
+          "room_id_missing": "Připojení ke skupině se nepodařilo dokončit. Zkuste to znovu.",
+          "success": {
+            "default": "Připojili jste se ke skupině."
+          },
+          "tooltip": "Připojit se ke skupině pomocí tohoto kódu pozvánky."
+        },
+        "leave": {
+          "action": "Opustit skupinu",
+          "confirmation": {
+            "action": "Opustit",
+            "member_message": "K této skupině ani jejím nedávným zprávám už nebudete mít přístup.",
+            "owner_message": "Vlastníkem se stane zbývající člen, který se připojil jako první. Pokud žádní členové nezůstanou, skupina se odstraní.",
+            "title": "Opustit skupinu „{0}“?"
+          },
+          "success": "Opustili jste skupinu.",
+          "tooltip": "Opustit tuto skupinu."
+        },
+        "member": {
+          "remove": {
+            "confirmation": {
+              "message": "Tento člen už nebude mít přístup ke skupině ani k historii jejích zpráv.",
+              "title": "Odebrat uživatele „{0}“?"
+            },
+            "success": "Člen byl odebrán.",
+            "tooltip": "Odebrat tohoto člena ze skupiny."
+          }
+        },
+        "navigation_label": "Skupiny",
+        "operation": {
+          "busy": "Počkejte na dokončení probíhající operace se skupinou a zkuste to znovu."
+        },
+        "refresh": {
+          "failed": "Informace o skupině se nepodařilo aktualizovat. Zkuste to později. ({0})"
+        },
+        "rename": {
+          "success": "Skupina byla přejmenována.",
+          "title": "Přejmenovat skupinu",
+          "tooltip": "Přejmenovat skupinu."
+        },
+        "state": {
+          "active": "Aktivní"
+        },
+        "summary": {
+          "invite_ready": "Členové: {0}/12 · Kód pozvánky {1}",
+          "invite_rotation_required": "Členové: {0}/12 · Je potřeba nový kód pozvánky"
+        },
+        "switch": {
+          "action": "Přepnout na skupinu",
+          "in_progress": "Připojování…",
+          "success": "Aktivní skupina byla změněna.",
+          "tooltip": "Zobrazit tuto skupinu na obrazovce."
+        },
+        "title": "Vaše skupiny"
+      },
+      "history": {
+        "empty": {
+          "description": "Tady se zobrazí nedávné zprávy z této skupiny.",
+          "title": "Zatím žádné zprávy"
+        },
+        "group": {
+          "none": "Žádná aktivní skupina",
+          "required": "Pokud chcete zobrazit nedávné zprávy, připojte se ke skupině."
+        },
+        "load": {
+          "initial_failed": "Nedávné zprávy se nepodařilo načíst",
+          "retry": "Zkusit znovu"
+        },
+        "pagination": {
+          "exhausted": "Dostali jste se na konec historie za poslední 3 dny"
+        },
+        "recent": {
+          "title": "Nedávné zprávy"
+        },
+        "retention": {
+          "notice": "Zprávy se po 3 dnech automaticky odstraní.",
+          "reload_failed": "Starší zprávy se nepodařilo znovu načíst. Zkuste to za chvíli. ({0})"
+        },
+        "scroll": {
+          "latest": "Přejít na nejnovější zprávy"
+        },
+        "user": {
+          "unknown": "Neznámý člen"
+        },
+        "window": {
+          "always_on_top": {
+            "disable": "Vypnout zobrazení vždy nahoře",
+            "disable_shortcut": "Vypnout zobrazení vždy nahoře (Alt+Šipka dolů)",
+            "enable": "Vždy nahoře",
+            "enable_shortcut": "Vždy nahoře (Alt+Šipka nahoru)"
+          },
+          "title": "Historie zpráv"
+        }
+      },
+      "legal": {
+        "description": "Přečtěte si podmínky a zásady používání aplikace.",
+        "privacy": {
+          "action": "Zobrazit zásady ochrany osobních údajů"
+        },
+        "refund": {
+          "action": "Zobrazit zásady zrušení a vrácení peněz"
+        },
+        "terms": {
+          "action": "Zobrazit podmínky"
+        },
+        "title": "Zásady"
+      },
+      "message": {
+        "delivery": {
+          "recheck_failed": "Nepodařilo se ověřit, jestli byla zpráva odeslána. Za chvíli to zkontrolujte znovu. ({0})"
+        },
+        "send": {
+          "failed": "Zprávu se nepodařilo odeslat. Zkuste to znovu. ({0})",
+          "rate_limited": "Zprávy posíláte příliš rychle."
+        }
+      },
+      "onboarding": {
+        "auth": {
+          "google": {
+            "cancel": "Zrušit přihlášení",
+            "continue": "Pokračovat přes Google",
+            "description": "Propojte účet Google. Váš stávající profil, skupiny a historie zpráv zůstanou zachované.",
+            "pending": "Dokončete přihlášení přes Google v prohlížeči."
+          },
+          "start": "Začít"
+        },
+        "complete": {
+          "description": "Skupinu můžete kdykoli vytvořit nebo se k ní připojit v Nastavení.",
+          "title": "SIDEY je připravený"
+        },
+        "connection": {
+          "connected": "Připojeno",
+          "connecting": "Připojování…"
+        },
+        "group": {
+          "invite_code": {
+            "label": "Kód pozvánky",
+            "member_limit": "Každá skupina může mít až 12 členů.",
+            "placeholder": "Kód od přítele",
+            "required": "Zadejte kód pozvánky."
+          },
+          "join": {
+            "action": "Připojit se"
+          },
+          "name": {
+            "placeholder": "Např. Naše parta"
+          },
+          "path": {
+            "label": "Jak chcete začít?"
+          }
+        },
+        "launch": {
+          "action": "Spustit SIDEY"
+        },
+        "profile": {
+          "description": "Kdykoli ho můžete změnit v Nastavení.",
+          "title": "Zvolte si jméno"
+        },
+        "step": {
+          "complete": "Hotovo"
+        },
+        "tagline": "Mějte své přátele stále nablízku."
+      },
+      "overlay": {
+        "current_user": "{0} · Já"
+      },
+      "platform": {
+        "requirements": {
+          "description": "SIDEY vyžaduje 64bitovou verzi Windows 10 1809 (build 17763) nebo novější.",
+          "title": "Nepodporovaná verze Windows",
+          "window_title": "SIDEY — Nepodporovaná verze Windows"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Vyberte pixelovou postavičku, která vás bude představovat na obrazovkách přátel.",
+          "save": {
+            "success": "Postavička byla změněna."
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "default": "Výchozí bublina zprávy",
+            "description": "Vyberte bublinu zprávy, kterou máte. Použije se ve všech vašich skupinách.",
+            "title": "Bublina zprávy"
+          },
+          "equipped": "Používá se",
+          "save": {
+            "success": "Nový vzhled je připravený."
+          },
+          "throwable": {
+            "default": "Výchozí měkký míček",
+            "description": "Vyberte házecí hračku, kterou máte. Použije se ve všech vašich skupinách.",
+            "title": "Házecí hračka"
+          }
+        },
+        "description": "Nastavte jméno a postavičku, které uvidí vaši přátelé.",
+        "duplicates": {
+          "notice": "Nevadí, když používáte stejné jméno nebo postavičku jako někdo z přátel."
+        },
+        "nickname": {
+          "description": "Jméno, které přátelé uvidí na obrazovce a ve zprávách · 2–8 znaků",
+          "save": {
+            "action": "Změnit přezdívku",
+            "tooltip": "Uložit změněnou přezdívku."
+          }
+        },
+        "save": {
+          "success": "Profil byl uložen."
+        }
+      },
+      "settings": {
+        "display": {
+          "description": "Nastavte, jak se zobrazují stav přátel a zprávy.",
+          "offline_members": {
+            "description": "Zobrazit offline přátele jako spící postavičky s červeným stavovým bodem.",
+            "title": "Zobrazovat offline členy",
+            "tooltip": "Přepnout zobrazení offline členů"
+          },
+          "quiet_mode": {
+            "description": "Skrýt bubliny zpráv a indikátory psaní, ale zachovat počet nepřečtených zpráv.",
+            "tooltip": "Přepnout tichý režim"
+          },
+          "throw_guard": {
+            "description": "Když je tato možnost vypnutá, kliknutím na postavičku přítele hned hodíte hračku. Když je zapnutá, dvakrát klikněte pravým tlačítkem na svou postavičku a potom do 10 sekund na postavičku přítele.",
+            "title": "Házet po dvojitém kliknutí pravým tlačítkem",
+            "tooltip": "Před házením vyžadovat dvojité kliknutí pravým tlačítkem na vlastní postavičku"
+          }
+        },
+        "general": {
+          "description": "Nastavte vzhled aplikace a její spouštění."
+        },
+        "language": {
+          "description": "Zvolte jazyk aplikace. Změna se projeví okamžitě.",
+          "title": "Jazyk"
+        },
+        "navigation_label": "Nastavení",
+        "overlay": {
+          "description": "Zobrazit pixelový svět přátel podél vybraného okraje obrazovky.",
+          "tooltip": "Přepnout pixelový svět"
+        },
+        "placement": {
+          "description": "Zvolte, kde se postavičky zobrazí.",
+          "edge": {
+            "description": "Zvolte okraj obrazovky, podél kterého budou postavičky chodit.",
+            "title": "Okraj",
+            "tooltip": "Okraj obrazovky pro pixelový svět"
+          },
+          "monitor": {
+            "description": "Zvolte monitor pro pixelový svět a pole zprávy.",
+            "title": "Monitor",
+            "tooltip": "Monitor pro pixelový svět a pole zprávy",
+            "unavailable": "Není dostupný žádný monitor."
+          },
+          "span": {
+            "description": "Zvolte, jak velkou část okraje obrazovky mohou postavičky procházet.",
+            "full": "Celý okraj",
+            "title": "Oblast pohybu",
+            "tooltip": "Část obrazovky, kterou zabírá pixelový svět"
+          },
+          "title": "Umístění postaviček"
+        },
+        "save": {
+          "failed": "Nastavení se nepodařilo uložit. Zkuste to znovu. ({0})"
+        },
+        "shortcuts": {
+          "action": {
+            "composer": "Otevřít nebo zavřít pole zprávy",
+            "history": "Otevřít nebo zavřít nedávné zprávy",
+            "overlay": "Zobrazit nebo skrýt překryvnou vrstvu",
+            "quiet_mode": "Přepnout tichý režim"
+          },
+          "description": "Vyberte zkratku a stiskněte požadovanou kombinaci kláves. Pokud je kombinace už přiřazená, zkratky si ji vymění.",
+          "error": {
+            "already_registered": "Tuto zkratku už používá systém nebo jiná aplikace.",
+            "availability_unverified": "Nepodařilo se ověřit, jestli je tato zkratka dostupná.",
+            "in_app_conflict": "Tuto kombinaci používá jiná zkratka v SIDEY. Po uložení si zkratky kombinace vymění.",
+            "invalid": "Neplatná zkratka",
+            "modifier_required": "Zkratka musí začínat klávesou Win, Ctrl, Alt nebo Shift.",
+            "system_conflict": "Tuto zkratku už používá systém."
+          },
+          "recorder": {
+            "empty": "Stisknutím kombinace kláves zkratku změníte.",
+            "help": "Vyberte pole a stiskněte modifikační klávesu spolu s další klávesou. Klávesou Esc akci zrušíte.",
+            "recording": "Stiskněte zkratku…",
+            "reset": "Obnovit"
+          },
+          "title": "Klávesové zkratky"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Přehrát zvukový efekt, když házecí hračka zasáhne postavičku v aktuální skupině.",
+            "title": "Zvukové efekty postaviček"
+          },
+          "description": "Nastavte zvukové efekty postaviček.",
+          "mute": "Ztlumit",
+          "unmute": "Zapnout zvuk",
+          "volume": "Hlasitost"
+        },
+        "storage": {
+          "folder_invalid": "Složku nastavení se nepodařilo otevřít. Restartujte aplikaci.",
+          "read_failed": "Uložené nastavení se nepodařilo přečíst. Restartujte aplikaci."
+        },
+        "theme": {
+          "dark": "Tmavý",
+          "description": "Zvolte světlý, tmavý nebo systémový motiv aplikace.",
+          "light": "Světlý",
+          "system": "Výchozí nastavení Windows",
+          "title": "Motiv"
+        },
+        "update": {
+          "check": {
+            "action": "Vyhledat aktualizace"
+          },
+          "check_now": {
+            "tooltip": "Vyhledat novější verzi."
+          },
+          "description": "Zjistěte, jestli je dostupná novější verze.",
+          "last_checked": {
+            "never": "Poslední kontrola: nikdy",
+            "today": "Dnes v {0}",
+            "value": "Poslední kontrola: {0}",
+            "yesterday": "Včera v {0}"
+          },
+          "release_notes": {
+            "action": "Podrobnosti aktualizace"
+          },
+          "title": "Aktualizace"
+        }
+      },
+      "store": {
+        "auth": {
+          "google": {
+            "failed": "Propojování účtu Google se nepodařilo zahájit."
+          }
+        },
+        "availability": {
+          "coming_soon": {
+            "description": "Obchod teď nabízí jen náhledy. Nakupování zatím není dostupné.",
+            "title": "Zatím nelze koupit"
+          }
+        },
+        "checkout": {
+          "opening": "Otevírání nákupu…"
+        },
+        "description": "Prohlédněte si postavičky, bubliny zpráv a házecí hračky v akci.",
+        "empty": {
+          "description": "Zkuste jiné hledání nebo změňte filtry.",
+          "title": "Nic jsme nenašli"
+        },
+        "filter": {
+          "hide_owned": "Skrýt položky, které máte",
+          "menu": "Řazení a filtry",
+          "reset": "Obnovit vše",
+          "search": {
+            "label": "Hledat",
+            "placeholder": "Hledat v názvech a popisech"
+          }
+        },
+        "kind": {
+          "bubble": "Bubliny zpráv",
+          "character": "Postavičky",
+          "keepsake": "Oblíbený předmět",
+          "throwable": "Házecí hračky"
+        },
+        "navigation_label": "Vzhled a obchod",
+        "preview": {
+          "member": {
+            "dubu": "Dubu",
+            "moka": "Moka"
+          },
+          "message": {
+            "left": "Co bude k večeři?",
+            "right": "Co třeba pizza?"
+          },
+          "open": "Náhled",
+          "sound": {
+            "off": "Ztlumit zvuk náhledu",
+            "on": "Zapnout zvuk náhledu"
+          },
+          "tree_movement_hint": "Kliknutím pravým tlačítkem strom zastavíte. Dalším kliknutím pravým tlačítkem ho necháte znovu chodit.",
+          "unavailable": "Náhled se nepodařilo načíst."
+        },
+        "price": {
+          "krw": "₩{0:N0}"
+        },
+        "product": {
+          "sold_separately": "Prodává se samostatně od postavičky"
+        },
+        "purchase": {
+          "action": "Koupit za {0}",
+          "confirming": "Ověřování platby…",
+          "failed": "Nákup se nepodařilo ověřit. Za chvíli to zkuste znovu.",
+          "owned": "Už máte",
+          "success": "Nákup byl dokončen.",
+          "timeout": "Čas pro potvrzení platby vypršel. Znovu otevřete obchod a zkontrolujte stav.",
+          "unavailable": "Nakupování teď není dostupné. Zkuste to za chvíli."
+        },
+        "sort": {
+          "price_ascending": "Cena: od nejnižší po nejvyšší",
+          "price_descending": "Cena: od nejvyšší po nejnižší"
+        },
+        "status": {
+          "retry": "Zkusit znovu",
+          "unavailable": "Obchod se nepodařilo načíst. Zkuste to za chvíli znovu."
+        },
+        "title": "Vzhled a obchod"
+      },
+      "support": {
+        "diagnostics": {
+          "description": "Soubory protokolu se zkomprimují a uloží na plochu. Když nám je pošlete, pomůžou nám chyby opravit.",
+          "export": {
+            "action": "Exportovat",
+            "failed": "Diagnostická data se nepodařilo exportovat.",
+            "success": "Diagnostická data byla uložena na plochu."
+          },
+          "title": "Exportovat diagnostická data"
+        },
+        "feedback": {
+          "action": "Poslat zpětnou vazbu",
+          "description": "Pokud něco nefunguje nebo potřebujete pomoc, otevřete problém na GitHubu.",
+          "title": "Zpětná vazba"
+        }
+      },
+      "tray": {
+        "app": {
+          "exit": "Ukončit"
+        },
+        "connection": {
+          "error": {
+            "message": "V části Připojení vyberte Znovu připojit. Pokud se SIDEY stále nepřipojí, pošlete nám diagnostický protokol.",
+            "title": "SIDEY je odpojený"
+          }
+        },
+        "group": {
+          "active": "Aktivní skupina"
+        },
+        "groups": {
+          "empty": "Žádné připojené skupiny",
+          "open": "Nastavení skupin…"
+        },
+        "history": {
+          "open": "Nedávné zprávy…"
+        },
+        "message": {
+          "compose": "Napsat zprávu…"
+        },
+        "overlay": {
+          "hide": "Skrýt překryvnou vrstvu"
+        },
+        "quiet_mode": {
+          "toggle": "Tichý režim"
+        },
+        "settings": {
+          "open": "Nastavení…"
+        },
+        "shortcuts": {
+          "registration_failed": "Tyto zkratky nejsou dostupné: {0}. Možná je používá jiná aplikace. Místo nich použijte nabídku v oznamovací oblasti."
+        },
+        "start": {
+          "failed": "Ikonu v oznamovací oblasti se nepodařilo spustit. Zavřením okna ukončíte SIDEY."
+        },
+        "store": {
+          "open": "Obchod…"
+        },
+        "unread": {
+          "tooltip": "SIDEY · Nepřečtené zprávy: {0}"
+        },
+        "update": {
+          "available": "Je dostupná aktualizace. {0}",
+          "check": "Vyhledat aktualizace…",
+          "check_failed": "Aktualizace se nepodařilo vyhledat. Zkuste to za chvíli.",
+          "installed": "SIDEY byl aktualizován na verzi {0}. Kliknutím zobrazíte změny.",
+          "latest": "Používáte nejnovější verzi."
+        }
+      },
+      "update": {
+        "available": "Je dostupný SIDEY {0}.",
+        "checking": "Vyhledávání aktualizací…",
+        "download": {
+          "hash_mismatch": "Soubor aktualizace se nepodařilo ověřit. Stáhněte ho znovu.",
+          "in_progress": "Stahování aktualizace…",
+          "progress": "Stahování aktualizace… ({0} %)"
+        },
+        "failed": "Aktualizaci se nepodařilo dokončit. Zkuste to za chvíli.",
+        "install": {
+          "cancelled": "Instalace aktualizace byla zrušena.",
+          "invalid": "Podrobnosti instalace aktualizace se nepodařilo ověřit. Zkuste to později.",
+          "launch_failed": "Instalační program se nepodařilo otevřít. Vyberte Vyhledat aktualizace a zkuste to znovu.",
+          "launched": "Stahování je dokončené. Instalační program byl otevřen.",
+          "missing": "Aktualizaci teď nejde nainstalovat. Zkuste to později."
+        },
+        "latest": "Používáte nejnovější verzi.",
+        "metadata": {
+          "invalid": "Informace o aktualizaci se nepodařilo ověřit. Zkuste to později."
+        },
+        "not_published": "Nová aktualizace zatím není dostupná. Zkontrolujte to později.",
+        "prompt": {
+          "download": "Stáhnout",
+          "later": "Později",
+          "message": "Stáhnout SIDEY {0}?",
+          "title": "Je dostupná aktualizace"
+        },
+        "release_notes": {
+          "open_failed": "Podrobnosti aktualizace se nepodařilo otevřít. Zkuste to znovu. ({0})"
+        }
+      },
+      "validation": {
+        "message": {
+          "length": "Zadejte zprávu o délce 1–200 znaků."
+        },
+        "nickname": {
+          "length": "Zadejte přezdívku o délce 2–8 znaků."
+        },
+        "room_name": {
+          "length": "Zadejte název skupiny o délce 1–20 znaků."
+        }
+      }
+    }
+  },
+  "profile": {
+    "applying": "Používání",
+    "character": {
+      "label": "Postavička"
+    },
+    "nickname": {
+      "label": "Přezdívka",
+      "placeholder": "2–8 znaků"
+    },
+    "title": "Můj profil"
+  },
+  "settings": {
+    "display": {
+      "quiet_mode": {
+        "title": "Tichý režim"
+      }
+    },
+    "overlay": {
+      "title": "Zobrazit pixelový svět"
+    },
+    "placement": {
+      "edge": {
+        "bottom": "Dole",
+        "left": "Vlevo",
+        "right": "Vpravo",
+        "top": "Nahoře"
+      }
+    },
+    "section": {
+      "display": {
+        "title": "Zobrazení"
+      },
+      "general": {
+        "title": "Obecné"
+      },
+      "sound": {
+        "title": "Zvuk"
+      }
+    },
+    "window": {
+      "title": "Nastavení SIDEY"
+    },
+    "startup": {
+      "title": "Spouštět při přihlášení",
+      "description": "Aplikace se spustí automaticky po přihlášení."
+    }
+  },
+  "store": {
+    "sort": {
+      "catalog": "Výchozí",
+      "label": "Seřadit"
+    }
+  }
+}

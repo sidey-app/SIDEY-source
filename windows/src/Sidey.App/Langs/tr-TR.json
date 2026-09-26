@@ -1,0 +1,951 @@
+{
+  "accessibility": {
+    "motion": {
+      "disabled": "Windows'ta animasyon efektleri kapalı."
+    }
+  },
+  "account": {
+    "delete": {
+      "confirmation": {
+        "action": "Hesabı sil",
+        "message": "Profiliniz, katıldığınız gruplarla ilgili bilgiler kalıcı olarak silinir ve satın alma geçmişinizle hesabınızın bağlantısı kaldırılır.",
+        "title": "Hesabınız silinsin mi?"
+      },
+      "description": "Hesabınızı ve ilişkili kişisel verilerinizi kalıcı olarak silin.",
+      "final_confirmation": {
+        "message": "Silinen hesabınız ve verileriniz geri yüklenemez.",
+        "title": "Hesabınız kalıcı olarak silinsin mi?"
+      },
+      "title": "Hesabı sil"
+    },
+    "description": "Oturumu kapatın veya hesabınızı yönetin.",
+    "sign_out": {
+      "confirmation": {
+        "action": "Oturumu kapat",
+        "message": "Yalnızca bu bilgisayardaki oturumunuz kapatılır. Uygulamayı yeniden kullanmak için Google ile oturum açmanız gerekir.",
+        "title": "Oturum kapatılsın mı?"
+      },
+      "description": "Yalnızca bu bilgisayardaki oturumu kapatın.",
+      "title": "Oturumu kapat"
+    },
+    "title": "Hesap"
+  },
+  "app": {
+    "info": {
+      "description": "Sürüm ve destek bilgilerini görüntüleyin.",
+      "navigation_label": "Hakkında",
+      "title": "Hakkında"
+    },
+    "launch": {
+      "failed": "SIDEY başlatılırken bir hata oluştu. Uygulamayı kapatıp yeniden deneyin."
+    },
+    "startup": {
+      "error": {
+        "title": "SIDEY başlatma hatası"
+      },
+      "failed": "SIDEY başlatılamadı.",
+      "failed_with_log": "SIDEY başlatılamadı.\n\nTanılama günlüğü: {0}",
+      "runtime_missing": "Bazı SIDEY dosyaları eksik. Uygulamayı yeniden yükleyin."
+    }
+  },
+  "auth": {
+    "google": {
+      "already_linked": "Bu Google hesabı zaten geçerli profile bağlı. Profiliniz ve verileriniz değiştirilmedi.",
+      "cancelled": "Google ile oturum açma iptal edildi veya tamamlanamadı. Yeniden deneyin.",
+      "identity_changed": "Bu Google hesabı, geçerli hesaba bağlı hesapla eşleşmiyor. Profiliniz ve verileriniz değiştirilmedi.",
+      "link_expired": "Google ile oturum açma isteğinin süresi doldu. Oturum açmayı iptal edip yeniden deneyin.",
+      "required": "Devam etmek için Google hesabınızı bağlayın.",
+      "sign_in_complete": "Google ile oturum açma tamamlandı. Tarayıcınızdaki oturum açma sekmesini kapatın."
+    },
+    "request": {
+      "failed": "Oturum açılamadı. Daha sonra yeniden deneyin. (Hata kodu: {0})"
+    },
+    "response": {
+      "empty": "Oturum açma tamamlanamadı. Yeniden deneyin."
+    },
+    "session": {
+      "expired": "Oturumunuzun süresi doldu. Yeniden oturum açın.",
+      "replace_blocked": "Bu bilgisayarda zaten oturum açma bilgileri var. Uygulamayı yeniden başlatıp tekrar oturum açın.",
+      "restore_failed": "Oturumunuz geri yüklenemedi. Yeni hesap oluşturulmadı. Yeniden oturum açın.",
+      "stored_invalid": "Kaydedilmiş oturum açma bilgileriniz okunamadı. Yeniden oturum açın.",
+      "values_missing": "Oturum açma tamamlanamadı. Yeniden deneyin."
+    }
+  },
+  "character": {
+    "pixel_cat": {
+      "display_name": "Yavru Kedi"
+    },
+    "pixel_chinchilla": {
+      "display_name": "Yavru Çinçilla"
+    },
+    "pixel_duck": {
+      "display_name": "Ördek"
+    },
+    "pixel_guinea_pig": {
+      "display_name": "Yavru Gine Domuzu"
+    },
+    "pixel_hamster": {
+      "display_name": "Yavru Hamster"
+    },
+    "pixel_monkey": {
+      "display_name": "Yavru Maymun"
+    },
+    "pixel_otter": {
+      "display_name": "Yavru Su Samuru"
+    },
+    "pixel_penguin": {
+      "display_name": "Yavru Penguen"
+    },
+    "pixel_pig": {
+      "display_name": "Yavru Domuz"
+    },
+    "pixel_poop": {
+      "display_name": "Kaka"
+    },
+    "pixel_puppy": {
+      "display_name": "Yavru Köpek"
+    },
+    "pixel_quokka": {
+      "display_name": "Quokka"
+    },
+    "pixel_rabbit": {
+      "display_name": "Tavşancık"
+    },
+    "pixel_shiba": {
+      "display_name": "Shiba Inu"
+    },
+    "pixel_starlight_upalupa": {
+      "display_name": "Yıldız Işığı Aksolotlu"
+    },
+    "pixel_tree": {
+      "display_name": "Küçük Ağaç"
+    },
+    "pixel_tteokbokki": {
+      "display_name": "Tteokbokki"
+    },
+    "unknown": {
+      "display_name": "Karakter"
+    }
+  },
+  "common": {
+    "back": "Geri",
+    "cancel": "İptal",
+    "close": "Kapat",
+    "continue": "Devam",
+    "delete": "Sil",
+    "friend": "Arkadaş",
+    "me": "Ben",
+    "next": "İleri",
+    "save": "Kaydet",
+    "skip": "Atla"
+  },
+  "composer": {
+    "drag": {
+      "tooltip": "Giriş penceresini taşımak için sürükleyin"
+    },
+    "group": {
+      "required": "Mesaj göndermek için profilinizi ayarlayın ve bir grup seçin."
+    },
+    "message": {
+      "placeholder": "Mesajınızı yazın…"
+    },
+    "window": {
+      "title": "SIDEY mesaj girişi"
+    }
+  },
+  "connection": {
+    "configuration": {
+      "not_configured": "Gerekli sunucu bağlantısı ayarları eksik. Uygulamayı yeniden yükleyin."
+    },
+    "error": {
+      "access_required": "Hesabınıza veya gruba erişiminiz doğrulanamadı. Sunucu bağlantısı bölümünde Yeniden bağlan'ı seçin. Aynı ileti görünmeye devam ederse tanılama günlüğüyle bize ulaşın.",
+      "busy": "Şu anda çok sayıda kişi bağlandığından bağlantı normalden uzun sürüyor. Uygulama otomatik olarak denemeye devam edecek. Birkaç dakika sonra hâlâ bağlanmadıysa tanılama günlüğüyle bize ulaşın.",
+      "configuration_unavailable": "Sunucu bağlantısı şu anda başlatılamıyor. Biraz bekleyip Sunucu bağlantısı bölümünde Yeniden bağlan'ı seçin. Sorun devam ederse tanılama günlüğüyle bize ulaşın.",
+      "network_unavailable": "Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edip Sunucu bağlantısı bölümünde Yeniden bağlan'ı seçin. Diğer siteler çalıştığı hâlde sorun sürerse tanılama günlüğüyle bize ulaşın.",
+      "secure_connection_failed": "Güvenli bağlantı kurulamadı. Windows tarih ve saatinin doğru olduğunu kontrol edip yeniden bağlanın. Sorun devam ederse tanılama günlüğüyle bize ulaşın.",
+      "service_unavailable": "Sunucuya bağlanılamadı. Uygulama otomatik olarak denemeye devam edecek. Birkaç dakika sonra hâlâ bağlanmadıysa Sunucu bağlantısı bölümünde Yeniden bağlan'ı seçin. Bu da işe yaramazsa tanılama günlüğüyle bize ulaşın."
+    },
+    "group_resync_failed": "Grubun son durumu yüklenemedi. Devam etmek için yeniden bağlanın. ({0})",
+    "group_revision_missing": "Grup bağlantısı değişti. Devam etmek için yeniden bağlanın.",
+    "notice": {
+      "connected": "Sunucuya bağlanıldı.",
+      "reconnecting": "Sunucuya yeniden bağlanılıyor."
+    },
+    "retry": {
+      "action": "Yeniden bağlan"
+    },
+    "server": {
+      "not_configured": "Gerekli sunucu bağlantısı ayarları eksik. Uygulamayı yeniden yükleyin."
+    },
+    "state": {
+      "connected": "Bağlandı",
+      "disconnected": "Bağlı değil",
+      "reconnecting": "Bağlanıyor"
+    },
+    "unavailable": "Sunucuya bağlanılamadı. Biraz sonra yeniden deneyin."
+  },
+  "external_link": {
+    "open": {
+      "failed": "Sayfa varsayılan tarayıcınızda açılamadı."
+    }
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "Kodla katıl"
+    },
+    "collapse": "Grubu daralt",
+    "create": {
+      "action": "Grup oluştur",
+      "description": "Bir grup oluşturup davet kodunu arkadaşlarınızla paylaşın.",
+      "in_progress": "Oluşturuluyor…",
+      "name": {
+        "placeholder": "Grup adı"
+      },
+      "result_missing": "Grup oluşturma tamamlanamadı. Yeniden deneyin.",
+      "success": {
+        "default": "Grup oluşturuldu."
+      },
+      "tooltip": "Girdiğiniz adla bir grup oluşturun."
+    },
+    "delete": {
+      "action": "Grubu sil",
+      "confirmation": {
+        "message": "Grup ve tüm mesajlar kalıcı olarak silinir. Bu işlem geri alınamaz.",
+        "title": "‘{0}’ silinsin mi?"
+      },
+      "final_confirmation": {
+        "message": "‘{0}’ ve tüm mesajları şimdi kalıcı olarak silinecek.",
+        "title": "Bu grup kalıcı olarak silinsin mi?"
+      },
+      "success": "Grup silindi.",
+      "tooltip": "Bu grubu kalıcı olarak silin."
+    },
+    "description": "Arkadaşlarınızla paylaştığınız grupları yönetin. Her gruba en fazla 12 kişi katılabilir.",
+    "empty": {
+      "description": "Yeni bir grup oluşturun veya bir arkadaşınızdan aldığınız davet kodunu girin.",
+      "title": "Henüz katıldığınız grup yok"
+    },
+    "error": {
+      "not_found": "Grup bulunamadı."
+    },
+    "expand": "Grubu genişlet",
+    "invite": {
+      "code": {
+        "label": "Davet kodu",
+        "missing": "Bu cihazda kayıtlı davet kodu yok. Yeni bir davet kodu oluşturun.",
+        "replaced": "Bu cihazda kayıtlı davet kodu değiştirildi. Yeni kodu grup sahibinden isteyin.",
+        "revoked": "Önceki davet kodu iptal edildi. Grup sahibi yeni bir kod oluşturmalı."
+      },
+      "copy": {
+        "action": "Davet kodunu kopyala",
+        "complete": "Kopyalandı"
+      },
+      "rotate": {
+        "action": "Yeni davet kodu oluştur",
+        "code_missing": "Yeni davet kodu oluşturulamadı. Yeniden deneyin.",
+        "confirmation": {
+          "action": "Yeni kod oluştur",
+          "message": "Mevcut kod hemen iptal edilir. Bu işlem geri alınamaz.",
+          "title": "Yeni davet kodu oluşturulsun mu?"
+        },
+        "success": "Yeni davet kodu oluşturuldu ve bu cihaza güvenli bir şekilde kaydedildi."
+      }
+    },
+    "join": {
+      "description": "Bir gruba katılmak için arkadaşınızdan aldığınız davet kodunu girin.",
+      "failed": "Gruba katılınamadı. Davet kodunu kontrol edip yeniden deneyin. ({0})",
+      "in_progress": "Katılınıyor…",
+      "result_missing": "Katıldığınız grup yüklenemedi. Yeniden deneyin.",
+      "room_id_missing": "Gruba katılma tamamlanamadı. Yeniden deneyin.",
+      "success": {
+        "default": "Gruba katıldınız."
+      },
+      "tooltip": "Bu davet koduna ait gruba katılın."
+    },
+    "leave": {
+      "action": "Gruptan ayrıl",
+      "confirmation": {
+        "action": "Ayrıl",
+        "member_message": "Artık bu gruba veya son mesajlarına erişemezsiniz.",
+        "owner_message": "Kalan ilk üye grup sahibi olur. Üye kalmazsa grup silinir.",
+        "title": "‘{0}’ grubundan ayrılmak istiyor musunuz?"
+      },
+      "success": "Gruptan ayrıldınız.",
+      "tooltip": "Bu gruptan ayrılın."
+    },
+    "member": {
+      "remove": {
+        "action": "Gruptan çıkar",
+        "confirmation": {
+          "message": "Bu üye artık gruba veya mesaj geçmişine erişemez.",
+          "title": "‘{0}’ kaldırılsın mı?"
+        },
+        "success": "Üye kaldırıldı.",
+        "tooltip": "Bu üyeyi gruptan kaldırın."
+      }
+    },
+    "navigation_label": "Gruplar",
+    "operation": {
+      "busy": "Diğer grup işlemi tamamlandıktan sonra yeniden deneyin."
+    },
+    "refresh": {
+      "failed": "Grup bilgileri yenilenemedi. Daha sonra yeniden deneyin. ({0})"
+    },
+    "rename": {
+      "action": "Yeniden adlandır",
+      "name_placeholder": "Grup adı, 1–20 karakter",
+      "success": "Grup yeniden adlandırıldı.",
+      "title": "Grubu yeniden adlandır",
+      "tooltip": "Grubu yeniden adlandırın."
+    },
+    "room_name": {
+      "label": "Grup adı"
+    },
+    "state": {
+      "active": "Kullanımda"
+    },
+    "summary": {
+      "invite_ready": "{0}/12 üye · Davet kodu {1}",
+      "invite_rotation_required": "{0}/12 üye · Yeni davet kodu gerekli"
+    },
+    "switch": {
+      "action": "Gruba geç",
+      "in_progress": "Grup değiştiriliyor…",
+      "success": "Etkin grup değiştirildi.",
+      "tooltip": "Bu grubu ekranınızda gösterin."
+    },
+    "title": "Geçerli grup"
+  },
+  "history": {
+    "empty": {
+      "description": "Bu gruptaki son mesajlar burada görünür.",
+      "title": "Henüz mesaj yok."
+    },
+    "group": {
+      "none": "Etkin grup yok",
+      "required": "Son mesajları görmek için bir gruba katılın."
+    },
+    "load": {
+      "initial_failed": "Mesaj geçmişi yüklenemedi",
+      "retry": "Yeniden dene"
+    },
+    "load_more": {
+      "failed": "Önceki mesajlar yüklenemedi",
+      "loading": "Önceki mesajlar yükleniyor…"
+    },
+    "loading": "Son mesajlar yükleniyor…",
+    "pagination": {
+      "exhausted": "Son 3 günün sonuna ulaştınız"
+    },
+    "recent": {
+      "title": "Yakın geçmiş"
+    },
+    "retention": {
+      "notice": "Mesajlar 3 gün sonra otomatik olarak silinir.",
+      "reload_failed": "Önceki mesajlar yeniden yüklenemedi. Biraz sonra yeniden deneyin. ({0})"
+    },
+    "scroll": {
+      "latest": "En son mesajlara git"
+    },
+    "user": {
+      "unknown": "Bilinmeyen arkadaş"
+    },
+    "window": {
+      "always_on_top": {
+        "disable": "Her zaman üstte özelliğini kapat",
+        "disable_shortcut": "Her zaman üstte özelliğini kapat (Alt+Aşağı ok)",
+        "enable": "Her zaman üstte",
+        "enable_shortcut": "Her zaman üstte (Alt+Yukarı ok)"
+      },
+      "title": "SIDEY mesaj geçmişi"
+    }
+  },
+  "legal": {
+    "description": "Koşulları ve ilkeleri inceleyin.",
+    "privacy": {
+      "action": "Gizlilik ilkesini görüntüle"
+    },
+    "refund": {
+      "action": "İptal ve para iadesi ilkesini görüntüle"
+    },
+    "terms": {
+      "action": "Koşulları görüntüle"
+    },
+    "title": "İlkeler"
+  },
+  "message": {
+    "delivery": {
+      "recheck_failed": "Mesajın gönderildiği doğrulanamadı. Biraz sonra yeniden kontrol edin. ({0})"
+    },
+    "send": {
+      "accessibility": "Mesaj gönder",
+      "failed": "Mesaj gönderilemedi. Yeniden deneyin. ({0})",
+      "rate_limited": "Çok hızlı mesaj gönderiyorsunuz."
+    }
+  },
+  "onboarding": {
+    "auth": {
+      "google": {
+        "cancel": "Oturum açmayı iptal et",
+        "continue": "Google ile devam et",
+        "description": "Devam etmek için Google hesabınızı bağlayın. Mevcut profiliniz, gruplarınız ve sohbet geçmişiniz korunur.",
+        "pending": "Tarayıcınızda Google ile oturum açmayı tamamlayın."
+      },
+      "start": "Başlayın"
+    },
+    "character": {
+      "label": "Karakterim"
+    },
+    "complete": {
+      "description": "Ayarlar'dan istediğiniz zaman grup oluşturabilir veya bir gruba katılabilirsiniz.",
+      "title": "Her şey hazır"
+    },
+    "connection": {
+      "connected": "Bağlantı kuruldu",
+      "connecting": "Bağlantı kuruluyor…"
+    },
+    "group": {
+      "create": {
+        "description": "Bir grup oluşturun."
+      },
+      "description": "Piksel dünyanızı canlandırmak için bir grup oluşturun veya davet koduyla katılın.",
+      "invite_code": {
+        "label": "Davet kodu",
+        "member_limit": "Her grupta en fazla 12 kişi olabilir.",
+        "placeholder": "Arkadaşınızdan aldığınız kod",
+        "required": "Bir davet kodu girin."
+      },
+      "join": {
+        "action": "Katıl"
+      },
+      "name": {
+        "placeholder": "ör. Bizim Ekip"
+      },
+      "path": {
+        "label": "Gruba katılma yöntemi"
+      },
+      "title": "Arkadaşlarınızla bir grup oluşturun"
+    },
+    "launch": {
+      "action": "Başlat"
+    },
+    "profile": {
+      "description": "Daha sonra istediğiniz zaman Ayarlar'dan değiştirebilirsiniz.",
+      "title": "Adınızı seçin"
+    },
+    "step": {
+      "complete": "Bitti",
+      "group": "Grup",
+      "profile": "Profil"
+    },
+    "tagline": "Arkadaşlarınız ekranınızın yanı başında."
+  },
+  "overlay": {
+    "current_user": "{0} · Ben"
+  },
+  "platform": {
+    "requirements": {
+      "description": "SIDEY için x64 üzerinde Windows 10 1809 (derleme 17763) veya sonraki bir sürüm gerekir.",
+      "title": "Desteklenmeyen Windows sürümü",
+      "window_title": "SIDEY — Desteklenmeyen Windows"
+    }
+  },
+  "profile": {
+    "applying": "Uygulanıyor",
+    "character": {
+      "description": "Arkadaşlarınızın ekranında sizi temsil edecek piksel karakteri seçin.",
+      "label": "Karakter",
+      "save": {
+        "success": "Karakter değiştirildi."
+      }
+    },
+    "cosmetics": {
+      "bubble": {
+        "default": "Varsayılan sohbet balonu",
+        "description": "Sahip olduğunuz bir balonu seçin. Bu balon tüm gruplarınızda kullanılır.",
+        "title": "Sohbet balonu"
+      },
+      "equipped": "Kullanımda",
+      "save": {
+        "success": "Yeni görünümünüz hazır."
+      },
+      "throwable": {
+        "default": "Varsayılan yumuşak top",
+        "description": "Sahip olduğunuz bir oyuncağı seçin. Bu oyuncak tüm gruplarınızda kullanılır.",
+        "title": "Fırlatılabilir oyuncak"
+      }
+    },
+    "description": "Arkadaşlarınızın gördüğü adı ve karakteri ayarlayın.",
+    "duplicates": {
+      "notice": "Bir arkadaşınızla aynı adı veya karakteri kullanmanızda sakınca yok."
+    },
+    "nickname": {
+      "description": "Arkadaşlarınızın ekranda ve mesajlarda gördüğü ad · 2–8 karakter",
+      "label": "Takma ad",
+      "placeholder": "2–8 karakter",
+      "save": {
+        "action": "Takma adı değiştir",
+        "tooltip": "Değiştirilen takma adı kaydedin."
+      }
+    },
+    "save": {
+      "success": "Profil kaydedildi."
+    },
+    "title": "Profilim"
+  },
+  "settings": {
+    "display": {
+      "description": "Arkadaşlarınızın durumunun ve mesajların nasıl görüneceğini ayarlayın.",
+      "offline_members": {
+        "description": "Çevrimdışı arkadaşları kırmızı durum noktalı, uyuyan karakterler olarak gösterin.",
+        "title": "Çevrimdışı üyeleri göster",
+        "tooltip": "Çevrimdışı üyeleri aç veya kapat"
+      },
+      "quiet_mode": {
+        "description": "Bağlantı durumunu ve okunmamış mesaj sayılarını koruyup mesaj balonlarını ve yazıyor göstergelerini gizleyin.",
+        "title": "Mesajları gizle",
+        "tooltip": "Mesajları gizle veya göster"
+      },
+      "throw_guard": {
+        "description": "Kapalıyken fırlatmak için bir arkadaşınızın karakterine farenin sol düğmesiyle tıklayın. Açıkken önce kendi karakterinize farenin sağ düğmesiyle iki kez tıklayın; ardından 10 saniye boyunca arkadaşlarınızın karakterlerini sol tıklayarak fırlatabilirsiniz.",
+        "title": "Fırlatmak için sağ düğmeyle iki kez tıkla",
+        "tooltip": "Fırlatmadan önce kendi karakterinize sağ düğmeyle iki kez tıklamayı gerektir"
+      }
+    },
+    "general": {
+      "description": "Uygulamanın görünümünü ve ne zaman başlayacağını seçin."
+    },
+    "language": {
+      "description": "Uygulamada kullanılan dili seçin. Değişiklikler hemen uygulanır.",
+      "title": "Dil / Language"
+    },
+    "navigation_label": "Ayarlar",
+    "overlay": {
+      "description": "Arkadaşlarınızın piksel dünyasını seçilen ekran kenarı boyunca gösterin.",
+      "title": "Piksel dünyasını göster",
+      "tooltip": "Piksel dünyasını aç veya kapat"
+    },
+    "placement": {
+      "description": "Karakterlerinizin nerede görüneceğini seçin.",
+      "edge": {
+        "bottom": "Alt",
+        "description": "Karakterlerin yürüyeceği ekran kenarını seçin.",
+        "left": "Sol",
+        "right": "Sağ",
+        "title": "Kenar",
+        "tooltip": "Piksel dünyasının ekran kenarı",
+        "top": "Üst"
+      },
+      "monitor": {
+        "description": "Piksel dünyasının ve mesaj girişinin gösterileceği ekranı seçin.",
+        "title": "Monitör",
+        "tooltip": "Piksel dünyası ve mesaj girişi için monitör",
+        "unavailable": "Kullanılabilir monitör yok. Bir monitör bağlayıp yeniden deneyin."
+      },
+      "span": {
+        "description": "Piksel dünyasının seçilen ekran kenarında kaplayacağı alanı seçin.",
+        "full": "Kenarın tamamı",
+        "title": "Alan uzunluğu",
+        "tooltip": "Piksel dünyasının kapladığı ekran aralığı"
+      },
+      "title": "Dünya yerleşimi"
+    },
+    "save": {
+      "failed": "Ayarlarınız kaydedilemedi. Yeniden deneyin. ({0})"
+    },
+    "section": {
+      "display": {
+        "title": "Görüntü"
+      },
+      "general": {
+        "title": "Genel"
+      },
+      "sound": {
+        "title": "Ses"
+      }
+    },
+    "shortcuts": {
+      "action": {
+        "composer": "Mesaj girişini aç veya kapat",
+        "history": "Son geçmişi aç veya kapat",
+        "overlay": "Kaplamayı aç veya kapat",
+        "quiet_mode": "Mesajları gizle veya göster"
+      },
+      "description": "Bir kısayol seçip istediğiniz tuş birleşimine basın. Kullanımda olan bir birleşimi atarsanız iki kısayol yer değiştirir.",
+      "error": {
+        "already_registered": "Bu kısayol sistem veya başka bir uygulama tarafından zaten kullanılıyor.",
+        "availability_unverified": "Bu kısayolun kullanılabilirliği doğrulanamadı.",
+        "in_app_conflict": "Başka bir uygulama kısayolu bu birleşimi kullanıyor. Kaydettiğinizde iki kısayol yer değiştirir.",
+        "invalid": "Geçersiz kısayol",
+        "modifier_required": "Kısayol Win, Ctrl, Alt veya Shift tuşuyla başlamalıdır.",
+        "system_conflict": "Bu kısayol zaten bir sistem kısayolu olarak kullanılıyor."
+      },
+      "recorder": {
+        "empty": "Bu kısayolu değiştirmek için bir tuş birleşimine basın.",
+        "help": "Seçip bir değiştirici tuşa ve başka bir tuşa basın. İptal etmek için Esc tuşuna basın.",
+        "recording": "Bir kısayola basın…",
+        "reset": "Sıfırla"
+      },
+      "title": "Klavye kısayolları"
+    },
+    "sound": {
+      "character_effects": {
+        "description": "Geçerli gruptaki karakterlere vurulduğunda ses efekti çalın.",
+        "title": "Karakter ses efektleri"
+      },
+      "description": "Karakter ses efektlerini ayarlayın.",
+      "mute": "Sesi kapat",
+      "unmute": "Sesi aç",
+      "volume": "Ses düzeyi"
+    },
+    "startup": {
+      "description": "Oturum açtığınızda uygulama otomatik olarak başlatılır.",
+      "title": "Oturum açıldığında başlat"
+    },
+    "storage": {
+      "folder_invalid": "Ayarlar klasörü açılamadı. Uygulamayı yeniden başlatın.",
+      "read_failed": "Kaydedilmiş ayarlarınız okunamadı. Uygulamayı yeniden başlatın."
+    },
+    "theme": {
+      "dark": "Koyu",
+      "description": "Uygulama için açık, koyu veya sistem temasını seçin.",
+      "light": "Açık",
+      "system": "Windows varsayılanı",
+      "title": "Tema"
+    },
+    "update": {
+      "check": {
+        "action": "Güncelleştirmeleri denetle"
+      },
+      "check_now": {
+        "tooltip": "Daha yeni bir sürümü denetleyin."
+      },
+      "description": "Daha yeni bir sürümü denetleyin.",
+      "last_checked": {
+        "never": "Son denetleme: henüz yapılmadı",
+        "today": "Bugün {0}",
+        "value": "Son denetleme: {0}",
+        "yesterday": "Dün {0}"
+      },
+      "release_notes": {
+        "action": "Güncelleştirme ayrıntıları"
+      },
+      "title": "Güncelleştirmeler"
+    },
+    "window": {
+      "title": "SIDEY ayarları"
+    }
+  },
+  "store": {
+    "auth": {
+      "google": {
+        "failed": "Google hesabı bağlama işlemi başlatılamadı."
+      }
+    },
+    "availability": {
+      "coming_soon": {
+        "description": "Mağazada şu anda yalnızca önizleme yapılabilir. Satın alma henüz kullanılamıyor.",
+        "title": "Satın alma özelliği yakında"
+      }
+    },
+    "catalog": {
+      "bubble_bunny_pink": {
+        "description": "Tavşan süslemeli pembe bir konuşma balonu.",
+        "name": "Pembe Tavşan Balonu"
+      },
+      "bubble_butter_chick": {
+        "description": "Civciv süslemeli tereyağı sarısı bir konuşma balonu.",
+        "name": "Tereyağı Sarısı Civciv Balonu"
+      },
+      "bubble_starry_cat": {
+        "description": "Yıldızlı kedi süslemeli koyu mor bir konuşma balonu.",
+        "name": "Yıldızlı Kedi Balonu"
+      },
+      "character_chinchilla": {
+        "description": "Kum banyosundan yeni çıkıp oynamaya geldi. Selam vermeden önce kabarık kürkünü göstermesi gerekiyor."
+      },
+      "character_duck": {
+        "description": "Sorumluluktan sıyrılma konusunda uzman. Ördek ayakları da bunun kanıtı."
+      },
+      "character_guinea_pig": {
+        "description": "Atıştırmalığını nereye sakladığını unuttu. O dolu yanaklara bakılırsa çok uzakta olamaz."
+      },
+      "character_monkey": {
+        "description": "Bir muz paylaşmaya geldi. Yolda yalnızca bir ısırık aldığını söylüyor… öyleyse yarısı neden yok?"
+      },
+      "character_otter": {
+        "description": "En sevdiği deniz kabuğunu göstermeye geldi. Bakabilirsiniz ama elinden alırsanız küser."
+      },
+      "character_pig": {
+        "description": "Atıştırmalık kokusunu izleyip kalmaya karar verdi. Artık burayı evi sanıyor."
+      },
+      "character_poop": {
+        "description": "Kimin çağırdığını bilmiyoruz ama işte burada."
+      },
+      "character_quokka": {
+        "description": "Her zaman gülümsüyor. Evet, o yaprağı az önce atan da bu."
+      },
+      "character_shiba": {
+        "description": "Zaten yürüyüşe çıktık. Shiba bu gerçeği kabul etmeyi reddediyor."
+      },
+      "character_starlight_upalupa": {
+        "description": "Bu aksolotl yolunu kaybetmiş bir yıldızı eve getirdi ve uyurken bile ona sımsıkı sarılıyor."
+      },
+      "character_tree": {
+        "description": "Küçük bir ağaç yürüyüşe çıktı. Biraz dinlenmesi söylenince kök salacağı yeri seçmeye başladı."
+      },
+      "character_tteokbokki": {
+        "description": "Acısız olduğunu söylediler. Kimin ölçüsüne göre olduğunu söylemediler."
+      },
+      "throwable_banana": {
+        "description": "Maymun bu muzu paylaştı. Bunu isteyerek yapıp yapmadığını henüz soramadık.",
+        "name": "Maymunun Muzu"
+      },
+      "throwable_baseball": {
+        "description": "Çarpınca ezilip sekerek uzaklaşan, kırmızı dikişli bir top.",
+        "name": "Beyzbol Topu"
+      },
+      "throwable_bouncy_heart": {
+        "description": "Havada uçarken zıplayan, fırlatılabilir bir kalp.",
+        "name": "Zıplayan Kalp"
+      },
+      "throwable_clam": {
+        "description": "Su samurunun her yere taşıdığı deniz kabuğu. İçinde inci yok, yalnızca biraz bağ kalmış.",
+        "name": "Su Samurunun Deniz Kabuğu"
+      },
+      "throwable_dujjonku": {
+        "description": "Kakaolu kabuğu ve yeşil dolgusu, insanın hoşuna giden çıtır bir sesle ezilir.",
+        "name": "Dubai çikolata yumuşak bisküvi"
+      },
+      "throwable_dust_bath_pouch": {
+        "description": "Bu, Çinçillanın banyo kumu. Onu fırlatması herhâlde yıkanmanız gerektiğine dair bir ima değildir.",
+        "name": "Çinçillanın Kum Kesesi"
+      },
+      "throwable_fish_cake_skewer": {
+        "description": "Yenmek içindi. Neden etrafta sallıyorsunuz?",
+        "name": "Kore Eomuk Şişi"
+      },
+      "throwable_leaf": {
+        "description": "Quokka'nın paket öğle yemeği. Fırlatmamızda sakınca olup olmadığını sormadık.",
+        "name": "Yaprak"
+      },
+      "throwable_mini_paprika": {
+        "description": "Özenle saklanmış bir atıştırmalık. Fırlattıktan sonra üç saniye içinde yerden alırsanız sorun olmaz, değil mi?",
+        "name": "Gine Domuzunun Mini Biberi"
+      },
+      "throwable_pork": {
+        "description": "Tok ve tatmin edici bir şaplak! Bu arada, son zamanlarda komşu domuzu gören oldu mu?",
+        "name": "Yavru Domuzun Domuz Eti"
+      },
+      "throwable_snowflake": {
+        "description": "Çarpınca küçük kristal parçalarına dağılan bir kar tanesi.",
+        "name": "Kar Tanesi"
+      },
+      "throwable_squeaky_duck": {
+        "description": "Ördek atan bir ördek. Muhtemelen bir aile kavgası değildir.",
+        "name": "Gıcırdayan Ördek"
+      },
+      "throwable_starlight_orb": {
+        "description": "Küçük bir küreye doldurulmuş yıldız ışığı. Gökyüzünden bir yıldız eksilmiş mi diye bakan oldu mu?",
+        "name": "Aksolotlun yıldız küresi"
+      },
+      "throwable_tennis_ball": {
+        "description": "Topu atacak birini seçtik. Getirecek birini hâlâ arıyoruz.",
+        "name": "Tenis Topu"
+      },
+      "throwable_timber": {
+        "description": "Bir ağaç, minik bir ağaç fırlatıyor. Belki önce soy ağacına bakmalıyız.",
+        "name": "Küçük Ağacın Minik Ağacı"
+      },
+      "throwable_tissue_ball": {
+        "description": "Tuvalet kâğıdının kullanılmış olup olmadığını kimse bilmiyor. Siz en iyisi kaçın!",
+        "name": "Tuvalet Kâğıdı Topu"
+      },
+      "throwable_toy_cannon": {
+        "description": "Yanan fitilli bir mermi atan, fırlatılabilir mini bir top.",
+        "name": "Mini Top"
+      },
+      "throwable_wakkuball": {
+        "description": "Çat! Wakku Topu parçalara ayrılırken çıkan çıtır sesin tadını çıkarın.",
+        "name": "Wakku Topu"
+      }
+    },
+    "checkout": {
+      "opening": "Ödeme sayfası açılıyor…"
+    },
+    "description": "Karakterlerinizi, sohbet balonlarınızı ve oyuncaklarınızı hareket hâlinde görün.",
+    "empty": {
+      "description": "Başka bir arama yapın veya filtrelerinizi değiştirin.",
+      "title": "Sonuç bulunamadı"
+    },
+    "filter": {
+      "hide_owned": "Sahip olduklarımı gizle",
+      "menu": "Sırala ve filtrele",
+      "reset": "Tümünü sıfırla",
+      "search": {
+        "label": "Ara",
+        "placeholder": "Adlarda veya açıklamalarda ara"
+      }
+    },
+    "kind": {
+      "bubble": "Konuşma balonları",
+      "character": "Karakterler",
+      "keepsake": "Sevilen eşya",
+      "throwable": "Fırlatılabilir oyuncaklar"
+    },
+    "navigation_label": "Özelleştirme ve mağaza",
+    "preview": {
+      "member": {
+        "dubu": "Dubu",
+        "moka": "Moka"
+      },
+      "message": {
+        "left": "Akşama ne yesek?",
+        "right": "Mantı nasıl olur?"
+      },
+      "open": "Önizle",
+      "sound": {
+        "off": "Önizleme sesini kapat",
+        "on": "Önizleme sesini aç"
+      },
+      "tree_movement_hint": "Ağacı durdurmak için sağ tıklayın. Yeniden yürütmek için tekrar sağ tıklayın.",
+      "unavailable": "Önizleme yüklenemedi."
+    },
+    "price": {
+      "krw": "₩{0:N0}"
+    },
+    "product": {
+      "sold_separately": "Karakterden ayrı satılır"
+    },
+    "purchase": {
+      "action": "{0} karşılığında satın al",
+      "confirming": "Ödeme doğrulanıyor…",
+      "failed": "Satın alma işleminiz doğrulanamadı. Biraz sonra yeniden kontrol edin.",
+      "owned": "Sizde var",
+      "success": "Satın alma tamamlandı.",
+      "timeout": "Ödeme doğrulaması zaman aşımına uğradı. Durumu kontrol etmek için mağazayı yeniden açın.",
+      "unavailable": "Satın alma işlemleri şu anda kullanılamıyor. Biraz sonra yeniden deneyin."
+    },
+    "sort": {
+      "catalog": "Varsayılan",
+      "label": "Sırala",
+      "price_ascending": "Önce en düşük fiyat",
+      "price_descending": "Önce en yüksek fiyat"
+    },
+    "status": {
+      "retry": "Yeniden dene",
+      "unavailable": "Mağaza yüklenemedi. Biraz sonra yeniden deneyin."
+    },
+    "title": "Özelleştirme ve mağaza"
+  },
+  "support": {
+    "diagnostics": {
+      "description": "Günlük dosyaları sıkıştırılıp Masaüstünüze kaydedilir. Bunları bizimle paylaşmanız hataları düzeltmemize yardımcı olabilir.",
+      "export": {
+        "action": "Dışarı aktar",
+        "failed": "Tanılama verileri dışarı aktarılamadı.",
+        "success": "Tanılama verileri Masaüstünüze kaydedildi."
+      },
+      "title": "Tanılama verilerini dışarı aktar"
+    },
+    "feedback": {
+      "action": "Geri bildirim gönder",
+      "description": "Bir şey çalışmıyorsa veya yardıma ihtiyacınız varsa GitHub'da bir sorun açın.",
+      "title": "Geri bildirim"
+    }
+  },
+  "tray": {
+    "app": {
+      "exit": "Çıkış"
+    },
+    "connection": {
+      "error": {
+        "message": "Sunucu bağlantısı bölümünde Yeniden bağlan'ı seçin. Hâlâ bağlanamıyorsa tanılama günlüğüyle bize ulaşın.",
+        "title": "SIDEY sunucu bağlantısı hatası"
+      }
+    },
+    "group": {
+      "active": "Etkin grup"
+    },
+    "groups": {
+      "empty": "Katıldığınız grup yok",
+      "open": "Grup ayarları…"
+    },
+    "history": {
+      "open": "Son geçmiş…"
+    },
+    "message": {
+      "compose": "Mesaj oluştur…"
+    },
+    "overlay": {
+      "hide": "Kaplamayı gizle"
+    },
+    "quiet_mode": {
+      "toggle": "Mesajları gizle"
+    },
+    "settings": {
+      "open": "Ayarlar…"
+    },
+    "shortcuts": {
+      "registration_failed": "Şu kısayollar kullanılamıyor: {0}. Başka bir uygulama bunları kullanıyor olabilir. Bunun yerine bildirim alanı menüsünü kullanın."
+    },
+    "start": {
+      "failed": "Bildirim alanı simgesi başlatılamadı. Pencereyi kapatırsanız SIDEY'den çıkılır."
+    },
+    "store": {
+      "open": "Mağaza…"
+    },
+    "unread": {
+      "tooltip": "SIDEY · {0} okunmamış mesaj"
+    },
+    "update": {
+      "available": "Bir güncelleştirme kullanılabilir. {0}",
+      "check": "Güncelleştirmeleri denetle…",
+      "check_failed": "Güncelleştirmeler denetlenemedi. Biraz sonra yeniden deneyin.",
+      "installed": "SIDEY {0} sürümüne güncelleştirildi. Değişiklikleri görmek için tıklayın.",
+      "latest": "En son sürümü kullanıyorsunuz."
+    }
+  },
+  "update": {
+    "available": "SIDEY {0} kullanılabilir.",
+    "checking": "Güncelleştirmeler denetleniyor...",
+    "download": {
+      "hash_mismatch": "Güncelleştirme dosyası doğrulanamadı. Yeniden indirin.",
+      "in_progress": "Güncelleştirme indiriliyor…",
+      "progress": "Güncelleştirme indiriliyor… (%{0})"
+    },
+    "failed": "Güncelleştirme tamamlanamadı. Biraz sonra yeniden deneyin.",
+    "install": {
+      "cancelled": "Güncelleştirme yüklemesi iptal edildi.",
+      "invalid": "Güncelleştirme yükleme ayrıntıları doğrulanamadı. Daha sonra yeniden deneyin.",
+      "launch_failed": "Yükleyici açılamadı. Yeniden denemek için Güncelleştirmeleri denetle'yi seçin.",
+      "launched": "İndirme tamamlandı. Yükleyici açıldı.",
+      "missing": "Güncelleştirme şu anda yüklenemiyor. Daha sonra yeniden deneyin."
+    },
+    "latest": "En son sürümü kullanıyorsunuz.",
+    "metadata": {
+      "invalid": "Güncelleştirme bilgileri doğrulanamadı. Daha sonra yeniden deneyin."
+    },
+    "not_published": "Yeni güncelleştirme henüz kullanılamıyor. Daha sonra yeniden denetleyin.",
+    "prompt": {
+      "download": "İndir",
+      "later": "Daha sonra",
+      "message": "SIDEY {0} indirilsin mi?",
+      "title": "Bir güncelleştirme kullanılabilir"
+    },
+    "release_notes": {
+      "open_failed": "Güncelleştirme ayrıntıları açılamadı. Yeniden deneyin. ({0})"
+    }
+  },
+  "validation": {
+    "message": {
+      "length": "1–200 karakterlik bir mesaj girin."
+    },
+    "nickname": {
+      "length": "2–8 karakterlik bir takma ad girin."
+    },
+    "room_name": {
+      "length": "1–20 karakterlik bir grup adı girin."
+    }
+  }
+}

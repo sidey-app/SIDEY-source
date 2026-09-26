@@ -26,13 +26,13 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
     private readonly bool _ownsComposer;
 
     [ObservableProperty]
-    public partial string Title { get; set; } = I18n.Get("history.recentTitle");
+    public partial string Title { get; set; } = I18n.Get("history.recent.title");
 
     [ObservableProperty]
-    public partial string EmptyMessage { get; set; } = I18n.Get("history.empty");
+    public partial string EmptyMessage { get; set; } = I18n.Get("history.empty.title");
 
     [ObservableProperty]
-    public partial string EmptyDescription { get; set; } = I18n.Get("history.emptyDescription");
+    public partial string EmptyDescription { get; set; } = I18n.Get("history.empty.description");
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsEmptyStateVisible))]
@@ -101,7 +101,7 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
 
     public void RefreshLocalizedText()
     {
-        Title = I18n.Get("history.recentTitle");
+        Title = I18n.Get("history.recent.title");
         RebuildEntries();
         UpdateEmptyState();
     }
@@ -144,7 +144,7 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
         Guid? roomId = _state.ActiveRoomId;
         CancelRequest();
         ResetLoadedHistory(roomId);
-        Title = I18n.Get("history.recentTitle");
+        Title = I18n.Get("history.recent.title");
         if (roomId is null)
         {
             UpdateEmptyState();
@@ -387,7 +387,7 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
             candidate => candidate.UserId == entry.SenderId);
         return new HistoryEntryViewModel(
             entry.Id,
-            member?.Nickname ?? I18n.Get("history.unknownUser"),
+            member?.Nickname ?? I18n.Get("history.user.unknown"),
             entry.Body,
             entry.CreatedAt.ToLocalTime().ToString("g", CultureInfo.CurrentCulture),
             PixelCharacterCatalog.NormalizeId(member?.CharacterId),
@@ -449,11 +449,11 @@ public sealed partial class HistoryWindowViewModel : ObservableObject, IDisposab
         if (Items.Count == 0 && !IsInitialLoading && !IsInitialFailureVisible)
         {
             EmptyMessage = _loadedRoomId is null
-                ? I18n.Get("history.noActiveRoom")
-                : I18n.Get("history.empty");
+                ? I18n.Get("history.group.none")
+                : I18n.Get("history.empty.title");
             EmptyDescription = _loadedRoomId is null
-                ? I18n.Get("history.joinPrompt")
-                : I18n.Get("history.emptyDescription");
+                ? I18n.Get("history.group.required")
+                : I18n.Get("history.empty.description");
         }
 
         OnPropertyChanged(nameof(IsEmptyStateVisible));

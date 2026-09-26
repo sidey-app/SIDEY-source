@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Снова откройте приложение с помощью scripts/macos/open_current.sh или соберите и запустите его в Xcode.",
+          "unverified_source": "Не удалось проверить, что это приложение собрано из текущего исходного кода."
+        }
+      },
+      "common": {
+        "quit": "Выйти"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Задайте SIDEY_SUPABASE_URL и SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Для Sidey-dev нужны URL-адрес SIDEY-staging и publishable key.",
+          "production_backend_in_development": "Sidey-dev не может подключаться к рабочему проекту Supabase.",
+          "secret_key_not_allowed": "Supabase secret key или service-role key нельзя использовать в клиенте.",
+          "unsupported_realtime_protocol": "Настройка протокола реального времени SIDEY содержит неподдерживаемое значение."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Незафиксированные изменения"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Проверка магазина · Не удалось сделать снимок",
+          "ownership": {
+            "$value": "Владение",
+            "all": "Оба",
+            "character": "Только персонаж",
+            "keepsake": "Только любимая вещь",
+            "none": "Нет"
+          },
+          "product": "Товар",
+          "purchase_disabled": "На этом экране проверки реальные покупки не совершаются.",
+          "window": {
+            "title": "Sidey-dev · Проверка магазина · Без реальных покупок"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Локальный предпросмотр с 12 персонажами запущен, потому что не заданы переменные среды сервера."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "Модуль показателей отрисовки не работает.",
+          "not_started": "Модуль показателей отрисовки не запущен."
+        },
+        "export": {
+          "action": "Экспортировать текущие показатели JSON",
+          "failed": "Не удалось экспортировать показатели: {0}",
+          "path": "Путь экспорта: {0}",
+          "success": "Текущие показатели JSON экспортированы. Результат ручной проверки остаётся not_run.",
+          "tooltip": "Сохранить текущие показатели производительности отрисовки в формате JSON."
+        },
+        "preview_notice": "Внутренний режим показателей отрисовки только с хомячком. Ручная проверка ещё не зафиксирована.",
+        "samples": {
+          "empty": "Нет образцов показателей"
+        },
+        "summary": "Прошло {0:F0} с · Образцов: {1} · Самый долгий кадр: {2:F2} мс · Рабочий набор: {3:F1} МБ (пик: {4:F1} МБ) · GDI: {5} · USER: {6}",
+        "title": "Внутренние показатели отрисовки"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Для переопределения Supabase нужны URL-адрес HTTPS (или HTTP для localhost) и публичный ключ. Секретные ключи и ключи service-role запрещены."
+        }
+      }
+    }
+  }
+}

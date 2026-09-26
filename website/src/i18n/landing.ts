@@ -25,7 +25,7 @@ const ui = {
     skip: "본문으로 건너뛰기",
     navigation: {
       navigation: "주요 메뉴", home: "SIDEY 홈", openMenu: "메뉴 열기", closeMenu: "메뉴 닫기", features: "기능", download: "다운로드",
-      faq: "자주 묻는 질문", whatsNew: "새로운 기능", store: "상점", support: "지원", characters: "캐릭터", throwables: "투척물", bubbles: "말풍선",
+      faq: "자주 묻는 질문", whatsNew: "새로운 기능", store: "상점", support: "지원", characters: "캐릭터", throwables: "던지기 장난감", bubbles: "말풍선",
       useLightTheme: "라이트 모드로 전환", useDarkTheme: "다크 모드로 전환",
     },
     hero: {
@@ -93,7 +93,7 @@ const ui = {
     skip: "Skip to content",
     navigation: {
       navigation: "Main navigation", home: "SIDEY home", openMenu: "Open menu", closeMenu: "Close menu", features: "Features", download: "Download",
-      faq: "FAQ", whatsNew: "What's New", store: "Store", support: "Support", characters: "Characters", throwables: "Throwables", bubbles: "Bubbles",
+      faq: "FAQ", whatsNew: "What's New", store: "Store", support: "Support", characters: "Characters", throwables: "Tossable toys", bubbles: "Bubbles",
       useLightTheme: "Switch to light mode", useDarkTheme: "Switch to dark mode",
     },
     hero: {
@@ -161,7 +161,7 @@ const ui = {
     skip: "本文へスキップ",
     navigation: {
       navigation: "メインメニュー", home: "SIDEY ホーム", openMenu: "メニューを開く", closeMenu: "メニューを閉じる", features: "機能", download: "ダウンロード",
-      faq: "よくある質問", whatsNew: "新機能", store: "ストア", support: "サポート", characters: "キャラクター", throwables: "投げアイテム", bubbles: "吹き出し",
+      faq: "よくある質問", whatsNew: "新機能", store: "ストア", support: "サポート", characters: "キャラクター", throwables: "投げて遊ぶおもちゃ", bubbles: "吹き出し",
       useLightTheme: "ライトモードに切り替える", useDarkTheme: "ダークモードに切り替える",
     },
     hero: {
@@ -231,7 +231,7 @@ const ui = {
     skip: "跳到主要內容",
     navigation: {
       navigation: "主要導覽", home: "SIDEY 首頁", openMenu: "開啟選單", closeMenu: "關閉選單", features: "功能", download: "下載",
-      faq: "常見問題", whatsNew: "新功能", store: "商店", support: "支援", characters: "角色", throwables: "投擲道具", bubbles: "對話框",
+      faq: "常見問題", whatsNew: "新功能", store: "商店", support: "支援", characters: "角色", throwables: "投擲玩具", bubbles: "對話框",
       useLightTheme: "切換至淺色模式", useDarkTheme: "切換至深色模式",
     },
     hero: {

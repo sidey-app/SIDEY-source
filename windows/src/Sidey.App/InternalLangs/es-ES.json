@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Una invalidación de Supabase requiere una URL HTTPS (o HTTP localhost) y una clave publicable. No se permiten claves secret ni service-role."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "Se está ejecutando una vista previa local con 12 personajes porque no se han configurado las variables de entorno del servidor."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "El representador de métricas no se está ejecutando.",
+      "not_started": "El representador de métricas no se ha iniciado."
+    },
+    "export": {
+      "action": "Exportar JSON de métricas actuales",
+      "failed": "Error al exportar las métricas: {0}",
+      "path": "Ruta de exportación: {0}",
+      "success": "Se ha exportado el JSON de métricas actuales. Los resultados manuales siguen como not_run.",
+      "tooltip": "Guarda como JSON las métricas actuales de rendimiento de representación."
+    },
+    "preview_notice": "Modo interno de métricas del representador limitado al hámster. No se ha registrado la comprobación manual.",
+    "samples": {
+      "empty": "No hay muestras de métricas"
+    },
+    "summary": "Transcurrido: {0:F0} s · {1} muestras · fotograma máx.: {2:F2} ms · conjunto de trabajo: {3:F1} MB (máx.: {4:F1} MB) · GDI: {5} · USER: {6}",
+    "title": "Métricas internas del representador"
+  }
+}

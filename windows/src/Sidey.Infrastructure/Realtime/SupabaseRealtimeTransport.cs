@@ -351,7 +351,7 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
             if (!IsNetworkAvailable)
                 interrupted.Cancel();
             _ = await _sessions.GetStoredSessionAsync(interrupted.Token).ConfigureAwait(false)
-                ?? throw new UnauthorizedAccessException(I18n.Get("auth.sessionMissing"));
+                ?? throw new UnauthorizedAccessException(I18n.Get("auth.session.expired"));
             var builder = new UriBuilder(_configuration.Url)
             {
                 Scheme = "wss",
@@ -439,7 +439,7 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
         CancellationToken cancellationToken)
     {
         StoredSupabaseSession session = await _sessions.GetStoredSessionAsync(cancellationToken).ConfigureAwait(false)
-            ?? throw new UnauthorizedAccessException(I18n.Get("auth.sessionMissing"));
+            ?? throw new UnauthorizedAccessException(I18n.Get("auth.session.expired"));
         bool isEphemeral = descriptor.Kind == RealtimeTopicKind.Ephemeral;
         string topicKind = isEphemeral ? "ephemeral" : "database";
         Emit(new BackendEvent.Diagnostic(
@@ -535,7 +535,7 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
         CancellationToken cancellationToken)
     {
         StoredSupabaseSession session = await _sessions.GetStoredSessionAsync(cancellationToken).ConfigureAwait(false)
-            ?? throw new InvalidOperationException(I18n.Get("auth.sessionMissing"));
+            ?? throw new InvalidOperationException(I18n.Get("auth.session.expired"));
         var desiredTopics = intent.RoomEpochs.Select(room => new RealtimeRoomDescriptor(
             room.Key, room.Value, RealtimeTopicKind.Ephemeral).PhoenixTopic).ToHashSet(StringComparer.Ordinal);
         foreach (string departedTopic in _publishedPresence.Keys.Where(topic => !desiredTopics.Contains(topic)).ToArray())
@@ -593,7 +593,7 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
         ClientWebSocket? socket = _socketSession?.Socket;
         if (socket?.State != WebSocketState.Open)
         {
-            throw new WebSocketException(I18n.Get("backend.realtimeUnavailable"));
+            throw new WebSocketException(I18n.Get("connection.unavailable"));
         }
 
         string reference = Interlocked.Increment(ref _reference).ToString();
@@ -734,7 +734,7 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
                     $"realtime-heartbeat-timeout silence-ms={(long)silence.TotalMilliseconds}"));
                 socket.Abort();
                 Emit(new BackendEvent.TechnicalError(
-                    I18n.Get("connection.serviceUnavailable")));
+                    I18n.Get("connection.error.service_unavailable")));
                 EmitDisconnected();
                 ScheduleRecovery();
                 continue;
@@ -755,7 +755,7 @@ internal sealed class SupabaseRealtimeTransport : IRealtimeTransport
                 {
                     StoredSupabaseSession session = await _sessions.GetStoredSessionAsync(_shutdown.Token)
                         .ConfigureAwait(false)
-                        ?? throw new UnauthorizedAccessException(I18n.Get("auth.sessionMissing"));
+                        ?? throw new UnauthorizedAccessException(I18n.Get("auth.session.expired"));
                     await RefreshChannelAuthorizationAsync(session, _shutdown.Token).ConfigureAwait(false);
                     Volatile.Write(ref _lastAuthorizationRefreshTimestamp, Stopwatch.GetTimestamp());
                 }

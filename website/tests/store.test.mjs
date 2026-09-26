@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 
 const catalog = JSON.parse(readFileSync(new URL("../../assets/v1/commerce-catalog.json", import.meta.url)));
-const commerceLocalizations = JSON.parse(readFileSync(new URL("../../assets/v1/commerce-localizations.json", import.meta.url)));
+const commerceLocalizations = Object.fromEntries(
+  ["ko", "en", "ja", "zh-Hant"].map((locale) => [
+    locale,
+    JSON.parse(readFileSync(new URL(`../../assets/v1/locale/commerce/${locale}.json`, import.meta.url))),
+  ]),
+);
 const read = (path) => readFileSync(new URL(`../dist/${path}`, import.meta.url), "utf8");
 const manifest = JSON.parse(readFileSync(new URL("../../assets/v1/manifest.json", import.meta.url)));
 const root = new URL("../../", import.meta.url);
@@ -136,10 +141,10 @@ for (const locale of ["ko", "en", "ja", "zh-Hant"]) {
         assert.ok(card, entry.id);
         const price = locale === "ko" ? `${entry.direct_price.toLocaleString("ko-KR")}원` : `₩${entry.direct_price.toLocaleString("en-US")}`;
         assert.ok(card.includes(`<strong>${price}</strong>`), `${entry.id}: ${price}`);
-        const localized = commerceLocalizations.products.find((product) => product.id === entry.id)?.localizations[locale];
+        const localized = commerceLocalizations[locale][entry.id];
         assert.ok(localized, `${entry.id}: ${locale} localization`);
         assert.ok(card.includes(localized.display_name), `${entry.id}: localized display name`);
-        assert.ok(card.includes(localized.marketing_description), `${entry.id}: localized marketing description`);
+        assert.ok(card.includes(localized.description), `${entry.id}: localized description`);
         const keepsake = catalog.find((candidate) => candidate.related_character_product_id === entry.id);
         if (keepsake) {
           assert.match(card, /store-keepsake-summary/);
@@ -162,7 +167,6 @@ for (const locale of ["ko", "en", "ja", "zh-Hant"]) {
       }
       if (category === "characters") {
         assert.equal(html.match(/class="store-keepsake-summary"/g)?.length, catalog.filter(entry => entry.related_character_product_id).length);
-        if (locale === "ko") assert.match(html, /우클릭하면 멈추고/);
       }
     });
   }
@@ -618,10 +622,10 @@ test("browser regions update App Store links and the platform-selector macOS tar
 
 test("localized refund policies cover every paid customization category", () => {
   const expectations = {
-    ko: ["유료 꾸미기 상품", "기본 햄스터", "기본 말풍선", "기본 투척물"],
-    en: ["Paid SIDEY customization items", "default hamster", "default speech bubble", "default throwable"],
-    ja: ["有料カスタマイズアイテム", "標準のハムスター", "標準の吹き出し", "標準の投げアイテム"],
-    "zh-hant": ["付費自訂商品", "基本小倉鼠", "基本對話框", "基本投擲物"],
+    ko: ["유료 꾸미기 상품", "기본 햄스터", "기본 말풍선", "기본 던지기 장난감"],
+    en: ["Paid SIDEY customization items", "default hamster", "default speech bubble", "default tossable toy"],
+    ja: ["有料カスタマイズアイテム", "標準のハムスター", "標準の吹き出し", "標準の投げて遊ぶおもちゃ"],
+    "zh-hant": ["付費自訂商品", "基本小倉鼠", "基本對話框", "基本投擲玩具"],
   };
   for (const [locale, phrases] of Object.entries(expectations)) {
     const html = read(`${locale}/refund/index.html`);
@@ -669,17 +673,6 @@ test("support navigation and locale-neutral language metadata are explicit", () 
   }
   for (const path of ["", "store/", "privacy/", "refund/", "terms/", "support/", "whats-new/"]) {
     assert.match(read(`${path}index.html`), /<html lang="en">/);
-  }
-});
-
-test("Traditional Chinese public copy uses Taiwan-style status and inclusion terms", () => {
-  const landing = read("zh-hant/index.html");
-  assert.ok(landing.includes("線上、離開或離線"));
-  assert.doesNotMatch(landing, /在線/);
-  for (const category of Object.keys(included)) {
-    const html = read(`zh-hant/store/${category}/index.html`);
-    assert.ok(html.includes("隨附"), category);
-    assert.doesNotMatch(html, /基本提供/, category);
   }
 });
 

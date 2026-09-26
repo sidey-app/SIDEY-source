@@ -24,6 +24,9 @@
     <None Include="../../src/Sidey.App/Langs/*.json" Link="Langs/%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="../../src/Sidey.App/InternalLangs/*.json" Link="InternalLangs/%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="../../src/Sidey.Overlay/Assets/Characters/**/*.png" Link="TestAssets/%(RecursiveDir)%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

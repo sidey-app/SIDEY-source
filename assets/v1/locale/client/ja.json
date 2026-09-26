@@ -1,0 +1,1630 @@
+{
+  "character": {
+    "pixel_cat": {
+      "display_name": "子猫"
+    },
+    "pixel_hamster": {
+      "display_name": "ハムスターの赤ちゃん"
+    },
+    "pixel_penguin": {
+      "display_name": "ペンギンのひな"
+    },
+    "pixel_puppy": {
+      "display_name": "子犬"
+    },
+    "pixel_rabbit": {
+      "display_name": "子うさぎ"
+    },
+    "unknown": {
+      "display_name": "キャラクター"
+    }
+  },
+  "common": {
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "continue": "続ける",
+    "me": "自分",
+    "next": "次へ",
+    "save": "保存"
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "コードで参加"
+    },
+    "collapse": "グループを折りたたむ",
+    "create": {
+      "action": "グループを作成",
+      "name": {
+        "placeholder": "新しいグループ名"
+      }
+    },
+    "delete": {
+      "action": "グループを削除"
+    },
+    "expand": "グループを展開",
+    "member": {
+      "remove": {
+        "action": "退出させる"
+      }
+    },
+    "rename": {
+      "action": "名前を変更",
+      "name_placeholder": "グループ名（1〜20文字）"
+    },
+    "room_name": {
+      "label": "グループ名"
+    }
+  },
+  "history": {
+    "load_more": {
+      "failed": "以前のメッセージを読み込めませんでした",
+      "loading": "以前のメッセージを読み込み中…"
+    },
+    "loading": "最近のメッセージを読み込み中…"
+  },
+  "message": {
+    "send": {
+      "accessibility": "メッセージを送信"
+    }
+  },
+  "onboarding": {
+    "character": {
+      "label": "自分のキャラクター"
+    },
+    "group": {
+      "create": {
+        "description": "グループを作成できます。"
+      },
+      "description": "グループを作るか、招待コードで参加すると、ピクセルワールドが現れます。",
+      "title": "友だちとグループを始める"
+    },
+    "step": {
+      "group": "グループ",
+      "profile": "プロフィール"
+    }
+  },
+  "platforms": {
+    "macos": {
+      "account": {
+        "delete": {
+          "failed": "アカウントを削除できませんでした。もう一度お試しください。"
+        }
+      },
+      "account_delete": {
+        "error": {
+          "request_failed": "アカウント削除リクエストを完了できませんでした。"
+        }
+      },
+      "app": {
+        "settings": {
+          "navigation_label": "アプリ設定"
+        }
+      },
+      "apple_auth": {
+        "error": {
+          "missing_authorization_code": "「Appleでサインイン」を完了できませんでした。もう一度お試しください。",
+          "missing_identity_token": "「Appleでサインイン」を完了できませんでした。もう一度試してください。",
+          "missing_request_nonce": "「Appleでサインイン」を完了できませんでした。もう一度試してください。"
+        }
+      },
+      "auth": {
+        "apple": {
+          "description": "アプリ内課金の復元とアカウント保護のため、App Store版ではAppleでのサインインが必要です。",
+          "title": "Appleでサインイン",
+          "verifying": "サインインを確認中"
+        },
+        "apple_sign_in": {
+          "failed": "Appleでサインインできませんでした。もう一度お試しください。"
+        }
+      },
+      "backend": {
+        "connect": {
+          "failed_detail": "サーバーに接続できませんでした。インターネット接続を確認して、もう一度お試しください。（%@）"
+        },
+        "connection": {
+          "connecting": "接続中",
+          "failed": "接続エラー",
+          "idle": "待機中",
+          "online": "接続済み"
+        },
+        "error": {
+          "already_member": "すでに参加しているグループです。",
+          "authentication_required": "ログインが必要です。もう一度ログインしてください。",
+          "current_user_unavailable": "ログイン情報を確認できませんでした。もう一度ログインしてください。",
+          "generic": "リクエストを完了できませんでした。しばらくしてからもう一度お試しください。",
+          "invalid_invite_code": "招待コードを確認して、もう一度お試しください。",
+          "invalid_message": "メッセージは200文字・3行以内で入力してください。",
+          "invalid_profile": "ニックネームは改行なしの2〜8文字で入力してください。",
+          "invalid_room_name": "グループ名は改行なしの1〜20文字で入力してください。",
+          "invalid_timestamp": "メッセージ情報を読み取れませんでした。しばらくしてから、もう一度試してください。",
+          "invite_rate_limited": "招待コードの試行回数が多すぎます。10分後にもう一度お試しください。",
+          "malformed_response": "リクエストを完了できませんでした。しばらくしてから、もう一度お試しください。",
+          "member_limit_reached": {
+            "one": "このグループはすでに%lld人で満員です。",
+            "other": "このグループはすでに%lld人で満員です。"
+          },
+          "member_not_found": "グループから外すメンバーが見つかりませんでした。",
+          "membership_required": "この操作はグループのメンバーのみ実行できます。",
+          "message_receive_failed": "メッセージを受信できませんでした。しばらくしてからもう一度お試しください。",
+          "no_active_room": "メッセージを送信するグループがありません。",
+          "owner_cannot_remove_self": "グループオーナー自身をグループから外すことはできません。",
+          "owner_required": "この操作はグループオーナーのみ実行できます。",
+          "profile_required": "先にプロフィールを保存してください。",
+          "realtime_unavailable": "サーバー接続を準備しています。しばらくしてから、もう一度お試しください。",
+          "room_limit_reached": "1人につき最大5個のグループを利用できます。",
+          "room_resync_failed": "グループの最新状態を読み込めませんでした。しばらくしてから、もう一度お試しください。",
+          "session_recovery_failed": "以前のログインを復元できませんでした。新しいアカウントは作成されていません。もう一度ログインするか、サポートにお問い合わせください。",
+          "stale_realtime_epoch": "グループへのアクセス権が変更されました。もう一度接続してください。"
+        },
+        "realtime_recovery_failed": "サーバーに再接続できませんでした。しばらくしてから、もう一度お試しください。（%@）"
+      },
+      "commerce": {
+        "character": {
+          "equip": {
+            "failed": "キャラクターを装備できませんでした。もう一度お試しください。（%@）",
+            "success": "%@を装備しました。"
+          }
+        },
+        "equipment": {
+          "success": {
+            "default_bubble": "デフォルトの吹き出しを装備しました。",
+            "default_character": "デフォルトのキャラクターを装備しました。",
+            "default_throwable": "デフォルトのやわらかボールを装備しました。",
+            "named": "%@を装備しました。"
+          }
+        },
+        "error": {
+          "catalog_unavailable": "ストアの状態を読み込めませんでした。"
+        },
+        "kind": {
+          "bubble": "吹き出し",
+          "character": "キャラクター",
+          "throwable": "投げて遊ぶおもちゃ"
+        }
+      },
+      "common": {
+        "retry": "再試行"
+      },
+      "composer": {
+        "drag": {
+          "accessibility": "入力欄移動ハンドル",
+          "tooltip": "入力欄を移動"
+        }
+      },
+      "connection": {
+        "state": {
+          "connecting": "接続中…",
+          "failed": "接続エラー",
+          "idle": "待機中",
+          "online": "接続済み"
+        }
+      },
+      "firebase": {
+        "auth": {
+          "error": {
+            "account_mismatch": "ログインアカウントが変更されました。もう一度ログインしてください。",
+            "invalid_rollout_lease_claim": "サーバー接続に必要なログイン情報を確認できませんでした。もう一度ログインしてください。",
+            "invalid_session_claim": "ログイン情報を確認できませんでした。もう一度ログインしてください。",
+            "login_mismatch": "ログイン情報が現在のアカウントと一致しません。もう一度ログインしてください。",
+            "malformed_account_identifier": "ログインアカウントを確認できませんでした。もう一度ログインしてください。",
+            "rollout_lease_expired": "ログインの有効期限が切れました。もう一度ログインしてください。",
+            "rollout_lease_mismatch": "現在のログイン情報ではサーバーに接続できません。もう一度ログインしてください。",
+            "session_mismatch": "ログイン情報が現在のアカウントと一致しません。もう一度ログインしてください。",
+            "token_refresh_validation_failed": "ログイン情報を確認できませんでした。もう一度ログインしてください。"
+          }
+        },
+        "bootstrap": {
+          "error": {
+            "authentication_required": "ログインの有効期限が切れました。もう一度ログインしてください。",
+            "grant_not_converged": "サーバー接続を完了しています。しばらくしてから、もう一度お試しください。",
+            "invalid_argument": "サーバー接続を準備できませんでした。しばらくしてから、もう一度お試しください。",
+            "invalid_http_response": "サーバー接続を準備できませんでした。しばらくしてから、もう一度お試しください。",
+            "malformed_success": "サーバー接続を準備できませんでした。しばらくしてから、もう一度お試しください。",
+            "method_not_allowed": "現在のアプリのバージョンではサーバーに接続できません。アプリをアップデートしてください。",
+            "missing_access_token": "ログインの有効期限が切れました。もう一度ログインしてください。",
+            "rate_limited": "接続の試行回数が多すぎます。しばらくしてから、もう一度試してください。",
+            "rollout_disabled": "現在サーバーに接続できません。自動で再試行します。",
+            "unavailable": "サーバー接続を準備できませんでした。しばらくしてから、もう一度お試しください。",
+            "unexpected_contract": "現在のアプリのバージョンではサーバーに接続できません。アプリをアップデートしてください。"
+          }
+        },
+        "chat": {
+          "error": {
+            "authentication_expired": "ログインの有効期限が切れました。もう一度ログインしてください。",
+            "invalid_message": "メッセージの内容を確認して、もう一度送信してください。",
+            "permission_denied": "このグループではメッセージを送信できません。",
+            "rate_limited": "メッセージの送信が速すぎます。",
+            "state_conflict": "メッセージを送信できませんでした。しばらくしてから、もう一度試してください。"
+          }
+        },
+        "configuration": {
+          "error": {
+            "invalid_plist": "アプリの接続設定を読み込めませんでした。アプリを再インストールしてください。",
+            "missing_plist": "アプリの接続設定に問題があります。アプリを再インストールしてください。",
+            "sdk_app_unavailable": "アプリの接続を開始できませんでした。アプリを開き直してください。",
+            "sdk_options_unavailable": "アプリの接続を準備できませんでした。アプリを開き直してください。",
+            "unexpected_app": "アプリの接続設定が正しくありません。アプリを再インストールしてください。",
+            "unexpected_bundle": "アプリの接続設定が正しくありません。アプリを再インストールしてください。",
+            "unexpected_database": "アプリの接続設定が正しくありません。アプリを再インストールしてください。",
+            "unexpected_project": "アプリの接続設定が正しくありません。アプリを再インストールしてください。"
+          }
+        },
+        "production": {
+          "error": {
+            "app_version_unavailable": "アプリのバージョンを確認できないため、サーバーに接続できません。アプリを開き直してください。",
+            "duplicate_wire_code": "アプリのデータに問題があるため、サーバーに接続できません。アプリを再インストールしてください。"
+          }
+        },
+        "transport": {
+          "error": {
+            "access_grant_closed": "グループへのアクセス権を確認しています。しばらくしてから、もう一度試してください。",
+            "listener_failed": "メッセージ接続が切れました。もう一度接続してください。",
+            "live_listener_unavailable": "メッセージ接続を準備できませんでした。しばらくしてから再接続してください。",
+            "reconciliation_failed": "グループの最新状態を確認できませんでした。しばらくしてから、もう一度試してください。",
+            "room_not_authorized": "このグループへのアクセス権を確認できませんでした。もう一度接続してください。",
+            "shut_down": "サーバー接続が切れました。もう一度接続してください。"
+          }
+        }
+      },
+      "group": {
+        "create": {
+          "in_progress": "作成中…",
+          "keychain_warning": "グループは作成されましたが、招待コードをキーチェーンに保存できませんでした。現在表示されているコードを別の安全な場所に保管してください。",
+          "realtime_grant_pending": "グループは作成されましたが、接続を完了できませんでした。しばらくしてから、もう一度ご確認ください。（%@）"
+        },
+        "delete": {
+          "success": "「%@」グループを削除しました。"
+        },
+        "join": {
+          "in_progress": "参加中…",
+          "keychain_warning": "グループには参加しましたが、招待コードをキーチェーンに保存できませんでした。受け取ったコードを別の安全な場所に保管してください。",
+          "realtime_grant_pending": "グループには参加しましたが、接続を完了できませんでした。しばらくしてから、もう一度ご確認ください。（%@）"
+        },
+        "leave": {
+          "confirmation": {
+            "last_member": "最後のメンバーのため、グループとすべてのメッセージは完全に削除され、復元できません。",
+            "member": "グループとこれまでのメッセージにはアクセスできなくなります。",
+            "owner_transfer": "残っているメンバーのうち、最初に参加した人がグループオーナーになります。グループとこれまでのメッセージにはアクセスできなくなります。"
+          },
+          "success": "「%@」グループから退出しました。"
+        },
+        "name": {
+          "unknown": "グループ"
+        },
+        "remove_member": {
+          "success": "%@さんをグループから外しました。"
+        },
+        "rename": {
+          "success": "グループ名を変更しました。"
+        },
+        "switch": {
+          "failed": "グループを切り替えられませんでした。もう一度お試しください。（%@）"
+        }
+      },
+      "groups": {
+        "active": "使用中",
+        "create": {
+          "invite_code": {
+            "description": "このコードを受け取った友だちだけがグループに参加できます。",
+            "title": "発行したばかりの招待コード"
+          },
+          "name": {
+            "description": "1〜20文字の名前を入力してグループを作成できます。"
+          },
+          "subtitle": "グループを作成し、招待コードを友だちと共有できます。"
+        },
+        "current": {
+          "empty": {
+            "description": "新しいグループを作成するか、友だちから受け取った招待コードを入力してください。",
+            "title": "参加中のグループはまだありません"
+          },
+          "subtitle": {
+            "one": "友だちと一緒に参加するグループを管理できます。各グループには最大%lld人まで参加できます。",
+            "other": "友だちと一緒に参加するグループを管理できます。各グループには最大%lld人まで参加できます。"
+          },
+          "title": "現在のグループ"
+        },
+        "delete": {
+          "confirmation_title": "「%@」グループを削除しますか？",
+          "message": "グループとすべてのメッセージが完全に削除され、復元できません。"
+        },
+        "invite_code": {
+          "copy": {
+            "action": "招待コードをコピー",
+            "complete": "コピーしました",
+            "help": "このデバイスのキーチェーンに保存された招待コードをコピーします。"
+          },
+          "rotate": {
+            "$value": "招待コードを再発行",
+            "help": "漏えいした可能性のある以前のコードを無効にし、新しい128ビットコードを1つ発行します。"
+          }
+        },
+        "join": {
+          "invite_code": {
+            "description": "招待コードを入力すると、グループに参加できるかと空き状況を確認します。",
+            "placeholder": "招待コード",
+            "title": "招待コード"
+          },
+          "subtitle": "友だちから受け取った招待コードでグループに参加できます。"
+        },
+        "leave": {
+          "action": "グループから退出",
+          "confirmation_title": "「%@」グループから退出しますか？",
+          "message": {
+            "last_owner": "最後のメンバーのため、グループとすべてのメッセージが完全に削除され、復元できません。",
+            "member": "このグループと既存のメッセージにはアクセスできなくなります。",
+            "owner_transfer": "残っているメンバーのうち、最初に参加した人がグループオーナーになります。このグループと既存のメッセージにはアクセスできなくなります。"
+          }
+        },
+        "management": {
+          "navigation_label": "グループ"
+        },
+        "member": {
+          "owner": "オーナー",
+          "remove": {
+            "confirmation_title": "「%@」さんを退出させますか？",
+            "message": "このメンバーはグループと既存のメッセージにアクセスできなくなります。",
+            "title": "メンバーを退出させる"
+          }
+        },
+        "members": {
+          "empty": "表示するメンバーがいません。"
+        },
+        "operation": {
+          "creating": "作成中…",
+          "joining": "参加中…",
+          "select": "このグループを使用",
+          "switching": "グループを切り替え中…"
+        },
+        "room": {
+          "summary": {
+            "invite_ready": {
+              "one": "%1$lld/%2$lld人・招待コード %3$@",
+              "other": "%1$lld/%2$lld人・招待コード %3$@"
+            },
+            "invite_rotation_required": {
+              "one": "%1$lld/%2$lld人・招待コードの再発行が必要",
+              "other": "%1$lld/%2$lld人・招待コードの再発行が必要"
+            }
+          }
+        }
+      },
+      "history": {
+        "close": {
+          "accessibility": "最近のメッセージを閉じる"
+        },
+        "empty": {
+          "description": "このグループの最近のメッセージがここに表示されます。",
+          "title": "まだメッセージはありません"
+        },
+        "error": {
+          "load_failed": "履歴を読み込めませんでした"
+        },
+        "older": {
+          "exhausted": {
+            "one": "過去%lld日分の履歴をすべて表示しました",
+            "other": "過去%lld日分の履歴をすべて表示しました"
+          }
+        },
+        "retention_notice": {
+          "one": "メッセージは%lld日後に自動的に削除されます。",
+          "other": "メッセージは%lld日後に自動的に削除されます。"
+        },
+        "title": "最近のメッセージ",
+        "window": {
+          "title": "%@ 最近の履歴"
+        }
+      },
+      "invite": {
+        "error": {
+          "backend_unavailable": "現在、招待コードを確認できません。しばらくしてから、もう一度試してください。",
+          "clipboard_failed": "招待コードをクリップボードにコピーできませんでした。もう一度お試しください。",
+          "not_stored_on_device": "このデバイスに招待コードが保存されていません。新しいコードを発行するか、オーナーに確認してください。",
+          "read_failed": "招待コードを読み取れませんでした。もう一度試してください。（%@）",
+          "revoked": "このグループの以前の招待コードは無効になりました。グループオーナーが新しいコードを発行する必要があります。"
+        },
+        "rotate": {
+          "keychain_warning": "新しいコードは発行されましたが、キーチェーンに保存できませんでした。現在表示されているコードを別の安全な場所に保管してください。",
+          "success": "新しい招待コードを発行しました。"
+        }
+      },
+      "keychain": {
+        "error": {
+          "status": "キーチェーンエラー %lld"
+        },
+        "operation_reason": "サインイン情報とグループの招待コードを安全に読み込みます。",
+        "transition": {
+          "message": "SIDEYはサインイン情報とグループの招待コードを安全に保存・取得するためにmacOSキーチェーンを使用します。",
+          "migration_explanation": "以前のバージョンで保存した情報を初めて読み込む際に、Macのログインパスワードを求められることがあります。次回から確認されないようにするには、続いて表示されるmacOSのダイアログで「常に許可」を選択してください。「許可」を選ぶと、保存されている情報に応じてダイアログが数回表示されたり、次回の起動時に再び表示されたりすることがあります。",
+          "privacy_explanation": "入力したパスワードを確認したり保存したりすることはありません。",
+          "quit": "SIDEYを終了"
+        }
+      },
+      "landing": {
+        "accessibility": {
+          "ready": "SIDEY開始画面",
+          "restoring": "SIDEYで前回のログインを復元中"
+        },
+        "status": {
+          "ready": "左クリックして始めましょう。",
+          "restoring": "前回のログインを復元しています…"
+        },
+        "tagline": "友だちが画面のそばにやってきました。"
+      },
+      "launch_at_login": {
+        "update_failed": "ログイン時に開く設定を変更できませんでした。もう一度お試しください。（%@）"
+      },
+      "message": {
+        "composer": {
+          "placeholder": "メッセージを入力"
+        },
+        "delivery": {
+          "failed": "送信失敗",
+          "pending": "送信中"
+        },
+        "error": {
+          "realtime_disconnected": "サーバー接続が切れているため、メッセージを送信できません。もう一度接続してください。",
+          "wait_for_group_switch": "グループの切り替えが完了してから送信してください。"
+        },
+        "retention_sync_failed": "メッセージの保存設定を反映できませんでした。もう一度お試しください。（%@）",
+        "send": {
+          "failed": "メッセージを送信できませんでした。もう一度お試しください。（%@）"
+        }
+      },
+      "mutation": {
+        "post_commit_sync_failed": "変更は保存されましたが、画面を更新できませんでした。しばらくしてから確認してください。（%@）",
+        "realtime_recovering": "変更内容は保存されました。サーバーに再接続しています…"
+      },
+      "onboarding": {
+        "group": {
+          "invite_code": {
+            "placeholder": "友だちから受け取った招待コード"
+          },
+          "member_limit": {
+            "one": "グループには最大%lld人まで参加できます。",
+            "other": "グループには最大%lld人まで参加できます。"
+          },
+          "path": {
+            "accessibility": "グループへの参加方法"
+          }
+        },
+        "profile": {
+          "description": "あとで設定からいつでも変更できます。",
+          "nickname": {
+            "placeholder": "ニックネーム（2〜8文字）"
+          },
+          "title": "使用する名前を決める"
+        }
+      },
+      "overlay": {
+        "span": {
+          "full": "全体"
+        }
+      },
+      "pixel_world": {
+        "doze_label": "Zzz",
+        "interaction": {
+          "throw": "友だちを左クリックすると、デフォルトのやわらかボールを投げます。",
+          "tree": "木を右クリックすると立ち止まったり歩いたりします。"
+        },
+        "nickname": {
+          "current_user": "%@ · 私"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "友だちの画面で自分を表すピクセルキャラクターを選べます。",
+          "selection": {
+            "accessibility": "キャラクター選択"
+          },
+          "state": {
+            "equipping": "装備中"
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "description": "持っている吹き出しを選ぶと、すべてのグループにすぐ適用されます。",
+            "selection": {
+              "accessibility": "吹き出し選択"
+            }
+          },
+          "character": {
+            "description": "持っているキャラクターを選ぶと、すべてのグループにすぐ適用されます。",
+            "selection": {
+              "accessibility": "キャラクター選択"
+            }
+          },
+          "default_bubble": "デフォルトの吹き出し",
+          "default_throwable": "デフォルトのやわらかボール",
+          "hint": {
+            "current": "現在使用中",
+            "select": "選択すると、すべてのグループにすぐ適用されます"
+          },
+          "throwable": {
+            "description": "持っている投げて遊ぶおもちゃを選ぶと、すべてのグループにすぐ適用されます。",
+            "selection": {
+              "accessibility": "投げて遊ぶおもちゃの選択"
+            }
+          }
+        },
+        "current_user": {
+          "badge": "自分"
+        },
+        "duplicates_allowed": "同じグループ内でキャラクターやニックネームが重複してもかまいません。",
+        "error": {
+          "character_not_owned": "プロフィールには所有しているキャラクターのみ選択できます。"
+        },
+        "nickname": {
+          "description": "友だちのピクセルワールドとメッセージに表示される名前です。2〜8文字で入力してください。",
+          "save": "ニックネームを変更",
+          "unknown": "友だち",
+          "unknown_friend": "不明な友だち",
+          "unknown_member": "メンバー"
+        },
+        "onboarding": {
+          "next_hint": "プロフィールを保存したら、グループを作成するか招待コードで参加してください。"
+        },
+        "selection": {
+          "state": {
+            "not_selected": "未選択",
+            "selected": "選択済み"
+          }
+        },
+        "subtitle": "友だちに表示される名前とキャラクターを設定できます。",
+        "success": {
+          "nickname_updated": "ニックネームを変更しました。",
+          "saved": "プロフィールを保存しました。"
+        }
+      },
+      "realtime": {
+        "kill_switch": {
+          "error": {
+            "legacy_connection_creation_failed": "サーバー接続を準備できませんでした。しばらくしてから、もう一度お試しください。",
+            "legacy_connection_recovery_failed": "サーバーに再接続できませんでした。しばらくしてから、もう一度お試しください。"
+          },
+          "transition_failed": "サーバーに接続できませんでした。しばらくしてから再接続してください。（%@）"
+        },
+        "rollout": {
+          "error": {
+            "cache_unavailable": "サーバー接続の状態を保存できませんでした。アプリを開き直してください。",
+            "contract_mismatch": "現在のアプリのバージョンではサーバーに接続できません。アプリをアップデートしてください。",
+            "enabled_policy_unavailable": "サーバーに接続できませんでした。しばらくしてから、もう一度お試しください。",
+            "malformed_response": "サーバーに接続できませんでした。しばらくしてから、もう一度お試しください。"
+          }
+        }
+      },
+      "settings": {
+        "account": {
+          "delete": {
+            "authentication_notice": "「削除」と入力し、Appleで再度サインインすると、アカウントはすぐに削除されます。",
+            "confirmation_phrase": "削除",
+            "description": "プロフィール、メッセージ、グループへの参加情報を削除します。購入記録は、会計および不正利用防止に必要な範囲でアカウントと分けて保持される場合があります。",
+            "placeholder": "確認のため「削除」と入力",
+            "reveal": "アカウントを削除…",
+            "title": "アカウントを削除"
+          },
+          "privacy_policy": "プライバシーポリシー",
+          "restore_purchases": "購入を復元",
+          "subtitle": "アカウントデータとアプリ内課金を管理します。",
+          "terms": "利用規約",
+          "title": "アカウントとプライバシー"
+        },
+        "display": {
+          "offline_members": {
+            "description": "オフラインの友だちも、眠っているキャラクターと赤いステータス点で表示します。",
+            "title": "オフラインメンバーを表示"
+          },
+          "quiet_mode": {
+            "description": "メッセージの吹き出しと入力中の表示を隠し、接続状態と未読数は表示します。"
+          },
+          "subtitle": "友だちの状態とメッセージが画面に表示される方法を調整できます。",
+          "throw_guard": {
+            "description": "オフにすると、友だちのキャラクターを左クリックしてすぐに投げられます。オンにすると、自分のキャラクターを右ボタンでダブルクリックしてから10秒間だけ、友だちのキャラクターを左クリックして投げられます。",
+            "title": "自分のキャラクターを右ボタンでダブルクリックしてから投げる"
+          }
+        },
+        "general": {
+          "overlay_visible": {
+            "description": "選択した画面端に友だちのピクセルワールドを表示します。"
+          },
+          "subtitle": "アプリの基本的な表示と起動方法を設定できます。"
+        },
+        "placement": {
+          "edge": {
+            "description": "キャラクターが歩く画面端を選びます。",
+            "picker": "画面端",
+            "title": "画面端"
+          },
+          "monitor": {
+            "description": "ピクセルワールドを表示する画面を選びます。入力ウインドウは左側のハンドルで別に移動できます。",
+            "picker": "ディスプレイ",
+            "title": "ディスプレイ"
+          },
+          "span": {
+            "description": "選択した画面端でワールドが占める範囲を選びます。",
+            "full": "全体",
+            "half": "1/2",
+            "picker": "長さ",
+            "third": "1/3",
+            "title": "範囲の長さ"
+          },
+          "subtitle": "ピクセルキャラクターを表示する画面と位置を選べます。",
+          "title": "ワールドの配置"
+        },
+        "shortcuts": {
+          "key": {
+            "picker": "キー"
+          },
+          "restore_default": {
+            "accessibility": "デフォルトのショートカットに戻す",
+            "help": "デフォルトのショートカットに戻す"
+          },
+          "subtitle": "修飾キーを1つ以上選び、英字または数字キーを指定します。変更はすぐに適用されます。",
+          "title": "グローバルショートカット"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "現在のグループでキャラクターに投げて遊ぶおもちゃが当たったときに効果音を再生します。",
+            "title": "キャラクター効果音"
+          },
+          "subtitle": "キャラクター効果音の再生を設定します。"
+        }
+      },
+      "shortcut": {
+        "action": {
+          "composer": "入力ウインドウを開く／閉じる",
+          "history": "最近の履歴を開く",
+          "overlay": "オーバーレイを表示／非表示",
+          "quiet_mode": "ひかえめモード"
+        },
+        "error": {
+          "duplicate": "「%@」ですでに使用されています。現在のショートカットを維持します。",
+          "modifier_required": "修飾キーを1つ以上選択してください。現在のショートカットを維持します。",
+          "new_binding_registration_failed": "新しいショートカットを登録できなかったため、現在のショートカットを維持します。",
+          "new_binding_used_by_other_app": "この組み合わせは別のアプリで使用されています。現在のショートカットを維持します。",
+          "registration_failed": "ショートカットを登録できませんでした。別のショートカットに変更してください。",
+          "used_by_other_app": "別のアプリで使用されています。別のショートカットに変更するか、競合するアプリの設定を確認してください。"
+        },
+        "modifier": {
+          "command": "Commandキー",
+          "control": "Controlキー",
+          "option": "Optionキー",
+          "shift": "Shiftキー"
+        },
+        "status": {
+          "change_failed": "変更失敗",
+          "unavailable": "ショートカットを使用できません"
+        }
+      },
+      "status": {
+        "icon": {
+          "unread": {
+            "accessibility": "%@、未読メッセージあり"
+          }
+        },
+        "menu": {
+          "active_group": "使用中のグループ",
+          "compose": "メッセージを作成…",
+          "group_settings": "グループ設定…",
+          "history": "最近の履歴…",
+          "no_connected_groups": "参加中のグループはありません",
+          "overlay": {
+            "hide": "オーバーレイを隠す",
+            "show": "オーバーレイを表示"
+          },
+          "quiet_mode": "ひかえめモード",
+          "quit": "%@を終了",
+          "settings": "設定…",
+          "store": "ストア…"
+        },
+        "room": {
+          "unread_count": "（%@）"
+        },
+        "tooltip": {
+          "unread": "%@ · 未読メッセージあり"
+        }
+      },
+      "store": {
+        "coming_soon": {
+          "badge": "近日公開",
+          "detail": "ストアは準備中です。もうしばらくお待ちください。",
+          "product": {
+            "accessibility": "%@、近日公開"
+          }
+        },
+        "empty": {
+          "description": "商品の種類や所有済み商品のフィルターを変更してみてください。",
+          "title": "条件に合う商品はありません"
+        },
+        "error": {
+          "auto_equip_failed": "購入は完了しましたが、自動で装着できませんでした。プロフィールから装着してください。",
+          "auto_equip_realtime_grant_pending": "自動装着は完了しました。すぐに表示されない場合は、しばらくしてから確認してください。（%@）",
+          "entitlements_reconcile_failed": "アプリ内で購入したアイテムを確認できませんでした。「購入を復元」をもう一度お試しください。",
+          "equipment_realtime_grant_pending": "装着は完了しました。すぐに表示されない場合は、しばらくしてから確認してください。（%@）",
+          "equipment_update_failed": "装着状態を変更できませんでした。",
+          "product_unavailable": "App Storeでこの商品を見つけられませんでした。",
+          "products_load_failed": "App Storeの商品を読み込めませんでした。しばらくしてから、もう一度試してください。",
+          "purchase_failed": "%@の購入を完了できませんでした。しばらくしてから、もう一度お試しください。",
+          "purchase_pending": "購入の承認待ちです。承認後に自動で反映されます。",
+          "purchase_status_failed": "購入状況を確認できませんでした。しばらくしてから確認してください。",
+          "server_rejected": "購入したアイテムを確認できませんでした。「購入を復元」をもう一度お試しください。",
+          "transaction_update_failed": "購入したアイテムを反映できませんでした。「購入を復元」をもう一度お試しください。",
+          "unknown_result": "購入結果を確認できませんでした。しばらくしてから確認してください。",
+          "unverified_transaction": "購入したアイテムを確認できなかったため、反映されませんでした。「購入を復元」をもう一度お試しください。",
+          "verifier_not_configured": "現在、購入を確認できません。しばらくしてから、もう一度試してください。"
+        },
+        "filter": {
+          "hide_owned": "所有済みを隠す",
+          "kind": {
+            "$value": "商品の種類",
+            "accessibility": "ストア商品の種類"
+          },
+          "menu": "並べ替えとフィルター"
+        },
+        "footer": {
+          "app_store": {
+            "entitlement": "アプリ内課金はApp Storeで処理されます。購入が確認されると、すぐに利用できます。",
+            "headline": "価格の表示と支払い処理はApp Storeで行われます。",
+            "refund": "返金や支払いに関するお問い合わせには、AppleのApp Storeポリシーと手続きが適用されます。"
+          },
+          "coming_soon": "ストアは準備中です。所有済みの商品は引き続き利用できます。",
+          "direct": {
+            "entitlement": "表示価格は税込みです。支払いの確認後、カスタマイズ商品をすぐに利用できます。",
+            "refund": "提供開始後の自己都合による返金はできません。未提供、契約不一致、重複・不正決済など法定事由には全額返金します。"
+          }
+        },
+        "kind": {
+          "bubble": "吹き出し",
+          "character": "キャラクター",
+          "keepsake": "大切な品",
+          "throwable": "投げて遊ぶおもちゃ"
+        },
+        "navigation_label": "カスタマイズ・ストア",
+        "preview": {
+          "accessibility": "%@のプレビュー",
+          "character_interaction_hint": "相手のキャラクターを左クリックすると%@を投げられます。キャラクターを左ボタンでダブルクリックすると拡大リアクションを確認できます。",
+          "default_throwable": "デフォルトのやわらかボール",
+          "double_click_hint": "キャラクターを左ボタンでダブルクリックすると拡大リアクションを確認できます。",
+          "member": {
+            "dubu": "ドゥブ",
+            "moka": "モカ"
+          },
+          "message": {
+            "left": "晩ごはん、何がいい？",
+            "right": "コプドリタンはどう？"
+          },
+          "reduce_motion_hint": "「視差効果を減らす」がオンのため、静止した場面を表示しています。",
+          "sound": {
+            "off": "プレビュー音をオフ",
+            "on": "プレビュー音をオン"
+          },
+          "tree_toggle_hint": "木を右クリックすると止まり、もう一度右クリックすると歩きます。"
+        },
+        "price": {
+          "loading": {
+            "$value": "価格を読み込んでいます…",
+            "short": "価格を確認中"
+          },
+          "required": "価格の確認が必要",
+          "retry": "価格を再確認",
+          "unavailable": {
+            "$value": "App Storeの価格を確認できません。",
+            "short": "価格を確認できません"
+          }
+        },
+        "processing": "処理中",
+        "product": {
+          "detail": {
+            "close": "商品詳細を閉じる",
+            "hint": "詳細を表示"
+          },
+          "equipped": "使用中",
+          "preview": {
+            "hint": "詳細をプレビュー"
+          },
+          "processing": {
+            "accessibility": "%@を処理中"
+          },
+          "sold_separately": "別売り",
+          "status": {
+            "accessibility": "%@、%@"
+          },
+          "unavailable": {
+            "detail": "現在、この商品は購入できません。"
+          }
+        },
+        "purchase": {
+          "accessibility": "%@を%@で購入",
+          "action": "%@を%@で購入",
+          "available": "購入可能",
+          "confirming": "確認中",
+          "error": "エラー",
+          "opening_checkout": "購入画面を開いています…",
+          "owned": "所有済み",
+          "refunded": "返金済み",
+          "success": "%@を購入しました。",
+          "unavailable": "現在購入できません"
+        },
+        "purchase_and_equip": {
+          "success": "%@を購入して装着しました。"
+        },
+        "restore": {
+          "action": "購入を復元",
+          "failed": "購入を復元できませんでした。もう一度お試しください。",
+          "success": "アプリ内課金で購入したコンテンツを復元しました。"
+        },
+        "sort": {
+          "price_ascending": "価格の安い順",
+          "price_descending": "価格の高い順"
+        },
+        "status": {
+          "retry": "状態を再確認"
+        },
+        "subtitle": "キャラクター、吹き出し、投げて遊ぶおもちゃを選んでください。",
+        "title": "カスタマイズ・ストア"
+      },
+      "tree_movement": {
+        "error": {
+          "save_failed": "木の動きの設定を保存できませんでした。もう一度お試しください。"
+        }
+      }
+    },
+    "windows": {
+      "accessibility": {
+        "motion": {
+          "disabled": "Windowsのアニメーション効果がオフになっています。"
+        }
+      },
+      "account": {
+        "delete": {
+          "confirmation": {
+            "action": "アカウントを削除",
+            "message": "プロフィールとグループへの参加情報が完全に削除され、購入履歴とアカウントの連携が解除されます。",
+            "title": "アカウントを削除しますか？"
+          },
+          "description": "アカウントに関連付けられた個人データを完全に削除します。",
+          "final_confirmation": {
+            "message": "削除したアカウントとデータは復元できません。",
+            "title": "アカウントを完全に削除しますか？"
+          },
+          "title": "アカウントを削除"
+        },
+        "description": "ログアウトやアカウントの管理ができます。",
+        "sign_out": {
+          "confirmation": {
+            "action": "ログアウト",
+            "message": "このPCでのみログアウトします。再び使用するにはGoogleでログインしてください。",
+            "title": "ログアウトしますか？"
+          },
+          "description": "このPCでのみログアウトします。",
+          "title": "ログアウト"
+        },
+        "title": "アカウント"
+      },
+      "app": {
+        "info": {
+          "description": "バージョンとサポート情報を確認できます。",
+          "navigation_label": "情報",
+          "title": "情報"
+        },
+        "launch": {
+          "failed": "アプリを起動できませんでした。アプリを閉じて、もう一度お試しください。"
+        },
+        "startup": {
+          "error": {
+            "title": "SIDEY起動エラー"
+          },
+          "failed": "SIDEYを起動できませんでした。",
+          "failed_with_log": "SIDEYを起動できませんでした。\n\n診断ログ：{0}",
+          "runtime_missing": "起動に必要なファイルが見つかりません。SIDEYを再インストールしてください。"
+        }
+      },
+      "auth": {
+        "google": {
+          "already_linked": "このGoogleアカウントはすでに現在のプロフィールに連携されています。プロフィールとデータは変更されていません。",
+          "cancelled": "Googleログインがキャンセルされたか、完了できませんでした。もう一度お試しください。",
+          "identity_changed": "このGoogleアカウントは、現在のアカウントに連携されているものと異なります。既存のプロフィールとデータは変更されていません。",
+          "link_expired": "Googleログインのリクエストが期限切れです。ログインをキャンセルして、もう一度お試しください。",
+          "required": "Googleアカウントを連携してください。",
+          "sign_in_complete": "Googleログインが完了しました。ブラウザーのログインタブを閉じてもかまいません。"
+        },
+        "request": {
+          "failed": "ログインできませんでした。しばらくしてから、もう一度お試しください。（エラーコード：{0}）"
+        },
+        "response": {
+          "empty": "ログインを完了できませんでした。もう一度お試しください。"
+        },
+        "session": {
+          "expired": "ログインの有効期限が切れました。もう一度ログインしてください。",
+          "replace_blocked": "このPCにはログイン情報が残っています。アプリを再起動してから、もう一度ログインしてください。",
+          "restore_failed": "以前のログインを復元できませんでした。新しいアカウントは作成されていません。もう一度ログインしてください。",
+          "stored_invalid": "保存済みのログイン情報を読み取れませんでした。もう一度ログインしてください。",
+          "values_missing": "ログインを完了できませんでした。もう一度お試しください。"
+        }
+      },
+      "common": {
+        "back": "戻る",
+        "delete": "削除",
+        "friend": "友だち",
+        "skip": "スキップ"
+      },
+      "composer": {
+        "drag": {
+          "tooltip": "ドラッグして入力ウィンドウを移動"
+        },
+        "group": {
+          "required": "プロフィールを設定して、表示するグループを選んでください。"
+        },
+        "message": {
+          "placeholder": "メッセージを入力…"
+        },
+        "window": {
+          "title": "SIDEYメッセージ"
+        }
+      },
+      "connection": {
+        "configuration": {
+          "not_configured": "サーバー接続に必要な設定が見つかりません。アプリを再インストールしてください。"
+        },
+        "error": {
+          "access_required": "SIDEYのアカウントまたはグループへのアクセスを再確認する必要があります。接続状態で「再接続」を選んでください。同じ案内が続く場合は、診断ログを添えてお問い合わせください。",
+          "busy": "現在接続が集中しているため、通常より時間がかかっています。SIDEYが自動で再試行します。数分たっても接続できない場合は、診断ログを添えてお問い合わせください。",
+          "configuration_unavailable": "現在SIDEYへの接続を開始できません。しばらくしてから、接続状態で「再接続」を選んでください。同じ問題が続く場合は、診断ログを添えてお問い合わせください。",
+          "network_unavailable": "SIDEYに接続できませんでした。インターネット接続を確認してから、接続状態で「再接続」を選んでください。他のサイトは開けるのに問題が続く場合は、診断ログを添えてお問い合わせください。",
+          "secure_connection_failed": "安全な接続を確立できませんでした。Windowsの日付と時刻が正しいことを確認してから再接続してください。問題が続く場合は、診断ログを添えてお問い合わせください。",
+          "service_unavailable": "SIDEYからの応答を確認できませんでした。自動的に接続を再試行します。数分たっても接続できない場合は、接続状態で「再接続」を選び、それでも解決しなければ診断ログを添えてお問い合わせください。"
+        },
+        "group_resync_failed": "グループの最新状態を読み込めませんでした。もう一度接続してください。（{0}）",
+        "group_revision_missing": "グループへの接続情報が変わりました。もう一度接続してください。",
+        "notice": {
+          "connected": "サーバーに接続しました。",
+          "reconnecting": "サーバーに再接続しています…"
+        },
+        "retry": {
+          "action": "再接続"
+        },
+        "server": {
+          "not_configured": "サーバー接続に必要な設定が見つかりません。アプリを再インストールしてください。"
+        },
+        "state": {
+          "connected": "SIDEYに接続済み",
+          "disconnected": "SIDEYに未接続",
+          "reconnecting": "接続中"
+        },
+        "unavailable": "SIDEYに接続できません。しばらくしてから、もう一度接続してください。"
+      },
+      "external_link": {
+        "open": {
+          "failed": "既定のブラウザーでページを開けませんでした。"
+        }
+      },
+      "groups": {
+        "create": {
+          "description": "グループを作って、招待コードで友だちを誘いましょう。",
+          "in_progress": "作成中…",
+          "result_missing": "グループの作成を完了できませんでした。もう一度お試しください。",
+          "success": {
+            "default": "グループを作成しました。"
+          },
+          "tooltip": "入力した名前でグループを作成します。"
+        },
+        "delete": {
+          "confirmation": {
+            "message": "メンバー情報とメッセージが完全に削除されます。この操作は取り消せません。",
+            "title": "「{0}」を削除しますか？"
+          },
+          "final_confirmation": {
+            "message": "「{0}」とすべてのメッセージが、今すぐ完全に削除されます。",
+            "title": "このグループを完全に削除しますか？"
+          },
+          "success": "グループを削除しました。",
+          "tooltip": "このグループを完全に削除します。"
+        },
+        "description": "画面に表示するグループを切り替えたり、メンバーを管理したりできます。各グループの定員は12人です。",
+        "empty": {
+          "description": "新しいグループを作るか、友だちからの招待コードを入力してください。",
+          "title": "まだグループがありません"
+        },
+        "error": {
+          "not_found": "グループが見つかりません。"
+        },
+        "invite": {
+          "code": {
+            "label": "招待コード",
+            "missing": "この端末に招待コードが保存されていません。",
+            "replaced": "この端末の招待コードは更新されています。オーナーに新しいコードを確認してください。",
+            "revoked": "以前の招待コードは無効になりました。オーナーによる再発行が必要です。"
+          },
+          "copy": {
+            "action": "招待コードをコピー",
+            "complete": "コピーしました"
+          },
+          "rotate": {
+            "action": "招待コードを再発行",
+            "code_missing": "新しい招待コードが空です。",
+            "confirmation": {
+              "action": "再発行",
+              "message": "現在のコードはすぐに無効になります。この操作は取り消せません。",
+              "title": "招待コードを再発行しますか？"
+            },
+            "success": "招待コードを再発行し、このパソコンに安全に保存しました。"
+          }
+        },
+        "join": {
+          "description": "友だちから受け取った招待コードでグループに参加できます。",
+          "failed": "グループに参加できませんでした。招待コードを確認して、もう一度お試しください。（{0}）",
+          "in_progress": "参加中…",
+          "result_missing": "参加したグループを読み込めませんでした。もう一度お試しください。",
+          "room_id_missing": "グループへの参加を完了できませんでした。もう一度お試しください。",
+          "success": {
+            "default": "グループに参加しました。"
+          },
+          "tooltip": "この招待コードのグループに参加します。"
+        },
+        "leave": {
+          "action": "グループを退出",
+          "confirmation": {
+            "action": "退出",
+            "member_message": "このグループや最近のメッセージにアクセスできなくなります。",
+            "owner_message": "残ったメンバーのうち、最も早く参加した人がオーナーになります。誰も残らない場合は、グループが削除されます。",
+            "title": "「{0}」から退出しますか？"
+          },
+          "success": "グループから退出しました。",
+          "tooltip": "このグループから退出します。"
+        },
+        "member": {
+          "remove": {
+            "confirmation": {
+              "message": "このメンバーはグループや過去のメッセージにアクセスできなくなります。",
+              "title": "「{0}」を退出させますか？"
+            },
+            "success": "メンバーを退出させました。",
+            "tooltip": "このメンバーをグループから退出させます。"
+          }
+        },
+        "navigation_label": "グループ",
+        "operation": {
+          "busy": "ほかのグループ操作が終わってから、もう一度お試しください。"
+        },
+        "refresh": {
+          "failed": "グループの最新情報を読み込めませんでした。もう一度お試しください。（{0}）"
+        },
+        "rename": {
+          "success": "グループ名を変更しました。",
+          "title": "グループ名を変更",
+          "tooltip": "グループ名を変更します。"
+        },
+        "state": {
+          "active": "表示中"
+        },
+        "summary": {
+          "invite_ready": "{0}/12人 · 招待コード {1}",
+          "invite_rotation_required": "{0}/12人 · 招待コードの再発行が必要です"
+        },
+        "switch": {
+          "action": "このグループを表示",
+          "in_progress": "接続中…",
+          "success": "表示するグループを変更しました。",
+          "tooltip": "表示するグループを切り替えます。"
+        },
+        "title": "参加中のグループ"
+      },
+      "history": {
+        "empty": {
+          "description": "このグループの最近のメッセージがここに表示されます。",
+          "title": "まだメッセージがありません。"
+        },
+        "group": {
+          "none": "表示中のグループがありません",
+          "required": "グループに参加すると、最近のメッセージを確認できます。"
+        },
+        "load": {
+          "initial_failed": "メッセージ履歴を読み込めませんでした",
+          "retry": "再試行"
+        },
+        "pagination": {
+          "exhausted": "過去3日分の履歴はここまでです"
+        },
+        "recent": {
+          "title": "最近のメッセージ"
+        },
+        "retention": {
+          "notice": "メッセージは3日後にSIDEYから自動削除されます。",
+          "reload_failed": "過去のメッセージを再読み込みできませんでした。しばらくしてから、もう一度お試しください。（{0}）"
+        },
+        "scroll": {
+          "latest": "最新のメッセージへ移動"
+        },
+        "user": {
+          "unknown": "不明なユーザー"
+        },
+        "window": {
+          "always_on_top": {
+            "disable": "常に手前に表示を解除",
+            "disable_shortcut": "最前面表示を解除（Alt+下矢印）",
+            "enable": "常に手前に表示",
+            "enable_shortcut": "常に手前に表示（Alt+上矢印）"
+          },
+          "title": "SIDEYメッセージ履歴"
+        }
+      },
+      "legal": {
+        "description": "利用規約とポリシーを確認できます。",
+        "privacy": {
+          "action": "プライバシーポリシーを見る"
+        },
+        "refund": {
+          "action": "キャンセル・返金ポリシーを見る"
+        },
+        "terms": {
+          "action": "利用規約を見る"
+        },
+        "title": "ポリシー"
+      },
+      "message": {
+        "delivery": {
+          "recheck_failed": "メッセージの送信を確認できませんでした。もう一度お試しください。（{0}）"
+        },
+        "send": {
+          "failed": "メッセージを送信できませんでした。もう一度お試しください。（{0}）",
+          "rate_limited": "メッセージの送信が速すぎます。"
+        }
+      },
+      "onboarding": {
+        "auth": {
+          "google": {
+            "cancel": "ログインをキャンセル",
+            "continue": "Googleで続ける",
+            "description": "Googleアカウントを連携して始めましょう。既存のプロフィール、グループ、会話履歴はそのまま保持されます。",
+            "pending": "ブラウザーでGoogleへのログインを完了してください。"
+          },
+          "start": "始める"
+        },
+        "complete": {
+          "description": "グループの作成や参加は、あとから設定でもできます。",
+          "title": "準備ができました"
+        },
+        "connection": {
+          "connected": "サーバーに接続しました",
+          "connecting": "サーバーに接続中…"
+        },
+        "group": {
+          "invite_code": {
+            "label": "招待コード",
+            "member_limit": "1つのグループには最大12人まで参加できます。",
+            "placeholder": "友だちからの招待コード",
+            "required": "招待コードを入力してください。"
+          },
+          "join": {
+            "action": "参加"
+          },
+          "name": {
+            "placeholder": "例：みんなの部屋"
+          },
+          "path": {
+            "label": "グループへの参加方法"
+          }
+        },
+        "launch": {
+          "action": "始める"
+        },
+        "profile": {
+          "description": "あとから設定でいつでも変更できます。",
+          "title": "表示名を決める"
+        },
+        "step": {
+          "complete": "完了"
+        },
+        "tagline": "画面のすみで、友だちと一緒に。"
+      },
+      "overlay": {
+        "current_user": "{0} · 私"
+      },
+      "platform": {
+        "requirements": {
+          "description": "SIDEYにはWindows 10 1809（ビルド17763）以降のx64版が必要です。",
+          "title": "対応していないWindowsです",
+          "window_title": "SIDEY — 非対応のWindows"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "友だちの画面に表示する、あなたのキャラクターを選びます。",
+          "save": {
+            "success": "キャラクターを変更しました。"
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "default": "標準の吹き出し",
+            "description": "持っている吹き出しを選ぶと、すべてのグループにすぐ反映されます。",
+            "title": "吹き出し"
+          },
+          "equipped": "装着中",
+          "save": {
+            "success": "変更を反映しました。"
+          },
+          "throwable": {
+            "default": "標準のやわらかボール",
+            "description": "持っている投げて遊ぶおもちゃを選ぶと、すべてのグループにすぐ反映されます。",
+            "title": "投げて遊ぶおもちゃ"
+          }
+        },
+        "description": "友だちに表示される名前とキャラクターを設定できます。",
+        "duplicates": {
+          "notice": "友だちと同じ名前やキャラクターも使えます。"
+        },
+        "nickname": {
+          "description": "画面やメッセージに表示される名前（2〜8文字）",
+          "save": {
+            "action": "ニックネームを変更",
+            "tooltip": "変更したニックネームを保存します。"
+          }
+        },
+        "save": {
+          "success": "プロフィールを保存しました。"
+        }
+      },
+      "settings": {
+        "display": {
+          "description": "友だちの状態やメッセージの表示方法を調整できます。",
+          "offline_members": {
+            "description": "オフラインの友だちも、眠ったキャラクターと赤い状態マークで表示します。",
+            "title": "オフラインのメンバーを表示",
+            "tooltip": "オフラインのメンバーの表示を切り替えます"
+          },
+          "quiet_mode": {
+            "description": "メッセージの吹き出しと入力中の表示を隠し、未読数は維持します。",
+            "tooltip": "ひかえめモードを切り替えます"
+          },
+          "throw_guard": {
+            "description": "オフでは友だちを左クリックして投げられます。オンでは自分のキャラクターを右ボタンでダブルクリックすると、10秒間投げられます。",
+            "title": "右ボタンのダブルクリックで投げる",
+            "tooltip": "投げる前に自分のキャラクターを右ボタンでダブルクリックするように設定"
+          }
+        },
+        "general": {
+          "description": "基本の表示方法と起動方法を設定できます。"
+        },
+        "language": {
+          "description": "アプリで使用する言語を選択します。変更はすぐに反映されます。",
+          "title": "言語 / Language"
+        },
+        "navigation_label": "設定",
+        "overlay": {
+          "description": "選んだ画面の端に、友だちのピクセルワールドを表示します。",
+          "tooltip": "ピクセルワールドの表示を切り替えます"
+        },
+        "placement": {
+          "description": "キャラクターを表示する画面や歩く範囲を選びます。",
+          "edge": {
+            "description": "キャラクターが歩く画面の端を選びます。",
+            "title": "表示する位置",
+            "tooltip": "ピクセルワールドを表示する画面の端"
+          },
+          "monitor": {
+            "description": "ピクセルワールドとメッセージ入力欄を表示するモニターを選びます。",
+            "title": "モニター",
+            "tooltip": "ピクセルワールドとメッセージ入力欄のモニター",
+            "unavailable": "利用できるディスプレイがありません。"
+          },
+          "span": {
+            "description": "選んだ画面の端で、キャラクターが歩ける範囲を選びます。",
+            "full": "端から端まで",
+            "title": "歩く範囲",
+            "tooltip": "ピクセルワールドの表示範囲"
+          },
+          "title": "キャラクターの表示位置"
+        },
+        "save": {
+          "failed": "設定を保存できませんでした。もう一度お試しください。（{0}）"
+        },
+        "shortcuts": {
+          "action": {
+            "composer": "メッセージ入力を開く／閉じる",
+            "history": "最近の履歴を開く／閉じる",
+            "overlay": "オーバーレイ表示を切り替える",
+            "quiet_mode": "ひかえめモードを切り替える"
+          },
+          "description": "ショートカットを選択し、設定するキーの組み合わせを押してください。使用中の組み合わせを指定すると、2つの割り当てが入れ替わります。",
+          "error": {
+            "already_registered": "このショートカットはシステムまたは別のアプリで既に使用されています。",
+            "availability_unverified": "このショートカットを使用できるか確認できませんでした。",
+            "in_app_conflict": "この組み合わせはアプリ内の別のショートカットで使用中です。保存すると割り当てが入れ替わります。",
+            "invalid": "無効なショートカット",
+            "modifier_required": "ショートカットは Win、Ctrl、Alt、Shift のいずれかで始めてください。",
+            "system_conflict": "このショートカットはシステムの標準ショートカットとして使用されています。"
+          },
+          "recorder": {
+            "empty": "ショートカットを変更するには、キーの組み合わせを押してください。",
+            "help": "選択してから修飾キーと別のキーを押してください。Escでキャンセルできます。",
+            "recording": "ショートカットを入力…",
+            "reset": "リセット"
+          },
+          "title": "キーボードショートカット"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "現在のグループでキャラクターに投げたものが当たると、効果音を再生します。",
+            "title": "キャラクターの効果音"
+          },
+          "description": "キャラクターの効果音の再生を設定します。",
+          "mute": "ミュート",
+          "unmute": "ミュートを解除",
+          "volume": "音量"
+        },
+        "storage": {
+          "folder_invalid": "設定を保存するフォルダーを開けませんでした。アプリを再起動してください。",
+          "read_failed": "保存した設定を読み込めませんでした。アプリを再起動してください。"
+        },
+        "theme": {
+          "dark": "ダーク",
+          "description": "アプリのテーマをライト、ダーク、またはシステム設定から選びます。",
+          "light": "ライト",
+          "system": "Windowsの既定",
+          "title": "テーマ"
+        },
+        "update": {
+          "check": {
+            "action": "アップデートを確認"
+          },
+          "check_now": {
+            "tooltip": "新しいバージョンがあるか確認します。"
+          },
+          "description": "新しいバージョンがあるか確認できます。",
+          "last_checked": {
+            "never": "まだ確認していません",
+            "today": "今日 {0}",
+            "value": "最終確認：{0}",
+            "yesterday": "昨日 {0}"
+          },
+          "release_notes": {
+            "action": "更新内容"
+          },
+          "title": "アップデート"
+        }
+      },
+      "store": {
+        "auth": {
+          "google": {
+            "failed": "Googleアカウントの連携を開始できませんでした。"
+          }
+        },
+        "availability": {
+          "coming_soon": {
+            "description": "現在のストアではプレビューのみ利用できます。購入機能はまだ利用できません。",
+            "title": "現在は購入できません"
+          }
+        },
+        "checkout": {
+          "opening": "決済画面を開いています…"
+        },
+        "description": "キャラクターや吹き出し、投げて遊ぶおもちゃの動きをプレビューできます。",
+        "empty": {
+          "description": "検索キーワードや絞り込み条件を変えてみてください。",
+          "title": "条件に合う商品がありません"
+        },
+        "filter": {
+          "hide_owned": "所持済みを非表示",
+          "menu": "並べ替え・絞り込み",
+          "reset": "すべてリセット",
+          "search": {
+            "label": "検索",
+            "placeholder": "商品名や説明を検索"
+          }
+        },
+        "kind": {
+          "bubble": "吹き出し",
+          "character": "キャラクター",
+          "keepsake": "大切な品",
+          "throwable": "投げて遊ぶおもちゃ"
+        },
+        "navigation_label": "着せ替え・ストア",
+        "preview": {
+          "member": {
+            "dubu": "とうふ",
+            "moka": "モカ"
+          },
+          "message": {
+            "left": "今日の晩ごはん、どうする？",
+            "right": "カレーにしない？"
+          },
+          "open": "プレビュー",
+          "sound": {
+            "off": "プレビューの音をオフ",
+            "on": "プレビューの音をオン"
+          },
+          "tree_movement_hint": "木を右クリックすると止まり、もう一度右クリックすると歩きます。",
+          "unavailable": "プレビューを読み込めませんでした。"
+        },
+        "price": {
+          "krw": "{0:N0}ウォン"
+        },
+        "product": {
+          "sold_separately": "キャラクターとは別売り"
+        },
+        "purchase": {
+          "action": "{0}で購入",
+          "confirming": "お支払いを確認中…",
+          "failed": "購入状況を確認できませんでした。",
+          "owned": "所持済み",
+          "success": "購入が完了しました。",
+          "timeout": "お支払いの確認がタイムアウトしました。ストアを開き直して状態を確認してください。",
+          "unavailable": "現在購入できません。しばらくしてからもう一度お試しください。"
+        },
+        "sort": {
+          "price_ascending": "価格が安い順",
+          "price_descending": "価格が高い順"
+        },
+        "status": {
+          "retry": "再試行",
+          "unavailable": "ストアの状態を読み込めませんでした。しばらくしてからお試しください。"
+        },
+        "title": "着せ替え・ストア"
+      },
+      "support": {
+        "diagnostics": {
+          "description": "ログファイルを圧縮してデスクトップに保存します。共有いただくと、不具合の修正に役立ちます。",
+          "export": {
+            "action": "エクスポート",
+            "failed": "診断データをエクスポートできませんでした。",
+            "success": "診断データをデスクトップに保存しました。"
+          },
+          "title": "診断データをエクスポート"
+        },
+        "feedback": {
+          "action": "フィードバックを送る",
+          "description": "問題がある場合やサポートが必要な場合は、GitHub Issueを作成してお問い合わせいただけます。",
+          "title": "フィードバック"
+        }
+      },
+      "tray": {
+        "app": {
+          "exit": "終了"
+        },
+        "connection": {
+          "error": {
+            "message": "接続状態で「再接続」を選んでください。それでも接続できない場合は、診断ログを添えてお問い合わせください。",
+            "title": "SIDEYの接続が切れました"
+          }
+        },
+        "group": {
+          "active": "表示中のグループ"
+        },
+        "groups": {
+          "empty": "接続中のグループなし",
+          "open": "グループ設定…"
+        },
+        "history": {
+          "open": "最近のメッセージ…"
+        },
+        "message": {
+          "compose": "メッセージを書く…"
+        },
+        "overlay": {
+          "hide": "オーバーレイを隠す"
+        },
+        "quiet_mode": {
+          "toggle": "ひかえめモード"
+        },
+        "settings": {
+          "open": "設定…"
+        },
+        "shortcuts": {
+          "registration_failed": "次のショートカットは使用できません：{0}。他のアプリで使用されている可能性があります。トレイメニューをご利用ください。"
+        },
+        "start": {
+          "failed": "トレイアイコンを起動できませんでした。ウィンドウを閉じるとSIDEYが終了します。"
+        },
+        "store": {
+          "open": "ストア…"
+        },
+        "unread": {
+          "tooltip": "SIDEY · 未読 {0}件"
+        },
+        "update": {
+          "available": "アップデートがあります。{0}",
+          "check": "アップデートを確認…",
+          "check_failed": "アップデートを確認できませんでした。しばらくしてからお試しください。",
+          "installed": "SIDEY {0} へのアップデートが完了しました。左クリックして変更内容を確認できます。",
+          "latest": "最新バージョンです。"
+        }
+      },
+      "update": {
+        "available": "SIDEY {0}を利用できます。",
+        "checking": "アップデートを確認中…",
+        "download": {
+          "hash_mismatch": "アップデートファイルを確認できませんでした。もう一度ダウンロードしてください。",
+          "in_progress": "アップデートをダウンロード中…",
+          "progress": "アップデートをダウンロード中…（{0}%）"
+        },
+        "failed": "アップデートを完了できませんでした。しばらくしてからお試しください。",
+        "install": {
+          "cancelled": "アップデートのインストールをキャンセルしました。",
+          "invalid": "アップデートのインストール情報を確認できませんでした。しばらくしてから、もう一度お試しください。",
+          "launch_failed": "インストーラーを開けませんでした。「アップデートを確認」からもう一度お試しください。",
+          "launched": "ダウンロードが完了し、インストーラーを開きました。",
+          "missing": "現在、アップデートをインストールできません。しばらくしてから、もう一度お試しください。"
+        },
+        "latest": "最新バージョンを使用しています。",
+        "metadata": {
+          "invalid": "アップデート情報を確認できませんでした。しばらくしてから、もう一度お試しください。"
+        },
+        "not_published": "新しいアップデートはまだ利用できません。しばらくしてから、もう一度ご確認ください。",
+        "prompt": {
+          "download": "ダウンロード",
+          "later": "あとで",
+          "message": "SIDEY {0}をダウンロードしますか？",
+          "title": "新しいアップデートがあります"
+        },
+        "release_notes": {
+          "open_failed": "アップデート内容を開けませんでした。もう一度お試しください。（{0}）"
+        }
+      },
+      "validation": {
+        "message": {
+          "length": "メッセージを1〜200文字で入力してください。"
+        },
+        "nickname": {
+          "length": "ニックネームを2〜8文字で入力してください。"
+        },
+        "room_name": {
+          "length": "グループ名を1〜20文字で入力してください。"
+        }
+      }
+    }
+  },
+  "profile": {
+    "applying": "適用中",
+    "character": {
+      "label": "キャラクター"
+    },
+    "nickname": {
+      "label": "ニックネーム",
+      "placeholder": "2〜8文字"
+    },
+    "title": "マイプロフィール"
+  },
+  "settings": {
+    "display": {
+      "quiet_mode": {
+        "title": "ひかえめモード"
+      }
+    },
+    "overlay": {
+      "title": "ピクセルワールドを表示"
+    },
+    "placement": {
+      "edge": {
+        "bottom": "下",
+        "left": "左",
+        "right": "右",
+        "top": "上"
+      }
+    },
+    "section": {
+      "display": {
+        "title": "表示"
+      },
+      "general": {
+        "title": "一般"
+      },
+      "sound": {
+        "title": "サウンド"
+      }
+    },
+    "window": {
+      "title": "SIDEY設定"
+    },
+    "startup": {
+      "title": "ログイン時に自動起動",
+      "description": "ログインすると、アプリが自動的に起動します。"
+    }
+  },
+  "store": {
+    "sort": {
+      "catalog": "標準",
+      "label": "並べ替え"
+    }
+  }
+}

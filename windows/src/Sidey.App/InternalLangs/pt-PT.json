@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Uma substituição do Supabase requer um URL HTTPS (ou HTTP localhost) e uma chave publicável. As chaves secret e service-role não são permitidas."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "Está em execução uma pré-visualização local com 12 personagens porque as variáveis de ambiente do servidor não estão configuradas."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "O processador de métricas não está em execução.",
+      "not_started": "O processador de métricas não foi iniciado."
+    },
+    "export": {
+      "action": "Exportar o JSON das métricas atuais",
+      "failed": "Falha ao exportar métricas: {0}",
+      "path": "Caminho de exportação: {0}",
+      "success": "O JSON das métricas atuais foi exportado. Os resultados manuais permanecem como not_run.",
+      "tooltip": "Guarde as métricas atuais de desempenho de composição como JSON."
+    },
+    "preview_notice": "Modo interno de métricas do processador limitado ao hamster. A verificação manual não foi registada.",
+    "samples": {
+      "empty": "Sem amostras de métricas"
+    },
+    "summary": "Decorrido {0:F0} s · {1} amostras · fotograma máx. {2:F2} ms · conjunto de trabalho {3:F1} MB (pico {4:F1} MB) · GDI {5} · USER {6}",
+    "title": "Métricas internas do processador"
+  }
+}

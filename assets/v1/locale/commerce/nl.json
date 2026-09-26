@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Sterrenlichtaxolotl",
+    "description": "Deze axolotl nam een verdwaald sterretje mee naar huis en houdt het zelfs in zijn slaap stevig vast.",
+    "iap_description": "Een axolotl knuffelt een verdwaald sterretje."
+  },
+  "character_guinea_pig": {
+    "display_name": "Babycavia",
+    "description": "Hij is vergeten waar hij zijn snack heeft verstopt. Aan die bolle wangetjes te zien, kan die niet ver weg zijn.",
+    "iap_description": "Vergat waar de snack verstopt ligt."
+  },
+  "character_monkey": {
+    "display_name": "Babyaap",
+    "description": "Hij kwam een banaan delen. Onderweg nam hij naar eigen zeggen maar één hapje… waarom is de helft dan weg?",
+    "iap_description": "Hij kwam een banaan delen."
+  },
+  "character_chinchilla": {
+    "display_name": "Babychinchilla",
+    "description": "Net uit het zandbad kwam hij spelen. Nog vóór de begroeting moest hij natuurlijk eerst met zijn pluizige vacht pronken.",
+    "iap_description": "Net uit het zandbad kwam hij spelen."
+  },
+  "character_otter": {
+    "display_name": "Babyotter",
+    "description": "Hij kwam zijn favoriete schelp laten zien. Kijken mag, maar als je hem afpakt, wordt hij mokkend.",
+    "iap_description": "Hij kwam zijn favoriete schelp laten zien."
+  },
+  "character_pig": {
+    "display_name": "Babyvarken",
+    "description": "Hij volgde de geur van snacks en besloot te blijven. Nu denkt hij dat dit zijn thuis is.",
+    "iap_description": "Volgde de snackgeur en bleef meteen."
+  },
+  "character_tree": {
+    "display_name": "Boompje",
+    "description": "Een boompje ging wandelen. Toen het even moest uitrusten, begon het meteen een plek te zoeken om wortel te schieten.",
+    "iap_description": "Een boompje ging wandelen."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Roze konijnenballon",
+    "description": "Een roze tekstballon met een konijnenversiering.",
+    "iap_description": "Roze tekstballon met een konijntje."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Botergele kuikenballon",
+    "description": "Een botergele tekstballon met een kuikenversiering.",
+    "iap_description": "Botergele tekstballon met een kuikentje."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Sterrenkatballon",
+    "description": "Een dieppaarse tekstballon met een sterrenkat als versiering.",
+    "iap_description": "Paarse tekstballon met een sterrenkat."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Stuiterhart",
+    "description": "Een werphart dat al stuiterend door de lucht vliegt.",
+    "iap_description": "Een werphart dat stuiterend wegvliegt."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Minikanon",
+    "description": "Een klein werpkanon dat een granaat met brandende lont afvuurt.",
+    "iap_description": "Minikanon met granaat en brandende lont."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Piepeend",
+    "description": "Een eend die een eend gooit. Waarschijnlijk geen familieruzie.",
+    "iap_description": "Een eend die een eend gooit."
+  },
+  "throwable_snowflake": {
+    "display_name": "Sneeuwvlok",
+    "description": "Een sneeuwvlok die bij de botsing uiteenspat in kleine ijskristallen.",
+    "iap_description": "Sneeuwvlok die in ijskristallen uiteenvalt."
+  },
+  "throwable_baseball": {
+    "display_name": "Honkbal",
+    "description": "Een bal met rode stiksels die bij de botsing indeukt en wegstuitert.",
+    "iap_description": "Roodgestikte bal die indeukt en wegstuitert."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Wakkubal",
+    "description": "Krak! Geniet van het knapperige geluid wanneer de Wakkubal in stukjes breekt.",
+    "iap_description": "Krak! Een Wakkubal die in stukjes breekt."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Zachte Dubai-chocoladekoek",
+    "description": "De cacaoschil en groene vulling worden met een heerlijke knak platgedrukt.",
+    "iap_description": "Cacaoschil en groene vulling met een knak."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Minipaprika van de cavia",
+    "description": "Een zorgvuldig bewaarde snack. Als je hem binnen drie seconden na het gooien oppakt, telt dat toch nog?",
+    "iap_description": "Een zorgvuldig bewaarde snack."
+  },
+  "throwable_banana": {
+    "display_name": "Banaan van de aap",
+    "description": "De aap deelde deze banaan. We hebben nog niet kunnen vragen of dat ook de bedoeling was.",
+    "iap_description": "De aap deelde deze banaan."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Zandzakje van de chinchilla",
+    "description": "Dit is het badzand van de chinchilla. Het gooien ervan is vast geen hint dat je je moet wassen.",
+    "iap_description": "Dit is het badzand van de chinchilla."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Sterrenbol van de axolotl",
+    "description": "Sterrenlicht, samengepakt in een kleine bol. Heeft iemand gekeken of er een ster aan de hemel ontbreekt?",
+    "iap_description": "Sterrenlicht, samengepakt in een kleine bol."
+  },
+  "throwable_clam": {
+    "display_name": "Schelp van de otter",
+    "description": "De schelp die de otter overal mee naartoe nam. Er zit geen parel in, alleen een beetje gehechtheid.",
+    "iap_description": "De schelp die de otter overal meenam."
+  },
+  "throwable_pork": {
+    "display_name": "Varkensvlees van babyvarken",
+    "description": "Een heerlijk stevige pets! Heeft iemand het varkentje van hiernaast de laatste tijd nog gezien?",
+    "iap_description": "Een heerlijk stevige pets!"
+  },
+  "throwable_timber": {
+    "display_name": "Klein boompje van het boompje",
+    "description": "Een boom gooit een boompje. Misschien moeten we eerst de stamboom controleren.",
+    "iap_description": "Een boom gooit een boompje."
+  },
+  "character_shiba": {
+    "display_name": "Shiba inu",
+    "description": "We zijn al gaan wandelen. De shiba weigert dat feit te erkennen.",
+    "iap_description": "We zijn al gaan wandelen."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Tennisbal",
+    "description": "Iemand om te gooien is gevonden. Nu zoeken we nog iemand die hem ophaalt.",
+    "iap_description": "Iemand om te gooien is gevonden."
+  },
+  "character_duck": {
+    "display_name": "Eend",
+    "description": "Een expert in verantwoordelijkheid ontwijken. De eendenpoten zijn het bewijs.",
+    "iap_description": "Een expert in verantwoordelijkheid ontwijken."
+  },
+  "character_poop": {
+    "display_name": "Drol",
+    "description": "Geen idee wie erom vroeg, maar hier is hij.",
+    "iap_description": "Geen idee wie erom vroeg, maar hier is hij."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Prop toiletpapier",
+    "description": "Niemand weet of het gebruikt toiletpapier is. Gewoon ontwijken!",
+    "iap_description": "Niemand weet of het gebruikt toiletpapier is."
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Ze zeiden dat het mild was. Ze zeiden er niet bij volgens wiens maatstaf.",
+    "iap_description": "Ze zeiden dat het mild was."
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Koreaanse eomukspies",
+    "description": "Die was bedoeld om op te eten. Waarom zwaai je ermee rond?",
+    "iap_description": "Die was bedoeld om op te eten."
+  },
+  "character_quokka": {
+    "display_name": "Quokka",
+    "description": "Altijd een glimlach. Ja, dit is degene die net dat blad gooide.",
+    "iap_description": "Altijd een glimlach."
+  },
+  "throwable_leaf": {
+    "display_name": "Blad",
+    "description": "Het lunchpakket van de quokka. We hebben niet gevraagd of het mocht worden gegooid.",
+    "iap_description": "Het lunchpakket van de quokka."
+  }
+}

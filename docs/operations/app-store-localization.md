@@ -2,7 +2,8 @@
 
 App Store Connect 현지화는
 [`release/app-store-localizations.json`](../../release/app-store-localizations.json)과
-공용 commerce localization source를 기준으로 비교한다. 이 절차는 앱 업로드, 심사 제출,
+언어별 [`assets/v1/locale/commerce/`](../../assets/v1/locale/commerce/) source를 기준으로
+비교한다. 이 절차는 앱 업로드, 심사 제출,
 출시를 수행하지 않는다. 원격 metadata 변경도 별도 release 승인이 없으면 실행하지 않는다.
 
 ## 자격 증명

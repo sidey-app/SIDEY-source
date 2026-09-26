@@ -61,7 +61,23 @@ foreach ($catalogName in @(
     'zh-CN.json',
     'zh-TW.json',
     'uk-UA.json',
-    'ru-RU.json')) {
+    'ru-RU.json',
+    'it-IT.json',
+    'pt-PT.json',
+    'es-ES.json',
+    'cs-CZ.json',
+    'tr-TR.json',
+    'ro-RO.json',
+    'bg-BG.json',
+    'pt-BR.json',
+    'sr-Cyrl-RS.json',
+    'pl-PL.json',
+    'sr-Latn-RS.json',
+    'nl-BE.json',
+    'fr-FR.json',
+    'nl-NL.json',
+    'he-IL.json',
+    'de-DE.json')) {
     $catalogPath = Join-Path $languageDirectory $catalogName
     if (-not (Test-Path -LiteralPath $catalogPath -PathType Leaf)) {
         throw "Published language catalog is missing: $catalogPath"
@@ -72,6 +88,7 @@ $preservedNames = [Collections.Generic.HashSet[string]]::new(
     [StringComparer]::OrdinalIgnoreCase)
 foreach ($name in @(
     'Assets',
+    'InternalLangs',
     'Langs',
     'Runtime')) {
     [void]$preservedNames.Add($name)

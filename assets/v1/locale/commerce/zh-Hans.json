@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "星光美西螈",
+    "description": "带回了一颗迷路的小星星。听说睡觉时也要紧紧抱着。",
+    "iap_description": "带回了一颗迷路的小星星。听说睡觉时也要紧紧抱着。"
+  },
+  "character_guinea_pig": {
+    "display_name": "豚鼠宝宝",
+    "description": "忘了把零食藏在哪儿了。看那鼓鼓的脸颊，应该没藏太远。",
+    "iap_description": "忘了把零食藏在哪儿了。看那鼓鼓的脸颊，应该没藏太远。"
+  },
+  "character_monkey": {
+    "display_name": "猴子宝宝",
+    "description": "带着香蕉来分享了。说路上只咬了一口……怎么只剩半根了？",
+    "iap_description": "带着香蕉来分享了。说路上只咬了一口……怎么只剩半根了？"
+  },
+  "character_chinchilla": {
+    "display_name": "龙猫宝宝",
+    "description": "洗完沙浴来串门了。还没打招呼，就先炫耀起蓬松的毛。",
+    "iap_description": "洗完沙浴来串门了。还没打招呼，就先炫耀起蓬松的毛。"
+  },
+  "character_otter": {
+    "display_name": "小水獭",
+    "description": "带着最喜欢的贝壳来给你看。看看可以，拿走可要闹别扭。",
+    "iap_description": "带着最喜欢的贝壳来给你看。看看可以，拿走可要闹别扭。"
+  },
+  "character_pig": {
+    "display_name": "小猪",
+    "description": "闻着零食的香味就住下了。现在好像已经把这里当成自己的家。",
+    "iap_description": "闻着零食的香味就住下了。现在好像已经把这里当成自己的家。"
+  },
+  "character_tree": {
+    "display_name": "小树",
+    "description": "出来散步的小树。让它歇一会儿，它却开始找地方扎根了。",
+    "iap_description": "出来散步的小树。让它歇一会儿，它却开始找地方扎根了。"
+  },
+  "bubble_bunny_pink": {
+    "display_name": "粉红兔兔气泡",
+    "description": "粉红色气泡配有兔兔装饰和清晰的深色文字。",
+    "iap_description": "粉红色气泡配有兔兔装饰和清晰的深色文字。"
+  },
+  "bubble_butter_chick": {
+    "display_name": "奶油小鸡气泡",
+    "description": "奶油黄色气泡配有小鸡装饰和清晰的深色文字。",
+    "iap_description": "奶油黄色气泡配有小鸡装饰和清晰的深色文字。"
+  },
+  "bubble_starry_cat": {
+    "display_name": "星夜猫咪气泡",
+    "description": "深紫色气泡配有星夜猫咪装饰和明亮文字。",
+    "iap_description": "深紫色气泡配有星夜猫咪装饰和明亮文字。"
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "弹弹爱心",
+    "description": "一颗蹦蹦跳跳飞过去、替你传递心意的爱心。",
+    "iap_description": "一颗蹦蹦跳跳飞过去、替你传递心意的爱心。"
+  },
+  "throwable_toy_cannon": {
+    "display_name": "迷你大炮",
+    "description": "角色面前会出现一门迷你大炮，炮弹命中后会砰地炸开。",
+    "iap_description": "角色面前会出现一门迷你大炮，炮弹命中后会砰地炸开。"
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "吱吱小黄鸭",
+    "description": "一只俏皮的小黄鸭旋转着飞过空中。",
+    "iap_description": "一只俏皮的小黄鸭旋转着飞过空中。"
+  },
+  "throwable_snowflake": {
+    "display_name": "雪花",
+    "description": "冰晶碰撞后散成细小的碎片。",
+    "iap_description": "冰晶碰撞后散成细小的碎片。"
+  },
+  "throwable_baseball": {
+    "display_name": "棒球",
+    "description": "带着红色缝线的棒球，碰撞时压扁再弹起。",
+    "iap_description": "带着红色缝线的棒球，碰撞时压扁再弹起。"
+  },
+  "throwable_wakkuball": {
+    "display_name": "哇咔球",
+    "description": "咔嚓咔嚓！听外壳碎成小片的清脆声音。",
+    "iap_description": "咔嚓咔嚓！听外壳碎成小片的清脆声音。"
+  },
+  "throwable_dujjonku": {
+    "display_name": "迪拜巧克力软曲奇",
+    "description": "圆圆的可可外皮，裹着会被压扁、拉长的绿色内馅。",
+    "iap_description": "圆圆的可可外皮，裹着会被压扁、拉长的绿色内馅。"
+  },
+  "throwable_mini_paprika": {
+    "display_name": "豚鼠的小甜椒",
+    "description": "珍藏的小零食。扔出去后，三秒内捡起来还算数吧？",
+    "iap_description": "珍藏的小零食。扔出去后，三秒内捡起来还算数吧？"
+  },
+  "throwable_banana": {
+    "display_name": "猴子的香蕉",
+    "description": "猴子拿来分享的香蕉。是不是愿意分享……还没问过它。",
+    "iap_description": "猴子拿来分享的香蕉。是不是愿意分享……还没问过它。"
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "龙猫的沙袋",
+    "description": "龙猫洗澡用的沙子。应该不是在暗示你该洗澡了吧。",
+    "iap_description": "龙猫洗澡用的沙子。应该不是在暗示你该洗澡了吧。"
+  },
+  "throwable_starlight_orb": {
+    "display_name": "星光美西螈的星光球",
+    "description": "把星光揉成了一团。听说天上少了一颗星？",
+    "iap_description": "把星光揉成了一团。听说天上少了一颗星？"
+  },
+  "throwable_clam": {
+    "display_name": "水獭的贝壳",
+    "description": "水獭珍爱的贝壳。里面没有珍珠，倒是有点舍不得。",
+    "iap_description": "水獭珍爱的贝壳。里面没有珍珠，倒是有点舍不得。"
+  },
+  "throwable_pork": {
+    "display_name": "小猪的猪肉",
+    "description": "啪！话说，最近是不是没见到隔壁的小猪？",
+    "iap_description": "啪！话说，最近是不是没见到隔壁的小猪？"
+  },
+  "throwable_timber": {
+    "display_name": "小树的小小树",
+    "description": "小树扔小树。要不先查查家谱？",
+    "iap_description": "小树扔小树。要不先查查家谱？"
+  },
+  "character_shiba": {
+    "display_name": "柴犬",
+    "description": "明明已经散过步，柴犬却装作完全不知道。",
+    "iap_description": "明明已经散过步，柴犬却装作完全不知道。"
+  },
+  "throwable_tennis_ball": {
+    "display_name": "网球",
+    "description": "扔球的人选好了，接球的人还在找。",
+    "iap_description": "扔球的人选好了，接球的人还在找。"
+  },
+  "character_duck": {
+    "display_name": "鸭子",
+    "description": "躲避责任的专家。看它的鸭掌就知道了。",
+    "iap_description": "躲避责任的专家。看它的鸭掌就知道了。"
+  },
+  "character_poop": {
+    "display_name": "便便",
+    "description": "不知道是谁叫的，但它来了。",
+    "iap_description": "不知道是谁叫的，但它来了。"
+  },
+  "throwable_tissue_ball": {
+    "display_name": "纸巾球",
+    "description": "没人知道是不是用过的纸巾。快躲开！",
+    "iap_description": "没人知道是不是用过的纸巾。快躲开！"
+  },
+  "character_tteokbokki": {
+    "display_name": "辣炒年糕",
+    "description": "他们说不辣，却没说是按谁的标准。",
+    "iap_description": "他们说不辣，却没说是按谁的标准。"
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "韩式鱼饼串",
+    "description": "本来是用鱼浆做来吃的，怎么拿来挥来挥去？",
+    "iap_description": "本来是用鱼浆做来吃的，怎么拿来挥来挥去？"
+  },
+  "character_quokka": {
+    "display_name": "短尾矮袋鼠",
+    "description": "它总在微笑。对，刚才扔叶子的就是它。",
+    "iap_description": "它总在微笑。对，刚才扔叶子的就是它。"
+  },
+  "throwable_leaf": {
+    "display_name": "树叶",
+    "description": "这是短尾矮袋鼠的午餐。我们没问过它能不能扔。",
+    "iap_description": "这是短尾矮袋鼠的午餐。我们没问过它能不能扔。"
+  }
+}

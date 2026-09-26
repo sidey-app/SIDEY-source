@@ -1,6 +1,9 @@
 import { commerceProducts } from "../../public/assets/commerce-products.js";
 import commerceCatalog from "../../../assets/v1/commerce-catalog.json";
-import commerceLocalizations from "../../../assets/v1/commerce-localizations.json";
+import commerceEn from "../../../assets/v1/locale/commerce/en.json";
+import commerceJa from "../../../assets/v1/locale/commerce/ja.json";
+import commerceKo from "../../../assets/v1/locale/commerce/ko.json";
+import commerceZhHant from "../../../assets/v1/locale/commerce/zh-Hant.json";
 import type { Locale } from "../i18n/landing";
 
 export type StoreCategory = "characters" | "throwables" | "bubbles";
@@ -33,6 +36,18 @@ export interface StoreCategoryContent {
 
 export type StoreCatalog = Record<StoreCategory, StoreCategoryContent>;
 
+interface CommerceLocalization {
+  display_name: string;
+  description: string;
+}
+
+const commerceLocalizations: Record<Locale, Record<string, CommerceLocalization>> = {
+  ko: commerceKo,
+  en: commerceEn,
+  ja: commerceJa,
+  "zh-Hant": commerceZhHant,
+};
+
 const ko: StoreCatalog = {
   characters: {
     eyebrow: "캐릭터",
@@ -47,9 +62,9 @@ const ko: StoreCatalog = {
     ],
   },
   throwables: {
-    eyebrow: "투척물",
+    eyebrow: "던지기 장난감",
     title: "말랑공부터 미니 대포까지.",
-    description: "말랑공, 하트, 미니 대포처럼 친구에게 던질 수 있는 장난들을 먼저 구경해 보세요.",
+    description: "말랑공, 하트, 미니 대포처럼 친구에게 던지며 놀 수 있는 장난감을 먼저 구경해 보세요.",
     products: [
       { id: "patch_soft_ball", name: "패치 말랑공", description: "기본 캐릭터들이 친구에게 가볍게 던지는 말랑공이에요.", price: "기본 제공", asset: "assets/previewer/patch_soft_ball.png", sound: "assets/store/impact-patch_soft_ball.wav", mode: "throwable" },
     ],
@@ -78,9 +93,9 @@ const en: StoreCatalog = {
     ],
   },
   throwables: {
-    eyebrow: "Throwables",
+    eyebrow: "Tossable toys",
     title: "From soft balls to mini cannons.",
-    description: "Preview the little things you can throw at your friends, from soft balls and hearts to mini cannons.",
+    description: "Preview toys you can toss at your friends, from soft balls and hearts to mini cannons.",
     products: [
       { id: "patch_soft_ball", name: "Patch Soft Ball", description: "The soft little ball every SIDEY character can toss at a friend.", price: "Included", asset: "assets/previewer/patch_soft_ball.png", sound: "assets/store/impact-patch_soft_ball.wav", mode: "throwable" },
     ],
@@ -109,9 +124,9 @@ const ja: StoreCatalog = {
     ],
   },
   throwables: {
-    eyebrow: "投げアイテム",
+    eyebrow: "投げて遊ぶおもちゃ",
     title: "やわらかボールからミニ大砲まで。",
-    description: "ボールやハート、ミニ大砲など、友だちに送れる小さないたずらをプレビューできます。",
+    description: "ボールやハート、ミニ大砲など、友だちに投げて遊べるおもちゃをプレビューできます。",
     products: [
       { id: "patch_soft_ball", name: "パッチやわらかボール", description: "どの基本キャラクターでも、友だちにぽんと投げられるやわらかなボールです。", price: "基本付属", asset: "assets/previewer/patch_soft_ball.png", sound: "assets/store/impact-patch_soft_ball.wav", mode: "throwable" },
     ],
@@ -130,7 +145,7 @@ const zhHant: StoreCatalog = {
   characters: {
     eyebrow: "角色",
     title: "帶新朋友來到你的螢幕。",
-    description: "選擇角色，預覽牠在 SIDEY 裡走動的模樣。",
+    description: "選擇角色，預覽在 SIDEY 裡走動的模樣。",
     products: [
       { id: "pixel_hamster", name: "小倉鼠", description: "SIDEY 的經典夥伴，有著小耳朵和粉紅臉頰。", price: "隨附", asset: "assets/characters/pixel_hamster.png", mode: "character" },
       { id: "pixel_cat", name: "小貓", description: "柔和的灰色虎斑，加上一對尖尖的小耳朵。", price: "隨附", asset: "assets/characters/pixel_cat.png", mode: "character" },
@@ -140,9 +155,9 @@ const zhHant: StoreCatalog = {
     ],
   },
   throwables: {
-    eyebrow: "投擲道具",
+    eyebrow: "投擲玩具",
     title: "從軟球到迷你大砲。",
-    description: "先預覽能丟向好友的小玩意，像是軟球、愛心和迷你大砲。",
+    description: "先預覽能丟向朋友一起玩的玩具，例如軟球、愛心和迷你大砲。",
     products: [
       { id: "patch_soft_ball", name: "拼布軟球", description: "所有基本角色都能輕輕丟向好友的小軟球。", price: "隨附", asset: "assets/previewer/patch_soft_ball.png", sound: "assets/store/impact-patch_soft_ball.wav", mode: "throwable" },
     ],
@@ -169,8 +184,7 @@ function completeCatalog(locale: Locale, catalog: StoreCatalog): StoreCatalog {
     const included = previous.filter((product) => includedProductIDs.has(product.id));
     catalog[category].products = [...included, ...paid.map((entry): StoreProduct => {
       const presentation = commerceProducts[entry.id as keyof typeof commerceProducts];
-      const localizedProduct = commerceLocalizations.products.find((product) => product.id === entry.id);
-      const translated = localizedProduct?.localizations[locale];
+      const translated = commerceLocalizations[locale][entry.id];
       if (!translated) throw new Error(`Missing ${locale} store translation: ${entry.id}`);
       const renderID = entry.render_asset_id ?? entry.item_id;
       return {
@@ -178,7 +192,7 @@ function completeCatalog(locale: Locale, catalog: StoreCatalog): StoreCatalog {
         id: entry.item_id,
         commerceID: entry.id,
         name: translated.display_name,
-        description: translated.marketing_description,
+        description: translated.description,
         price: locale === "ko" ? `${entry.direct_price.toLocaleString("ko-KR")}원` : `₩${entry.direct_price.toLocaleString("en-US")}`,
         mode: presentation.mode as StoreAssetMode,
         asset: presentation.asset,

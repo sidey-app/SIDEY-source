@@ -325,13 +325,13 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             SetState(_state with
             {
                 ErrorMessage = _validationMode
-                    ? I18n.Get("development.metricsPreview")
-                    : I18n.Get("development.localPreview"),
+                    ? I18n.Get("renderer_metrics.preview_notice")
+                    : I18n.Get("development.local_preview.notice"),
             });
 #else
             SetState(_state with
             {
-                ErrorMessage = I18n.Get("error.serverNotConfigured"),
+                ErrorMessage = I18n.Get("connection.server.not_configured"),
             });
 #endif
             return;
@@ -417,7 +417,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 StartupDiagnostics.NonFatal("store-state-load", exception);
-                commerceStateError = I18n.Get("store.stateUnavailable");
+                commerceStateError = I18n.Get("store.status.unavailable");
             }
         }
         _state = _state with
@@ -505,7 +505,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
             || _backend is not SupabaseBackendGateway backend
             || _auth is not SupabaseAnonymousAuthService auth)
         {
-            throw new InvalidOperationException(I18n.Get("store.unavailable"));
+            throw new InvalidOperationException(I18n.Get("store.purchase.unavailable"));
         }
         CommerceProductState state = _state.CommerceProducts.Single(product =>
             StringComparer.Ordinal.Equals(product.Product.Id, productId));
@@ -530,7 +530,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                 {
                     PurchaseState = CommercePurchaseState.Error,
                     IsWorking = false,
-                    ErrorMessage = I18n.Get("store.googleConnectionFailed"),
+                    ErrorMessage = I18n.Get("store.auth.google.failed"),
                 });
                 throw;
             }
@@ -578,7 +578,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                     return;
                 }
             }
-            throw new TimeoutException(I18n.Get("store.paymentTimedOut"));
+            throw new TimeoutException(I18n.Get("store.purchase.timeout"));
         }
         catch
         {
@@ -590,7 +590,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                 {
                     PurchaseState = CommercePurchaseState.Error,
                     IsWorking = false,
-                    ErrorMessage = I18n.Get("store.purchaseFailed"),
+                    ErrorMessage = I18n.Get("store.purchase.failed"),
                 });
             }
             throw;
@@ -614,7 +614,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                 ?? throw new ArgumentOutOfRangeException(nameof(catalogItemId));
             if (!_state.ActiveEntitlementKeys.Contains(product.EntitlementKey))
             {
-                throw new InvalidOperationException(I18n.Get("store.unavailable"));
+                throw new InvalidOperationException(I18n.Get("store.purchase.unavailable"));
             }
         }
 
@@ -666,7 +666,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         if (_state.GoogleVerified)
             return;
         if (_auth is not SupabaseAnonymousAuthService auth)
-            throw new InvalidOperationException(I18n.Get("error.serverNotConfigured"));
+            throw new InvalidOperationException(I18n.Get("connection.server.not_configured"));
         var attempt = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _roomSession.Token);
         _googleAuthenticationAttempt = attempt;
         SetState(_state with { GoogleAuthentication = GoogleAuthenticationState.SigningIn, ErrorMessage = null });
@@ -716,7 +716,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     {
         if (_auth is not SupabaseAnonymousAuthService auth
             || !WindowsAuthCallback.TryGetCode(callbackUri.AbsoluteUri, AuthCallbackScheme, out _, out string? code))
-            throw new InvalidOperationException(I18n.Get("auth.identityLinkExpired"));
+            throw new InvalidOperationException(I18n.Get("auth.google.link_expired"));
         CancellationTokenSource? attempt = _googleAuthenticationAttempt;
         using var completion = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken, _roomSession.Token, attempt?.Token ?? CancellationToken.None);
@@ -772,7 +772,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     public async Task CompleteOnboardingAsync(CancellationToken cancellationToken = default)
     {
         if (!_state.GoogleVerified)
-            throw new InvalidOperationException(I18n.Get("auth.googleRequired"));
+            throw new InvalidOperationException(I18n.Get("auth.google.required"));
         AppPreferences previousPreferences = _state.Preferences;
         SetState(_state with
         {
@@ -844,7 +844,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     {
         if (_state.GroupOperation is not (GroupOperation.Idle or GroupOperation.Switching))
         {
-            throw new InvalidOperationException(I18n.Get("groups.operationBusy"));
+            throw new InvalidOperationException(I18n.Get("groups.operation.busy"));
         }
 
         if (_roomSession.SwitchPipeline is null
@@ -932,11 +932,11 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         {
             if (_auth is not SupabaseAnonymousAuthService auth || !_state.GoogleVerified)
             {
-                throw new InvalidOperationException(I18n.Get("auth.sessionMissing"));
+                throw new InvalidOperationException(I18n.Get("auth.session.expired"));
             }
             if (_state.GroupOperation != GroupOperation.Idle)
             {
-                throw new InvalidOperationException(I18n.Get("groups.operationBusy"));
+                throw new InvalidOperationException(I18n.Get("groups.operation.busy"));
             }
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -1079,11 +1079,11 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         Guid roomId,
         CancellationToken cancellationToken = default)
     {
-        Room room = _state.Rooms.FirstOrDefault(room => room.Id == roomId) ?? throw new InvalidOperationException(I18n.Get("groups.notFound"));
+        Room room = _state.Rooms.FirstOrDefault(room => room.Id == roomId) ?? throw new InvalidOperationException(I18n.Get("groups.error.not_found"));
         if (!room.InviteCodeReady)
         {
             throw new InvalidOperationException(
-                I18n.Get("groups.inviteRevoked"));
+                I18n.Get("groups.invite.code.revoked"));
         }
 
         string? code = await GetInviteCodeAsync(roomId, cancellationToken);
@@ -1102,7 +1102,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         {
             await _credentialStore.DeleteInviteCodeAsync(roomId, cancellationToken);
             throw new InvalidOperationException(
-                I18n.Get("groups.inviteReplaced"));
+                I18n.Get("groups.invite.code.replaced"));
         }
 
         var data = new DataPackage();
@@ -1121,14 +1121,14 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
                 : _state.Profile is null ? "profile"
                 : _state.NeedsOnboarding ? "onboarding" : "group-operation";
             StartupDiagnostics.Stage($"chat-send-rejected reason={reason}");
-            throw new InvalidOperationException(I18n.Get("composer.activeRoomRequired"));
+            throw new InvalidOperationException(I18n.Get("composer.group.required"));
         }
 
         string normalized = MessageValidator.Normalize(body);
         if (!MessageValidator.IsValid(normalized))
         {
             StartupDiagnostics.Stage("chat-send-rejected reason=length");
-            throw new ArgumentException(I18n.Get("validation.messageLength"), nameof(body));
+            throw new ArgumentException(I18n.Get("validation.message.length"), nameof(body));
         }
 
         _typingActivity.Stop();
@@ -2430,8 +2430,8 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         await _preferencesStore.SaveAsync(_state.Preferences, cancellationToken).ConfigureAwait(false);
 
     private IBackendGateway RequiredBackend() =>
-        !_state.GoogleVerified ? throw new InvalidOperationException(I18n.Get("auth.googleRequired")) :
-        _backend ?? throw new InvalidOperationException(I18n.Get("error.serverConnectionNotConfigured"));
+        !_state.GoogleVerified ? throw new InvalidOperationException(I18n.Get("auth.google.required")) :
+        _backend ?? throw new InvalidOperationException(I18n.Get("connection.configuration.not_configured"));
 
     private async Task<IReadOnlyList<CommerceProductState>> RefreshDevelopmentCommerceStateAsync(
         CancellationToken cancellationToken,
@@ -2493,10 +2493,10 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
     private void EnsureMutationsAvailable()
     {
         if (!_state.GoogleVerified)
-            throw new InvalidOperationException(I18n.Get("auth.googleRequired"));
+            throw new InvalidOperationException(I18n.Get("auth.google.required"));
         if (_state.GroupOperation != GroupOperation.Idle)
         {
-            throw new InvalidOperationException(I18n.Get("groups.operationBusy"));
+            throw new InvalidOperationException(I18n.Get("groups.operation.busy"));
         }
     }
 
@@ -2519,7 +2519,7 @@ public sealed class AppCoordinator : IMainWindowCoordinator, IHistoryCoordinator
         }
         catch (Exception exception)
         {
-            SetState(_state with { ErrorMessage = I18n.Format("error.preferencesSaveFailed", exception.Message) });
+            SetState(_state with { ErrorMessage = I18n.Format("settings.save.failed", exception.Message) });
         }
     }
 

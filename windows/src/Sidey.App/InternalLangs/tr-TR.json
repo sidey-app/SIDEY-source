@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Supabase geçersiz kılma ayarı için HTTPS (veya localhost HTTP) URL'si ve yayımlanabilir anahtar gerekir. Gizli anahtarlar ve hizmet rolü anahtarları kullanılamaz."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "Sunucu ortam değişkenleri eksik olduğundan 12 karakterli yerel önizleme çalışıyor."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "Ölçüm işleyici çalışmıyor.",
+      "not_started": "Ölçüm işleyici başlatılmadı."
+    },
+    "export": {
+      "action": "Geçerli ölçümleri JSON olarak dışarı aktar",
+      "failed": "Ölçümler dışarı aktarılamadı: {0}",
+      "path": "Dışarı aktarma yolu: {0}",
+      "success": "Geçerli ölçümler JSON olarak dışarı aktarıldı. El ile elde edilen sonuçlar not_run olarak kalır.",
+      "tooltip": "Geçerli işleme performansı ölçümlerini JSON olarak kaydet."
+    },
+    "preview_notice": "Yalnızca hamster kullanan dahili işleyici ölçüm modu. El ile doğrulama kaydedilmedi.",
+    "samples": {
+      "empty": "Ölçüm örneği yok"
+    },
+    "summary": "Geçen süre {0:F0} sn · {1} örnek · en yüksek kare süresi {2:F2} ms · çalışma kümesi {3:F1} MB (zirve {4:F1} MB) · GDI {5} · USER {6}",
+    "title": "Dahili işleyici ölçümleri"
+  }
+}

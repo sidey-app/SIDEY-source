@@ -167,7 +167,7 @@ public sealed class TrayIconService : IDisposable
     }
 
     internal static (string Title, string Body, TrayCommand ClickCommand) GoogleSignInCompleteNotification() =>
-        ("SIDEY", I18n.Get("auth.googleSignInComplete"), TrayCommand.Open);
+        ("SIDEY", I18n.Get("auth.google.sign_in_complete"), TrayCommand.Open);
 
     public void NotifyLatestVersion()
     {
@@ -203,12 +203,12 @@ public sealed class TrayIconService : IDisposable
         string availableVersion = "") => notification switch
         {
             TrayUpdateNotification.Available => I18n.Format(
-                "tray.updateAvailable",
+                "tray.update.available",
                 availableVersion),
-            TrayUpdateNotification.Latest => I18n.Get("tray.updateLatest"),
-            TrayUpdateNotification.Failed => I18n.Get("tray.updateCheckFailed"),
+            TrayUpdateNotification.Latest => I18n.Get("tray.update.latest"),
+            TrayUpdateNotification.Failed => I18n.Get("tray.update.check_failed"),
             TrayUpdateNotification.Installed => I18n.Format(
-                "tray.updateInstalled",
+                "tray.update.installed",
                 availableVersion),
             _ => throw new ArgumentOutOfRangeException(nameof(notification)),
         };
@@ -334,7 +334,7 @@ public sealed class TrayIconService : IDisposable
         data.Flags |= NotifyIconInfo;
         data.InfoTitle = "SIDEY";
         data.Info = I18n.Format(
-            "tray.hotkeyRegistrationFailedBody",
+            "tray.shortcuts.registration_failed",
             string.Join(", ", _hotkeys.Failures.Select(failure => failure.Shortcut)));
         data.InfoFlags = NotifyInfoWarning;
         _notificationClickCommand = TrayCommand.Open;
@@ -370,7 +370,7 @@ public sealed class TrayIconService : IDisposable
         CallbackMessage = TrayMessage,
         Icon = _icon,
         Tip = _state.UnreadCount > 0
-            ? I18n.Format("tray.unreadTooltip", _state.UnreadCount)
+            ? I18n.Format("tray.unread.tooltip", _state.UnreadCount)
             : "SIDEY",
         Info = string.Empty,
         InfoTitle = string.Empty,
@@ -552,12 +552,12 @@ public sealed class TrayIconService : IDisposable
             AppendToggle(
                 menu,
                 TrayCommand.ToggleOverlay,
-                I18n.Get("tray.hideOverlay"),
+                I18n.Get("tray.overlay.hide"),
                 isChecked: OverlayHiddenCheckState(_state.OverlayVisible));
             Append(
                 menu,
                 TrayCommand.Compose,
-                I18n.Get("tray.compose"),
+                I18n.Get("tray.message.compose"),
                 isEnabled: _state.Rooms.Count > 0);
             NativeMethods.AppendMenu(menu, 0x800, 0, null);
 
@@ -566,7 +566,7 @@ public sealed class TrayIconService : IDisposable
             {
                 if (_state.Rooms.Count == 0)
                 {
-                    NativeMethods.AppendMenu(roomsMenu, 0x0001, 0, I18n.Get("tray.noGroups"));
+                    NativeMethods.AppendMenu(roomsMenu, 0x0001, 0, I18n.Get("tray.groups.empty"));
                 }
                 else
                 {
@@ -588,30 +588,30 @@ public sealed class TrayIconService : IDisposable
                     }
                 }
                 uint roomsFlags = 0x0010u | (_state.Rooms.Count == 0 ? 0x0001u : 0u);
-                NativeMethods.AppendMenu(menu, roomsFlags, (nuint)roomsMenu, I18n.Get("tray.activeGroup"));
+                NativeMethods.AppendMenu(menu, roomsFlags, (nuint)roomsMenu, I18n.Get("tray.group.active"));
             }
             AppendToggle(
                 menu,
                 TrayCommand.ToggleQuietMode,
-                I18n.Get("tray.quietMode"),
+                I18n.Get("tray.quiet_mode.toggle"),
                 isChecked: _state.QuietMode);
             Append(
                 menu,
                 TrayCommand.History,
-                I18n.Get("tray.history"),
+                I18n.Get("tray.history.open"),
                 isEnabled: _state.Rooms.Count > 0);
-            Append(menu, TrayCommand.Store, I18n.Get("tray.store"));
-            Append(menu, TrayCommand.Groups, I18n.Get("tray.groups"));
+            Append(menu, TrayCommand.Store, I18n.Get("tray.store.open"));
+            Append(menu, TrayCommand.Groups, I18n.Get("tray.groups.open"));
             AppendToggle(
                 menu,
                 TrayCommand.ToggleStartAtLogin,
-                I18n.Get("tray.startup"),
+                I18n.Get("settings.startup.title"),
                 isChecked: _state.StartAtLogin);
             NativeMethods.AppendMenu(menu, 0x800, 0, null);
-            Append(menu, TrayCommand.CheckUpdates, I18n.Get("tray.checkUpdates"));
-            Append(menu, TrayCommand.Settings, I18n.Get("tray.settings"));
+            Append(menu, TrayCommand.CheckUpdates, I18n.Get("tray.update.check"));
+            Append(menu, TrayCommand.Settings, I18n.Get("tray.settings.open"));
             NativeMethods.AppendMenu(menu, 0x800, 0, null);
-            Append(menu, TrayCommand.Exit, I18n.Get("tray.exit"));
+            Append(menu, TrayCommand.Exit, I18n.Get("tray.app.exit"));
 
             NativeMethods.GetCursorPos(out NativePoint point);
             NativeMethods.SetForegroundWindow(_window);
@@ -786,8 +786,8 @@ public sealed class TrayIconService : IDisposable
                 else
                 {
                     service._notificationClickCommand = TrayCommand.Open;
-                    data.InfoTitle = I18n.Get("tray.connectionFailedTitle");
-                    data.Info = I18n.Get("tray.connectionFailedBody");
+                    data.InfoTitle = I18n.Get("tray.connection.error.title");
+                    data.Info = I18n.Get("tray.connection.error.message");
                     data.InfoFlags = NotifyInfoWarning;
                 }
                 NativeMethods.ShellNotifyIcon(1, ref data);

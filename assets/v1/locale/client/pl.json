@@ -1,0 +1,1630 @@
+{
+  "character": {
+    "pixel_cat": {
+      "display_name": "Kotek"
+    },
+    "pixel_hamster": {
+      "display_name": "Mały chomik"
+    },
+    "pixel_penguin": {
+      "display_name": "Mały pingwin"
+    },
+    "pixel_puppy": {
+      "display_name": "Szczeniak"
+    },
+    "pixel_rabbit": {
+      "display_name": "Króliczek"
+    },
+    "unknown": {
+      "display_name": "Postać"
+    }
+  },
+  "common": {
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "continue": "Kontynuuj",
+    "me": "Ja",
+    "next": "Dalej",
+    "save": "Zapisz"
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "Dołącz za pomocą kodu"
+    },
+    "collapse": "Zwiń grupę",
+    "create": {
+      "action": "Utwórz grupę",
+      "name": {
+        "placeholder": "Nazwa nowej grupy"
+      }
+    },
+    "delete": {
+      "action": "Usuń grupę"
+    },
+    "expand": "Rozwiń grupę",
+    "member": {
+      "remove": {
+        "action": "Usuń"
+      }
+    },
+    "rename": {
+      "action": "Zmień nazwę",
+      "name_placeholder": "Nazwa grupy, od 1 do 20 znaków"
+    },
+    "room_name": {
+      "label": "Nazwa grupy"
+    }
+  },
+  "history": {
+    "load_more": {
+      "failed": "Nie udało się wczytać wcześniejszych wiadomości",
+      "loading": "Wczytywanie wcześniejszych wiadomości…"
+    },
+    "loading": "Wczytywanie ostatnich wiadomości…"
+  },
+  "message": {
+    "send": {
+      "accessibility": "Wyślij wiadomość"
+    }
+  },
+  "onboarding": {
+    "character": {
+      "label": "Moja postać"
+    },
+    "group": {
+      "create": {
+        "description": "Utwórz grupę."
+      },
+      "description": "Utwórz grupę lub dołącz do niej za pomocą kodu zaproszenia, aby ożywić swój pikselowy świat.",
+      "title": "Utwórz grupę ze znajomymi"
+    },
+    "step": {
+      "group": "Grupa",
+      "profile": "Profil"
+    }
+  },
+  "platforms": {
+    "windows": {
+      "accessibility": {
+        "motion": {
+          "disabled": "Efekty animacji są wyłączone w systemie Windows."
+        }
+      },
+      "account": {
+        "delete": {
+          "confirmation": {
+            "action": "Usuń konto",
+            "message": "Profil i informacje o grupach, do których należysz, zostaną trwale usunięte, a historia zakupów zostanie odłączona od konta.",
+            "title": "Usunąć konto?"
+          },
+          "description": "Trwale usuń konto i powiązane z nim dane osobowe.",
+          "final_confirmation": {
+            "message": "Usuniętego konta ani danych nie będzie można odzyskać.",
+            "title": "Trwale usunąć konto?"
+          },
+          "title": "Usuń konto"
+        },
+        "description": "Wyloguj się lub zarządzaj kontem.",
+        "sign_out": {
+          "confirmation": {
+            "action": "Wyloguj się",
+            "message": "Spowoduje to wylogowanie tylko na tym komputerze. Aby ponownie korzystać z aplikacji, trzeba będzie zalogować się przez Google.",
+            "title": "Wylogować się?"
+          },
+          "description": "Wyloguj się tylko na tym komputerze.",
+          "title": "Wyloguj się"
+        },
+        "title": "Konto"
+      },
+      "app": {
+        "info": {
+          "description": "Wyświetl informacje o wersji i pomocy technicznej.",
+          "navigation_label": "Informacje",
+          "title": "Informacje"
+        },
+        "launch": {
+          "failed": "Podczas uruchamiania aplikacji SIDEY wystąpił błąd. Zamknij aplikację i spróbuj ponownie."
+        },
+        "startup": {
+          "error": {
+            "title": "Błąd uruchamiania aplikacji SIDEY"
+          },
+          "failed": "Nie udało się uruchomić aplikacji SIDEY.",
+          "failed_with_log": "Nie udało się uruchomić aplikacji SIDEY.\n\nDziennik diagnostyczny: {0}",
+          "runtime_missing": "Brakuje niektórych plików aplikacji SIDEY. Zainstaluj aplikację ponownie."
+        }
+      },
+      "auth": {
+        "google": {
+          "already_linked": "To konto Google jest już połączone z bieżącym profilem. Profil i dane nie zostały zmienione.",
+          "cancelled": "Logowanie przez Google zostało anulowane lub nie można go było ukończyć. Spróbuj ponownie.",
+          "identity_changed": "To konto Google nie jest zgodne z kontem połączonym z bieżącym kontem. Profil i dane nie zostały zmienione.",
+          "link_expired": "Żądanie logowania przez Google wygasło. Anuluj logowanie i spróbuj ponownie.",
+          "required": "Aby kontynuować, połącz konto Google.",
+          "sign_in_complete": "Logowanie przez Google zostało ukończone. Zamknij kartę logowania w przeglądarce."
+        },
+        "request": {
+          "failed": "Nie udało się zalogować. Spróbuj ponownie później. (Kod błędu: {0})"
+        },
+        "response": {
+          "empty": "Nie udało się ukończyć logowania. Spróbuj ponownie."
+        },
+        "session": {
+          "expired": "Sesja logowania wygasła. Zaloguj się ponownie.",
+          "replace_blocked": "Na tym komputerze są już zapisane dane logowania. Uruchom aplikację ponownie, a następnie zaloguj się jeszcze raz.",
+          "restore_failed": "Nie udało się przywrócić logowania. Nie utworzono nowego konta. Zaloguj się ponownie.",
+          "stored_invalid": "Nie udało się odczytać zapisanych danych logowania. Zaloguj się ponownie.",
+          "values_missing": "Nie udało się ukończyć logowania. Spróbuj ponownie."
+        }
+      },
+      "common": {
+        "back": "Wstecz",
+        "delete": "Usuń",
+        "friend": "Znajomy",
+        "skip": "Pomiń"
+      },
+      "composer": {
+        "drag": {
+          "tooltip": "Przeciągnij, aby przenieść okno wprowadzania"
+        },
+        "group": {
+          "required": "Skonfiguruj profil i wybierz grupę, aby wysłać wiadomość."
+        },
+        "message": {
+          "placeholder": "Wpisz wiadomość…"
+        },
+        "window": {
+          "title": "Wiadomość SIDEY"
+        }
+      },
+      "connection": {
+        "configuration": {
+          "not_configured": "Brakuje wymaganych ustawień połączenia z serwerem. Zainstaluj aplikację ponownie."
+        },
+        "error": {
+          "access_required": "Nie udało się zweryfikować dostępu konta lub grupy. W obszarze Połączenie z serwerem wybierz pozycję Połącz ponownie. Jeśli ten komunikat nadal się pojawia, skontaktuj się z nami i dołącz dziennik diagnostyczny.",
+          "busy": "Wiele osób łączy się teraz z serwerem, dlatego trwa to dłużej niż zwykle. Aplikacja będzie automatycznie ponawiać próbę. Jeśli po kilku minutach nadal nie będzie połączenia, skontaktuj się z nami i dołącz dziennik diagnostyczny.",
+          "configuration_unavailable": "Nie można teraz nawiązać połączenia z serwerem. Poczekaj chwilę, a następnie w obszarze Połączenie z serwerem wybierz pozycję Połącz ponownie. Jeśli problem nie ustąpi, skontaktuj się z nami i dołącz dziennik diagnostyczny.",
+          "network_unavailable": "Nie udało się połączyć z serwerem. Sprawdź połączenie internetowe, a następnie w obszarze Połączenie z serwerem wybierz pozycję Połącz ponownie. Jeśli inne witryny działają, ale problem nie ustępuje, skontaktuj się z nami i dołącz dziennik diagnostyczny.",
+          "secure_connection_failed": "Nie udało się utworzyć bezpiecznego połączenia. Sprawdź, czy data i godzina w systemie Windows są prawidłowe, a następnie połącz się ponownie. Jeśli problem nie ustąpi, skontaktuj się z nami i dołącz dziennik diagnostyczny.",
+          "service_unavailable": "Nie udało się połączyć z serwerem. Aplikacja będzie automatycznie ponawiać próbę. Jeśli po kilku minutach nadal nie będzie połączenia, w obszarze Połączenie z serwerem wybierz pozycję Połącz ponownie. Jeśli to nie pomoże, skontaktuj się z nami i dołącz dziennik diagnostyczny."
+        },
+        "group_resync_failed": "Nie udało się wczytać najnowszego stanu grupy. Połącz się ponownie, aby kontynuować. ({0})",
+        "group_revision_missing": "Połączenie z grupą uległo zmianie. Połącz się ponownie, aby kontynuować.",
+        "notice": {
+          "connected": "Połączono z serwerem.",
+          "reconnecting": "Ponowne łączenie z serwerem."
+        },
+        "retry": {
+          "action": "Połącz ponownie"
+        },
+        "server": {
+          "not_configured": "Brakuje wymaganych ustawień połączenia z serwerem. Zainstaluj aplikację ponownie."
+        },
+        "state": {
+          "connected": "Połączono",
+          "disconnected": "Brak połączenia",
+          "reconnecting": "Łączenie"
+        },
+        "unavailable": "Nie udało się połączyć z serwerem. Spróbuj ponownie za chwilę."
+      },
+      "external_link": {
+        "open": {
+          "failed": "Nie udało się otworzyć strony w domyślnej przeglądarce."
+        }
+      },
+      "groups": {
+        "create": {
+          "description": "Utwórz grupę i udostępnij kod zaproszenia znajomym.",
+          "in_progress": "Tworzenie…",
+          "result_missing": "Nie udało się ukończyć tworzenia grupy. Spróbuj ponownie.",
+          "success": {
+            "default": "Utworzono grupę."
+          },
+          "tooltip": "Utwórz grupę o tej nazwie."
+        },
+        "delete": {
+          "confirmation": {
+            "message": "Spowoduje to usunięcie wszystkich osób z grupy oraz jej wiadomości. Tej operacji nie można cofnąć.",
+            "title": "Usunąć grupę „{0}”?"
+          },
+          "final_confirmation": {
+            "message": "Grupa „{0}” i wszystkie jej wiadomości zostaną teraz trwale usunięte.",
+            "title": "Trwale usunąć tę grupę?"
+          },
+          "success": "Usunięto grupę.",
+          "tooltip": "Trwale usuń tę grupę."
+        },
+        "description": "Zarządzaj grupami, które dzielisz ze znajomymi. Do każdej grupy może dołączyć maksymalnie 12 osób.",
+        "empty": {
+          "description": "Utwórz nową grupę lub wpisz kod zaproszenia otrzymany od znajomego.",
+          "title": "Nie masz jeszcze żadnych grup"
+        },
+        "error": {
+          "not_found": "Nie znaleziono grupy."
+        },
+        "invite": {
+          "code": {
+            "label": "Kod zaproszenia",
+            "missing": "Na tym urządzeniu nie ma zapisanego kodu zaproszenia.",
+            "replaced": "Kod zaproszenia zapisany na tym urządzeniu został zastąpiony. Poproś właściciela o nowy kod.",
+            "revoked": "Poprzedni kod zaproszenia został unieważniony. Właściciel musi wygenerować nowy kod."
+          },
+          "copy": {
+            "action": "Kopiuj kod zaproszenia",
+            "complete": "Skopiowano"
+          },
+          "rotate": {
+            "action": "Wygeneruj nowy kod zaproszenia",
+            "code_missing": "Nowy kod zaproszenia jest pusty.",
+            "confirmation": {
+              "action": "Utwórz nowy kod",
+              "message": "Dotychczasowy kod zostanie natychmiast unieważniony. Tej operacji nie można cofnąć.",
+              "title": "Utworzyć nowy kod zaproszenia?"
+            },
+            "success": "Utworzono nowy kod zaproszenia i bezpiecznie zapisano go na tym urządzeniu."
+          }
+        },
+        "join": {
+          "description": "Wpisz kod zaproszenia otrzymany od znajomego, aby dołączyć do grupy.",
+          "failed": "Nie udało się dołączyć do grupy. Sprawdź kod zaproszenia i spróbuj ponownie. ({0})",
+          "in_progress": "Dołączanie…",
+          "result_missing": "Nie udało się wczytać grupy, do której dołączono. Spróbuj ponownie.",
+          "room_id_missing": "Nie udało się ukończyć dołączania do grupy. Spróbuj ponownie.",
+          "success": {
+            "default": "Dołączono do grupy."
+          },
+          "tooltip": "Dołącz do grupy przy użyciu tego kodu zaproszenia."
+        },
+        "leave": {
+          "action": "Opuść grupę",
+          "confirmation": {
+            "action": "Opuść",
+            "member_message": "Utracisz dostęp do tej grupy i jej ostatnich wiadomości.",
+            "owner_message": "Właścicielem zostanie osoba z najdłuższym stażem w grupie. Jeśli w grupie nie pozostanie nikt, grupa zostanie usunięta.",
+            "title": "Opuścić grupę „{0}”?"
+          },
+          "success": "Opuszczono grupę.",
+          "tooltip": "Opuść tę grupę."
+        },
+        "member": {
+          "remove": {
+            "confirmation": {
+              "message": "Ta osoba utraci dostęp do grupy i jej historii wiadomości.",
+              "title": "Usunąć osobę „{0}”?"
+            },
+            "success": "Usunięto członka.",
+            "tooltip": "Usuń tę osobę z grupy."
+          }
+        },
+        "navigation_label": "Grupy",
+        "operation": {
+          "busy": "Spróbuj ponownie po zakończeniu innej operacji na grupie."
+        },
+        "refresh": {
+          "failed": "Nie udało się odświeżyć informacji o grupie. Spróbuj ponownie później. ({0})"
+        },
+        "rename": {
+          "success": "Zmieniono nazwę grupy.",
+          "title": "Zmień nazwę grupy",
+          "tooltip": "Zmień nazwę grupy."
+        },
+        "state": {
+          "active": "Aktywna"
+        },
+        "summary": {
+          "invite_ready": "Członkowie: {0}/12 · Kod zaproszenia: {1}",
+          "invite_rotation_required": "Członkowie: {0}/12 · Wymagany nowy kod zaproszenia"
+        },
+        "switch": {
+          "action": "Przełącz na grupę",
+          "in_progress": "Łączenie…",
+          "success": "Zmieniono aktywną grupę.",
+          "tooltip": "Pokaż tę grupę na ekranie."
+        },
+        "title": "Moje grupy"
+      },
+      "history": {
+        "empty": {
+          "description": "Tutaj pojawią się ostatnie wiadomości z tej grupy.",
+          "title": "Nie ma jeszcze wiadomości."
+        },
+        "group": {
+          "none": "Brak aktywnej grupy",
+          "required": "Dołącz do grupy, aby zobaczyć ostatnie wiadomości."
+        },
+        "load": {
+          "initial_failed": "Nie udało się wczytać historii wiadomości",
+          "retry": "Spróbuj ponownie"
+        },
+        "pagination": {
+          "exhausted": "To już koniec wiadomości z ostatnich 3 dni"
+        },
+        "recent": {
+          "title": "Ostatnie wiadomości"
+        },
+        "retention": {
+          "notice": "Wiadomości są automatycznie usuwane po 3 dniach.",
+          "reload_failed": "Nie udało się ponownie wczytać starszych wiadomości. Spróbuj ponownie za chwilę. ({0})"
+        },
+        "scroll": {
+          "latest": "Przejdź do najnowszych wiadomości"
+        },
+        "user": {
+          "unknown": "Nieznany członek"
+        },
+        "window": {
+          "always_on_top": {
+            "disable": "Wyłącz opcję Zawsze na wierzchu",
+            "disable_shortcut": "Wyłącz opcję Zawsze na wierzchu (Alt+strzałka w dół)",
+            "enable": "Zawsze na wierzchu",
+            "enable_shortcut": "Zawsze na wierzchu (Alt+strzałka w górę)"
+          },
+          "title": "Historia wiadomości SIDEY"
+        }
+      },
+      "legal": {
+        "description": "Zapoznaj się z warunkami i zasadami.",
+        "privacy": {
+          "action": "Wyświetl zasady ochrony prywatności"
+        },
+        "refund": {
+          "action": "Wyświetl zasady anulowania i zwrotów"
+        },
+        "terms": {
+          "action": "Wyświetl warunki"
+        },
+        "title": "Zasady"
+      },
+      "message": {
+        "delivery": {
+          "recheck_failed": "Nie udało się potwierdzić wysłania wiadomości. Sprawdź ponownie za chwilę. ({0})"
+        },
+        "send": {
+          "failed": "Nie udało się wysłać wiadomości. Spróbuj ponownie. ({0})",
+          "rate_limited": "Wysyłasz wiadomości zbyt szybko."
+        }
+      },
+      "onboarding": {
+        "auth": {
+          "google": {
+            "cancel": "Anuluj logowanie",
+            "continue": "Kontynuuj przez Google",
+            "description": "Aby kontynuować, połącz konto Google. Dotychczasowy profil, grupy i historia czatów zostaną zachowane.",
+            "pending": "Dokończ logowanie przez Google w przeglądarce."
+          },
+          "start": "Rozpocznij"
+        },
+        "complete": {
+          "description": "Grupę możesz utworzyć lub do niej dołączyć w dowolnej chwili w Ustawieniach.",
+          "title": "Wszystko gotowe"
+        },
+        "connection": {
+          "connected": "Połączono z serwerem",
+          "connecting": "Łączenie z serwerem…"
+        },
+        "group": {
+          "invite_code": {
+            "label": "Kod zaproszenia",
+            "member_limit": "Każda grupa może mieć maksymalnie 12 osób.",
+            "placeholder": "Kod od znajomego",
+            "required": "Wpisz kod zaproszenia."
+          },
+          "join": {
+            "action": "Dołącz"
+          },
+          "name": {
+            "placeholder": "np. Nasza miejscówka"
+          },
+          "path": {
+            "label": "Jak chcesz zacząć?"
+          }
+        },
+        "launch": {
+          "action": "Uruchom"
+        },
+        "profile": {
+          "description": "Możesz to zmienić w dowolnej chwili w Ustawieniach.",
+          "title": "Wybierz swoją nazwę"
+        },
+        "step": {
+          "complete": "Gotowe"
+        },
+        "tagline": "Miej znajomych zawsze obok."
+      },
+      "overlay": {
+        "current_user": "{0} · Ja"
+      },
+      "platform": {
+        "requirements": {
+          "description": "Aplikacja SIDEY wymaga systemu Windows 10 1809 (kompilacja 17763) lub nowszego w wersji x64.",
+          "title": "Nieobsługiwana wersja systemu Windows",
+          "window_title": "SIDEY — nieobsługiwany system Windows"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Wybierz pikselową postać, która będzie cię reprezentować na ekranach znajomych.",
+          "save": {
+            "success": "Zmieniono postać."
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "default": "Domyślna chmurka czatu",
+            "description": "Wybierz posiadaną chmurkę. Będzie używana we wszystkich twoich grupach.",
+            "title": "Chmurka czatu"
+          },
+          "equipped": "Używane",
+          "save": {
+            "success": "Nowy wygląd jest gotowy."
+          },
+          "throwable": {
+            "default": "Domyślna miękka piłeczka",
+            "description": "Wybierz posiadaną zabawkę. Będzie używana we wszystkich twoich grupach.",
+            "title": "Zabawka do rzucania"
+          }
+        },
+        "description": "Ustaw nazwę i postać widoczne dla znajomych.",
+        "duplicates": {
+          "notice": "Możesz używać takiej samej nazwy lub postaci jak znajomy."
+        },
+        "nickname": {
+          "description": "Nazwa widoczna dla znajomych na ekranie i w wiadomościach · od 2 do 8 znaków",
+          "save": {
+            "action": "Zmień pseudonim",
+            "tooltip": "Zapisz zmieniony pseudonim."
+          }
+        },
+        "save": {
+          "success": "Zapisano profil."
+        }
+      },
+      "settings": {
+        "display": {
+          "description": "Dostosuj sposób wyświetlania stanu znajomych i wiadomości.",
+          "offline_members": {
+            "description": "Pokazuj znajomych offline jako śpiące postacie z czerwoną kropką stanu.",
+            "title": "Pokaż członków offline",
+            "tooltip": "Przełącz wyświetlanie członków offline"
+          },
+          "quiet_mode": {
+            "description": "Ukrywaj chmurki wiadomości i wskaźniki pisania, ale zachowaj liczniki nieprzeczytanych wiadomości.",
+            "tooltip": "Przełącz tryb dyskretny"
+          },
+          "throw_guard": {
+            "description": "Gdy ta opcja jest wyłączona, kliknij znajomego, aby rzucić. Gdy jest włączona, kliknij dwukrotnie prawym przyciskiem swoją postać, aby włączyć rzucanie na 10 sekund.",
+            "title": "Kliknij dwukrotnie prawym przyciskiem, aby rzucić",
+            "tooltip": "Wymagaj dwukrotnego kliknięcia prawym przyciskiem swojej postaci przed rzuceniem"
+          }
+        },
+        "general": {
+          "description": "Wybierz wygląd aplikacji i określ, kiedy ma się uruchamiać."
+        },
+        "language": {
+          "description": "Wybierz język aplikacji. Zmiany zostaną zastosowane od razu.",
+          "title": "Język"
+        },
+        "navigation_label": "Ustawienia",
+        "overlay": {
+          "description": "Pokaż pikselowy świat znajomych wzdłuż wybranej krawędzi ekranu.",
+          "tooltip": "Przełącz pikselowy świat"
+        },
+        "placement": {
+          "description": "Wybierz miejsce wyświetlania postaci.",
+          "edge": {
+            "description": "Wybierz krawędź ekranu, wzdłuż której będą chodzić postacie.",
+            "title": "Krawędź",
+            "tooltip": "Krawędź ekranu dla pikselowego świata"
+          },
+          "monitor": {
+            "description": "Wybierz ekran dla pikselowego świata i pola wiadomości.",
+            "title": "Monitor",
+            "tooltip": "Monitor dla pikselowego świata i pola wiadomości",
+            "unavailable": "Żaden ekran nie jest dostępny."
+          },
+          "span": {
+            "description": "Wybierz, jak dużą część krawędzi ekranu mogą przemierzać postacie.",
+            "full": "Cała krawędź",
+            "title": "Obszar poruszania się",
+            "tooltip": "Zakres ekranu zajmowany przez pikselowy świat"
+          },
+          "title": "Położenie postaci"
+        },
+        "save": {
+          "failed": "Nie udało się zapisać ustawień. Spróbuj ponownie. ({0})"
+        },
+        "shortcuts": {
+          "action": {
+            "composer": "Otwórz lub zamknij pole wiadomości",
+            "history": "Otwórz lub zamknij ostatnią historię",
+            "overlay": "Przełącz nakładkę",
+            "quiet_mode": "Przełącz tryb dyskretny"
+          },
+          "description": "Wybierz skrót, a następnie naciśnij wybraną kombinację klawiszy. Przypisanie używanej już kombinacji spowoduje zamianę obu skrótów.",
+          "error": {
+            "already_registered": "Ten skrót jest już używany przez system lub inną aplikację.",
+            "availability_unverified": "Nie udało się sprawdzić, czy ten skrót jest dostępny.",
+            "in_app_conflict": "Inny skrót aplikacji używa tej kombinacji. Zapisanie zmian spowoduje zamianę obu skrótów.",
+            "invalid": "Nieprawidłowy skrót",
+            "modifier_required": "Skrót musi zaczynać się od klawisza Win, Ctrl, Alt lub Shift.",
+            "system_conflict": "Ten skrót jest już używany jako skrót systemowy."
+          },
+          "recorder": {
+            "empty": "Naciśnij kombinację klawiszy, aby zmienić ten skrót.",
+            "help": "Wybierz, a następnie naciśnij klawisz modyfikujący i inny klawisz. Naciśnij klawisz Esc, aby anulować.",
+            "recording": "Naciśnij skrót…",
+            "reset": "Resetuj"
+          },
+          "title": "Skróty klawiaturowe"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Odtwarzaj efekty dźwiękowe, gdy postacie w bieżącej grupie zostaną trafione.",
+            "title": "Efekty dźwiękowe postaci"
+          },
+          "description": "Dostosuj efekty dźwiękowe postaci.",
+          "mute": "Wycisz",
+          "unmute": "Wyłącz wyciszenie",
+          "volume": "Głośność"
+        },
+        "storage": {
+          "folder_invalid": "Nie udało się otworzyć folderu ustawień. Uruchom aplikację ponownie.",
+          "read_failed": "Nie udało się odczytać zapisanych ustawień. Uruchom aplikację ponownie."
+        },
+        "theme": {
+          "dark": "Ciemny",
+          "description": "Wybierz jasny, ciemny lub systemowy motyw aplikacji.",
+          "light": "Jasny",
+          "system": "Domyślny systemu Windows",
+          "title": "Motyw"
+        },
+        "update": {
+          "check": {
+            "action": "Sprawdź aktualizacje"
+          },
+          "check_now": {
+            "tooltip": "Sprawdź, czy jest dostępna nowsza wersja."
+          },
+          "description": "Sprawdź, czy jest dostępna nowsza wersja.",
+          "last_checked": {
+            "never": "Ostatnio sprawdzono: nigdy",
+            "today": "Dzisiaj o {0}",
+            "value": "Ostatnio sprawdzono: {0}",
+            "yesterday": "Wczoraj o {0}"
+          },
+          "release_notes": {
+            "action": "Szczegóły aktualizacji"
+          },
+          "title": "Aktualizacje"
+        }
+      },
+      "store": {
+        "auth": {
+          "google": {
+            "failed": "Nie udało się rozpocząć łączenia konta Google."
+          }
+        },
+        "availability": {
+          "coming_soon": {
+            "description": "Sklep oferuje obecnie tylko podgląd. Zakupy nie są jeszcze dostępne.",
+            "title": "Zakup nie jest jeszcze dostępny"
+          }
+        },
+        "checkout": {
+          "opening": "Otwieranie płatności…"
+        },
+        "description": "Zobacz postacie, chmurki czatu i zabawki w akcji.",
+        "empty": {
+          "description": "Spróbuj użyć innego wyszukiwania lub zmienić filtry.",
+          "title": "Nic nie znaleziono"
+        },
+        "filter": {
+          "hide_owned": "Ukryj posiadane",
+          "menu": "Sortowanie i filtry",
+          "reset": "Resetuj wszystko",
+          "search": {
+            "label": "Wyszukaj",
+            "placeholder": "Wyszukaj nazwy lub opisy"
+          }
+        },
+        "kind": {
+          "bubble": "Chmurki czatu",
+          "character": "Postacie",
+          "keepsake": "Ulubiony przedmiot",
+          "throwable": "Zabawki do rzucania"
+        },
+        "navigation_label": "Dostosuj i kupuj",
+        "preview": {
+          "member": {
+            "dubu": "Tofu",
+            "moka": "Mokka"
+          },
+          "message": {
+            "left": "Co będzie na kolację?",
+            "right": "Może pizza?"
+          },
+          "open": "Wyświetl podgląd",
+          "sound": {
+            "off": "Wycisz dźwięk podglądu",
+            "on": "Włącz dźwięk podglądu"
+          },
+          "tree_movement_hint": "Kliknij drzewo prawym przyciskiem, aby je zatrzymać. Kliknij ponownie prawym przyciskiem, aby znów zaczęło chodzić.",
+          "unavailable": "Nie udało się wczytać podglądu."
+        },
+        "price": {
+          "krw": "₩{0:N0}"
+        },
+        "product": {
+          "sold_separately": "Sprzedawane oddzielnie od postaci"
+        },
+        "purchase": {
+          "action": "Kup za {0}",
+          "confirming": "Potwierdzanie płatności…",
+          "failed": "Nie udało się potwierdzić zakupu. Sprawdź ponownie za chwilę.",
+          "owned": "Posiadasz",
+          "success": "Zakup został ukończony.",
+          "timeout": "Upłynął limit czasu potwierdzenia płatności. Otwórz sklep ponownie, aby sprawdzić jej stan.",
+          "unavailable": "Zakupy są obecnie niedostępne. Spróbuj ponownie za chwilę."
+        },
+        "sort": {
+          "price_ascending": "Od najniższej ceny",
+          "price_descending": "Od najwyższej ceny"
+        },
+        "status": {
+          "retry": "Spróbuj ponownie",
+          "unavailable": "Nie udało się wczytać sklepu. Spróbuj ponownie za chwilę."
+        },
+        "title": "Dostosuj i kupuj"
+      },
+      "support": {
+        "diagnostics": {
+          "description": "Pliki dziennika zostaną skompresowane i zapisane na pulpicie. Udostępnienie ich nam może pomóc w naprawie błędów.",
+          "export": {
+            "action": "Eksportuj",
+            "failed": "Nie udało się wyeksportować danych diagnostycznych.",
+            "success": "Dane diagnostyczne zapisano na pulpicie."
+          },
+          "title": "Eksportuj dane diagnostyczne"
+        },
+        "feedback": {
+          "action": "Wyślij opinię",
+          "description": "Jeśli coś nie działa lub potrzebujesz pomocy, utwórz zgłoszenie w serwisie GitHub.",
+          "title": "Opinia"
+        }
+      },
+      "tray": {
+        "app": {
+          "exit": "Zakończ"
+        },
+        "connection": {
+          "error": {
+            "message": "W obszarze Połączenie z serwerem wybierz pozycję Połącz ponownie. Jeśli nadal nie można nawiązać połączenia, skontaktuj się z nami i dołącz dziennik diagnostyczny.",
+            "title": "Błąd połączenia aplikacji SIDEY z serwerem"
+          }
+        },
+        "group": {
+          "active": "Aktywna grupa"
+        },
+        "groups": {
+          "empty": "Brak połączonych grup",
+          "open": "Ustawienia grup…"
+        },
+        "history": {
+          "open": "Ostatnia historia…"
+        },
+        "message": {
+          "compose": "Napisz wiadomość…"
+        },
+        "overlay": {
+          "hide": "Ukryj nakładkę"
+        },
+        "quiet_mode": {
+          "toggle": "Tryb dyskretny"
+        },
+        "settings": {
+          "open": "Ustawienia…"
+        },
+        "shortcuts": {
+          "registration_failed": "Te skróty są niedostępne: {0}. Być może używa ich inna aplikacja. Zamiast nich użyj menu w obszarze powiadomień."
+        },
+        "start": {
+          "failed": "Nie udało się uruchomić ikony w obszarze powiadomień. Zamknięcie okna spowoduje zamknięcie aplikacji SIDEY."
+        },
+        "store": {
+          "open": "Sklep…"
+        },
+        "unread": {
+          "tooltip": "SIDEY · Liczba nieprzeczytanych wiadomości: {0}"
+        },
+        "update": {
+          "available": "Dostępna jest aktualizacja. {0}",
+          "check": "Sprawdź aktualizacje…",
+          "check_failed": "Nie udało się sprawdzić dostępności aktualizacji. Spróbuj ponownie za chwilę.",
+          "installed": "Aplikacja SIDEY została zaktualizowana do wersji {0}. Kliknij, aby zobaczyć zmiany.",
+          "latest": "Korzystasz z najnowszej wersji."
+        }
+      },
+      "update": {
+        "available": "Dostępna jest aplikacja SIDEY {0}.",
+        "checking": "Sprawdzanie dostępności aktualizacji…",
+        "download": {
+          "hash_mismatch": "Nie udało się zweryfikować pliku aktualizacji. Pobierz go ponownie.",
+          "in_progress": "Pobieranie aktualizacji…",
+          "progress": "Pobieranie aktualizacji… ({0}%)"
+        },
+        "failed": "Nie udało się ukończyć aktualizacji. Spróbuj ponownie za chwilę.",
+        "install": {
+          "cancelled": "Anulowano instalację aktualizacji.",
+          "invalid": "Nie udało się zweryfikować szczegółów instalacji aktualizacji. Spróbuj ponownie później.",
+          "launch_failed": "Nie udało się otworzyć instalatora. Wybierz pozycję Sprawdź aktualizacje, aby spróbować ponownie.",
+          "launched": "Pobieranie ukończone. Instalator został otwarty.",
+          "missing": "Nie można teraz zainstalować aktualizacji. Spróbuj ponownie później."
+        },
+        "latest": "Korzystasz z najnowszej wersji.",
+        "metadata": {
+          "invalid": "Nie udało się zweryfikować informacji o aktualizacji. Spróbuj ponownie później."
+        },
+        "not_published": "Nowa aktualizacja nie jest jeszcze dostępna. Sprawdź ponownie później.",
+        "prompt": {
+          "download": "Pobierz",
+          "later": "Później",
+          "message": "Pobrać aplikację SIDEY {0}?",
+          "title": "Dostępna jest aktualizacja"
+        },
+        "release_notes": {
+          "open_failed": "Nie udało się otworzyć szczegółów aktualizacji. Spróbuj ponownie. ({0})"
+        }
+      },
+      "validation": {
+        "message": {
+          "length": "Wpisz wiadomość o długości od 1 do 200 znaków."
+        },
+        "nickname": {
+          "length": "Wpisz pseudonim o długości od 2 do 8 znaków."
+        },
+        "room_name": {
+          "length": "Wpisz nazwę grupy o długości od 1 do 20 znaków."
+        }
+      }
+    },
+    "macos": {
+      "account": {
+        "delete": {
+          "failed": "Nie udało się usunąć konta. Spróbuj ponownie."
+        }
+      },
+      "account_delete": {
+        "error": {
+          "request_failed": "Nie udało się ukończyć żądania usunięcia konta. Spróbuj ponownie."
+        }
+      },
+      "app": {
+        "settings": {
+          "navigation_label": "Ustawienia aplikacji"
+        }
+      },
+      "apple_auth": {
+        "error": {
+          "missing_authorization_code": "Nie udało się ukończyć funkcji Zaloguj się przez Apple. Spróbuj ponownie.",
+          "missing_identity_token": "Nie udało się ukończyć funkcji Zaloguj się przez Apple. Spróbuj ponownie.",
+          "missing_request_nonce": "Nie udało się ukończyć funkcji Zaloguj się przez Apple. Spróbuj ponownie."
+        }
+      },
+      "auth": {
+        "apple": {
+          "description": "W wersji z App Store logowanie przez Apple jest wymagane do przywracania zakupów i ochrony konta.",
+          "title": "Zaloguj się przez Apple",
+          "verifying": "Sprawdzanie logowania"
+        },
+        "apple_sign_in": {
+          "failed": "Nie udało się zalogować przez Apple. Spróbuj ponownie."
+        }
+      },
+      "backend": {
+        "connect": {
+          "failed_detail": "Nie udało się połączyć z serwerem. Sprawdź połączenie z Internetem i spróbuj ponownie. (%@)"
+        },
+        "connection": {
+          "connecting": "Łączenie",
+          "failed": "Błąd połączenia",
+          "idle": "Oczekiwanie",
+          "online": "Połączono"
+        },
+        "error": {
+          "already_member": "Należysz już do tej grupy.",
+          "authentication_required": "Zaloguj się ponownie, aby kontynuować.",
+          "current_user_unavailable": "Nie udało się zweryfikować logowania. Zaloguj się ponownie.",
+          "generic": "Nie udało się ukończyć żądania. Spróbuj ponownie później.",
+          "invalid_invite_code": "Sprawdź kod zaproszenia i spróbuj ponownie.",
+          "invalid_message": "Wpisz wiadomość zawierającą maksymalnie 200 znaków i 3 wiersze.",
+          "invalid_profile": "Wpisz pseudonim o długości 2–8 znaków bez podziałów wiersza.",
+          "invalid_room_name": "Wpisz nazwę grupy o długości 1–20 znaków bez podziałów wiersza.",
+          "invalid_timestamp": "Nie udało się odczytać szczegółów wiadomości. Spróbuj ponownie później.",
+          "invite_rate_limited": "Zbyt wiele prób użycia kodu zaproszenia. Spróbuj ponownie za 10 minut.",
+          "malformed_response": "Nie udało się ukończyć żądania. Spróbuj ponownie później.",
+          "member_limit_reached": {
+            "one": "Ta grupa jest już pełna i ma %lld członka.",
+            "other": "Ta grupa jest już pełna i ma %lld członków."
+          },
+          "member_not_found": "Nie udało się znaleźć członka do usunięcia.",
+          "membership_required": "Tylko członkowie tej grupy mogą to zrobić.",
+          "message_receive_failed": "Nie udało się odebrać wiadomości. Spróbuj ponownie później.",
+          "no_active_room": "Wybierz grupę przed wysłaniem wiadomości.",
+          "owner_cannot_remove_self": "Właściciel grupy nie może usunąć siebie.",
+          "owner_required": "Tylko właściciel grupy może to zrobić.",
+          "profile_required": "Najpierw zapisz profil.",
+          "realtime_unavailable": "Połączenie z serwerem jest nadal przygotowywane. Spróbuj ponownie za chwilę.",
+          "room_limit_reached": "Każda osoba może korzystać z maksymalnie 5 grup.",
+          "room_resync_failed": "Nie udało się wczytać najnowszego stanu grupy. Spróbuj ponownie później.",
+          "session_recovery_failed": "Nie udało się przywrócić poprzedniego logowania. Nie utworzono nowego konta. Zaloguj się ponownie lub skontaktuj się z pomocą techniczną.",
+          "stale_realtime_epoch": "Dostęp do grupy uległ zmianie. Połącz się ponownie, aby kontynuować."
+        },
+        "realtime_recovery_failed": "Nie udało się ponownie połączyć z serwerem. Spróbuj ponownie za chwilę. (%@)"
+      },
+      "commerce": {
+        "character": {
+          "equip": {
+            "failed": "Nie udało się wyposażyć postaci. Spróbuj ponownie. (%@)",
+            "success": "Wyposażono %@."
+          }
+        },
+        "equipment": {
+          "success": {
+            "default_bubble": "Wyposażono domyślny dymek.",
+            "default_character": "Wyposażono domyślną postać.",
+            "default_throwable": "Wyposażono domyślną miękką piłkę.",
+            "named": "Wyposażono %@."
+          }
+        },
+        "error": {
+          "catalog_unavailable": "Nie udało się wczytać sklepu. Spróbuj ponownie później."
+        },
+        "kind": {
+          "bubble": "Chmurki czatu",
+          "character": "Postacie",
+          "throwable": "Zabawki do rzucania"
+        }
+      },
+      "common": {
+        "retry": "Spróbuj ponownie"
+      },
+      "composer": {
+        "drag": {
+          "accessibility": "Przenieś uchwyt pola wiadomości",
+          "tooltip": "Przenieś pole wiadomości"
+        }
+      },
+      "connection": {
+        "state": {
+          "connecting": "Łączenie…",
+          "failed": "Błąd połączenia",
+          "idle": "Bezczynne",
+          "online": "Połączono"
+        }
+      },
+      "firebase": {
+        "auth": {
+          "error": {
+            "account_mismatch": "Zalogowane konto uległo zmianie. Zaloguj się ponownie.",
+            "invalid_rollout_lease_claim": "Nie udało się zweryfikować logowania do połączenia z serwerem. Zaloguj się ponownie.",
+            "invalid_session_claim": "Nie udało się zweryfikować logowania. Zaloguj się ponownie.",
+            "login_mismatch": "Dane logowania nie pasują do bieżącego konta. Zaloguj się ponownie.",
+            "malformed_account_identifier": "Nie udało się zweryfikować konta. Zaloguj się ponownie.",
+            "rollout_lease_expired": "Sesja logowania wygasła. Zaloguj się ponownie.",
+            "rollout_lease_mismatch": "Bieżące dane logowania nie pozwalają połączyć się z serwerem. Zaloguj się ponownie.",
+            "session_mismatch": "Dane logowania nie pasują do bieżącego konta. Zaloguj się ponownie.",
+            "token_refresh_validation_failed": "Nie udało się zweryfikować logowania. Zaloguj się ponownie."
+          }
+        },
+        "bootstrap": {
+          "error": {
+            "authentication_required": "Sesja logowania wygasła. Zaloguj się ponownie.",
+            "grant_not_converged": "Połączenie z serwerem jest nadal przygotowywane. Spróbuj ponownie za chwilę.",
+            "invalid_argument": "Nie udało się połączyć z serwerem. Spróbuj ponownie później.",
+            "invalid_http_response": "Nie udało się połączyć z serwerem. Spróbuj ponownie później.",
+            "malformed_success": "Nie udało się połączyć z serwerem. Spróbuj ponownie później.",
+            "method_not_allowed": "Ta wersja nie może połączyć się z serwerem. Zaktualizuj aplikację.",
+            "missing_access_token": "Sesja logowania wygasła. Zaloguj się ponownie.",
+            "rate_limited": "Zbyt wiele prób połączenia. Spróbuj ponownie za chwilę.",
+            "rollout_disabled": "Nie można teraz połączyć się z serwerem. Aplikacja będzie automatycznie próbować dalej.",
+            "unavailable": "Nie udało się połączyć z serwerem. Spróbuj ponownie później.",
+            "unexpected_contract": "Ta wersja nie może połączyć się z serwerem. Zaktualizuj aplikację."
+          }
+        },
+        "chat": {
+          "error": {
+            "authentication_expired": "Sesja logowania wygasła. Zaloguj się ponownie.",
+            "invalid_message": "Sprawdź wiadomość i wyślij ją ponownie.",
+            "permission_denied": "Nie masz uprawnień do wysyłania wiadomości w tej grupie.",
+            "rate_limited": "Wysyłasz wiadomości zbyt szybko.",
+            "state_conflict": "Nie udało się wysłać wiadomości. Spróbuj ponownie za chwilę."
+          }
+        },
+        "configuration": {
+          "error": {
+            "invalid_plist": "Nie udało się odczytać ustawień połączenia aplikacji. Zainstaluj ją ponownie.",
+            "missing_plist": "Brakuje ustawień połączenia aplikacji. Zainstaluj ją ponownie.",
+            "sdk_app_unavailable": "Nie udało się uruchomić połączenia aplikacji. Otwórz ją ponownie.",
+            "sdk_options_unavailable": "Nie udało się przygotować połączenia aplikacji. Otwórz ją ponownie.",
+            "unexpected_app": "Ustawienia połączenia aplikacji są nieprawidłowe. Zainstaluj ją ponownie.",
+            "unexpected_bundle": "Ustawienia połączenia aplikacji są nieprawidłowe. Zainstaluj ją ponownie.",
+            "unexpected_database": "Ustawienia połączenia aplikacji są nieprawidłowe. Zainstaluj ją ponownie.",
+            "unexpected_project": "Ustawienia połączenia aplikacji są nieprawidłowe. Zainstaluj ją ponownie."
+          }
+        },
+        "production": {
+          "error": {
+            "app_version_unavailable": "Nie udało się sprawdzić wersji aplikacji, więc nie można rozpocząć połączenia z serwerem. Otwórz aplikację ponownie.",
+            "duplicate_wire_code": "Problem z danymi aplikacji blokuje połączenie z serwerem. Zainstaluj aplikację ponownie."
+          }
+        },
+        "transport": {
+          "error": {
+            "access_grant_closed": "Dostęp do grupy jest nadal sprawdzany. Spróbuj ponownie za chwilę.",
+            "listener_failed": "Połączenie wiadomości zostało zakończone. Połącz się ponownie, aby kontynuować.",
+            "live_listener_unavailable": "Nie udało się przygotować połączenia wiadomości. Połącz się ponownie za chwilę.",
+            "reconciliation_failed": "Nie udało się sprawdzić najnowszego stanu grupy. Spróbuj ponownie za chwilę.",
+            "room_not_authorized": "Nie udało się zweryfikować dostępu do tej grupy. Połącz się ponownie, aby kontynuować.",
+            "shut_down": "Połączenie z serwerem zostało zakończone. Połącz się ponownie, aby kontynuować."
+          }
+        }
+      },
+      "group": {
+        "create": {
+          "in_progress": "Tworzenie…",
+          "keychain_warning": "Grupa została utworzona, ale nie udało się zapisać kodu zaproszenia w Pęku kluczy. Zapisz teraz wyświetlony kod w bezpiecznym miejscu.",
+          "realtime_grant_pending": "Grupa została utworzona, ale nie udało się ukończyć połączenia z serwerem. Sprawdź ponownie za chwilę. (%@)"
+        },
+        "delete": {
+          "success": "Usunięto grupę „%@”."
+        },
+        "join": {
+          "in_progress": "Dołączanie…",
+          "keychain_warning": "Dołączono do grupy, ale nie udało się zapisać kodu zaproszenia w Pęku kluczy. Zapisz otrzymany kod w bezpiecznym miejscu.",
+          "realtime_grant_pending": "Dołączono do grupy, ale nie udało się ukończyć połączenia z serwerem. Sprawdź ponownie za chwilę. (%@)"
+        },
+        "leave": {
+          "confirmation": {
+            "last_member": "Ponieważ jesteś ostatnim członkiem, grupa i wszystkie wiadomości zostaną trwale usunięte bez możliwości odzyskania.",
+            "member": "Utracisz dostęp do grupy i jej dotychczasowych wiadomości.",
+            "owner_transfer": "Własność zostanie przekazana członkowi, który dołączył najwcześniej, a ty utracisz dostęp do grupy i jej dotychczasowych wiadomości."
+          },
+          "success": "Opuszczono grupę „%@”."
+        },
+        "name": {
+          "unknown": "Grupa"
+        },
+        "remove_member": {
+          "success": "Usunięto %@ z grupy."
+        },
+        "rename": {
+          "success": "Zmieniono nazwę grupy."
+        },
+        "switch": {
+          "failed": "Nie udało się zmienić grupy. Spróbuj ponownie. (%@)"
+        }
+      },
+      "groups": {
+        "active": "Aktywna",
+        "create": {
+          "invite_code": {
+            "description": "Do grupy mogą dołączyć tylko znajomi, którzy otrzymają ten kod.",
+            "title": "Nowy kod zaproszenia"
+          },
+          "name": {
+            "description": "Wpisz nazwę o długości 1–20 znaków, aby utworzyć grupę."
+          },
+          "subtitle": "Utwórz grupę i udostępnij jej kod zaproszenia znajomym."
+        },
+        "current": {
+          "empty": {
+            "description": "Utwórz nową grupę lub wpisz kod zaproszenia otrzymany od znajomego.",
+            "title": "Nie masz jeszcze żadnych grup"
+          },
+          "subtitle": {
+            "one": "Zarządzaj grupami udostępnianymi znajomym. Każda grupa może mieć maksymalnie %lld członka.",
+            "other": "Zarządzaj grupami udostępnianymi znajomym. Każda grupa może mieć maksymalnie %lld członków."
+          },
+          "title": "Moje grupy"
+        },
+        "delete": {
+          "confirmation_title": "Usunąć grupę „%@”?",
+          "message": "Grupa i wszystkie jej wiadomości zostaną trwale usunięte bez możliwości odzyskania."
+        },
+        "invite_code": {
+          "copy": {
+            "action": "Kopiuj kod zaproszenia",
+            "complete": "Skopiowano",
+            "help": "Skopiuj kod zaproszenia zapisany w Pęku kluczy tego urządzenia."
+          },
+          "rotate": {
+            "$value": "Zastąp kod zaproszenia",
+            "help": "Unieważnij potencjalnie ujawniony kod i wydaj nowy 128-bitowy kod."
+          }
+        },
+        "join": {
+          "invite_code": {
+            "description": "Wpisz kod zaproszenia, aby sprawdzić, czy możesz dołączyć i czy w grupie jest miejsce.",
+            "placeholder": "Kod zaproszenia",
+            "title": "Kod zaproszenia"
+          },
+          "subtitle": "Dołącz do grupy za pomocą kodu zaproszenia od znajomego."
+        },
+        "leave": {
+          "action": "Opuść grupę",
+          "confirmation_title": "Opuścić grupę „%@”?",
+          "message": {
+            "last_owner": "Ponieważ jesteś ostatnim członkiem, grupa i wszystkie wiadomości zostaną trwale usunięte bez możliwości odzyskania.",
+            "member": "Utracisz dostęp do grupy i jej dotychczasowych wiadomości.",
+            "owner_transfer": "Własność zostanie przekazana pozostałemu członkowi, który dołączył najwcześniej, a ty utracisz dostęp do grupy i jej dotychczasowych wiadomości."
+          }
+        },
+        "management": {
+          "navigation_label": "Grupy"
+        },
+        "member": {
+          "owner": "Właściciel",
+          "remove": {
+            "confirmation_title": "Usunąć %@?",
+            "message": "Ten członek utraci dostęp do grupy i jej dotychczasowych wiadomości.",
+            "title": "Usuń członka"
+          }
+        },
+        "members": {
+          "empty": "Brak członków do wyświetlenia."
+        },
+        "operation": {
+          "creating": "Tworzenie…",
+          "joining": "Dołączanie…",
+          "select": "Przełącz na grupę",
+          "switching": "Zmienianie grupy…"
+        },
+        "room": {
+          "summary": {
+            "invite_ready": {
+              "one": "%1$lld/%2$lld członek · Kod zaproszenia %3$@",
+              "other": "%1$lld/%2$lld członków · Kod zaproszenia %3$@"
+            },
+            "invite_rotation_required": {
+              "one": "%1$lld/%2$lld członek · Kod zaproszenia wymaga zastąpienia",
+              "other": "%1$lld/%2$lld członków · Kod zaproszenia wymaga zastąpienia"
+            }
+          }
+        }
+      },
+      "history": {
+        "close": {
+          "accessibility": "Zamknij ostatnie wiadomości"
+        },
+        "empty": {
+          "description": "Tutaj pojawią się ostatnie wiadomości z tej grupy.",
+          "title": "Brak wiadomości"
+        },
+        "error": {
+          "load_failed": "Nie udało się wczytać historii wiadomości"
+        },
+        "older": {
+          "exhausted": {
+            "one": "Wyświetlono wszystkie wiadomości z ostatniego %lld dnia.",
+            "other": "Wyświetlono wszystkie wiadomości z ostatnich %lld dni."
+          }
+        },
+        "retention_notice": {
+          "one": "Wiadomości są automatycznie usuwane po %lld dniu.",
+          "other": "Wiadomości są automatycznie usuwane po %lld dniach."
+        },
+        "title": "Ostatnie wiadomości",
+        "window": {
+          "title": "%@ · Ostatnie wiadomości"
+        }
+      },
+      "invite": {
+        "error": {
+          "backend_unavailable": "Nie można teraz sprawdzić kodu zaproszenia. Spróbuj ponownie za chwilę.",
+          "clipboard_failed": "Nie udało się skopiować kodu zaproszenia. Spróbuj ponownie.",
+          "not_stored_on_device": "Kod zaproszenia nie jest zapisany na tym urządzeniu. Utwórz nowy kod lub poproś o niego właściciela.",
+          "read_failed": "Nie udało się odczytać kodu zaproszenia. Spróbuj ponownie. (%@)",
+          "revoked": "Poprzedni kod zaproszenia tej grupy został unieważniony. Właściciel grupy musi wydać nowy."
+        },
+        "rotate": {
+          "keychain_warning": "Wydano nowy kod, ale nie udało się zapisać go w Pęku kluczy. Zapisz teraz wyświetlony kod w bezpiecznym miejscu.",
+          "success": "Wydano nowy kod zaproszenia."
+        }
+      },
+      "keychain": {
+        "error": {
+          "status": "Błąd Pęku kluczy %lld"
+        },
+        "operation_reason": "Uzyskaj bezpieczny dostęp do danych logowania i kodów zaproszeń grup.",
+        "transition": {
+          "message": "Aplikacja używa Pęku kluczy macOS do bezpiecznego przechowywania i pobierania danych logowania oraz kodów zaproszeń grup.",
+          "migration_explanation": "Gdy aplikacja po raz pierwszy wczytuje informacje zapisane przez wcześniejszą wersję, macOS może poprosić o hasło logowania do Maca. Aby uniknąć kolejnych próśb, wybierz „Zawsze zezwalaj” w następnym oknie macOS. Po wybraniu „Zezwalaj” okno może pojawić się jeszcze kilka razy lub przy następnym otwarciu aplikacji, zależnie od zapisanych informacji.",
+          "privacy_explanation": "Aplikacja nie widzi ani nie zapisuje wprowadzonego hasła.",
+          "quit": "Zakończ SIDEY"
+        }
+      },
+      "landing": {
+        "accessibility": {
+          "ready": "Ekran startowy SIDEY",
+          "restoring": "SIDEY przywraca poprzednie logowanie"
+        },
+        "status": {
+          "ready": "Kliknij, aby rozpocząć.",
+          "restoring": "Przywracanie poprzedniego logowania…"
+        },
+        "tagline": "Twoi znajomi pojawili się na krawędzi ekranu."
+      },
+      "launch_at_login": {
+        "update_failed": "Nie udało się zmienić ustawienia „Otwieraj po zalogowaniu”. Spróbuj ponownie. (%@)"
+      },
+      "message": {
+        "composer": {
+          "placeholder": "Wpisz wiadomość"
+        },
+        "delivery": {
+          "failed": "Wysyłanie nie powiodło się",
+          "pending": "Wysyłanie"
+        },
+        "error": {
+          "realtime_disconnected": "Połączenie z serwerem zostało zakończone. Połącz się ponownie przed wysłaniem wiadomości.",
+          "wait_for_group_switch": "Przed wysłaniem zaczekaj na zakończenie zmiany grupy."
+        },
+        "retention_sync_failed": "Nie udało się zastosować ustawienia przechowywania wiadomości. Spróbuj ponownie. (%@)",
+        "send": {
+          "failed": "Nie udało się wysłać wiadomości. Spróbuj ponownie. (%@)"
+        }
+      },
+      "mutation": {
+        "post_commit_sync_failed": "Zmiana została zapisana, ale nie udało się odświeżyć ekranu. Sprawdź ponownie za chwilę. (%@)",
+        "realtime_recovering": "Zmiany zostały zapisane. Ponowne łączenie z serwerem…"
+      },
+      "onboarding": {
+        "group": {
+          "invite_code": {
+            "placeholder": "Kod zaproszenia od znajomego"
+          },
+          "member_limit": {
+            "one": "Grupa może mieć maksymalnie %lld członka.",
+            "other": "Grupa może mieć maksymalnie %lld członków."
+          },
+          "path": {
+            "accessibility": "Wybierz sposób dołączenia do grupy"
+          }
+        },
+        "profile": {
+          "description": "Możesz to zmienić w dowolnym momencie w Ustawieniach.",
+          "nickname": {
+            "placeholder": "Pseudonim, 2–8 znaków"
+          },
+          "title": "Wybierz swoją nazwę"
+        }
+      },
+      "overlay": {
+        "span": {
+          "full": "Cała"
+        }
+      },
+      "pixel_world": {
+        "doze_label": "Zzz",
+        "interaction": {
+          "throw": "Kliknij znajomego, aby rzucić domyślną miękką piłkę.",
+          "tree": "Kliknij drzewo prawym przyciskiem, aby zatrzymać lub wznowić chodzenie."
+        },
+        "nickname": {
+          "current_user": "%@ · ty"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Wybierz pikselową postać, która będzie cię reprezentować na ekranach znajomych.",
+          "selection": {
+            "accessibility": "Wybór postaci"
+          },
+          "state": {
+            "equipping": "Wyposażanie"
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "description": "Wybierz dymek, który masz. Zostanie od razu zastosowany we wszystkich grupach.",
+            "selection": {
+              "accessibility": "Wybór dymku"
+            }
+          },
+          "character": {
+            "description": "Wybierz postać, którą masz. Zostanie od razu zastosowana we wszystkich grupach.",
+            "selection": {
+              "accessibility": "Wybór postaci"
+            }
+          },
+          "default_bubble": "Domyślny dymek",
+          "default_throwable": "Domyślna miękka piłeczka",
+          "hint": {
+            "current": "Obecnie używane",
+            "select": "Od razu stosowane we wszystkich grupach"
+          },
+          "throwable": {
+            "description": "Wybierz zabawkę do rzucania, którą masz. Zostanie od razu zastosowana we wszystkich grupach.",
+            "selection": {
+              "accessibility": "Wybór zabawki do rzucania"
+            }
+          }
+        },
+        "current_user": {
+          "badge": "ty"
+        },
+        "duplicates_allowed": "Możesz używać tej samej postaci lub tego samego pseudonimu co inny członek grupy.",
+        "error": {
+          "character_not_owned": "Wybierz do profilu postać, którą masz."
+        },
+        "nickname": {
+          "description": "Nazwa widoczna dla znajomych w pikselowych światach i wiadomościach · 2–8 znaków",
+          "save": "Zaktualizuj pseudonim",
+          "unknown": "Znajomy",
+          "unknown_friend": "Nieznany znajomy",
+          "unknown_member": "Członek"
+        },
+        "onboarding": {
+          "next_hint": "Po zapisaniu profilu utwórz grupę lub dołącz do niej za pomocą kodu zaproszenia."
+        },
+        "selection": {
+          "state": {
+            "not_selected": "Nie wybrano",
+            "selected": "Wybrano"
+          }
+        },
+        "subtitle": "Ustaw nazwę i postać, które zobaczą znajomi.",
+        "success": {
+          "nickname_updated": "Pseudonim został zaktualizowany.",
+          "saved": "Profil został zapisany."
+        }
+      },
+      "realtime": {
+        "kill_switch": {
+          "error": {
+            "legacy_connection_creation_failed": "Nie udało się połączyć z serwerem. Spróbuj ponownie za chwilę.",
+            "legacy_connection_recovery_failed": "Nie udało się ponownie połączyć z serwerem. Spróbuj ponownie za chwilę."
+          },
+          "transition_failed": "Nie udało się połączyć z serwerem. Połącz się ponownie za chwilę. (%@)"
+        },
+        "rollout": {
+          "error": {
+            "cache_unavailable": "Nie udało się zapisać stanu połączenia z serwerem. Otwórz aplikację ponownie.",
+            "contract_mismatch": "Ta wersja nie może połączyć się z serwerem. Zaktualizuj aplikację.",
+            "enabled_policy_unavailable": "Nie udało się połączyć z serwerem. Spróbuj ponownie później.",
+            "malformed_response": "Nie udało się połączyć z serwerem. Spróbuj ponownie później."
+          }
+        }
+      },
+      "settings": {
+        "account": {
+          "delete": {
+            "authentication_notice": "Wpisz „DELETE”, a następnie ponownie zaloguj się przez Apple, aby natychmiast usunąć konto.",
+            "confirmation_phrase": "DELETE",
+            "description": "Spowoduje to usunięcie profilu, wiadomości i informacji o grupach, do których dołączono. Rejestry zakupów mogą być przechowywane oddzielnie od konta, jeśli wymagają tego rozliczenia lub zapobieganie oszustwom.",
+            "placeholder": "Wpisz „DELETE”, aby potwierdzić",
+            "reveal": "Usuń konto…",
+            "title": "Usuń konto"
+          },
+          "privacy_policy": "Zasady ochrony prywatności",
+          "restore_purchases": "Przywróć zakupy",
+          "subtitle": "Zarządzaj danymi konta i zakupami w aplikacji.",
+          "terms": "Warunki korzystania z usługi",
+          "title": "Konto i prywatność"
+        },
+        "display": {
+          "offline_members": {
+            "description": "Pokazuj znajomych offline jako śpiące postacie z czerwoną kropką stanu.",
+            "title": "Pokaż członków offline"
+          },
+          "quiet_mode": {
+            "description": "Ukryj dymki wiadomości i wskaźniki pisania, zachowując stan połączenia i liczbę nieprzeczytanych wiadomości."
+          },
+          "subtitle": "Określ, jak stan i wiadomości znajomych są wyświetlane na ekranie.",
+          "throw_guard": {
+            "description": "Gdy ta opcja jest wyłączona, kliknij postać znajomego, aby od razu rzucić. Gdy jest włączona, najpierw kliknij dwukrotnie swoją postać prawym przyciskiem, a następnie w ciągu 10 sekund kliknij postać znajomego.",
+            "title": "Kliknij dwukrotnie prawym przyciskiem przed rzutem"
+          }
+        },
+        "general": {
+          "overlay_visible": {
+            "description": "Pokaż pikselowy świat znajomych wzdłuż wybranej krawędzi ekranu."
+          },
+          "subtitle": "Skonfiguruj podstawowy wygląd aplikacji i jej zachowanie podczas uruchamiania."
+        },
+        "placement": {
+          "edge": {
+            "description": "Wybierz krawędź ekranu, wzdłuż której będą chodzić postacie.",
+            "picker": "Krawędź",
+            "title": "Krawędź"
+          },
+          "monitor": {
+            "description": "Wybierz ekran dla pikselowego świata. Pole wiadomości możesz przesuwać oddzielnie za pomocą uchwytu po lewej stronie.",
+            "picker": "Wyświetlanie",
+            "title": "Wyświetlanie"
+          },
+          "span": {
+            "description": "Wybierz, jaką część wskazanej krawędzi ma zajmować świat.",
+            "full": "Cała",
+            "half": "1/2",
+            "picker": "Długość",
+            "third": "1/3",
+            "title": "Długość świata"
+          },
+          "subtitle": "Wybierz ekran i położenie pikselowych postaci.",
+          "title": "Położenie świata"
+        },
+        "shortcuts": {
+          "key": {
+            "picker": "Klawisz"
+          },
+          "restore_default": {
+            "accessibility": "Przywróć domyślny skrót",
+            "help": "Przywróć domyślny skrót"
+          },
+          "subtitle": "Wybierz co najmniej jeden klawisz modyfikujący oraz klawisz litery lub cyfry. Zmiany zostaną zastosowane od razu.",
+          "title": "Skróty globalne"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Odtwarzaj dźwięk, gdy postać w bieżącej grupie zostanie trafiona zabawką do rzucania.",
+            "title": "Efekty dźwiękowe postaci"
+          },
+          "subtitle": "Skonfiguruj efekty dźwiękowe postaci."
+        }
+      },
+      "shortcut": {
+        "action": {
+          "composer": "Otwórz lub zamknij pole wiadomości",
+          "history": "Otwórz ostatnie wiadomości",
+          "overlay": "Pokaż lub ukryj nakładkę",
+          "quiet_mode": "Tryb dyskretny"
+        },
+        "error": {
+          "duplicate": "Skrót jest już używany przez „%@”. Dotychczasowy skrót zostanie zachowany.",
+          "modifier_required": "Wybierz co najmniej jeden klawisz modyfikujący. Dotychczasowy skrót zostanie zachowany.",
+          "new_binding_registration_failed": "Nie udało się zarejestrować nowego skrótu, dlatego dotychczasowy skrót zostanie zachowany.",
+          "new_binding_used_by_other_app": "Ta kombinacja jest używana przez inną aplikację. Dotychczasowy skrót zostanie zachowany.",
+          "registration_failed": "Nie udało się zarejestrować skrótu. Wybierz inny skrót.",
+          "used_by_other_app": "Ten skrót jest używany przez inną aplikację. Wybierz inny skrót lub sprawdź ustawienia aplikacji, która go używa."
+        },
+        "modifier": {
+          "command": "Command",
+          "control": "Control",
+          "option": "Option",
+          "shift": "Shift"
+        },
+        "status": {
+          "change_failed": "Zmiana nie powiodła się",
+          "unavailable": "Skrót jest niedostępny"
+        }
+      },
+      "status": {
+        "icon": {
+          "unread": {
+            "accessibility": "%@, nieprzeczytane wiadomości"
+          }
+        },
+        "menu": {
+          "active_group": "Aktywna grupa",
+          "compose": "Nowa wiadomość…",
+          "group_settings": "Ustawienia grup…",
+          "history": "Ostatnia historia…",
+          "no_connected_groups": "Nie należysz do żadnej grupy",
+          "overlay": {
+            "hide": "Ukryj nakładkę",
+            "show": "Pokaż nakładkę"
+          },
+          "quiet_mode": "Tryb dyskretny",
+          "quit": "Zakończ %@",
+          "settings": "Ustawienia…",
+          "store": "Sklep…"
+        },
+        "room": {
+          "unread_count": " (%@)"
+        },
+        "tooltip": {
+          "unread": "%@ · Nieprzeczytane wiadomości"
+        }
+      },
+      "store": {
+        "coming_soon": {
+          "badge": "Już wkrótce",
+          "detail": "Sklep jest w przygotowaniu. Do zobaczenia wkrótce.",
+          "product": {
+            "accessibility": "%@, już wkrótce"
+          }
+        },
+        "empty": {
+          "description": "Spróbuj zmienić typ produktu lub filtr posiadanych produktów.",
+          "title": "Brak pasujących produktów"
+        },
+        "error": {
+          "auto_equip_failed": "Zakup został ukończony, ale nie udało się automatycznie wyposażyć przedmiotu. Wyposaż go ręcznie w Profilu.",
+          "auto_equip_realtime_grant_pending": "Przedmiot jest wyposażony. Jeśli nie pojawi się od razu, sprawdź ponownie za chwilę. (%@)",
+          "entitlements_reconcile_failed": "Nie udało się zweryfikować zakupów w aplikacji. Spróbuj ponownie przywrócić zakupy.",
+          "equipment_realtime_grant_pending": "Przedmiot jest wyposażony. Jeśli nie pojawi się od razu, sprawdź ponownie za chwilę. (%@)",
+          "equipment_update_failed": "Nie udało się zaktualizować wyposażonego przedmiotu.",
+          "product_unavailable": "Ten produkt nie jest dostępny w App Store.",
+          "products_load_failed": "Nie udało się wczytać produktów z App Store. Spróbuj ponownie później.",
+          "purchase_failed": "Nie udało się ukończyć zakupu produktu %@. Spróbuj ponownie później.",
+          "purchase_pending": "Zakup oczekuje na zatwierdzenie. Przedmiot pojawi się automatycznie po zatwierdzeniu.",
+          "purchase_status_failed": "Nie udało się potwierdzić zakupu. Sprawdź ponownie za chwilę.",
+          "server_rejected": "Nie udało się zweryfikować zakupów w aplikacji. Spróbuj ponownie przywrócić zakupy.",
+          "transaction_update_failed": "Nie udało się zastosować zakupu. Spróbuj ponownie przywrócić zakupy.",
+          "unknown_result": "Nie udało się potwierdzić wyniku zakupu. Sprawdź ponownie za chwilę.",
+          "unverified_transaction": "Nie udało się zweryfikować zakupu, dlatego nie został zastosowany. Spróbuj ponownie przywrócić zakupy.",
+          "verifier_not_configured": "Nie można teraz zweryfikować zakupów. Spróbuj ponownie później."
+        },
+        "filter": {
+          "hide_owned": "Ukryj posiadane",
+          "kind": {
+            "$value": "Typ produktu",
+            "accessibility": "Typ produktu w sklepie"
+          },
+          "menu": "Sortowanie i filtry"
+        },
+        "footer": {
+          "app_store": {
+            "entitlement": "Zakupy w aplikacji są obsługiwane przez App Store. Możesz użyć przedmiotu po potwierdzeniu zakupu.",
+            "headline": "Ceny są wyświetlane, a zakupy obsługiwane przez App Store.",
+            "refund": "Zwroty i pytania dotyczące rozliczeń podlegają zasadom i procedurom Apple App Store."
+          },
+          "coming_soon": "Sklep pojawi się już wkrótce. Nadal możesz używać przedmiotów, które masz.",
+          "direct": {
+            "entitlement": "Wyświetlane ceny zawierają podatek. Możesz używać przedmiotów do personalizacji po potwierdzeniu płatności.",
+            "refund": "Po rozpoczęciu dostępu zwrot z powodu zmiany zdania nie jest dostępny. Pełny zwrot przysługuje, gdy wymaga tego prawo, między innymi w razie niedostarczenia, niezgodności, podwójnej lub nieautoryzowanej płatności."
+          }
+        },
+        "kind": {
+          "bubble": "Chmurka czatu",
+          "character": "Postać",
+          "keepsake": "Ulubiony przedmiot",
+          "throwable": "Zabawka do rzucania"
+        },
+        "navigation_label": "Dostosuj i kupuj",
+        "preview": {
+          "accessibility": "Podgląd: %@",
+          "character_interaction_hint": "Kliknij drugą postać, aby spróbować rzucić %@. Kliknij postać dwukrotnie, aby zobaczyć jej reakcję w wyskakującym okienku.",
+          "default_throwable": "Domyślna miękka piłeczka",
+          "double_click_hint": "Kliknij postać dwukrotnie, aby zobaczyć jej reakcję w wyskakującym okienku.",
+          "member": {
+            "dubu": "Dubu",
+            "moka": "Moka"
+          },
+          "message": {
+            "left": "Jakiś pomysł na kolację?",
+            "right": "Może pikantny gulasz z kurczaka?"
+          },
+          "reduce_motion_hint": "Opcja „Redukuj ruch” jest włączona, dlatego wyświetlana jest nieruchoma scena.",
+          "sound": {
+            "off": "Wyłącz dźwięk podglądu",
+            "on": "Włącz dźwięk podglądu"
+          },
+          "tree_toggle_hint": "Kliknij drzewo prawym przyciskiem, aby je zatrzymać, a następnie kliknij ponownie, aby zaczęło chodzić."
+        },
+        "price": {
+          "loading": {
+            "$value": "Wczytywanie ceny…",
+            "short": "Sprawdzanie ceny"
+          },
+          "required": "Wymagane sprawdzenie ceny",
+          "retry": "Sprawdź cenę ponownie",
+          "unavailable": {
+            "$value": "Cena w App Store jest niedostępna.",
+            "short": "Cena niedostępna"
+          }
+        },
+        "processing": "Przetwarzanie",
+        "product": {
+          "detail": {
+            "close": "Zamknij szczegóły produktu",
+            "hint": "Wyświetl szczegóły"
+          },
+          "equipped": "Używane",
+          "preview": {
+            "hint": "Szczegóły podglądu"
+          },
+          "processing": {
+            "accessibility": "Przetwarzanie: %@"
+          },
+          "sold_separately": "Sprzedawane oddzielnie",
+          "status": {
+            "accessibility": "%@, %@"
+          },
+          "unavailable": {
+            "detail": "Ten produkt nie jest jeszcze dostępny do kupienia."
+          }
+        },
+        "purchase": {
+          "accessibility": "Kup %@ za %@",
+          "action": "Kup %@ · %@",
+          "available": "Dostępne",
+          "confirming": "Potwierdzanie",
+          "error": "Błąd",
+          "opening_checkout": "Otwieranie zakupu…",
+          "owned": "Posiadasz",
+          "refunded": "Zwrócono",
+          "success": "Kupiono %@.",
+          "unavailable": "Obecnie niedostępne"
+        },
+        "purchase_and_equip": {
+          "success": "Kupiono i wyposażono %@."
+        },
+        "restore": {
+          "action": "Przywróć zakupy",
+          "failed": "Nie udało się przywrócić zakupów. Spróbuj ponownie.",
+          "success": "Zakupy zostały przywrócone."
+        },
+        "sort": {
+          "price_ascending": "Od najniższej ceny",
+          "price_descending": "Od najwyższej ceny"
+        },
+        "status": {
+          "retry": "Sprawdź stan ponownie"
+        },
+        "subtitle": "Wybieraj postacie, dymki i zabawki do rzucania.",
+        "title": "Dostosuj i kupuj"
+      },
+      "tree_movement": {
+        "error": {
+          "save_failed": "Nie udało się zapisać ustawienia ruchu drzewa. Spróbuj ponownie."
+        }
+      }
+    }
+  },
+  "profile": {
+    "applying": "Stosowanie",
+    "character": {
+      "label": "Postać"
+    },
+    "nickname": {
+      "label": "Pseudonim",
+      "placeholder": "Od 2 do 8 znaków"
+    },
+    "title": "Mój profil"
+  },
+  "settings": {
+    "display": {
+      "quiet_mode": {
+        "title": "Tryb dyskretny"
+      }
+    },
+    "overlay": {
+      "title": "Pokaż pikselowy świat"
+    },
+    "placement": {
+      "edge": {
+        "bottom": "Dół",
+        "left": "Lewa",
+        "right": "Prawa",
+        "top": "Góra"
+      }
+    },
+    "section": {
+      "display": {
+        "title": "Wyświetlanie"
+      },
+      "general": {
+        "title": "Ogólne"
+      },
+      "sound": {
+        "title": "Dźwięk"
+      }
+    },
+    "window": {
+      "title": "Ustawienia SIDEY"
+    },
+    "startup": {
+      "title": "Uruchamiaj przy logowaniu",
+      "description": "Aplikacja jest uruchamiana automatycznie podczas logowania."
+    }
+  },
+  "store": {
+    "sort": {
+      "catalog": "Domyślne",
+      "label": "Sortuj"
+    }
+  }
+}

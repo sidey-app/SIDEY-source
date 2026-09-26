@@ -17,3 +17,14 @@ enum L10n {
         )
     }
 }
+
+/// Resolves strings that are bundled only with development builds.
+enum InternalL10n {
+    static func text(_ key: String) -> String {
+        Bundle.main.localizedString(
+            forKey: key,
+            value: key,
+            table: "InternalLocalizable"
+        )
+    }
+}

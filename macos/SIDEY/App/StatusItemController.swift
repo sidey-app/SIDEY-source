@@ -171,7 +171,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(groupSettings)
 
         let login = NSMenuItem(
-            title: L10n.text("status.menu.launch_at_login"),
+            title: L10n.text("settings.startup.title"),
             action: #selector(toggleLaunchAtLogin),
             keyEquivalent: ""
         )

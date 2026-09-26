@@ -1,630 +1,951 @@
 {
-  "about": {
-    "accountDescription": "Sign out or manage your SIDEY account.",
-    "accountTitle": "Account",
-    "deleteAccount": "Delete account",
-    "deleteAccountBody": "Your profile, group connections, and SIDEY entitlement links will be permanently deleted. Purchase cancellations and refunds must be requested separately.",
-    "deleteAccountContinue": "Continue",
-    "deleteAccountDescription": "Permanently delete your SIDEY account and associated personal data.",
-    "deleteAccountFinalBody": "Your deleted SIDEY account and data cannot be restored.",
-    "deleteAccountFinalTitle": "Permanently delete your account?",
-    "deleteAccountPrimary": "Delete account",
-    "deleteAccountTitle": "Delete your SIDEY account?",
-    "description": "View SIDEY version and support information.",
-    "diagnosticsDescription": "Log files are compressed and saved to your Desktop. Sharing them with us can help us fix errors.",
-    "diagnosticsExportFailed": "Could not export diagnostic data.",
-    "diagnosticsExported": "Diagnostic data was saved to your Desktop.",
-    "diagnosticsTitle": "Export diagnostic data",
-    "exportDiagnostics": "Export",
-    "feedbackDescription": "If something is not working or you need help, you can contact us by opening a GitHub issue.",
-    "feedbackTitle": "Feedback",
-    "linkOpenFailed": "Could not open the page in your default browser.",
-    "policiesDescription": "Review the terms and policies that apply to SIDEY.",
-    "policiesTitle": "Policies",
-    "privacy": "View privacy policy",
-    "refund": "View cancellation and refund policy",
-    "sendFeedback": "Send feedback",
-    "signOut": "Sign out",
-    "signOutBody": "This signs you out on this PC only. You'll need to sign in with Google to use SIDEY again.",
-    "signOutDescription": "End the SIDEY session on this PC.",
-    "signOutPrimary": "Sign out",
-    "signOutTitle": "Sign out?",
-    "terms": "View terms",
-    "title": "About"
+  "accessibility": {
+    "motion": {
+      "disabled": "Animation effects are turned off in Windows."
+    }
+  },
+  "account": {
+    "delete": {
+      "confirmation": {
+        "action": "Delete account",
+        "message": "Your profile and information about the groups you’ve joined will be permanently deleted, and your purchase history will be unlinked from your account.",
+        "title": "Delete your account?"
+      },
+      "description": "Permanently delete your account and associated personal data.",
+      "final_confirmation": {
+        "message": "Your deleted account and data cannot be restored.",
+        "title": "Permanently delete your account?"
+      },
+      "title": "Delete account"
+    },
+    "description": "Sign out or manage your account.",
+    "sign_out": {
+      "confirmation": {
+        "action": "Sign out",
+        "message": "This signs you out on this PC only. You'll need to sign in with Google to use the app again.",
+        "title": "Sign out?"
+      },
+      "description": "Sign out on this PC only.",
+      "title": "Sign out"
+    },
+    "title": "Account"
+  },
+  "app": {
+    "info": {
+      "description": "View version and support information.",
+      "navigation_label": "About",
+      "title": "About"
+    },
+    "launch": {
+      "failed": "An error occurred while starting SIDEY. Close the app and try again."
+    },
+    "startup": {
+      "error": {
+        "title": "SIDEY startup error"
+      },
+      "failed": "SIDEY couldn’t start.",
+      "failed_with_log": "SIDEY couldn’t start.\n\nDiagnostic log: {0}",
+      "runtime_missing": "Some SIDEY files are missing. Reinstall the app."
+    }
   },
   "auth": {
-    "cannotReplaceStoredSession": "A new anonymous account cannot be created when this installation has a stored session.",
-    "emptyResponse": "The Supabase authentication response is empty.",
-    "googleAlreadyLinked": "This Google account is already linked to a SIDEY profile. Your current profile and data were not changed.",
-    "googleCancelled": "Google sign-in was cancelled or could not be completed. Please try again.",
-    "googleRequired": "Connect Google to use SIDEY.",
-    "googleSignInComplete": "Google sign-in is complete. You can close the sign-in tab in your browser.",
-    "identityChanged": "The SIDEY user ID changed after Google linking, so the session was not stored.",
-    "identityLinkExpired": "The Google sign-in request expired. Cancel sign-in and try again.",
-    "invalidStoredSession": "The stored SIDEY session could not be parsed.",
-    "missingSessionValues": "The Supabase authentication response is missing required session values.",
-    "requestFailed": "SIDEY authentication failed. HTTP {0}.",
-    "restoreFailed": "The existing SIDEY session could not be restored. A new account will not be created automatically.",
-    "sessionMissing": "The Supabase session is missing."
+    "google": {
+      "already_linked": "This Google account is already linked to the current profile. Your profile and data were not changed.",
+      "cancelled": "Google sign-in was canceled or couldn’t be completed. Try again.",
+      "identity_changed": "This Google account doesn’t match the one linked to the current account. Your profile and data weren’t changed.",
+      "link_expired": "The Google sign-in request expired. Cancel sign-in and try again.",
+      "required": "Connect your Google account to continue.",
+      "sign_in_complete": "Google sign-in is complete. Close the sign-in tab in your browser."
+    },
+    "request": {
+      "failed": "Couldn’t sign in. Try again later. (Error code: {0})"
+    },
+    "response": {
+      "empty": "Couldn’t complete sign-in. Try again."
+    },
+    "session": {
+      "expired": "Your sign-in expired. Sign in again.",
+      "replace_blocked": "This PC already has sign-in information. Restart the app, then sign in again.",
+      "restore_failed": "Couldn’t restore your sign-in. No new account was created. Sign in again.",
+      "stored_invalid": "Couldn’t read your saved sign-in. Sign in again.",
+      "values_missing": "Couldn’t complete sign-in. Try again."
+    }
   },
-  "backend": {
-    "createdRoomMissing": "The created group is missing from the server snapshot.",
-    "emptyInviteCode": "The new invitation code is empty.",
-    "expiredMessagesFailed": "Could not reread expired messages: {0}",
-    "invalidOverride": "A Supabase override requires an HTTPS (or localhost HTTP) URL and publishable key. Secret and service-role keys are forbidden.",
-    "joinFailed": "Could not join group: {0}",
-    "joinRoomIdMissing": "The join response is missing room_id.",
-    "joinedRoomMissing": "The joined group is missing from the server snapshot.",
-    "messageRecheckFailed": "RLS message recheck failed: {0}",
-    "realtimeEpochMissing": "The subscribed group’s Realtime epoch is missing.",
-    "realtimeResyncFailed": "Realtime state resynchronization failed: {0}",
-    "realtimeUnavailable": "The Supabase Realtime connection is unavailable.",
-    "roomSnapshotFailed": "Could not reread the group snapshot: {0}"
-  },
-  "characters": {
-    "cat": "Kitten",
-    "chinchilla": "Baby Chinchilla",
-    "dog": "Puppy",
-    "guineaPig": "Baby Guinea Pig",
-    "hamster": "Baby Hamster",
-    "monkey": "Baby Monkey",
-    "otter": "Baby Otter",
-    "penguin": "Baby Penguin",
-    "pig": "Baby Pig",
-    "rabbit": "Bunny",
-    "starlightUpalupa": "Starlight Axolotl",
-    "tree": "Little Tree"
+  "character": {
+    "pixel_cat": {
+      "display_name": "Kitten"
+    },
+    "pixel_chinchilla": {
+      "display_name": "Baby Chinchilla"
+    },
+    "pixel_duck": {
+      "display_name": "Duck"
+    },
+    "pixel_guinea_pig": {
+      "display_name": "Baby Guinea Pig"
+    },
+    "pixel_hamster": {
+      "display_name": "Baby Hamster"
+    },
+    "pixel_monkey": {
+      "display_name": "Baby Monkey"
+    },
+    "pixel_otter": {
+      "display_name": "Baby Otter"
+    },
+    "pixel_penguin": {
+      "display_name": "Baby Penguin"
+    },
+    "pixel_pig": {
+      "display_name": "Baby Pig"
+    },
+    "pixel_poop": {
+      "display_name": "Poop"
+    },
+    "pixel_puppy": {
+      "display_name": "Puppy"
+    },
+    "pixel_quokka": {
+      "display_name": "Quokka"
+    },
+    "pixel_rabbit": {
+      "display_name": "Bunny"
+    },
+    "pixel_shiba": {
+      "display_name": "Shiba Inu"
+    },
+    "pixel_starlight_upalupa": {
+      "display_name": "Starlight Axolotl"
+    },
+    "pixel_tree": {
+      "display_name": "Little Tree"
+    },
+    "pixel_tteokbokki": {
+      "display_name": "Tteokbokki"
+    },
+    "unknown": {
+      "display_name": "Character"
+    }
   },
   "common": {
     "back": "Back",
     "cancel": "Cancel",
     "close": "Close",
-    "confirm": "OK",
-    "copied": "Copied",
-    "defaultRoomName": "Our Hangout",
+    "continue": "Continue",
     "delete": "Delete",
     "friend": "Friend",
     "me": "Me",
     "next": "Next",
     "save": "Save",
-    "skip": "Skip",
-    "unknown": "Unknown"
+    "skip": "Skip"
   },
   "composer": {
-    "activeRoomRequired": "Set up your profile and choose a group to send a message.",
-    "closeTooltip": "Close message composer",
-    "dragTooltip": "Drag to move the input window",
-    "placeholder": "Type a message…",
-    "sendTooltip": "Send message"
+    "drag": {
+      "tooltip": "Drag to move the input window"
+    },
+    "group": {
+      "required": "Set up your profile and choose a group to send a message."
+    },
+    "message": {
+      "placeholder": "Type a message…"
+    },
+    "window": {
+      "title": "SIDEY message"
+    }
   },
   "connection": {
-    "accessRequired": "SIDEY needs to check your account or group access again. Select Reconnect in Connection. If the same message keeps appearing, contact us with a diagnostic log.",
-    "busy": "Many people are connecting right now, so the connection is taking longer than usual. SIDEY will keep trying automatically. If it is still not connected after a few minutes, contact us with a diagnostic log.",
-    "configurationUnavailable": "SIDEY cannot start a connection right now. Try Reconnect in Connection after a short wait. If the same problem continues, contact us with a diagnostic log.",
-    "connected": "Connected to server",
-    "disconnected": "Not connected to server",
-    "networkUnavailable": "SIDEY could not reach the server. Check your internet connection, then select Reconnect in Connection. If other sites work but this continues, contact us with a diagnostic log.",
-    "offline": "Offline",
-    "pageDescription": "Check the SIDEY server connection and reconnect when there is a problem.",
-    "pageTitle": "Connection",
-    "reconnecting": "Connecting",
-    "retry": "Reconnect",
-    "secureConnectionFailed": "SIDEY could not create a secure connection. Check that the Windows date and time are correct, then reconnect. If this continues, contact us with a diagnostic log.",
-    "serverConnected": "Connected to the SIDEY server.",
-    "serverReconnecting": "Reconnecting to the SIDEY server.",
-    "serviceUnavailable": "The server did not respond as expected. SIDEY will keep trying automatically. If it is still not connected after a few minutes, select Reconnect in Connection. If that does not help, contact us with a diagnostic log."
+    "configuration": {
+      "not_configured": "Required server connection settings are missing. Reinstall the app."
+    },
+    "error": {
+      "access_required": "Your account or group access couldn’t be verified. Select Reconnect under Server connection. If the same message keeps appearing, contact us with a diagnostic log.",
+      "busy": "Many people are connecting right now, so the connection is taking longer than usual. The app will keep trying automatically. If it is still not connected after a few minutes, contact us with a diagnostic log.",
+      "configuration_unavailable": "The server connection can’t start right now. Wait a moment, then select Reconnect under Server connection. If the same problem continues, contact us with a diagnostic log.",
+      "network_unavailable": "Couldn’t connect to the server. Check your internet connection, then select Reconnect under Server connection. If other sites work but this continues, contact us with a diagnostic log.",
+      "secure_connection_failed": "Couldn’t create a secure connection. Check that the Windows date and time are correct, then reconnect. If this continues, contact us with a diagnostic log.",
+      "service_unavailable": "Couldn’t connect to the server. The app will keep trying automatically. If it still isn’t connected after a few minutes, select Reconnect under Server connection. If that doesn’t help, contact us with a diagnostic log."
+    },
+    "group_resync_failed": "Couldn’t load the latest group state. Reconnect to continue. ({0})",
+    "group_revision_missing": "The group connection changed. Reconnect to continue.",
+    "notice": {
+      "connected": "Connected to the server.",
+      "reconnecting": "Reconnecting to the server."
+    },
+    "retry": {
+      "action": "Reconnect"
+    },
+    "server": {
+      "not_configured": "Required server connection settings are missing. Reinstall the app."
+    },
+    "state": {
+      "connected": "Connected",
+      "disconnected": "Not connected",
+      "reconnecting": "Connecting"
+    },
+    "unavailable": "Couldn’t connect to the server. Try again shortly."
   },
-  "development": {
-    "localPreview": "Running the twelve-character local preview because backend environment variables are absent.",
-    "metricsPreview": "Internal hamster-limited renderer metrics mode. Manual verification has not been recorded."
-  },
-  "dialogs": {
-    "deleteRoomBody": "This will remove everyone from the group and delete its messages. This can't be undone.",
-    "deleteRoomContinue": "Continue",
-    "deleteRoomFinalBody": "‘{0}’ and all its messages will be permanently deleted now.",
-    "deleteRoomFinalTitle": "Permanently delete this group?",
-    "deleteRoomTitle": "Delete ‘{0}’?",
-    "download": "Download",
-    "later": "Later",
-    "leaveOwnedRoomBody": "The earliest remaining member will become the owner. If no members remain, the group will be deleted.",
-    "leaveRoomBody": "You will no longer be able to access this group or its recent messages.",
-    "leaveRoomPrimary": "Leave",
-    "leaveRoomTitle": "Leave ‘{0}’?",
-    "removeMemberBody": "This member will no longer be able to access the group or its message history.",
-    "removeMemberPrimary": "Remove",
-    "removeMemberTitle": "Remove ‘{0}’?",
-    "roomNamePlaceholder": "Group name, 1–20 characters",
-    "rotateInviteBody": "The existing code will be revoked immediately. This cannot be undone.",
-    "rotateInvitePrimary": "Create New Code",
-    "rotateInviteTitle": "Create a new invite code?",
-    "updateBody": "Download SIDEY {0}?",
-    "updateTitle": "An Update Is Available"
-  },
-  "error": {
-    "chatRateLimited": "You're sending messages too quickly.",
-    "fatalTitle": "SIDEY Startup Error",
-    "generic": "An error occurred: {0}",
-    "launch": "An error occurred while starting SIDEY. Close the app and try again.",
-    "messageSendFailed": "Message send failed: {0}",
-    "missingConfiguration": "SIDEY connection settings were not found.",
-    "preferencesSaveFailed": "Could not save settings: {0}",
-    "serverConnectionNotConfigured": "The SIDEY server connection is not configured.",
-    "serverNotConfigured": "The SIDEY server is not configured. Check the deployment configuration.",
-    "startup": "SIDEY could not start.",
-    "startupWithLog": "SIDEY could not start.\n\nDiagnostic log: {0}",
-    "trayStart": "The tray icon could not start. Closing the window will exit SIDEY.",
-    "typingUpdateFailed": "Typing status update failed: {0}"
+  "external_link": {
+    "open": {
+      "failed": "Couldn’t open the page in your default browser."
+    }
   },
   "groups": {
-    "active": "Active",
+    "action": {
+      "join_by_code": "Join with code"
+    },
     "collapse": "Collapse group",
-    "copyInvite": "Copy invitation code",
-    "copyInviteTooltip": "Copy the group invitation code to the clipboard.",
-    "create": "Create Group",
-    "createDescription": "Make a group and share the invite code with your friends.",
-    "createTitle": "Create a New Group",
-    "createTooltip": "Create a private group with this name.",
-    "created": "Created {0}. Invitation code: {1}",
-    "createdSimple": "Group created.",
-    "creating": "Creating…",
-    "delete": "Delete Group",
-    "deleteDialogBody": "Delete ‘{0}’? This cannot be undone.",
-    "deleteDialogTitle": "Delete Group",
-    "deleteTooltip": "Permanently delete this group.",
-    "deleted": "Group deleted.",
-    "description": "Choose which group appears on your screen and manage its members. Each group can have up to 12 people.",
-    "details": "{0}/12 members · Invitation code {1}",
-    "detailsRotationRequired": "{0}/12 members · New invitation code required",
-    "emptyDescription": "Create a new group or enter an invitation code from a friend.",
-    "emptyTitle": "No groups yet",
+    "create": {
+      "action": "Create group",
+      "description": "Create a group and share the invite code with your friends.",
+      "in_progress": "Creating…",
+      "name": {
+        "placeholder": "New group name"
+      },
+      "result_missing": "Couldn’t finish creating the group. Try again.",
+      "success": {
+        "default": "Group created."
+      },
+      "tooltip": "Create a group with this name."
+    },
+    "delete": {
+      "action": "Delete group",
+      "confirmation": {
+        "message": "This group and all its messages will be permanently deleted. This can't be undone.",
+        "title": "Delete ‘{0}’?"
+      },
+      "final_confirmation": {
+        "message": "‘{0}’ and all its messages will be permanently deleted now.",
+        "title": "Permanently delete this group?"
+      },
+      "success": "Group deleted.",
+      "tooltip": "Permanently delete this group."
+    },
+    "description": "Manage the groups you share with friends. Up to 12 people can join each group.",
+    "empty": {
+      "description": "Create a new group or enter an invite code from a friend.",
+      "title": "No groups yet"
+    },
+    "error": {
+      "not_found": "Group not found."
+    },
     "expand": "Expand group",
-    "expandUnavailable": "Capacity expansion is coming soon.",
-    "invite": "Invite",
-    "inviteCode": "Invitation code",
-    "inviteCopied": "Invitation code copied.",
-    "inviteCopyComplete": "Copied",
-    "inviteMissing": "No invitation code is stored on this device.",
-    "inviteReplaced": "The invitation code stored on this device was replaced. Ask the owner for a new code.",
-    "inviteRevoked": "The previous invitation code was revoked. The owner must issue a new code.",
-    "inviteRotated": "A new invite code has been created and saved securely on this device.",
-    "join": "Switch to Group",
-    "joinByCode": "Join with Code",
-    "joinByCodeTooltip": "Join the group for this invitation code.",
-    "joinDescription": "Enter a code from a friend to join an existing private group.",
-    "joinTitle": "Join with an Invitation Code",
-    "joinTooltip": "Show this group on your screen.",
-    "joined": "Joined {0}.",
-    "joinedSimple": "Joined group.",
-    "joining": "Joining…",
-    "leave": "Leave Group",
-    "leaveTooltip": "Leave this group.",
-    "left": "Left group.",
-    "memberCount": "{0}/{1} members",
-    "memberRemoved": "Member removed.",
-    "notFound": "Group not found.",
-    "operationBusy": "Try again after the other group operation finishes.",
-    "owner": "Owner",
-    "removeDialogBody": "Remove ‘{0}’ from the group?",
-    "removeDialogTitle": "Remove Member",
-    "removeMember": "Remove",
-    "removeMemberTooltip": "Remove this member from the group.",
-    "rename": "Rename",
-    "renameDialogPlaceholder": "New group name",
-    "renameDialogPrimary": "Rename",
-    "renameDialogTitle": "Rename Group",
-    "renameTooltip": "Rename the group.",
-    "renamed": "Group renamed.",
-    "roomName": "Group name",
-    "roomNamePlaceholder": "New group name",
-    "rotateInvite": "Issue new invitation code",
-    "switched": "Active group changed.",
-    "switching": "Connecting…",
-    "title": "Your Groups",
-    "upgrade": "Expand capacity",
-    "upgradeTooltip": "Increase the group member limit."
+    "invite": {
+      "code": {
+        "label": "Invite code",
+        "missing": "No invite code is stored on this device.",
+        "replaced": "The invite code stored on this device was replaced. Ask the owner for a new code.",
+        "revoked": "The previous invite code was revoked. The owner must issue a new code."
+      },
+      "copy": {
+        "action": "Copy invite code",
+        "complete": "Copied"
+      },
+      "rotate": {
+        "action": "Issue new invite code",
+        "code_missing": "The new invite code is empty.",
+        "confirmation": {
+          "action": "Create new code",
+          "message": "The existing code will be revoked immediately. This cannot be undone.",
+          "title": "Create a new invite code?"
+        },
+        "success": "A new invite code has been created and saved securely on this device."
+      }
+    },
+    "join": {
+      "description": "Enter an invite code from a friend to join a group.",
+      "failed": "Couldn’t join the group. Check the invite code and try again. ({0})",
+      "in_progress": "Joining…",
+      "result_missing": "Couldn’t load the group you joined. Try again.",
+      "room_id_missing": "Couldn’t finish joining the group. Try again.",
+      "success": {
+        "default": "Joined group."
+      },
+      "tooltip": "Join the group with this invite code."
+    },
+    "leave": {
+      "action": "Leave group",
+      "confirmation": {
+        "action": "Leave",
+        "member_message": "You will no longer be able to access this group or its recent messages.",
+        "owner_message": "The earliest remaining member will become the owner. If no members remain, the group will be deleted.",
+        "title": "Leave ‘{0}’?"
+      },
+      "success": "Left group.",
+      "tooltip": "Leave this group."
+    },
+    "member": {
+      "remove": {
+        "action": "Remove",
+        "confirmation": {
+          "message": "This member will no longer be able to access the group or its recent messages.",
+          "title": "Remove ‘{0}’?"
+        },
+        "success": "Member removed.",
+        "tooltip": "Remove this member from the group."
+      }
+    },
+    "navigation_label": "Groups",
+    "operation": {
+      "busy": "Try again after the other group operation finishes."
+    },
+    "refresh": {
+      "failed": "Couldn’t refresh the group information. Try again later. ({0})"
+    },
+    "rename": {
+      "action": "Rename",
+      "name_placeholder": "Group name, 1–20 characters",
+      "success": "Group renamed.",
+      "title": "Rename group",
+      "tooltip": "Rename the group."
+    },
+    "room_name": {
+      "label": "Group name"
+    },
+    "state": {
+      "active": "Active"
+    },
+    "summary": {
+      "invite_ready": "{0}/12 members · Invite code {1}",
+      "invite_rotation_required": "{0}/12 members · New invite code required"
+    },
+    "switch": {
+      "action": "Switch to group",
+      "in_progress": "Connecting…",
+      "success": "Active group changed.",
+      "tooltip": "Show this group on your screen."
+    },
+    "title": "Your groups"
   },
   "history": {
-    "delivered": "Delivered",
-    "empty": "No messages yet.",
-    "emptyDescription": "Recent messages from this group will appear here.",
-    "exhausted": "You’ve reached the end of the last 3 days",
-    "failed": "Send failed",
-    "initialFailed": "Couldn’t load message history",
-    "joinPrompt": "Join a group to see recent messages.",
-    "keepOnTop": "Always on top",
-    "keepOnTopShortcut": "Always on top (Alt+Up arrow)",
-    "loadMoreFailed": "Couldn’t load earlier messages",
+    "empty": {
+      "description": "Recent messages from this group will appear here.",
+      "title": "No messages yet."
+    },
+    "group": {
+      "none": "No active group",
+      "required": "Join a group to see recent messages."
+    },
+    "load": {
+      "initial_failed": "Couldn’t load recent messages",
+      "retry": "Try again"
+    },
+    "load_more": {
+      "failed": "Couldn’t load earlier messages",
+      "loading": "Loading earlier messages…"
+    },
     "loading": "Loading recent messages…",
-    "loadingMore": "Loading earlier messages…",
-    "noActiveRoom": "No active group",
-    "read": "Read",
-    "recentTitle": "Recent Messages",
-    "retentionNotice": "Messages are automatically deleted from the server after 3 days.",
-    "retry": "Try Again",
-    "retryDescription": "Please try opening your message history again in a moment.",
-    "roomTitle": "Recent Messages · {0}",
-    "scrollToLatest": "Jump to latest messages",
-    "sending": "Sending",
-    "sent": "Sent",
-    "stopKeepingOnTop": "Turn off always on top",
-    "stopKeepingOnTopShortcut": "Turn off always on top (Alt+Down arrow)",
-    "title": "{0} · Message History",
-    "unknownUser": "Unknown member"
+    "pagination": {
+      "exhausted": "You’ve reached the end of the last 3 days"
+    },
+    "recent": {
+      "title": "Recent messages"
+    },
+    "retention": {
+      "notice": "Messages are automatically deleted after 3 days.",
+      "reload_failed": "Couldn’t reload older messages. Try again shortly. ({0})"
+    },
+    "scroll": {
+      "latest": "Jump to latest messages"
+    },
+    "user": {
+      "unknown": "Unknown member"
+    },
+    "window": {
+      "always_on_top": {
+        "disable": "Turn off always on top",
+        "disable_shortcut": "Turn off always on top (Alt+Down arrow)",
+        "enable": "Always on top",
+        "enable_shortcut": "Always on top (Alt+Up arrow)"
+      },
+      "title": "SIDEY · Recent messages"
+    }
   },
-  "launcher": {
-    "fatalTitle": "SIDEY Startup Error",
-    "runtimeMissing": "Some SIDEY files are missing. Please reinstall the app.",
-    "startupFailed": "SIDEY could not start."
+  "legal": {
+    "description": "Review the terms and policies.",
+    "privacy": {
+      "action": "View privacy policy"
+    },
+    "refund": {
+      "action": "View cancellation and refund policy"
+    },
+    "terms": {
+      "action": "View terms"
+    },
+    "title": "Policies"
   },
-  "metrics": {
-    "exportFailed": "Metrics export failed: {0}",
-    "exportPath": "Export path: {0}",
-    "exported": "Current metrics JSON exported. Manual results remain not_run.",
-    "noSamples": "No metric samples",
-    "rendererNotRunning": "The metrics renderer is not running.",
-    "rendererNotStarted": "The metrics renderer has not started.",
-    "summary": "Elapsed {0:F0}s · {1} samples · max frame {2:F2}ms · working set {3:F1}MB (peak {4:F1}MB) · GDI {5} · USER {6}"
-  },
-  "motion": {
-    "disabled": "Animation effects are turned off in Windows."
-  },
-  "navigation": {
-    "about": "About",
-    "connection": "Connection",
-    "groups": "Groups",
-    "profile": "My Profile",
-    "settings": "Settings",
-    "store": "Customize & Shop"
+  "message": {
+    "delivery": {
+      "recheck_failed": "Couldn’t confirm that the message was sent. Check again shortly. ({0})"
+    },
+    "send": {
+      "accessibility": "Send message",
+      "failed": "Couldn’t send the message. Try again. ({0})",
+      "rate_limited": "You're sending messages too quickly."
+    }
   },
   "onboarding": {
-    "character": "My Character",
-    "complete": "Setup complete",
-    "completeDescription": "You can create or join a group anytime in Settings.",
-    "completeTitle": "SIDEY is ready",
-    "connected": "Connected",
-    "create": "Create Group",
-    "createDescription": "Create a new private group of your own.",
-    "createPath": "Create a new group",
-    "creatingRoom": "Creating group...",
-    "disconnected": "Disconnected",
-    "getStarted": "Get Started",
-    "googleCancel": "Cancel sign-in",
-    "googleContinue": "Continue with Google",
-    "googleDescription": "Connect Google to use SIDEY. Your existing profile, groups, and chat history are preserved.",
-    "googlePending": "Complete Google sign-in in your browser.",
-    "groupDescription": "Create a group or join with an invitation code to bring up your pixel world.",
-    "groupPath": "How would you like to get started?",
-    "groupTitle": "Connect with friends",
-    "inviteCaseNotice": "Each group can have up to 12 people.",
-    "inviteCode": "Invitation code",
-    "inviteCodePlaceholder": "Code from a friend",
-    "inviteRequired": "Enter an invitation code.",
-    "join": "Join",
-    "joinPath": "Use an invitation code",
-    "joiningRoom": "Joining group...",
-    "landingDescription": "A few quick settings and you’ll be ready to go.",
-    "launch": "Start SIDEY",
-    "nickname": "Nickname",
-    "nicknamePlaceholder": "2–8 characters",
-    "nicknameRequired": "Enter a nickname.",
-    "profileDescription": "You can change it anytime in Settings.",
-    "profileTitle": "Choose your SIDEY name",
-    "roomName": "Group name",
-    "roomNamePlaceholder": "e.g. Our Hangout",
-    "roomNameRequired": "Enter a group name.",
-    "saving": "Saving settings...",
-    "serverConnected": "Connected to SIDEY",
-    "serverConnecting": "Connecting to SIDEY…",
-    "stepComplete": "Done",
-    "stepGroup": "Group",
-    "stepProfile": "Profile",
+    "auth": {
+      "google": {
+        "cancel": "Cancel sign-in",
+        "continue": "Continue with Google",
+        "description": "Connect your Google account to continue. Your existing profile, groups, and chat history are preserved.",
+        "pending": "Complete Google sign-in in your browser."
+      },
+      "start": "Get started"
+    },
+    "character": {
+      "label": "My character"
+    },
+    "complete": {
+      "description": "Create or join a group anytime in Settings.",
+      "title": "You’re ready to go"
+    },
+    "connection": {
+      "connected": "Connected to the server",
+      "connecting": "Connecting to the server…"
+    },
+    "group": {
+      "create": {
+        "description": "Create a group."
+      },
+      "description": "Create a group or join with an invite code to bring your pixel world to life.",
+      "invite_code": {
+        "label": "Invite code",
+        "member_limit": "Each group can have up to 12 people.",
+        "placeholder": "Code from a friend",
+        "required": "Enter an invite code."
+      },
+      "join": {
+        "action": "Join"
+      },
+      "name": {
+        "placeholder": "e.g. Our Hangout"
+      },
+      "path": {
+        "label": "How would you like to get started?"
+      },
+      "title": "Start a group with friends"
+    },
+    "launch": {
+      "action": "Start"
+    },
+    "profile": {
+      "description": "Change it anytime in Settings.",
+      "title": "Choose your name"
+    },
+    "step": {
+      "complete": "Done",
+      "group": "Group",
+      "profile": "Profile"
+    },
     "tagline": "Keep your friends by your side."
   },
   "overlay": {
-    "currentUser": "{0} · Me"
+    "current_user": "{0} · Me"
   },
   "platform": {
-    "noMonitor": "No display is available."
-  },
-  "preferences": {
-    "invalidFolder": "The preferences folder path is invalid.",
-    "readFailed": "The SIDEY preferences file could not be read."
-  },
-  "preview": {
-    "dubu": "Tofu",
-    "enableSound": "Enable preview sound",
-    "leftMessage": "What's for dinner?",
-    "moka": "Mocha",
-    "muteSound": "Mute preview sound",
-    "rightMessage": "How about pizza?",
-    "treeMovementHint": "Right-click the tree to stop it. Right-click again to let it walk."
+    "requirements": {
+      "description": "SIDEY requires Windows 10 1809 (build 17763) or later on x64.",
+      "title": "Unsupported Windows version",
+      "window_title": "SIDEY — Unsupported Windows"
+    }
   },
   "profile": {
     "applying": "Applying",
-    "bubble": "Chat Bubble",
-    "bubbleDescription": "Choose a bubble you own. It will be used in all your groups.",
-    "changeNickname": "Change Nickname",
-    "changeNicknameTooltip": "Save the changed nickname.",
-    "character": "Character",
-    "characterDescription": "Choose the pixel animal that represents you on your friends’ screens.",
-    "characterSaved": "Character changed.",
-    "cosmeticDefault": "Default",
-    "cosmeticSaved": "Your new look is ready.",
-    "defaultBubble": "Default Chat Bubble",
-    "defaultThrowable": "Default Soft Ball",
+    "character": {
+      "description": "Choose the pixel character that represents you on your friends’ screens.",
+      "label": "Character",
+      "save": {
+        "success": "Character changed."
+      }
+    },
+    "cosmetics": {
+      "bubble": {
+        "default": "Default speech bubble",
+        "description": "Choose a bubble you own. It will be used in all your groups.",
+        "title": "Speech bubble"
+      },
+      "equipped": "Equipped",
+      "save": {
+        "success": "Your new look is ready."
+      },
+      "throwable": {
+        "default": "Default soft ball",
+        "description": "Choose a tossable toy you own. It will be used in all your groups.",
+        "title": "Tossable toy"
+      }
+    },
     "description": "Set the name and character your friends see.",
-    "duplicateNotice": "It's fine to use the same name or character as a friend.",
-    "equipped": "Equipped",
-    "nickname": "Nickname",
-    "nicknameDescription": "The name your friends see on screen and in messages · 2–8 characters",
-    "save": "Save Profile",
-    "saveTooltip": "Save nickname and character changes.",
-    "saved": "Profile saved.",
-    "throwable": "Tossable Toy",
-    "throwableDescription": "Choose a toy you own. It will be used in all your groups.",
-    "title": "My Profile"
+    "duplicates": {
+      "notice": "It's fine to use the same name or character as a friend."
+    },
+    "nickname": {
+      "description": "The name your friends see on screen and in messages · 2–8 characters",
+      "label": "Nickname",
+      "placeholder": "2–8 characters",
+      "save": {
+        "action": "Change nickname",
+        "tooltip": "Save the changed nickname."
+      }
+    },
+    "save": {
+      "success": "Profile saved."
+    },
+    "title": "My profile"
   },
   "settings": {
-    "characterSounds": "Character sound effects",
-    "characterSoundsDescription": "Play sound effects when characters in the current group are hit.",
-    "checkNow": "Check Now",
-    "checkNowTooltip": "Check for a newer SIDEY version.",
-    "checkUpdate": "Check for Updates",
-    "checkUpdateDescription": "Safely download and install a new version when available.",
-    "displayDescription": "Adjust how friend status and messages appear.",
-    "displayTitle": "Display",
-    "edge": "Edge",
-    "edgeBottom": "Bottom",
-    "edgeDescription": "Choose the screen edge where characters walk.",
-    "edgeLeft": "Left",
-    "edgeRight": "Right",
-    "edgeTooltip": "Screen edge for the pixel world",
-    "edgeTop": "Top",
-    "exportMetrics": "Export current metrics JSON",
-    "exportMetricsTooltip": "Save current rendering performance metrics as JSON.",
-    "generalDescription": "Choose how SIDEY appears and when it starts.",
-    "generalTitle": "General",
-    "hotkeyAlreadyRegistered": "This shortcut is already in use by the system or another app.",
-    "hotkeyAvailabilityUnverified": "Could not verify whether this shortcut is available.",
-    "hotkeyComposer": "Open or close message input",
-    "hotkeyHistory": "Open or close recent history",
-    "hotkeyInvalid": "Invalid shortcut",
-    "hotkeyNeedsModifier": "A shortcut must start with Win, Ctrl, Alt, or Shift.",
-    "hotkeyOverlay": "Toggle overlay",
-    "hotkeyQuietMode": "Toggle quiet mode",
-    "hotkeyRecorderEmpty": "Press a key combination to change this shortcut.",
-    "hotkeyRecorderHelp": "Select, then press a modifier key and another key. Press Esc to cancel.",
-    "hotkeyRecorderReset": "Reset",
-    "hotkeyRecording": "Press a shortcut…",
-    "hotkeySideyConflict": "Another SIDEY shortcut uses this combination. Saving will swap the two shortcuts.",
-    "hotkeySystemShortcut": "This shortcut is already in use as a system shortcut.",
-    "hotkeysDescription": "Select a shortcut, then press the key combination you want. Assigning a combination already in use swaps the two shortcuts.",
-    "hotkeysTitle": "Keyboard shortcuts",
-    "language": "Language",
-    "languageDescription": "Choose the language used in the app. Changes take effect immediately.",
-    "monitor": "Monitor",
-    "monitorDescription": "Choose the display for the pixel world and message composer.",
-    "monitorTooltip": "Monitor for the pixel world and message composer",
-    "muteSound": "Mute",
-    "offlineMembers": "Show Offline Members",
-    "offlineMembersDescription": "Show offline friends as sleeping characters with a red status dot.",
-    "offlineMembersTooltip": "Toggle offline members",
-    "overlay": "Show Pixel World",
-    "overlayDescription": "Show your friends’ pixel world along the selected screen edge.",
-    "overlayTooltip": "Toggle the pixel world",
-    "quietMode": "Quiet Mode",
-    "quietModeDescription": "Hide message bubbles and typing indicators while keeping unread counts.",
-    "quietModeTooltip": "Toggle quiet mode",
-    "releaseNotes": "Release Notes",
-    "rendererMetrics": "Internal renderer metrics",
-    "rightClickThrow": "Double right-click to throw",
-    "rightClickThrowDescription": "When off, click a friend to throw. When on, double right-click your character to enable throwing for 10 seconds.",
-    "rightClickThrowTooltip": "Require a double right-click on your character before throwing",
-    "saved": "Settings saved.",
-    "soundDescription": "Adjust character sound effects.",
-    "soundTitle": "Sound",
-    "soundVolume": "Volume",
-    "span": "Roaming Area",
-    "spanDescription": "Choose how much of the screen edge your characters can explore.",
-    "spanFull": "Entire Edge",
-    "spanTooltip": "Screen range occupied by the pixel world",
-    "startup": "Start at Sign-in",
-    "startupDescription": "Start SIDEY automatically when you sign in to Windows.",
-    "startupTooltip": "Toggle automatic startup at Windows sign-in",
-    "theme": "Theme",
-    "themeDark": "Dark",
-    "themeDescription": "Windows color setting",
-    "themeLight": "Light",
-    "themeSystem": "Windows default",
-    "unmuteSound": "Unmute",
-    "updateCheckedToday": "Today at {0}",
-    "updateCheckedYesterday": "Yesterday at {0}",
-    "updateDescription": "Check for a newer version of SIDEY.",
-    "updateLastChecked": "Last checked: {0}",
-    "updateNeverChecked": "Last checked: Never",
-    "updateTitle": "Updates",
-    "worldDescription": "Choose where your characters appear.",
-    "worldTitle": "Character Placement"
+    "display": {
+      "description": "Adjust how friend status and messages appear.",
+      "offline_members": {
+        "description": "Show offline friends as sleeping characters with a red status dot.",
+        "title": "Show offline members",
+        "tooltip": "Toggle offline members"
+      },
+      "quiet_mode": {
+        "description": "Hide message bubbles and typing indicators while keeping unread counts.",
+        "title": "Quiet mode",
+        "tooltip": "Toggle quiet mode"
+      },
+      "throw_guard": {
+        "description": "When off, click a friend to throw. When on, double right-click your character to enable throwing for 10 seconds.",
+        "title": "Double right-click to throw",
+        "tooltip": "Require a double right-click on your character before throwing"
+      }
+    },
+    "general": {
+      "description": "Choose how the app appears and when it starts."
+    },
+    "language": {
+      "description": "Choose the language used in the app. Changes take effect immediately.",
+      "title": "Language"
+    },
+    "navigation_label": "Settings",
+    "overlay": {
+      "description": "Show your friends’ pixel world along the selected screen edge.",
+      "title": "Show pixel world",
+      "tooltip": "Toggle the pixel world"
+    },
+    "placement": {
+      "description": "Choose where your characters appear.",
+      "edge": {
+        "bottom": "Bottom",
+        "description": "Choose the screen edge where characters walk.",
+        "left": "Left",
+        "right": "Right",
+        "title": "Edge",
+        "tooltip": "Screen edge for the pixel world",
+        "top": "Top"
+      },
+      "monitor": {
+        "description": "Choose the display for the pixel world and message input.",
+        "title": "Monitor",
+        "tooltip": "Monitor for the pixel world and message input",
+        "unavailable": "No display is available."
+      },
+      "span": {
+        "description": "Choose how much of the screen edge your characters can explore.",
+        "full": "Entire edge",
+        "title": "Roaming area",
+        "tooltip": "Screen range occupied by the pixel world"
+      },
+      "title": "Character placement"
+    },
+    "save": {
+      "failed": "Couldn’t save your settings. Try again. ({0})"
+    },
+    "section": {
+      "display": {
+        "title": "Display"
+      },
+      "general": {
+        "title": "General"
+      },
+      "sound": {
+        "title": "Sound"
+      }
+    },
+    "shortcuts": {
+      "action": {
+        "composer": "Open or close message input",
+        "history": "Open or close recent messages",
+        "overlay": "Toggle overlay",
+        "quiet_mode": "Toggle quiet mode"
+      },
+      "description": "Select a shortcut, then press the key combination you want. Assigning a combination already in use swaps the two shortcuts.",
+      "error": {
+        "already_registered": "This shortcut is already in use by the system or another app.",
+        "availability_unverified": "Couldn’t verify whether this shortcut is available.",
+        "in_app_conflict": "Another app shortcut uses this combination. Saving will swap the two shortcuts.",
+        "invalid": "Invalid shortcut",
+        "modifier_required": "A shortcut must start with Win, Ctrl, Alt, or Shift.",
+        "system_conflict": "This shortcut is already in use as a system shortcut."
+      },
+      "recorder": {
+        "empty": "Press a key combination to change this shortcut.",
+        "help": "Select, then press a modifier key and another key. Press Esc to cancel.",
+        "recording": "Press a shortcut…",
+        "reset": "Reset"
+      },
+      "title": "Keyboard shortcuts"
+    },
+    "sound": {
+      "character_effects": {
+        "description": "Play sound effects when characters in the current group are hit.",
+        "title": "Character sound effects"
+      },
+      "description": "Adjust character sound effects.",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "volume": "Volume"
+    },
+    "startup": {
+      "description": "The app starts automatically when you sign in.",
+      "title": "Start at sign-in"
+    },
+    "storage": {
+      "folder_invalid": "Couldn’t open the settings folder. Restart the app.",
+      "read_failed": "Couldn’t read your saved settings. Restart the app."
+    },
+    "theme": {
+      "dark": "Dark",
+      "description": "Choose the app’s light, dark, or system theme.",
+      "light": "Light",
+      "system": "Windows default",
+      "title": "Theme"
+    },
+    "update": {
+      "check": {
+        "action": "Check for updates"
+      },
+      "check_now": {
+        "tooltip": "Check for a newer version."
+      },
+      "description": "Check for a newer version.",
+      "last_checked": {
+        "never": "Last checked: never",
+        "today": "Today at {0}",
+        "value": "Last checked: {0}",
+        "yesterday": "Yesterday at {0}"
+      },
+      "release_notes": {
+        "action": "Update details"
+      },
+      "title": "Updates"
+    },
+    "window": {
+      "title": "SIDEY settings"
+    }
   },
   "store": {
-    "bouncyHeartDescription": "A heart that bounces through the air to share a little affection.",
-    "browserOpenFailed": "The default browser could not be opened.",
-    "bunnyPinkBubbleDescription": "A pink bubble with a bunny decoration and crisp dark text.",
-    "butterChickBubbleDescription": "A butter-yellow bubble with a chick decoration and crisp dark text.",
-    "checkoutOpened": "Complete your purchase in the browser.",
-    "chinchillaDescription": "A fluffy gray chinchilla with big round ears and a cozy blue scarf.",
-    "comingSoon": "Not Available to Buy Yet",
-    "comingSoonDescription": "The store currently offers previews only. Purchasing is not available yet.",
-    "confirming": "Confirming Payment…",
-    "connectGoogle": "Connect Google Account",
-    "description": "See your characters, chat bubbles, and toys in action.",
-    "emptyDescription": "Try a different search or change your filters.",
-    "emptyTitle": "Nothing Found",
-    "filter": "Sort & Filter",
-    "googleConnected": "Google account connected.",
-    "googleConnectionFailed": "Google account linking could not be started.",
-    "googleConnectionOpened": "Complete Google account linking in your browser.",
-    "guineaPigDescription": "A round little guinea pig with a one-of-a-kind tricolor coat.",
-    "hideOwned": "Hide Owned",
-    "interaction": {
-      "pixel_chinchilla": "Click a friend's character to toss a little pouch of bathing dust.",
-      "pixel_guinea_pig": "Click a friend's character to toss a mini bell pepper.",
-      "pixel_monkey": "Click a friend's character to toss a ripe banana.",
-      "pixel_starlight_upalupa": "Click a friend's character to toss a sparkling orb."
+    "auth": {
+      "google": {
+        "failed": "Couldn’t start linking the Google account."
+      }
     },
-    "keepsake": "Keepsake",
-    "kindBubble": "Chat Bubbles",
-    "kindCharacter": "Characters",
-    "kindThrowable": "Tossable Toys",
-    "monkeyDescription": "A lively little monkey with a spiky tuft of hair and a bright blue scarf.",
-    "openPreview": "Preview",
-    "openingCheckout": "Opening Checkout…",
-    "owned": "Owned",
-    "paymentTimedOut": "Payment confirmation timed out. Reopen the store to check its status.",
-    "previewOnly": "Preview",
-    "previewUnavailable": "The preview could not be loaded.",
-    "priceKrw": "₩{0:N0}",
+    "availability": {
+      "coming_soon": {
+        "description": "The store currently offers previews only. Purchasing is not available yet.",
+        "title": "Not available to buy yet"
+      }
+    },
+    "catalog": {
+      "bubble_bunny_pink": {
+        "description": "A pink speech bubble with a bunny decoration.",
+        "name": "Pink Bunny Bubble"
+      },
+      "bubble_butter_chick": {
+        "description": "A butter-yellow speech bubble with a chick decoration.",
+        "name": "Butter Chick Bubble"
+      },
+      "bubble_starry_cat": {
+        "description": "A deep violet speech bubble with a starry cat decoration.",
+        "name": "Starry Cat Bubble"
+      },
+      "character_chinchilla": {
+        "description": "Fresh from a sand bath, it came to play. Before saying hello, it has to show off that fluffy fur."
+      },
+      "character_duck": {
+        "description": "An expert at ducking responsibility. It has the duck feet to prove it."
+      },
+      "character_guinea_pig": {
+        "description": "It forgot where it hid its snack. Judging by those full cheeks, it can't be far away."
+      },
+      "character_monkey": {
+        "description": "It came to share a banana. It says it only took one bite on the way… so why is half gone?"
+      },
+      "character_otter": {
+        "description": "It came to show off its favorite clam. You can look, but it will sulk if you take it."
+      },
+      "character_pig": {
+        "description": "It followed the smell of snacks and decided to stay. Now it thinks this is home."
+      },
+      "character_poop": {
+        "description": "Not sure who called, but here it is."
+      },
+      "character_quokka": {
+        "description": "Always smiling. Yes, this is the one who just threw that leaf."
+      },
+      "character_shiba": {
+        "description": "We already went for a walk. The Shiba refuses to acknowledge that fact."
+      },
+      "character_starlight_upalupa": {
+        "description": "This axolotl brought home a lost star and hugs it tight even while sleeping."
+      },
+      "character_tree": {
+        "description": "A little tree went out for a walk. Told to take a break, it started choosing where to put down roots."
+      },
+      "character_tteokbokki": {
+        "description": "They said it was mild. They never said whose idea of mild they meant."
+      },
+      "throwable_banana": {
+        "description": "The monkey shared this banana. We haven't had a chance to ask whether that was intentional.",
+        "name": "Monkey's Banana"
+      },
+      "throwable_baseball": {
+        "description": "A red-stitched ball that squashes on impact and bounces away.",
+        "name": "Baseball"
+      },
+      "throwable_bouncy_heart": {
+        "description": "A throwable heart that bounces as it flies.",
+        "name": "Bouncy Heart"
+      },
+      "throwable_clam": {
+        "description": "The clam the otter carried everywhere. There's no pearl inside, just some lingering attachment.",
+        "name": "Otter's Clam"
+      },
+      "throwable_dujjonku": {
+        "description": "Its cocoa shell and green filling squash with a satisfying crunch.",
+        "name": "Dubai Chocolate Chewy Cookie"
+      },
+      "throwable_dust_bath_pouch": {
+        "description": "It's the chinchilla's bath sand. Throwing it probably isn't a hint that you need a wash.",
+        "name": "Chinchilla's Sand Pouch"
+      },
+      "throwable_fish_cake_skewer": {
+        "description": "That was meant for eating. Why are you swinging it around?",
+        "name": "Fish Cake Skewer"
+      },
+      "throwable_leaf": {
+        "description": "It's the quokka's packed lunch. We didn't ask whether it was okay to throw it.",
+        "name": "Leaf"
+      },
+      "throwable_mini_paprika": {
+        "description": "A carefully saved snack. If you pick it up within three seconds after throwing it, that's fine, right?",
+        "name": "Guinea Pig's Mini Pepper"
+      },
+      "throwable_pork": {
+        "description": "A satisfyingly solid slap! By the way, has anyone seen the pig next door lately?",
+        "name": "Baby Pig's Pork"
+      },
+      "throwable_snowflake": {
+        "description": "A snowflake that scatters into tiny crystal shards on impact.",
+        "name": "Snowflake"
+      },
+      "throwable_squeaky_duck": {
+        "description": "A duck throwing a duck. It probably isn't a family dispute.",
+        "name": "Squeaky Duck"
+      },
+      "throwable_starlight_orb": {
+        "description": "Starlight packed into a little orb. Has anyone checked whether the sky is missing a star?",
+        "name": "Starlight Axolotl's Star Orb"
+      },
+      "throwable_tennis_ball": {
+        "description": "We picked someone to throw it. We're still looking for someone to fetch it.",
+        "name": "Tennis Ball"
+      },
+      "throwable_timber": {
+        "description": "A tree throws a tiny tree. Perhaps we should check the family tree first.",
+        "name": "Little Tree's Tiny Tree"
+      },
+      "throwable_tissue_ball": {
+        "description": "No one knows whether it's used toilet paper. Just dodge it!",
+        "name": "Tissue Ball"
+      },
+      "throwable_toy_cannon": {
+        "description": "A mini cannon throwable that fires a fuse-lit shell.",
+        "name": "Mini Cannon"
+      },
+      "throwable_wakkuball": {
+        "description": "Crunch! Enjoy the crisp sound as the Wakku Ball shatters into pieces.",
+        "name": "Wakku Ball"
+      }
+    },
+    "checkout": {
+      "opening": "Opening checkout…"
+    },
+    "description": "See your characters, speech bubbles, and tossable toys in action.",
+    "empty": {
+      "description": "Try a different search or change your filters.",
+      "title": "Nothing found"
+    },
+    "filter": {
+      "hide_owned": "Hide owned",
+      "menu": "Sort & filter",
+      "reset": "Reset all",
+      "search": {
+        "label": "Search",
+        "placeholder": "Search names or descriptions"
+      }
+    },
+    "kind": {
+      "bubble": "Speech bubbles",
+      "character": "Characters",
+      "keepsake": "Keepsake",
+      "throwable": "Tossable toys"
+    },
+    "navigation_label": "Customize & shop",
+    "preview": {
+      "member": {
+        "dubu": "Tofu",
+        "moka": "Mocha"
+      },
+      "message": {
+        "left": "What's for dinner?",
+        "right": "How about pizza?"
+      },
+      "open": "Preview",
+      "sound": {
+        "off": "Mute preview sound",
+        "on": "Enable preview sound"
+      },
+      "tree_movement_hint": "Right-click the tree to stop it. Right-click again to let it walk.",
+      "unavailable": "Couldn’t load the preview."
+    },
+    "price": {
+      "krw": "₩{0:N0}"
+    },
     "product": {
-      "bubble_bunny_pink": "Pink Bunny Bubble",
-      "bubble_butter_chick": "Butter Chick Bubble",
-      "bubble_starry_cat": "Starry Cat Bubble",
-      "character_duck": "Duck",
-      "character_poop": "Poop",
-      "character_quokka": "Quokka",
-      "character_shiba": "Shiba Inu",
-      "character_tteokbokki": "Tteokbokki",
-      "throwable_banana": "Monkey's Banana",
-      "throwable_baseball": "Baseball",
-      "throwable_bouncy_heart": "Bouncy Heart",
-      "throwable_clam": "Otter's Clam",
-      "throwable_dujjonku": "Dujjonku",
-      "throwable_dust_bath_pouch": "Chinchilla's Sand Pouch",
-      "throwable_fish_cake_skewer": "Fish Cake Skewer",
-      "throwable_leaf": "Leaf",
-      "throwable_mini_paprika": "Guinea Pig's Mini Pepper",
-      "throwable_pork": "Baby Pig's Pork",
-      "throwable_snowflake": "Snowflake",
-      "throwable_squeaky_duck": "Squeaky Duck",
-      "throwable_starlight_orb": "Starlight Axolotl's Star Orb",
-      "throwable_tennis_ball": "Tennis Ball",
-      "throwable_timber": "Little Tree's Tiny Tree",
-      "throwable_tissue_ball": "Tissue Ball",
-      "throwable_toy_cannon": "Mini Cannon",
-      "throwable_wakkuball": "Wakku Ball"
+      "sold_separately": "Sold separately from the character"
     },
-    "productDescriptions": {
-      "bubble_bunny_pink": "A pink speech bubble with a bunny decoration.",
-      "bubble_butter_chick": "A butter-yellow speech bubble with a chick decoration.",
-      "bubble_starry_cat": "A deep violet speech bubble with a starry cat decoration.",
-      "character_chinchilla": "Fresh from a sand bath, it came to play. Before saying hello, it has to show off that fluffy fur.",
-      "character_duck": "An expert at ducking responsibility. It has the duck feet to prove it.",
-      "character_guinea_pig": "It forgot where it hid its snack. Judging by those full cheeks, it can't be far away.",
-      "character_monkey": "It came to share a banana. It says it only took one bite on the way… so why is half gone?",
-      "character_otter": "It came to show off its favorite clam. You can look, but it will sulk if you take it.",
-      "character_pig": "It followed the smell of snacks and decided to stay. Now it thinks this is home.",
-      "character_poop": "Not sure who called, but here it is.",
-      "character_quokka": "Always smiling. Yes, this is the one who just threw that leaf.",
-      "character_shiba": "We already went for a walk. The Shiba refuses to acknowledge that fact.",
-      "character_starlight_upalupa": "This axolotl brought home a lost star and hugs it tight even while sleeping.",
-      "character_tree": "A little tree went out for a walk. Told to take a break, it started choosing where to put down roots.",
-      "character_tteokbokki": "They said it was mild. They never said whose idea of mild they meant.",
-      "throwable_banana": "The monkey shared this banana. We haven't had a chance to ask whether that was intentional.",
-      "throwable_baseball": "A red-stitched ball that squashes on impact and bounces away.",
-      "throwable_bouncy_heart": "A throwable heart that bounces as it flies.",
-      "throwable_clam": "The clam the otter carried everywhere. There's no pearl inside, just some lingering attachment.",
-      "throwable_dujjonku": "Its cocoa shell and green filling squash with a satisfying crunch.",
-      "throwable_dust_bath_pouch": "It's the chinchilla's bath sand. Throwing it probably isn't a hint that you need a wash.",
-      "throwable_fish_cake_skewer": "That was meant for eating. Why are you swinging it around?",
-      "throwable_leaf": "It's the quokka's packed lunch. We didn't ask whether it was okay to throw it.",
-      "throwable_mini_paprika": "A carefully saved snack. If you pick it up within three seconds after throwing it, that's fine, right?",
-      "throwable_pork": "A satisfyingly solid slap! By the way, has anyone seen the pig next door lately?",
-      "throwable_snowflake": "A snowflake that scatters into tiny crystal shards on impact.",
-      "throwable_squeaky_duck": "A duck throwing a duck. It probably isn't a family dispute.",
-      "throwable_starlight_orb": "Starlight packed into a little orb. Has anyone checked whether the sky is missing a star?",
-      "throwable_tennis_ball": "We picked someone to throw it. We're still looking for someone to fetch it.",
-      "throwable_timber": "A tree throws a tiny tree. Perhaps we should check the family tree first.",
-      "throwable_tissue_ball": "No one knows whether it's used toilet paper. Just dodge it!",
-      "throwable_toy_cannon": "A mini cannon throwable that fires a fuse-lit shell.",
-      "throwable_wakkuball": "Crunch! Enjoy the crisp sound as the Wakku Ball shatters into pieces."
+    "purchase": {
+      "action": "Buy for {0}",
+      "confirming": "Confirming payment…",
+      "failed": "We couldn't confirm your purchase. Check again in a moment.",
+      "owned": "Owned",
+      "success": "Purchase completed.",
+      "timeout": "Payment confirmation timed out. Reopen the store to check its status.",
+      "unavailable": "Purchases are currently unavailable. Try again shortly."
     },
-    "productKind": "Product Type",
-    "purchase": "Buy for {0}",
-    "purchaseCompleted": "Purchase completed.",
-    "purchaseFailed": "We couldn't confirm your purchase. Please check again in a moment.",
-    "resetAll": "Reset all",
-    "retry": "Try Again",
-    "search": "Search",
-    "searchPlaceholder": "Search names or descriptions",
-    "soldSeparately": "Sold separately from the character",
-    "sort": "Sort",
-    "sortCatalog": "Default",
-    "sortPriceAscending": "Price: Low to High",
-    "sortPriceDescending": "Price: High to Low",
-    "squeakyDuckDescription": "A playful yellow duck that spins through the air.",
-    "starlightUpalupaDescription": "A pearly little axolotl with starry gills. Tiny stars twinkle around it while it's online. Double-click to see two rings of starlight.",
-    "starryCatBubbleDescription": "A deep violet bubble with a starry cat decoration and bright text.",
-    "stateUnavailable": "We couldn't load the shop. Please try again in a moment.",
-    "title": "Customize & Shop",
-    "toyCannonDescription": "A tiny cannon pops up in front of your character and fires a cannonball that bursts on impact.",
-    "unavailable": "Purchases are currently unavailable. Please try again shortly."
+    "sort": {
+      "catalog": "Default",
+      "label": "Sort",
+      "price_ascending": "Price: low to high",
+      "price_descending": "Price: high to low"
+    },
+    "status": {
+      "retry": "Try again",
+      "unavailable": "We couldn't load the shop. Try again in a moment."
+    },
+    "title": "Customize & shop"
+  },
+  "support": {
+    "diagnostics": {
+      "description": "Log files are compressed and saved to your Desktop. Sharing them with us can help us fix errors.",
+      "export": {
+        "action": "Export",
+        "failed": "Couldn’t export diagnostic data.",
+        "success": "Diagnostic data was saved to your Desktop."
+      },
+      "title": "Export diagnostic data"
+    },
+    "feedback": {
+      "action": "Send feedback",
+      "description": "Open a GitHub issue if something isn’t working or you need help.",
+      "title": "Feedback"
+    }
   },
   "tray": {
-    "activeGroup": "Active Group",
-    "checkUpdates": "Check for Updates…",
-    "compose": "Compose Message…",
-    "connectionFailedBody": "Select Reconnect in Connection. If SIDEY still cannot connect, contact us with a diagnostic log.",
-    "connectionFailedTitle": "SIDEY Disconnected",
-    "exit": "Exit",
-    "groups": "Group Settings…",
-    "hideOverlay": "Hide Overlay",
-    "history": "Recent History…",
-    "hotkeyRegistrationFailedBody": "These shortcuts are unavailable: {0}. Another app may be using them. Use the tray menu instead.",
-    "noGroups": "No connected groups",
-    "open": "Open",
-    "quietMode": "Quiet Mode",
-    "settings": "Settings…",
-    "showOverlay": "Show Overlay",
-    "startup": "Start at Sign-in",
-    "store": "Store…",
-    "unreadTooltip": "SIDEY · {0} unread messages",
-    "updateAvailable": "An update is available. {0}",
-    "updateCheckFailed": "Couldn't check for updates. Please try again shortly.",
-    "updateInstalled": "SIDEY was updated to {0}. Click to see what changed.",
-    "updateLatest": "You're using the latest version."
-  },
-  "unsupported": {
-    "description": "SIDEY requires Windows 10 1809 (build 17763) or later on x64.",
-    "title": "Unsupported Windows Version",
-    "windowTitle": "SIDEY — Unsupported Windows"
+    "app": {
+      "exit": "Exit"
+    },
+    "connection": {
+      "error": {
+        "message": "Select Reconnect under Server connection. If it still can’t connect, contact us with a diagnostic log.",
+        "title": "SIDEY server connection error"
+      }
+    },
+    "group": {
+      "active": "Active group"
+    },
+    "groups": {
+      "empty": "No connected groups",
+      "open": "Group settings…"
+    },
+    "history": {
+      "open": "Recent messages…"
+    },
+    "message": {
+      "compose": "Compose message…"
+    },
+    "overlay": {
+      "hide": "Hide overlay"
+    },
+    "quiet_mode": {
+      "toggle": "Quiet mode"
+    },
+    "settings": {
+      "open": "Settings…"
+    },
+    "shortcuts": {
+      "registration_failed": "These shortcuts are unavailable: {0}. Another app may be using them. Use the tray menu instead."
+    },
+    "start": {
+      "failed": "The tray icon couldn’t start. Closing the window will exit SIDEY."
+    },
+    "store": {
+      "open": "Store…"
+    },
+    "unread": {
+      "tooltip": "SIDEY · {0} unread messages"
+    },
+    "update": {
+      "available": "An update is available. {0}",
+      "check": "Check for updates…",
+      "check_failed": "Couldn't check for updates. Try again shortly.",
+      "installed": "SIDEY was updated to {0}. Click to see what changed.",
+      "latest": "You're using the latest version."
+    }
   },
   "update": {
     "available": "SIDEY {0} is available.",
     "checking": "Checking for updates...",
-    "downloading": "Downloading update…",
-    "downloadingProgress": "Downloading update… ({0}%)",
-    "failed": "The update could not be completed. Please try again shortly.",
-    "hashMismatch": "We couldn't verify the update file. Please download it again.",
-    "installCancelled": "Update installation canceled.",
-    "installerLaunchFailed": "The installer could not be opened. Select Check for Updates to try again.",
-    "installerLaunched": "Download complete. The installer has been opened.",
-    "invalidInstaller": "The SIDEY Windows installer information is invalid.",
-    "invalidManifest": "The SIDEY Windows update manifest is invalid.",
+    "download": {
+      "hash_mismatch": "We couldn't verify the update file. Download it again.",
+      "in_progress": "Downloading update…",
+      "progress": "Downloading update… ({0}%)"
+    },
+    "failed": "The update couldn’t be completed. Try again shortly.",
+    "install": {
+      "cancelled": "Update installation canceled.",
+      "invalid": "Couldn’t verify the update installation details. Try again later.",
+      "launch_failed": "Couldn’t open the installer. Select Check for updates to try again.",
+      "launched": "Download complete. The installer has been opened.",
+      "missing": "The update can’t be installed right now. Try again later."
+    },
     "latest": "You’re using the latest version.",
-    "missingInstaller": "SIDEY update installer information is missing.",
-    "notPublished": "Windows update information has not been published yet.",
-    "releaseNotesFailed": "Could not open release notes: {0}",
-    "startupAvailable": "Version {0} is available. Open Check for Updates to visit the Release page."
+    "metadata": {
+      "invalid": "Couldn’t verify the update information. Try again later."
+    },
+    "not_published": "The new update isn’t available yet. Check again later.",
+    "prompt": {
+      "download": "Download",
+      "later": "Later",
+      "message": "Download SIDEY {0}?",
+      "title": "An update is available"
+    },
+    "release_notes": {
+      "open_failed": "Couldn’t open the update details. Try again. ({0})"
+    }
   },
   "validation": {
-    "invalidInviteCode": "Enter a valid invitation code.",
-    "messageLength": "Enter a message with 1–200 characters.",
-    "nicknameLength": "Enter a nickname with 2–8 characters.",
-    "roomNameLength": "Enter a group name with 1–20 characters."
-  },
-  "window": {
-    "composerTitle": "SIDEY Message",
-    "historyTitle": "SIDEY Message History",
-    "onboardingTitle": "Welcome to SIDEY",
-    "settingsTitle": "SIDEY Settings"
+    "message": {
+      "length": "Enter a message with 1–200 characters."
+    },
+    "nickname": {
+      "length": "Enter a nickname with 2–8 characters."
+    },
+    "room_name": {
+      "length": "Enter a group name with 1–20 characters."
+    }
   }
 }
