@@ -1362,6 +1362,9 @@
           "description": "Uygulama için açık, koyu veya sistem temasını seçin.",
           "light": "Açık",
           "system": "Windows varsayılanı",
+          "system_colors": {
+            "action": "Renk ayarlarını açma"
+          },
           "title": "Tema"
         },
         "update": {

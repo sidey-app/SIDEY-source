@@ -1362,6 +1362,9 @@
           "description": "앱에 적용할 밝기 테마를 선택합니다.",
           "light": "밝게",
           "system": "Windows 기본값",
+          "system_colors": {
+            "action": "색 설정 열기"
+          },
           "title": "테마"
         },
         "update": {

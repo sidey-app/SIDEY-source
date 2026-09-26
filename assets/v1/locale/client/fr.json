@@ -577,6 +577,9 @@
           "description": "Choisissez pour l’application le thème clair, sombre ou système.",
           "light": "Clair",
           "system": "Valeur par défaut de Windows",
+          "system_colors": {
+            "action": "Ouvrir les paramètres de couleur"
+          },
           "title": "Thème"
         },
         "update": {

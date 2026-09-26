@@ -130,19 +130,54 @@ class GateTests(unittest.TestCase):
             "macos/SIDEY/Domain/L10n.swift",
             "windows/src/Sidey.Core/Localization/I18n.cs",
         ]
+        root = Path(".")
 
-        self.assertEqual(
-            validate_paths(
-                "shared/locale-source-split",
-                [source, legacy_source, *consumers],
-            ),
-            "shared",
-        )
-        with self.assertRaisesRegex(WorkflowError, "platform boundary"):
-            validate_paths(
-                "shared/locale-source-split",
-                [source, *consumers],
+        with patch(
+            "sidey_tools.repository.git",
+            side_effect=[legacy_source, ""],
+        ) as git:
+            self.assertEqual(
+                validate_paths(
+                    "shared/locale-source-split",
+                    [source, legacy_source, *consumers],
+                    root=root,
+                    base="base",
+                    revision="head",
+                ),
+                "shared",
             )
+        self.assertEqual(
+            git.call_args_list,
+            [
+                call(root, "ls-tree", "--name-only", "base", "--", legacy_source),
+                call(root, "ls-tree", "--name-only", "head", "--", legacy_source),
+            ],
+        )
+
+        invalid_cases = (
+            ([source, *consumers], None),
+            ([source, legacy_source, *consumers], None),
+            ([source, legacy_source, *consumers], [legacy_source, legacy_source]),
+            ([source, legacy_source, *consumers], ["", legacy_source]),
+        )
+        for paths, revisions in invalid_cases:
+            with self.subTest(paths=paths, revisions=revisions):
+                context = (
+                    patch("sidey_tools.repository.git", side_effect=revisions)
+                    if revisions is not None
+                    else patch("sidey_tools.repository.git")
+                )
+                with context, self.assertRaisesRegex(
+                    WorkflowError,
+                    "platform boundary",
+                ):
+                    validate_paths(
+                        "shared/locale-source-split",
+                        paths,
+                        root=root if revisions is not None else None,
+                        base="base" if revisions is not None else None,
+                        revision="head",
+                    )
 
     def test_renamed_platform_workflows_keep_their_ownership(self):
         expected_platforms = {

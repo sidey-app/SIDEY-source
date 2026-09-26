@@ -1362,6 +1362,9 @@
           "description": "选择应用的浅色、深色或系统主题。",
           "light": "浅色",
           "system": "跟随 Windows",
+          "system_colors": {
+            "action": "打开颜色设置"
+          },
           "title": "主题"
         },
         "update": {

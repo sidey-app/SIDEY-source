@@ -577,6 +577,9 @@
           "description": "Изаберите светлу, тамну или системску тему апликације.",
           "light": "Светла",
           "system": "Као у систему Windows",
+          "system_colors": {
+            "action": "Otvori postavke boja"
+          },
           "title": "Тема"
         },
         "update": {

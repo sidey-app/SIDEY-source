@@ -1362,6 +1362,9 @@
           "description": "アプリのテーマをライト、ダーク、またはシステム設定から選びます。",
           "light": "ライト",
           "system": "Windowsの既定",
+          "system_colors": {
+            "action": "色の設定を開く"
+          },
           "title": "テーマ"
         },
         "update": {

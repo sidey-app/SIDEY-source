@@ -611,6 +611,9 @@
       "description": "Escolha o tema claro, escuro ou do sistema para o aplicativo.",
       "light": "Claro",
       "system": "Padrão do Windows",
+      "system_colors": {
+        "action": "Abrir configurações de cor"
+      },
       "title": "Tema"
     },
     "update": {

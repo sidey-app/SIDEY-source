@@ -1362,6 +1362,9 @@
           "description": "Alegeți tema deschisă, închisă sau a sistemului pentru aplicație.",
           "light": "Luminos",
           "system": "După setarea Windows",
+          "system_colors": {
+            "action": "Deschideți setările pentru culori"
+          },
           "title": "Temă"
         },
         "update": {

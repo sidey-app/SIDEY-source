@@ -147,10 +147,24 @@ def validate_paths(
     # The per-locale source split removes this legacy file exactly once. That
     # migration also changes both native consumers atomically so no temporary
     # compatibility keys or broken intermediate main revision are required.
-    # Once the deletion is merged, later diffs cannot satisfy this condition.
+    # Check the revisions themselves so a later change cannot recreate the
+    # path merely to reopen this platform-boundary exception.
+    legacy_source = "assets/v1/commerce-localizations.json"
     locale_source_split_change = (
         localization_source_change
-        and "assets/v1/commerce-localizations.json" in paths
+        and legacy_source in paths
+        and root is not None
+        and base is not None
+        and git(root, "ls-tree", "--name-only", base, "--", legacy_source)
+        == legacy_source
+        and not git(
+            root,
+            "ls-tree",
+            "--name-only",
+            revision,
+            "--",
+            legacy_source,
+        )
     )
     invalid = [
         path for path in paths

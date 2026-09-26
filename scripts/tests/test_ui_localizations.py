@@ -75,7 +75,7 @@ class UILocalizationTests(unittest.TestCase):
         self.assertTrue(internal_windows)
         self.assertTrue(set(windows).isdisjoint(internal_windows))
 
-    def test_metadata_and_nested_prefix_values_stay_separate(self):
+    def test_metadata_and_macos_nested_prefix_values_stay_separate(self):
         metadata = tool.read_json(tool.ROOT / tool.SOURCE)
         self.assertEqual(
             set(metadata),
@@ -85,12 +85,23 @@ class UILocalizationTests(unittest.TestCase):
         prefixed = tool.flatten_locale_tree(
             {"store": {"price": {"$value": "가격", "short": "짧은 가격"}}},
             "fixture",
-            "shared",
+            "macos",
         )
         self.assertEqual(
-            prefixed,
-            {"store.price": "가격", "store.price.short": "짧은 가격"},
+            tuple(prefixed),
+            ("store.price", "store.price.short"),
         )
+
+        for consumer in ("shared", "windows"):
+            with self.subTest(consumer=consumer), self.assertRaisesRegex(
+                tool.LocalizationError,
+                r"\$value is supported only for macOS keys",
+            ):
+                tool.flatten_locale_tree(
+                    {"store": {"price": {"$value": "가격", "short": "짧은 가격"}}},
+                    "fixture",
+                    consumer,
+                )
 
         with self.assertRaisesRegex(tool.LocalizationError, "invalid nested key"):
             tool.flatten_locale_tree(

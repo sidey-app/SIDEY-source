@@ -1362,6 +1362,9 @@
           "description": "Kies voor de app een licht, donker of systeemthema.",
           "light": "Licht",
           "system": "Windows-standaard",
+          "system_colors": {
+            "action": "Kleurinstellingen openen"
+          },
           "title": "Thema"
         },
         "update": {

@@ -1220,12 +1220,13 @@
                   <FontIcon FontSize="24" Glyph="&#xE790;" VerticalAlignment="Center" />
                   <StackPanel x:Name="ThemeDescription" Grid.Column="1" Spacing="4" VerticalAlignment="Center">
                     <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.theme.title}, Mode=OneWay}" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.theme.description}, Mode=OneWay}" TextWrapping="Wrap" />
                     <HyperlinkButton
                         Padding="0"
                         HorizontalAlignment="Left"
                         Command="{Binding OpenExternalLinkCommand}"
                         CommandParameter="ms-settings:colors"
-                        Content="{Binding Value, Source={i18n:I18n Key=settings.theme.description}, Mode=OneWay}" />
+                        Content="{Binding Value, Source={i18n:I18n Key=settings.theme.system_colors.action}, Mode=OneWay}" />
                   </StackPanel>
                   <ComboBox
                       x:Name="ThemeComboBox"

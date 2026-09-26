@@ -611,6 +611,9 @@
       "description": "選擇 App 的淺色、深色或系統主題。",
       "light": "淺色",
       "system": "跟隨 Windows",
+      "system_colors": {
+        "action": "開放色彩設定"
+      },
       "title": "主題"
     },
     "update": {

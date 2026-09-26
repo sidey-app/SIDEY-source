@@ -101,8 +101,9 @@ Windows 언어별 JSON mirror를 만든다. 각 플랫폼의 지원 언어와 fa
 plural 형식은 다를 수 있지만 생성된 bundle을 직접 고쳐 원본과 갈라지게 하지 않는다.
 아직 해당 플랫폼에서 제공하지 않는 언어도 완성된 플랫폼 번역을 locale 원본에 보관하며,
 `ui-localizations.json`의 consumer 목록에 포함되기 전에는 bundle로 내보내지 않는다.
-하나의 semantic key가 자체 값과 하위 key를 함께 가지는 경우 자체 값은 `$value`에 두고,
-macOS 복수형은 `one`과 `other`를 같은 leaf에 둔다.
+macOS 전용 semantic key가 자체 값과 하위 key를 함께 가지는 경우 자체 값은 `$value`에 두고,
+macOS 복수형은 `one`과 `other`를 같은 leaf에 둔다. shared와 Windows key에서는 `$value`를
+사용하지 않는다.
 개발 빌드와 검토 도구에서만 쓰는 문구는
 [`assets/v1/locale/internal/`](../assets/v1/locale/internal/)이 별도로 소유한다. 생성기는
 macOS `InternalLocalizable.xcstrings`와 Windows `InternalLangs`를 만들며, 두 산출물은

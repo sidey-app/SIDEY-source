@@ -577,6 +577,9 @@
           "description": "Scegli per l'app il tema chiaro, scuro o di sistema.",
           "light": "Chiaro",
           "system": "Predefinito di Windows",
+          "system_colors": {
+            "action": "Apri le impostazioni colore"
+          },
           "title": "Tema"
         },
         "update": {

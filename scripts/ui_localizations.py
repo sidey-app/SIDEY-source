@@ -144,6 +144,10 @@ def flatten_locale_tree(value: Any, label: str, consumer: str) -> dict[str, Any]
         if not node and prefix:
             raise LocalizationError(f"{label}.{prefix}: empty object is not allowed")
         if "$value" in node:
+            if consumer != "macos":
+                raise LocalizationError(
+                    f"{label}.{prefix}: $value is supported only for macOS keys"
+                )
             add(prefix, node["$value"])
         for key, child in node.items():
             if key == "$value":

@@ -1362,6 +1362,9 @@
           "description": "Zvolte světlý, tmavý nebo systémový motiv aplikace.",
           "light": "Světlý",
           "system": "Výchozí nastavení Windows",
+          "system_colors": {
+            "action": "Otevřít nastavení barev"
+          },
           "title": "Motiv"
         },
         "update": {
