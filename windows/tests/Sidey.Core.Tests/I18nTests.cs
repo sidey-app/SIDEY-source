@@ -7,12 +7,12 @@ public sealed class I18nTests
     [Fact]
     public void LoadsNestedKoreanCatalogByDottedKey()
     {
-        const string key = "onboarding.tagline";
+        const string Key = "onboarding.tagline";
 
-        string value = I18n.Get(key);
+        string value = I18n.Get(Key);
 
         Assert.False(string.IsNullOrWhiteSpace(value));
-        Assert.NotEqual(key, value);
+        Assert.NotEqual(Key, value);
     }
 
     [Theory]
