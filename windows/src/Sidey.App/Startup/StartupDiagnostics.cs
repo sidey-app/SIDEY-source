@@ -431,8 +431,8 @@ internal static class StartupDiagnostics
 
         _ = NativeMethods.MessageBox(
             nint.Zero,
-            I18n.Format("error.startupWithLog", s_logPath),
-            I18n.Get("error.fatalTitle"),
+            I18n.Format("app.startup.failed_with_log", s_logPath),
+            I18n.Get("app.startup.error.title"),
             0x00000010u | 0x00000000u);
     }
 

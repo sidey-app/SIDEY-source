@@ -39,7 +39,7 @@ else:
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = ROOT / "release" / "app-store-localizations.json"
-DEFAULT_COMMERCE = ROOT / "assets" / "v1" / "commerce-localizations.json"
+DEFAULT_COMMERCE = ROOT / "assets" / "v1" / "locale" / "commerce"
 DEFAULT_CATALOG = ROOT / "assets" / "v1" / "commerce-catalog.json"
 APP_INFO_FIELDS = ("name", "subtitle", "privacyPolicyUrl")
 VERSION_FIELDS = ("description", "keywords", "supportUrl", "whatsNew")

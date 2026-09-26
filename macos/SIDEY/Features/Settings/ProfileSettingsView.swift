@@ -26,7 +26,7 @@ struct ProfileSettingsView: View {
             systemImage: "person.crop.circle"
         ) {
             SettingsControlRow(
-                title: "profile.nickname.title",
+                title: "profile.nickname.label",
                 description: "profile.nickname.description"
             ) {
                 TextField("profile.nickname.placeholder", text: $model.nickname)
@@ -39,7 +39,7 @@ struct ProfileSettingsView: View {
             }
             Divider()
             VStack(alignment: .leading, spacing: 6) {
-                Text("profile.character.title")
+                Text("profile.character.label")
                     .font(.headline)
                 Text("profile.character.description")
                     .font(.subheadline)
@@ -242,7 +242,7 @@ struct ProfileCosmeticTile: View {
     }
 
     private var accessibilityValue: LocalizedStringResource {
-        if isPending { return "profile.cosmetics.state.applying" }
+        if isPending { return "profile.applying" }
         return isSelected
             ? "profile.selection.state.selected"
             : "profile.selection.state.not_selected"

@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "scripts/macos/open_current.shで開き直すか、Xcodeでビルドして実行してください。",
+          "unverified_source": "現在のソースからビルドされたアプリか確認できません。"
+        }
+      },
+      "common": {
+        "quit": "終了"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "SIDEY_SUPABASE_URLとSIDEY_SUPABASE_PUBLISHABLE_KEYの両方を設定してください。",
+          "missing_development_configuration": "Sidey-devにはSIDEY-stagingのURLとpublishable keyが必要です。",
+          "production_backend_in_development": "Sidey-devは本番環境のSupabaseプロジェクトに接続できません。",
+          "secret_key_not_allowed": "クライアントではSupabaseのsecret/service-roleキーを使用できません。",
+          "unsupported_realtime_protocol": "SIDEYのリアルタイムプロトコル設定に対応していない値が指定されています。"
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "未コミットの変更"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "ストア確認・キャプチャ失敗",
+          "ownership": {
+            "$value": "所有状態",
+            "all": "両方",
+            "character": "キャラクターのみ",
+            "keepsake": "アイテムのみ",
+            "none": "未所有"
+          },
+          "product": "商品",
+          "purchase_disabled": "確認用画面では実際の購入は行いません。",
+          "window": {
+            "title": "Sidey-dev・ストア確認・実購入なし"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "サーバー環境変数が設定されていないため、12体のキャラクターを使ったローカルプレビューで実行しています。"
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "計測用レンダラーが動作していません。",
+          "not_started": "計測用レンダラーが起動していません。"
+        },
+        "export": {
+          "action": "現在の指標をJSONで保存",
+          "failed": "指標の保存に失敗しました：{0}",
+          "path": "保存先：{0}",
+          "success": "現在の指標をJSONで保存しました。手動検証はnot_runのままです。",
+          "tooltip": "現在の描画パフォーマンス指標をJSONで保存します。"
+        },
+        "preview_notice": "内部検証用のハムスター限定レンダリング計測モードです。手動検証はまだ記録されていません。",
+        "samples": {
+          "empty": "計測データなし"
+        },
+        "summary": "経過 {0:F0}秒 · {1}サンプル · 最大フレーム {2:F2}ms · メモリ {3:F1}MB（最大 {4:F1}MB） · GDI {5} · USER {6}",
+        "title": "内部レンダリング指標"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Supabaseの上書き設定にはHTTPS（localhostはHTTP可）のURLと公開可能キーが必要です。シークレットキーとservice-roleキーは使用できません。"
+        }
+      }
+    }
+  }
+}

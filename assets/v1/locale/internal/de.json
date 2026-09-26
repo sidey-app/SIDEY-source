@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+        "relaunch_instructions": "Öffne die App erneut mit scripts/macos/open_current.sh oder erstelle und starte sie in Xcode.",
+          "unverified_source": "Es konnte nicht überprüft werden, ob diese App aus dem aktuellen Quellcode erstellt wurde."
+        }
+      },
+      "common": {
+        "quit": "Beenden"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Lege SIDEY_SUPABASE_URL und SIDEY_SUPABASE_PUBLISHABLE_KEY fest.",
+          "missing_development_configuration": "Sidey-dev benötigt die SIDEY-staging-URL und einen publishable key.",
+          "production_backend_in_development": "Sidey-dev kann keine Verbindung mit dem Supabase-Produktionsprojekt herstellen.",
+          "secret_key_not_allowed": "Ein Supabase secret key oder service-role key darf nicht im Client verwendet werden.",
+          "unsupported_realtime_protocol": "Die Einstellung des SIDEY-Echtzeitprotokolls enthält einen nicht unterstützten Wert."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Nicht committete Änderungen"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Store-Überprüfung · Aufnahme fehlgeschlagen",
+          "ownership": {
+            "$value": "Besitz",
+            "all": "Beide",
+            "character": "Nur Charakter",
+            "keepsake": "Nur Lieblingsstück",
+            "none": "Keines"
+          },
+          "product": "Produkt",
+          "purchase_disabled": "Dieser Überprüfungsbildschirm führt niemals echte Käufe durch.",
+          "window": {
+            "title": "Sidey-dev · Store-Überprüfung · Keine echten Käufe"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Da keine Serverumgebungsvariablen festgelegt sind, läuft eine lokale Vorschau mit 12 Figuren."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "Der Metrikrenderer wird nicht ausgeführt.",
+          "not_started": "Der Metrikrenderer wurde nicht gestartet."
+        },
+        "export": {
+          "action": "Aktuelle Metriken als JSON exportieren",
+          "failed": "Fehler beim Exportieren der Metriken: {0}",
+          "path": "Exportpfad: {0}",
+          "success": "Aktuelle Metriken wurden als JSON exportiert. Manuelle Ergebnisse bleiben auf not_run.",
+          "tooltip": "Aktuelle Rendering-Leistungsmetriken als JSON speichern."
+        },
+        "preview_notice": "Interner, auf den Hamster beschränkter Metrikmodus des Renderers. Die manuelle Überprüfung wurde nicht aufgezeichnet.",
+        "samples": {
+          "empty": "Keine Metrikbeispiele"
+        },
+        "summary": "Dauer {0:F0} s · {1} Beispiele · max. Frame {2:F2} ms · Arbeitssatz {3:F1} MB (Spitze {4:F1} MB) · GDI {5} · USER {6}",
+        "title": "Interne Renderermetriken"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Eine Supabase-Überschreibung erfordert eine HTTPS-URL (oder HTTP auf localhost) und einen veröffentlichbaren Schlüssel. Secret- und Service-Role-Schlüssel sind nicht zulässig."
+        }
+      }
+    }
+  }
+}

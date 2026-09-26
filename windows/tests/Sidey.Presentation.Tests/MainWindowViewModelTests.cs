@@ -105,7 +105,7 @@ public sealed class MainWindowViewModelTests
         await model.ExportDiagnosticDataCommand.ExecuteAsync(null);
 
         Assert.Equal(NoticeKind.Error, notice?.Kind);
-        Assert.Equal("진단 데이터를 내보내지 못했습니다.", notice?.Message);
+        Assert.Equal("진단 데이터를 내보내지 못했습니다. 다시 시도해 주세요.", notice?.Message);
         Assert.True(model.ExportDiagnosticDataCommand.CanExecute(null));
     }
     [Fact]
@@ -320,7 +320,7 @@ public sealed class MainWindowViewModelTests
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("fr-FR");
             Sidey.Core.Localization.I18n.SetLanguage(language);
             Assert.Equal(language, Sidey.Core.Localization.I18n.Culture.Name);
-            string text = Sidey.Core.Localization.I18n.Format("metrics.summary", 1, 2, 3.5, 4.5, 5.5, 6, 7);
+            string text = Sidey.Core.Localization.I18n.Format("renderer_metrics.summary", 1, 2, 3.5, 4.5, 5.5, 6, 7);
             Assert.Contains(expected, text, StringComparison.Ordinal);
             Assert.DoesNotContain(unexpected, text, StringComparison.Ordinal);
             Assert.Equal("fr-FR", System.Globalization.CultureInfo.CurrentCulture.Name);
@@ -359,21 +359,18 @@ public sealed class MainWindowViewModelTests
             var history = new HistoryWindowViewModel(coordinator);
             await history.ActivateAsync();
 
-            foreach (string language in new[]
-            {
-                "ko-KR", "en-US", "ja-JP", "zh-CN", "zh-TW", "uk-UA", "ru-RU", "ko-KR",
-            })
+            foreach (string language in Sidey.Core.Localization.I18n.SupportedLanguages.Append("ko-KR"))
             {
                 Sidey.Core.Localization.I18n.SetLanguage(language);
                 main.RefreshLocalizedText();
                 history.RefreshLocalizedText();
                 string display = daysAgo switch
                 {
-                    0 => Sidey.Core.Localization.I18n.Format("settings.updateCheckedToday", timestamp.ToString("t", systemCulture)),
-                    1 => Sidey.Core.Localization.I18n.Format("settings.updateCheckedYesterday", timestamp.ToString("t", systemCulture)),
+                    0 => Sidey.Core.Localization.I18n.Format("settings.update.last_checked.today", timestamp.ToString("t", systemCulture)),
+                    1 => Sidey.Core.Localization.I18n.Format("settings.update.last_checked.yesterday", timestamp.ToString("t", systemCulture)),
                     _ => timestamp.ToString("g", systemCulture),
                 };
-                Assert.Equal(Sidey.Core.Localization.I18n.Format("settings.updateLastChecked", display), main.LastUpdateCheckText);
+                Assert.Equal(Sidey.Core.Localization.I18n.Format("settings.update.last_checked.value", display), main.LastUpdateCheckText);
                 Assert.Equal(messageTimestamp.ToString("g", systemCulture), Assert.Single(history.Items).LocalTimeText);
                 Assert.Same(systemCulture, CultureInfo.CurrentCulture);
             }
@@ -402,10 +399,7 @@ public sealed class MainWindowViewModelTests
         string previous = Sidey.Core.Localization.I18n.Language;
         try
         {
-            foreach (string language in new[]
-            {
-                "en-US", "ja-JP", "zh-CN", "zh-TW", "uk-UA", "ru-RU", "ko-KR",
-            })
+            foreach (string language in Sidey.Core.Localization.I18n.SupportedLanguages.Skip(1).Append("ko-KR"))
             {
                 Sidey.Core.Localization.I18n.SetLanguage(language);
                 viewModel.RefreshLocalizedText();
@@ -415,11 +409,11 @@ public sealed class MainWindowViewModelTests
                 Assert.All(viewModel.StoreProducts, item =>
                 {
                     Assert.False(string.IsNullOrWhiteSpace(item.Description));
-                    Assert.DoesNotContain("store.productDescriptions.", item.Description, StringComparison.Ordinal);
-                    Assert.DoesNotContain("store.product.", item.DisplayName, StringComparison.Ordinal);
+                    Assert.DoesNotContain("store.catalog.", item.Description, StringComparison.Ordinal);
+                    Assert.DoesNotContain("store.catalog.", item.DisplayName, StringComparison.Ordinal);
                 });
                 Assert.Equal(PixelCharacterCatalog.Get(character.Id).DisplayName, character.DisplayName);
-                Assert.Equal(Sidey.Core.Localization.I18n.Get("profile.defaultBubble"), bubble.DisplayName);
+                Assert.Equal(Sidey.Core.Localization.I18n.Get("profile.cosmetics.bubble.default"), bubble.DisplayName);
                 Assert.Equal("draft", viewModel.Nickname);
                 Assert.Equal("ABCDEF", viewModel.InviteCode);
                 Assert.Equal("room draft", viewModel.CreateRoomName);
@@ -430,14 +424,12 @@ public sealed class MainWindowViewModelTests
         finally { Sidey.Core.Localization.I18n.SetLanguage(previous); }
     }
 
+    public static IEnumerable<object[]> SupportedLanguageSelections =>
+        Sidey.Core.Localization.I18n.SupportedLanguages
+            .Select((language, index) => new object[] { index, language });
+
     [Theory]
-    [InlineData(0, "ko-KR")]
-    [InlineData(1, "en-US")]
-    [InlineData(2, "ja-JP")]
-    [InlineData(3, "zh-CN")]
-    [InlineData(4, "zh-TW")]
-    [InlineData(5, "uk-UA")]
-    [InlineData(6, "ru-RU")]
+    [MemberData(nameof(SupportedLanguageSelections))]
     public void LanguageSelectionIsRestoredWithoutSavingAndPersistsUserChoice(int index, string language)
     {
         (FakeSideyCoordinator coordinator, CoordinatorState state) = CreateRoomState();
@@ -500,7 +492,7 @@ public sealed class MainWindowViewModelTests
 
         viewModel.BeginHotkeyRecording(GlobalHotkeyAction.ToggleOverlay);
         Assert.True(viewModel.IsHotkeyRecording(GlobalHotkeyAction.ToggleOverlay));
-        Assert.Contains(I18n.Get("settings.hotkeyRecording"), viewModel.OverlayHotkeyAccessibleName, StringComparison.Ordinal);
+        Assert.Contains(I18n.Get("settings.shortcuts.recorder.recording"), viewModel.OverlayHotkeyAccessibleName, StringComparison.Ordinal);
         viewModel.AssignGlobalHotkey(
             GlobalHotkeyAction.ToggleOverlay,
             GlobalHotkeyBinding.FromLegacy(GlobalHotkeyKey.I));
@@ -725,7 +717,7 @@ public sealed class MainWindowViewModelTests
             Assert.Same(product, viewModel.StoreProducts[0]);
             Assert.Equal(serverPrice, product.AmountKrw);
             Assert.Equal(koreanPrice, product.FormattedPrice);
-            Assert.Equal($"{koreanPrice} 구매", product.ActionText);
+            Assert.Equal($"{koreanPrice}에 구매", product.ActionText);
             Assert.Equal(product.ActionText, product.DetailStatusText);
             Assert.Contains(nameof(StoreProductPreviewViewModel.FormattedPrice), changes);
             Assert.Contains(nameof(StoreProductPreviewViewModel.DetailStatusText), changes);
@@ -744,7 +736,7 @@ public sealed class MainWindowViewModelTests
 
             Assert.Equal(serverPrice, product.AmountKrw);
             Assert.Equal(koreanPrice, product.FormattedPrice);
-            Assert.Equal($"{koreanPrice} 구매", product.DetailStatusText);
+            Assert.Equal($"{koreanPrice}에 구매", product.DetailStatusText);
         }
         finally
         {
@@ -935,7 +927,7 @@ public sealed class MainWindowViewModelTests
 
         Assert.Same(firstCard, Assert.Single(viewModel.Rooms));
         Assert.True(viewModel.IsConnected);
-        Assert.Equal("서버와 연결됨", viewModel.ConnectionText);
+        Assert.Equal("연결됨", viewModel.ConnectionText);
     }
 
     [Fact]
@@ -1006,7 +998,7 @@ public sealed class MainWindowViewModelTests
             new FakeUpdateService());
 
         Assert.False(viewModel.IsConnected);
-        Assert.Equal("서버와 연결 안 됨", viewModel.ConnectionText);
+        Assert.Equal("연결되지 않음", viewModel.ConnectionText);
     }
 
     [Fact]
@@ -1901,7 +1893,7 @@ public sealed class MainWindowViewModelTests
         RoomCardViewModel target = viewModel.Rooms.Single(room => room.Room.Id == targetRoomId);
         RoomCardViewModel active = viewModel.Rooms.Single(room => room.Room.Id == state.ActiveRoomId);
         Assert.True(target.IsSwitching);
-        Assert.Equal("연결 중…", target.JoinActionText);
+        Assert.Equal("그룹 전환 중…", target.JoinActionText);
         Assert.False(target.IsJoinEnabled);
         Assert.False(active.IsSwitching);
         Assert.False(viewModel.AreGroupMutationsEnabled);
@@ -1912,9 +1904,9 @@ public sealed class MainWindowViewModelTests
     }
 
     [Theory]
-    [InlineData(GroupOperation.Creating, "만드는 중…", "코드로 참여")]
+    [InlineData(GroupOperation.Creating, "만드는 중…", "초대 코드로 참여")]
     [InlineData(GroupOperation.Joining, "그룹 만들기", "참여 중…")]
-    [InlineData(GroupOperation.Mutating, "그룹 만들기", "코드로 참여")]
+    [InlineData(GroupOperation.Mutating, "그룹 만들기", "초대 코드로 참여")]
     public void CreateAndJoinOperationsExposeProgressCopy(
         GroupOperation operation,
         string createText,

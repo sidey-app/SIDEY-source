@@ -33,8 +33,8 @@ public sealed partial class StoreProductPreviewViewModel : ObservableObject
     }
 
     public StoreProductPreviewViewModel? RelatedKeepsake { get; internal set; }
-    public string DetailStatusText => IsOwned ? I18n.Get("store.owned")
-        : IsPreviewOnlyVisible ? I18n.Get("store.comingSoon") : ActionText;
+    public string DetailStatusText => IsOwned ? I18n.Get("store.purchase.owned")
+        : IsPreviewOnlyVisible ? I18n.Get("store.availability.coming_soon.title") : ActionText;
 
     public bool IsKeepsake { get; }
     public string ProductId { get; }
@@ -74,7 +74,7 @@ public sealed partial class StoreProductPreviewViewModel : ObservableObject
     public void Apply(CommerceProductState state, bool commerceEnabled, bool isOwned)
     {
         AmountKrw = state.Product.AmountKrw;
-        FormattedPrice = I18n.Format("store.priceKrw", AmountKrw);
+        FormattedPrice = I18n.Format("store.price.krw", AmountKrw);
         IsPreviewOnlyVisible = !commerceEnabled;
         IsOwned = isOwned;
         IsWorking = state.IsWorking;
@@ -89,17 +89,17 @@ public sealed partial class StoreProductPreviewViewModel : ObservableObject
                 or CommercePurchaseState.Error);
         bool actionAvailabilityChanged = IsActionEnabled != isActionEnabled;
         IsActionEnabled = isActionEnabled;
-        ActionText = isOwned ? I18n.Get("store.owned") : state.PurchaseState switch
+        ActionText = isOwned ? I18n.Get("store.purchase.owned") : state.PurchaseState switch
         {
-            CommercePurchaseState.Unavailable when commerceEnabled => I18n.Get("store.retry"),
-            CommercePurchaseState.GoogleConnectionRequired => I18n.Get("store.retry"),
+            CommercePurchaseState.Unavailable when commerceEnabled => I18n.Get("store.status.retry"),
+            CommercePurchaseState.GoogleConnectionRequired => I18n.Get("store.status.retry"),
             CommercePurchaseState.Available or CommercePurchaseState.Refunded =>
-                I18n.Format("store.purchase", FormattedPrice),
-            CommercePurchaseState.OpeningCheckout => I18n.Get("store.openingCheckout"),
-            CommercePurchaseState.Confirming => I18n.Get("store.confirming"),
-            CommercePurchaseState.Owned => I18n.Get("store.owned"),
-            CommercePurchaseState.Error => I18n.Get("store.retry"),
-            _ => I18n.Get("store.comingSoon"),
+                I18n.Format("store.purchase.action", FormattedPrice),
+            CommercePurchaseState.OpeningCheckout => I18n.Get("store.checkout.opening"),
+            CommercePurchaseState.Confirming => I18n.Get("store.purchase.confirming"),
+            CommercePurchaseState.Owned => I18n.Get("store.purchase.owned"),
+            CommercePurchaseState.Error => I18n.Get("store.status.retry"),
+            _ => I18n.Get("store.availability.coming_soon.title"),
         };
         if (actionAvailabilityChanged)
         {

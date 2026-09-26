@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Supabaseの上書き設定にはHTTPS（localhostはHTTP可）のURLと公開可能キーが必要です。シークレットキーとservice-roleキーは使用できません。"
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "サーバー環境変数が設定されていないため、12体のキャラクターを使ったローカルプレビューで実行しています。"
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "計測用レンダラーが動作していません。",
+      "not_started": "計測用レンダラーが起動していません。"
+    },
+    "export": {
+      "action": "現在の指標をJSONで保存",
+      "failed": "指標の保存に失敗しました：{0}",
+      "path": "保存先：{0}",
+      "success": "現在の指標をJSONで保存しました。手動検証はnot_runのままです。",
+      "tooltip": "現在の描画パフォーマンス指標をJSONで保存します。"
+    },
+    "preview_notice": "内部検証用のハムスター限定レンダリング計測モードです。手動検証はまだ記録されていません。",
+    "samples": {
+      "empty": "計測データなし"
+    },
+    "summary": "経過 {0:F0}秒 · {1}サンプル · 最大フレーム {2:F2}ms · メモリ {3:F1}MB（最大 {4:F1}MB） · GDI {5} · USER {6}",
+    "title": "内部レンダリング指標"
+  }
+}

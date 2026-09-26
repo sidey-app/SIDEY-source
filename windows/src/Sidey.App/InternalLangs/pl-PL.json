@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Nadpisanie ustawień Supabase wymaga adresu URL HTTPS (lub HTTP localhost) i klucza publicznego. Klucze tajne i klucze roli usługi są zabronione."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "Trwa lokalny podgląd z 12 postaciami, ponieważ nie skonfigurowano zmiennych środowiskowych serwera."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "Moduł pomiaru renderowania nie działa.",
+      "not_started": "Moduł pomiaru renderowania nie został uruchomiony."
+    },
+    "export": {
+      "action": "Eksportuj bieżące metryki do pliku JSON",
+      "failed": "Nie udało się wyeksportować metryk: {0}",
+      "path": "Ścieżka eksportu: {0}",
+      "success": "Bieżące metryki wyeksportowano do pliku JSON. Wynik ręcznej weryfikacji nadal ma stan not_run.",
+      "tooltip": "Zapisz bieżące metryki wydajności renderowania w pliku JSON."
+    },
+    "preview_notice": "Wewnętrzny tryb pomiaru renderowania tylko z chomikiem. Wynik ręcznej weryfikacji nie został jeszcze zapisany.",
+    "samples": {
+      "empty": "Brak próbek metryk"
+    },
+    "summary": "Czas: {0:F0} s · Próbki: {1} · Najdłuższa klatka: {2:F2} ms · Zestaw roboczy: {3:F1} MB (maks.: {4:F1} MB) · GDI: {5} · USER: {6}",
+    "title": "Wewnętrzne metryki renderowania"
+  }
+}

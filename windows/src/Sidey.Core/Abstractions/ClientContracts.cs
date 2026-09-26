@@ -34,7 +34,7 @@ public static class AnonymousSessionBootstrapper
         catch (Exception exception) when (hasStoredSession)
         {
             throw new SessionRecoveryException(
-                I18n.Get("auth.restoreFailed"),
+                I18n.Get("auth.session.restore_failed"),
                 exception);
         }
 
@@ -46,7 +46,7 @@ public static class AnonymousSessionBootstrapper
         if (hasStoredSession)
         {
             throw new SessionRecoveryException(
-                I18n.Get("auth.restoreFailed"));
+                I18n.Get("auth.session.restore_failed"));
         }
 
         return await auth.CreateAnonymousSessionAsync(cancellationToken).ConfigureAwait(false);

@@ -165,10 +165,10 @@ struct SettingsRootView: View {
 private extension SettingsPage {
     var localizedTitle: LocalizedStringResource {
         switch self {
-        case .profile: "settings.navigation.profile"
-        case .groups: "settings.navigation.groups"
-        case .store: "settings.navigation.store"
-        case .app: "settings.navigation.app"
+        case .profile: "profile.title"
+        case .groups: "groups.management.navigation_label"
+        case .store: "store.navigation_label"
+        case .app: "app.settings.navigation_label"
         }
     }
 }

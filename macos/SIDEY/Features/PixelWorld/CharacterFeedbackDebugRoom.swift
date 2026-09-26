@@ -70,7 +70,7 @@ final class CharacterFeedbackDebugRoom: NSWindowController, NSWindowDelegate {
         let sound = NSButton(checkboxWithTitle: "효과음 ON", target: self, action: #selector(toggleSound(_:)))
         sound.state = .on; sound.frame = CGRect(x: 635, y: 428, width: 150, height: 26)
         content.addSubview(sound)
-        let arming = NSButton(checkboxWithTitle: "더블 우클릭 후 던지기", target: self, action: #selector(toggleArming(_:)))
+        let arming = NSButton(checkboxWithTitle: "두 번 오른쪽 클릭한 후 던지기", target: self, action: #selector(toggleArming(_:)))
         arming.frame = CGRect(x: 635, y: 399, width: 220, height: 26)
         content.addSubview(arming)
         PixelWorldRendererPolicy.apply(to: spriteView)
@@ -104,7 +104,7 @@ final class CharacterFeedbackDebugRoom: NSWindowController, NSWindowDelegate {
         status.frame = CGRect(x: 490, y: 69, width: 390, height: 25)
         status.font = .monospacedDigitSystemFont(ofSize: 13, weight: .medium)
         content.addSubview(status)
-        addLabel("내 나무 우클릭: 정지/걷기 · 더블 우클릭: 던지기 준비 · 콩이 클릭/Space: 던지기 · 실제 방/소유권 변경 없음",
+        addLabel("내 나무 오른쪽 클릭: 정지/걷기 · 두 번 오른쪽 클릭: 던지기 준비 · 콩이 왼쪽 클릭/Space: 던지기 · 실제 방/소유권 변경 없음",
                  frame: CGRect(x: 24, y: 22, width: 860, height: 28), size: 12, to: content)
         applyMembers()
         ticker = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in

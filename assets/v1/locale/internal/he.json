@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "פתחו אותה שוב באמצעות scripts/macos/open_current.sh, או בנו והפעילו אותה מתוך Xcode.",
+          "unverified_source": "לא ניתן לוודא שהיישום הזה נבנה מקוד המקור הנוכחי."
+        }
+      },
+      "common": {
+        "quit": "יציאה"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "יש להגדיר גם את SIDEY_SUPABASE_URL וגם את SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Sidey-dev דורש את כתובת ה-URL של SIDEY-staging ואת ה-publishable key.",
+          "production_backend_in_development": "Sidey-dev אינו יכול להתחבר לפרויקט Supabase של סביבת הייצור.",
+          "secret_key_not_allowed": "אי אפשר להשתמש ב-Supabase secret key או ב-service-role key בלקוח.",
+          "unsupported_realtime_protocol": "הגדרת פרוטוקול זמן האמת של SIDEY מכילה ערך שאינו נתמך."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "שינויים שלא בוצע להם commit"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "בדיקת החנות · הצילום נכשל",
+          "ownership": {
+            "$value": "בעלות",
+            "all": "שניהם",
+            "character": "דמות בלבד",
+            "keepsake": "פריט אהוב בלבד",
+            "none": "ללא"
+          },
+          "product": "מוצר",
+          "purchase_disabled": "מסך הבדיקה הזה לעולם אינו מבצע רכישות אמיתיות.",
+          "window": {
+            "title": "Sidey-dev · בדיקת החנות · ללא רכישות אמיתיות"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "משתני הסביבה של השרת אינם מוגדרים, ולכן SIDEY פועל בתצוגה מקדימה מקומית עם 12 דמויות."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "מנוע הרינדור של המדדים אינו פועל.",
+          "not_started": "מנוע הרינדור של המדדים לא הופעל."
+        },
+        "export": {
+          "action": "ייצוא המדדים הנוכחיים כ-JSON",
+          "failed": "ייצוא המדדים נכשל: {0}",
+          "path": "נתיב הייצוא: {0}",
+          "success": "המדדים הנוכחיים יוצאו כ-JSON. התוצאות הידניות נשארות במצב not_run.",
+          "tooltip": "שמירת מדדי הביצועים הנוכחיים של הרינדור כ-JSON."
+        },
+        "preview_notice": "מצב מדדים פנימי של מנוע רינדור המוגבל לאוגר. אימות ידני לא תועד.",
+        "samples": {
+          "empty": "אין דגימות מדדים"
+        },
+        "summary": "חלפו {0:F0} שנ׳ · {1} דגימות · זמן מסגרת מרבי {2:F2} אלפיות שנ׳ · ערכת עבודה {3:F1} MB (שיא {4:F1} MB) · GDI {5} · USER {6}",
+        "title": "מדדי רינדור פנימיים"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "עקיפת Supabase חייבת לכלול כתובת URL מסוג HTTPS (או localhost באמצעות HTTP) ומפתח שניתן לפרסום. אסור להשתמש במפתח secret או service-role."
+        }
+      }
+    }
+  }
+}

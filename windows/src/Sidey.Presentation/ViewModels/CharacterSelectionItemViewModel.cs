@@ -27,7 +27,7 @@ public sealed partial class CharacterSelectionItemViewModel : ObservableObject
     public partial bool IsPending { get; set; }
 
     public string SelectionStatus => IsPending ? Sidey.Core.Localization.I18n.Get("profile.applying")
-        : IsSelected ? Sidey.Core.Localization.I18n.Get("profile.equipped") : string.Empty;
+        : IsSelected ? Sidey.Core.Localization.I18n.Get("profile.cosmetics.equipped") : string.Empty;
     public void RefreshSelectionStatus() => OnPropertyChanged(nameof(SelectionStatus));
     [ObservableProperty]
     public partial bool AnimationsEnabled { get; set; } = true;

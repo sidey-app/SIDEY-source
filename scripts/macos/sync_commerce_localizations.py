@@ -11,7 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 CATALOG_PATH = ROOT / "assets/v1/commerce-catalog.json"
-SOURCE_PATH = ROOT / "assets/v1/commerce-localizations.json"
+SOURCE_PATH = ROOT / "assets/v1/locale/commerce"
 BUNDLE_PATH = ROOT / "macos/SIDEY/Resources/Commerce/commerce-localizations.json"
 STOREKIT_PATH = ROOT / "macos/SIDEYAppStore.storekit"
 
@@ -31,7 +31,7 @@ def encoded(value: object) -> bytes:
 def expected_artifacts() -> tuple[bytes, bytes]:
     exporter = load_shared_exporter()
     catalog = exporter.read_json(CATALOG_PATH)
-    source = exporter.read_json(SOURCE_PATH)
+    source = exporter.read_source(SOURCE_PATH)
     exporter.validate_source(catalog, source)
 
     bundle = exporter.generated(catalog, source, "macos")

@@ -28,7 +28,7 @@ UI는 semantic localization key를 사용하고 날짜·수량·기간·가격�
 
 Commerce identity, 가격, entitlement와 정렬은 기존
 `assets/v1/commerce-catalog.json`을 유지한다. 네 언어의 상품 표시명, App Store IAP 설명과
-상세 설명은 별도 `assets/v1/commerce-localizations.json`을 원본으로 두고 앱, 웹, local
+상세 설명은 별도 `assets/v1/locale/commerce/{locale}.json`을 원본으로 두고 앱, 웹, local
 StoreKit과 App Store Connect 입력을 생성한다. StoreKit metadata를 우선하며 조회하지 못한
 상품은 bundle 번역을 표시하더라도 구매할 수 없다. Backend는 entitlement와 판매 상태만
 갱신하고 현지화 문구를 소유하지 않는다.

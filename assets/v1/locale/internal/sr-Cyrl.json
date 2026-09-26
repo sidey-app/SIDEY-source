@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Поново је отворите помоћу scripts/macos/open_current.sh или је направите и покрените из Xcode-а.",
+          "unverified_source": "Није могуће проверити да ли је ова апликација направљена из тренутног изворног кода."
+        }
+      },
+      "common": {
+        "quit": "Затвори"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Подесите SIDEY_SUPABASE_URL и SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Sidey-dev захтева SIDEY-staging URL и publishable key.",
+          "production_backend_in_development": "Sidey-dev не може да се повеже с продукционим Supabase пројектом.",
+          "secret_key_not_allowed": "Supabase secret key или service-role key не може да се користи у клијенту.",
+          "unsupported_realtime_protocol": "Подешавање SIDEY протокола у реалном времену садржи неподржану вредност."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Непотврђене измене"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Преглед продавнице · Снимање није успело",
+          "ownership": {
+            "$value": "Власништво",
+            "all": "Оба",
+            "character": "Само лик",
+            "keepsake": "Само омиљена ствар",
+            "none": "Ништа"
+          },
+          "product": "Производ",
+          "purchase_disabled": "Овај екран за преглед никада не обавља стварне куповине.",
+          "window": {
+            "title": "Sidey-dev · Преглед продавнице · Без стварних куповина"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Покренут је локални преглед са 12 ликова јер недостају променљиве окружења сервера."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "Модул за мерење рендеровања није покренут.",
+          "not_started": "Модул за мерење рендеровања није започет."
+        },
+        "export": {
+          "action": "Извези тренутне метрике у JSON",
+          "failed": "Метрике нису извезене: {0}",
+          "path": "Путања извоза: {0}",
+          "success": "Тренутне метрике су извезене у JSON. Резултат ручне провере и даље има статус not_run.",
+          "tooltip": "Сачувајте тренутне метрике перформанси рендеровања у JSON датотеци."
+        },
+        "preview_notice": "Интерни режим мерења рендеровања само с хрчком. Резултат ручне провере још није забележен.",
+        "samples": {
+          "empty": "Нема узорака метрика"
+        },
+        "summary": "Протекло: {0:F0} с · Узорци: {1} · Најдужи кадар: {2:F2} ms · Радни скуп: {3:F1} MB (највише: {4:F1} MB) · GDI: {5} · USER: {6}",
+        "title": "Интерне метрике рендеровања"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Замена подешавања за Supabase захтева HTTPS URL (или HTTP за localhost) и јавни кључ. Тајни кључеви и кључеви сервисне улоге су забрањени."
+        }
+      }
+    }
+  }
+}

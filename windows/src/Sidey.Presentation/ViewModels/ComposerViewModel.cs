@@ -141,7 +141,7 @@ public sealed partial class ComposerViewModel : ObservableObject, IDisposable
         {
             if (_disposed)
                 return;
-            string error = I18n.Format("error.messageSendFailed", exception.Message);
+            string error = I18n.Format("message.send.failed", exception.Message);
             if (roomId is { } failedRoom)
                 _errors[failedRoom] = error;
             if (_roomId == roomId)

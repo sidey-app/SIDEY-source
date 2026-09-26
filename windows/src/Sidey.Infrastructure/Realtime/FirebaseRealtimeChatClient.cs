@@ -31,7 +31,7 @@ internal sealed class FirebaseRealtimeChatException : Exception
         HttpStatusCode? statusCode = null)
         : base(code == "resource-exhausted"
             && classification == FirebaseRealtimeChatFailureClassification.KnownNonCommit
-                ? I18n.Get("error.chatRateLimited")
+                ? I18n.Get("message.send.rate_limited")
                 : classification == FirebaseRealtimeChatFailureClassification.KnownNonCommit
                     ? "Firebase realtime chat was rejected before commit."
                     : "Firebase realtime chat outcome is ambiguous.")

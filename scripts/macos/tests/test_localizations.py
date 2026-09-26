@@ -62,8 +62,12 @@ class LocalizationValidationTests(unittest.TestCase):
 
     def test_repository_catalog_covers_shipped_source_and_project_regions(self):
         strings = LOCALIZATIONS.load_and_validate_catalog()
+        internal_strings = LOCALIZATIONS.load_and_validate_catalog(
+            LOCALIZATIONS.INTERNAL_CATALOG
+        )
 
         LOCALIZATIONS.validate_key_coverage(strings)
+        LOCALIZATIONS.validate_internal_key_coverage(internal_strings)
         LOCALIZATIONS.validate_no_shipped_hangul()
         LOCALIZATIONS.validate_project_regions()
 

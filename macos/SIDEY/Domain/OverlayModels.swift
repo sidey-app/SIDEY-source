@@ -27,10 +27,10 @@ enum OverlayEdge: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .bottom: L10n.text("overlay.edge.bottom")
-        case .left: L10n.text("overlay.edge.left")
-        case .right: L10n.text("overlay.edge.right")
-        case .top: L10n.text("overlay.edge.top")
+        case .bottom: L10n.text("settings.placement.edge.bottom")
+        case .left: L10n.text("settings.placement.edge.left")
+        case .right: L10n.text("settings.placement.edge.right")
+        case .top: L10n.text("settings.placement.edge.top")
         }
     }
 

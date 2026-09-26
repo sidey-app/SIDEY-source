@@ -92,14 +92,92 @@ class GateTests(unittest.TestCase):
                 [".github/workflows/macos-build-and-tests.yml"],
             )
 
-    def test_shared_localization_source_owns_only_generated_windows_mirrors(self):
-        source = "assets/v1/ui-localizations.json"
-        mirror = "windows/src/Sidey.App/Langs/ko-KR.json"
-        self.assertEqual(validate_paths("shared/localization", [source, mirror]), "shared")
-        for paths in ([mirror], [source, "windows/src/Sidey.App/MainWindow.xaml"]):
+    def test_shared_localization_source_owns_only_required_platform_paths(self):
+        sources = [
+            "assets/v1/locale/client/ko.json",
+            "assets/v1/locale/commerce/ko.json",
+            "assets/v1/locale/internal/ko.json",
+        ]
+        mirrors = [
+            "windows/src/Sidey.App/Langs/ko-KR.json",
+            "windows/src/Sidey.App/InternalLangs/ko-KR.json",
+            "macos/SIDEY/Resources/Localizable.xcstrings",
+            "macos/SIDEY/Resources/InternalLocalizable.xcstrings",
+            "macos/SIDEY/Resources/Commerce/commerce-localizations.json",
+            "macos/SIDEYAppStore.storekit",
+        ]
+        adapter = "scripts/macos/sync_commerce_localizations.py"
+        self.assertEqual(
+            validate_paths(
+                "shared/localization",
+                [*sources, *mirrors, adapter],
+            ),
+            "shared",
+        )
+        for paths in (
+            [mirrors[0]],
+            [mirrors[1]],
+            [sources[0], "windows/src/Sidey.App/MainWindow.xaml"],
+        ):
             with self.subTest(paths=paths):
                 with self.assertRaisesRegex(WorkflowError, "platform boundary"):
                     validate_paths("shared/localization", paths)
+
+    def test_one_time_locale_source_split_can_update_both_native_consumers(self):
+        source = "assets/v1/locale/client/ko.json"
+        legacy_source = "assets/v1/commerce-localizations.json"
+        consumers = [
+            "macos/SIDEY/Domain/L10n.swift",
+            "windows/src/Sidey.Core/Localization/I18n.cs",
+        ]
+        root = Path(".")
+
+        with patch(
+            "sidey_tools.repository.git",
+            side_effect=[legacy_source, ""],
+        ) as git:
+            self.assertEqual(
+                validate_paths(
+                    "shared/locale-source-split",
+                    [source, legacy_source, *consumers],
+                    root=root,
+                    base="base",
+                    revision="head",
+                ),
+                "shared",
+            )
+        self.assertEqual(
+            git.call_args_list,
+            [
+                call(root, "ls-tree", "--name-only", "base", "--", legacy_source),
+                call(root, "ls-tree", "--name-only", "head", "--", legacy_source),
+            ],
+        )
+
+        invalid_cases = (
+            ([source, *consumers], None),
+            ([source, legacy_source, *consumers], None),
+            ([source, legacy_source, *consumers], [legacy_source, legacy_source]),
+            ([source, legacy_source, *consumers], ["", legacy_source]),
+        )
+        for paths, revisions in invalid_cases:
+            with self.subTest(paths=paths, revisions=revisions):
+                context = (
+                    patch("sidey_tools.repository.git", side_effect=revisions)
+                    if revisions is not None
+                    else patch("sidey_tools.repository.git")
+                )
+                with context, self.assertRaisesRegex(
+                    WorkflowError,
+                    "platform boundary",
+                ):
+                    validate_paths(
+                        "shared/locale-source-split",
+                        paths,
+                        root=root if revisions is not None else None,
+                        base="base" if revisions is not None else None,
+                        revision="head",
+                    )
 
     def test_renamed_platform_workflows_keep_their_ownership(self):
         expected_platforms = {

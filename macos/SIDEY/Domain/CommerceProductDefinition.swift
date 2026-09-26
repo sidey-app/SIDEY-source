@@ -26,7 +26,7 @@ struct CommerceProductDefinition: Decodable, Sendable {
     func product(localization: CommerceProductLocalization) -> CommerceProduct {
         let price = appStorePrice
         return CommerceProduct(id: id, displayName: localization.displayName,
-            description: localization.marketingDescription, kind: kind,
+            description: localization.description, kind: kind,
             catalogItemID: itemID, characterID: characterID, entitlementKey: entitlement,
             sortOrder: sortOrder, amountKRW: price, currency: "KRW", taxInclusive: true)
     }
@@ -34,13 +34,11 @@ struct CommerceProductDefinition: Decodable, Sendable {
 
 struct CommerceProductLocalization: Decodable, Equatable, Sendable {
     let displayName: String
-    let iapDescription: String
-    let marketingDescription: String
+    let description: String
 
     enum CodingKeys: String, CodingKey {
         case displayName = "display_name"
-        case iapDescription = "iap_description"
-        case marketingDescription = "marketing_description"
+        case description
     }
 }
 

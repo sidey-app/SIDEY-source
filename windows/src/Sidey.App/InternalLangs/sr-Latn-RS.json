@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Zamena podešavanja za Supabase zahteva HTTPS URL (ili HTTP za localhost) i javni ključ. Tajni ključevi i ključevi servisne uloge su zabranjeni."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "Pokrenut je lokalni pregled sa 12 likova jer nedostaju promenljive okruženja servera."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "Modul za merenje renderovanja nije pokrenut.",
+      "not_started": "Modul za merenje renderovanja nije započet."
+    },
+    "export": {
+      "action": "Izvezi trenutne metrike u JSON",
+      "failed": "Metrike nisu izvezene: {0}",
+      "path": "Putanja izvoza: {0}",
+      "success": "Trenutne metrike su izvezene u JSON. Rezultat ručne provere i dalje ima status not_run.",
+      "tooltip": "Sačuvajte trenutne metrike performansi renderovanja u JSON datoteci."
+    },
+    "preview_notice": "Interni režim merenja renderovanja samo s hrčkom. Rezultat ručne provere još nije zabeležen.",
+    "samples": {
+      "empty": "Nema uzoraka metrika"
+    },
+    "summary": "Proteklo: {0:F0} s · Uzorci: {1} · Najduži kadar: {2:F2} ms · Radni skup: {3:F1} MB (najviše: {4:F1} MB) · GDI: {5} · USER: {6}",
+    "title": "Interne metrike renderovanja"
+  }
+}

@@ -11,7 +11,12 @@ public static class I18n
     public const string DefaultLanguage = "ko-KR";
 
     public static IReadOnlyList<string> SupportedLanguages { get; } = Array.AsReadOnly(
-        [DefaultLanguage, "en-US", "ja-JP", "zh-CN", "zh-TW", "uk-UA", "ru-RU"]);
+        [
+            DefaultLanguage, "en-US", "ja-JP", "zh-CN", "zh-TW", "uk-UA", "ru-RU",
+            "it-IT", "pt-PT", "es-ES", "cs-CZ", "tr-TR", "ro-RO", "bg-BG", "pt-BR",
+            "sr-Cyrl-RS", "pl-PL", "sr-Latn-RS", "nl-BE", "fr-FR", "nl-NL", "he-IL",
+            "de-DE",
+        ]);
 
     private static readonly Lock s_syncRoot = new();
     private static IReadOnlyDictionary<string, string>? s_strings;
@@ -20,6 +25,7 @@ public static class I18n
 
     public static string Language => ResolveLanguage();
     public static CultureInfo Culture => CultureInfo.GetCultureInfo(Language);
+    public static bool IsRightToLeft => Culture.TextInfo.IsRightToLeft;
 
     public static string Get(string key)
     {
@@ -97,6 +103,71 @@ public static class I18n
         {
             return "ru-RU";
         }
+        if (requested.StartsWith("it", StringComparison.OrdinalIgnoreCase))
+        {
+            return "it-IT";
+        }
+        if (requested.StartsWith("pt-BR", StringComparison.OrdinalIgnoreCase))
+        {
+            return "pt-BR";
+        }
+        if (requested.StartsWith("pt", StringComparison.OrdinalIgnoreCase))
+        {
+            return "pt-PT";
+        }
+        if (requested.StartsWith("es", StringComparison.OrdinalIgnoreCase))
+        {
+            return "es-ES";
+        }
+        if (requested.StartsWith("cs", StringComparison.OrdinalIgnoreCase))
+        {
+            return "cs-CZ";
+        }
+        if (requested.StartsWith("tr", StringComparison.OrdinalIgnoreCase))
+        {
+            return "tr-TR";
+        }
+        if (requested.StartsWith("ro", StringComparison.OrdinalIgnoreCase))
+        {
+            return "ro-RO";
+        }
+        if (requested.StartsWith("bg", StringComparison.OrdinalIgnoreCase))
+        {
+            return "bg-BG";
+        }
+        if (requested.StartsWith("sr-Latn", StringComparison.OrdinalIgnoreCase))
+        {
+            return "sr-Latn-RS";
+        }
+        if (requested.StartsWith("sr", StringComparison.OrdinalIgnoreCase))
+        {
+            return "sr-Cyrl-RS";
+        }
+        if (requested.StartsWith("pl", StringComparison.OrdinalIgnoreCase))
+        {
+            return "pl-PL";
+        }
+        if (requested.StartsWith("nl-BE", StringComparison.OrdinalIgnoreCase))
+        {
+            return "nl-BE";
+        }
+        if (requested.StartsWith("nl", StringComparison.OrdinalIgnoreCase))
+        {
+            return "nl-NL";
+        }
+        if (requested.StartsWith("fr", StringComparison.OrdinalIgnoreCase))
+        {
+            return "fr-FR";
+        }
+        if (requested.StartsWith("he", StringComparison.OrdinalIgnoreCase)
+            || requested.StartsWith("iw", StringComparison.OrdinalIgnoreCase))
+        {
+            return "he-IL";
+        }
+        if (requested.StartsWith("de", StringComparison.OrdinalIgnoreCase))
+        {
+            return "de-DE";
+        }
 
         return DefaultLanguage;
     }
@@ -120,6 +191,17 @@ public static class I18n
         if (!string.Equals(language, DefaultLanguage, StringComparison.OrdinalIgnoreCase))
         {
             LoadFile(Path.Combine(root, $"{language}.json"), catalog);
+        }
+
+        string? parent = Directory.GetParent(root)?.FullName;
+        if (parent is not null)
+        {
+            string internalRoot = Path.Combine(parent, "InternalLangs");
+            LoadFile(Path.Combine(internalRoot, $"{DefaultLanguage}.json"), catalog);
+            if (!string.Equals(language, DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+            {
+                LoadFile(Path.Combine(internalRoot, $"{language}.json"), catalog);
+            }
         }
 
         return catalog;

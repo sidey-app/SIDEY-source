@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Open de toepassing opnieuw met scripts/macos/open_current.sh of bouw en start ze vanuit Xcode.",
+          "unverified_source": "Er kon niet worden nagegaan of deze toepassing vanuit de huidige broncode is gebouwd."
+        }
+      },
+      "common": {
+        "quit": "Stop"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Stel SIDEY_SUPABASE_URL en SIDEY_SUPABASE_PUBLISHABLE_KEY allebei in.",
+          "missing_development_configuration": "Sidey-dev heeft de SIDEY-staging-URL en een publishable key nodig.",
+          "production_backend_in_development": "Sidey-dev kan geen verbinding maken met het productieproject van Supabase.",
+          "secret_key_not_allowed": "Een Supabase secret key of service-role key mag niet in de client worden gebruikt.",
+          "unsupported_realtime_protocol": "De instelling voor het realtime SIDEY-protocol bevat een niet-ondersteunde waarde."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Niet-vastgelegde wijzigingen"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Storecontrole · Opname mislukt",
+          "ownership": {
+            "$value": "In bezit",
+            "all": "Allebei",
+            "character": "Alleen personage",
+            "keepsake": "Alleen dierbaar aandenken",
+            "none": "Geen"
+          },
+          "product": "Product",
+          "purchase_disabled": "Op dit controlescherm worden nooit echte aankopen gedaan.",
+          "window": {
+            "title": "Sidey-dev · Storecontrole · Geen echte aankopen"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "De lokale voorvertoning met 12 personages wordt uitgevoerd omdat de omgevingsvariabelen voor de server ontbreken."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "De metriekrenderer wordt niet uitgevoerd.",
+          "not_started": "De metriekrenderer is niet gestart."
+        },
+        "export": {
+          "action": "Huidige metriekgegevens als JSON exporteren",
+          "failed": "Exporteren van metriekgegevens is mislukt: {0}",
+          "path": "Exportpad: {0}",
+          "success": "Huidige metriekgegevens zijn als JSON geëxporteerd. Handmatige resultaten blijven not_run.",
+          "tooltip": "Huidige prestatiemetriek van de renderer als JSON opslaan."
+        },
+        "preview_notice": "Interne metriekmodus met alleen de hamster. Handmatige verificatie is niet vastgelegd.",
+        "samples": {
+          "empty": "Geen metriekvoorbeelden"
+        },
+        "summary": "Verstreken {0:F0} s · {1} voorbeelden · maximale frametijd {2:F2} ms · werkset {3:F1} MB (piek {4:F1} MB) · GDI {5} · USER {6}",
+        "title": "Interne renderermetriek"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "De Supabase-override moet een HTTPS-URL (of localhost via HTTP) en een publiceerbare sleutel bevatten. Geheime sleutels en service-role-sleutels zijn niet toegestaan."
+        }
+      }
+    }
+  }
+}

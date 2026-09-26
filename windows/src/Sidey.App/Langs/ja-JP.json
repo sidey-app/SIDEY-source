@@ -1,630 +1,954 @@
 {
-  "about": {
-    "accountDescription": "ログアウトまたはSIDEYアカウントの管理ができます。",
-    "accountTitle": "アカウント",
-    "deleteAccount": "アカウントを削除",
-    "deleteAccountBody": "プロフィール、グループとのつながり、SIDEY利用権との関連付けが完全に削除されます。購入のキャンセルや返金は別途申請してください。",
-    "deleteAccountContinue": "続ける",
-    "deleteAccountDescription": "SIDEYアカウントと関連する個人データを完全に削除します。",
-    "deleteAccountFinalBody": "削除したSIDEYアカウントとデータは復元できません。",
-    "deleteAccountFinalTitle": "アカウントを完全に削除しますか？",
-    "deleteAccountPrimary": "アカウントを削除",
-    "deleteAccountTitle": "SIDEYアカウントを削除しますか？",
-    "description": "SIDEYのバージョンとサポート情報を確認できます。",
-    "diagnosticsDescription": "ログファイルを圧縮してデスクトップに保存します。共有いただくと、不具合の修正に役立ちます。",
-    "diagnosticsExportFailed": "診断データをエクスポートできませんでした。",
-    "diagnosticsExported": "診断データをデスクトップに保存しました。",
-    "diagnosticsTitle": "診断データをエクスポート",
-    "exportDiagnostics": "エクスポート",
-    "feedbackDescription": "問題がある場合やサポートが必要な場合は、GitHub Issueを作成してお問い合わせいただけます。",
-    "feedbackTitle": "フィードバック",
-    "linkOpenFailed": "既定のブラウザーでページを開けませんでした。",
-    "policiesDescription": "SIDEYに適用される利用規約とポリシーを確認できます。",
-    "policiesTitle": "ポリシー",
-    "privacy": "プライバシーポリシーを見る",
-    "refund": "キャンセル・返金ポリシーを見る",
-    "sendFeedback": "フィードバックを送る",
-    "signOut": "ログアウト",
-    "signOutBody": "このPCでのみログアウトします。SIDEYを再び使用するにはGoogleでログインしてください。",
-    "signOutDescription": "このPCのSIDEYセッションを終了します。",
-    "signOutPrimary": "ログアウト",
-    "signOutTitle": "ログアウトしますか？",
-    "terms": "利用規約を見る",
-    "title": "情報"
+  "accessibility": {
+    "motion": {
+      "disabled": "Windowsのアニメーション効果がオフになっています。"
+    }
+  },
+  "account": {
+    "delete": {
+      "confirmation": {
+        "action": "アカウントを削除",
+        "message": "プロフィールとグループへの参加情報が完全に削除され、購入履歴とアカウントの連携が解除されます。",
+        "title": "アカウントを削除しますか？"
+      },
+      "description": "アカウントに関連付けられた個人データを完全に削除します。",
+      "final_confirmation": {
+        "message": "削除したアカウントとデータは復元できません。",
+        "title": "アカウントを完全に削除しますか？"
+      },
+      "title": "アカウントを削除"
+    },
+    "description": "ログアウトやアカウントの管理ができます。",
+    "sign_out": {
+      "confirmation": {
+        "action": "ログアウト",
+        "message": "このPCでのみログアウトします。再び使用するにはGoogleでログインしてください。",
+        "title": "ログアウトしますか？"
+      },
+      "description": "このPCでのみログアウトします。",
+      "title": "ログアウト"
+    },
+    "title": "アカウント"
+  },
+  "app": {
+    "info": {
+      "description": "バージョンとサポート情報を確認できます。",
+      "navigation_label": "情報",
+      "title": "情報"
+    },
+    "launch": {
+      "failed": "アプリを起動できませんでした。アプリを閉じて、もう一度お試しください。"
+    },
+    "startup": {
+      "error": {
+        "title": "SIDEY起動エラー"
+      },
+      "failed": "SIDEYを起動できませんでした。",
+      "failed_with_log": "SIDEYを起動できませんでした。\n\n診断ログ：{0}",
+      "runtime_missing": "起動に必要なファイルが見つかりません。SIDEYを再インストールしてください。"
+    }
   },
   "auth": {
-    "cannotReplaceStoredSession": "保存済みセッションがあるため、新しい匿名アカウントを作成できません。",
-    "emptyResponse": "Supabaseの認証応答が空です。",
-    "googleAlreadyLinked": "この Google アカウントはすでに SIDEY プロフィールに連携されています。現在のプロフィールとデータは変更されていません。",
-    "googleCancelled": "Googleログインがキャンセルされたか、完了できませんでした。もう一度お試しください。",
-    "googleRequired": "SIDEYを利用するにはGoogleとの連携が必要です。",
-    "googleSignInComplete": "Googleログインが完了しました。ブラウザーのログインタブを閉じてもかまいません。",
-    "identityChanged": "Google連携後にSIDEYのユーザーIDが変わったため、セッションを保存しませんでした。",
-    "identityLinkExpired": "Googleログインのリクエストが期限切れです。ログインをキャンセルして、もう一度お試しください。",
-    "invalidStoredSession": "保存済みのSIDEYセッションを読み取れませんでした。",
-    "missingSessionValues": "Supabaseの認証応答に必要なセッション情報がありません。",
-    "requestFailed": "SIDEYの認証に失敗しました。HTTP {0}。",
-    "restoreFailed": "SIDEYの既存セッションを復元できませんでした。新しいアカウントは自動作成されません。",
-    "sessionMissing": "Supabaseのセッションがありません。"
+    "google": {
+      "already_linked": "このGoogleアカウントはすでに現在のプロフィールに連携されています。プロフィールとデータは変更されていません。",
+      "cancelled": "Googleログインがキャンセルされたか、完了できませんでした。もう一度お試しください。",
+      "identity_changed": "このGoogleアカウントは、現在のアカウントに連携されているものと異なります。既存のプロフィールとデータは変更されていません。",
+      "link_expired": "Googleログインのリクエストが期限切れです。ログインをキャンセルして、もう一度お試しください。",
+      "required": "Googleアカウントを連携してください。",
+      "sign_in_complete": "Googleログインが完了しました。ブラウザーのログインタブを閉じてもかまいません。"
+    },
+    "request": {
+      "failed": "ログインできませんでした。しばらくしてから、もう一度お試しください。（エラーコード：{0}）"
+    },
+    "response": {
+      "empty": "ログインを完了できませんでした。もう一度お試しください。"
+    },
+    "session": {
+      "expired": "ログインの有効期限が切れました。もう一度ログインしてください。",
+      "replace_blocked": "このPCにはログイン情報が残っています。アプリを再起動してから、もう一度ログインしてください。",
+      "restore_failed": "以前のログインを復元できませんでした。新しいアカウントは作成されていません。もう一度ログインしてください。",
+      "stored_invalid": "保存済みのログイン情報を読み取れませんでした。もう一度ログインしてください。",
+      "values_missing": "ログインを完了できませんでした。もう一度お試しください。"
+    }
   },
-  "backend": {
-    "createdRoomMissing": "作成したグループがサーバーのデータに見つかりません。",
-    "emptyInviteCode": "新しい招待コードが空です。",
-    "expiredMessagesFailed": "期限切れメッセージを再読み込みできませんでした：{0}",
-    "invalidOverride": "Supabaseの上書き設定にはHTTPS（localhostはHTTP可）のURLと公開可能キーが必要です。シークレットキーとservice-roleキーは使用できません。",
-    "joinFailed": "グループに参加できませんでした：{0}",
-    "joinRoomIdMissing": "参加応答にroom_idがありません。",
-    "joinedRoomMissing": "参加したグループがサーバーのデータに見つかりません。",
-    "messageRecheckFailed": "RLSによるメッセージの再確認に失敗しました：{0}",
-    "realtimeEpochMissing": "接続したグループのRealtime epochがありません。",
-    "realtimeResyncFailed": "リアルタイム状態の再同期に失敗しました：{0}",
-    "realtimeUnavailable": "Supabaseのリアルタイム接続を利用できません。",
-    "roomSnapshotFailed": "グループのデータを再読み込みできませんでした：{0}"
-  },
-  "characters": {
-    "cat": "子ねこ",
-    "chinchilla": "こどもチンチラ",
-    "dog": "子いぬ",
-    "guineaPig": "こどもモルモット",
-    "hamster": "ちびハムスター",
-    "monkey": "こざる",
-    "otter": "こどもカワウソ",
-    "penguin": "ペンギンのヒナ",
-    "pig": "こぶた",
-    "rabbit": "子うさぎ",
-    "starlightUpalupa": "星明かりのウーパールーパー",
-    "tree": "小さな木"
+  "character": {
+    "pixel_cat": {
+      "display_name": "子猫"
+    },
+    "pixel_chinchilla": {
+      "display_name": "こどもチンチラ"
+    },
+    "pixel_duck": {
+      "display_name": "アヒル"
+    },
+    "pixel_guinea_pig": {
+      "display_name": "こどもモルモット"
+    },
+    "pixel_hamster": {
+      "display_name": "ハムスターの赤ちゃん"
+    },
+    "pixel_monkey": {
+      "display_name": "こざる"
+    },
+    "pixel_otter": {
+      "display_name": "こどもカワウソ"
+    },
+    "pixel_penguin": {
+      "display_name": "ペンギンのひな"
+    },
+    "pixel_pig": {
+      "display_name": "こぶた"
+    },
+    "pixel_poop": {
+      "display_name": "うんち"
+    },
+    "pixel_puppy": {
+      "display_name": "子犬"
+    },
+    "pixel_quokka": {
+      "display_name": "クオッカ"
+    },
+    "pixel_rabbit": {
+      "display_name": "子うさぎ"
+    },
+    "pixel_shiba": {
+      "display_name": "柴犬"
+    },
+    "pixel_starlight_upalupa": {
+      "display_name": "星明かりのウーパールーパー"
+    },
+    "pixel_tree": {
+      "display_name": "小さな木"
+    },
+    "pixel_tteokbokki": {
+      "display_name": "トッポッキ"
+    },
+    "unknown": {
+      "display_name": "キャラクター"
+    }
   },
   "common": {
     "back": "戻る",
     "cancel": "キャンセル",
     "close": "閉じる",
-    "confirm": "OK",
-    "copied": "コピーしました",
-    "defaultRoomName": "みんなの部屋",
+    "continue": "続ける",
     "delete": "削除",
     "friend": "友だち",
     "me": "自分",
     "next": "次へ",
     "save": "保存",
-    "skip": "スキップ",
-    "unknown": "不明"
+    "skip": "スキップ"
   },
   "composer": {
-    "activeRoomRequired": "プロフィールを設定して、表示するグループを選んでください。",
-    "closeTooltip": "メッセージ入力欄を閉じる",
-    "dragTooltip": "ドラッグして入力ウィンドウを移動",
-    "placeholder": "メッセージを入力…",
-    "sendTooltip": "メッセージを送信"
+    "drag": {
+      "tooltip": "ドラッグして入力ウィンドウを移動"
+    },
+    "group": {
+      "required": "プロフィールを設定して、表示するグループを選んでください。"
+    },
+    "message": {
+      "placeholder": "メッセージを入力…"
+    },
+    "window": {
+      "title": "SIDEYメッセージ"
+    }
   },
   "connection": {
-    "accessRequired": "SIDEYのアカウントまたはグループへのアクセスを再確認する必要があります。接続状態で「再接続」を選んでください。同じ案内が続く場合は、診断ログを添えてお問い合わせください。",
-    "busy": "現在接続が集中しているため、通常より時間がかかっています。SIDEYが自動で再試行します。数分たっても接続できない場合は、診断ログを添えてお問い合わせください。",
-    "configurationUnavailable": "現在SIDEYへの接続を開始できません。しばらくしてから、接続状態で「再接続」を選んでください。同じ問題が続く場合は、診断ログを添えてお問い合わせください。",
-    "connected": "サーバーに接続済み",
-    "disconnected": "サーバーに未接続",
-    "networkUnavailable": "SIDEYサーバーに到達できませんでした。インターネット接続を確認してから、接続状態で「再接続」を選んでください。他のサイトは開けるのに問題が続く場合は、診断ログを添えてお問い合わせください。",
-    "offline": "オフライン",
-    "pageDescription": "SIDEYサーバーへの接続状態を確認し、問題がある場合は再接続できます。",
-    "pageTitle": "接続状態",
-    "reconnecting": "接続中",
-    "retry": "再接続",
-    "secureConnectionFailed": "安全な接続を確立できませんでした。Windowsの日付と時刻が正しいことを確認してから再接続してください。問題が続く場合は、診断ログを添えてお問い合わせください。",
-    "serverConnected": "SIDEYサーバーに接続しました。",
-    "serverReconnecting": "SIDEYサーバーに再接続しています。",
-    "serviceUnavailable": "サーバーから正常な応答を確認できませんでした。SIDEYが自動で再試行します。数分たっても接続できない場合は、接続状態で「再接続」を選び、それでも解決しなければ診断ログを添えてお問い合わせください。"
+    "configuration": {
+      "not_configured": "サーバー接続に必要な設定が見つかりません。アプリを再インストールしてください。"
+    },
+    "error": {
+      "access_required": "SIDEYのアカウントまたはグループへのアクセスを再確認する必要があります。接続状態で「再接続」を選んでください。同じ案内が続く場合は、診断ログを添えてお問い合わせください。",
+      "busy": "現在接続が集中しているため、通常より時間がかかっています。SIDEYが自動で再試行します。数分たっても接続できない場合は、診断ログを添えてお問い合わせください。",
+      "configuration_unavailable": "現在SIDEYへの接続を開始できません。しばらくしてから、接続状態で「再接続」を選んでください。同じ問題が続く場合は、診断ログを添えてお問い合わせください。",
+      "network_unavailable": "SIDEYに接続できませんでした。インターネット接続を確認してから、接続状態で「再接続」を選んでください。他のサイトは開けるのに問題が続く場合は、診断ログを添えてお問い合わせください。",
+      "secure_connection_failed": "安全な接続を確立できませんでした。Windowsの日付と時刻が正しいことを確認してから再接続してください。問題が続く場合は、診断ログを添えてお問い合わせください。",
+      "service_unavailable": "SIDEYからの応答を確認できませんでした。自動的に接続を再試行します。数分たっても接続できない場合は、接続状態で「再接続」を選び、それでも解決しなければ診断ログを添えてお問い合わせください。"
+    },
+    "group_resync_failed": "グループの最新状態を読み込めませんでした。もう一度接続してください。（{0}）",
+    "group_revision_missing": "グループへの接続情報が変わりました。もう一度接続してください。",
+    "notice": {
+      "connected": "サーバーに接続しました。",
+      "reconnecting": "サーバーに再接続しています…"
+    },
+    "retry": {
+      "action": "再接続"
+    },
+    "server": {
+      "not_configured": "サーバー接続に必要な設定が見つかりません。アプリを再インストールしてください。"
+    },
+    "state": {
+      "connected": "SIDEYに接続済み",
+      "disconnected": "SIDEYに未接続",
+      "reconnecting": "接続中"
+    },
+    "unavailable": "SIDEYに接続できません。しばらくしてから、もう一度接続してください。"
   },
-  "development": {
-    "localPreview": "バックエンドの環境変数がないため、12種類のキャラクターのローカルプレビューを実行しています。",
-    "metricsPreview": "内部検証用のハムスター限定レンダリング計測モードです。手動検証はまだ記録されていません。"
-  },
-  "dialogs": {
-    "deleteRoomBody": "メンバー情報とメッセージがサーバーから削除されます。この操作は取り消せません。",
-    "deleteRoomContinue": "続ける",
-    "deleteRoomFinalBody": "「{0}」とすべてのメッセージが、今すぐ完全に削除されます。",
-    "deleteRoomFinalTitle": "このグループを完全に削除しますか？",
-    "deleteRoomTitle": "「{0}」を削除しますか？",
-    "download": "ダウンロード",
-    "later": "あとで",
-    "leaveOwnedRoomBody": "残ったメンバーのうち、最も早く参加した人がオーナーになります。誰も残らない場合は、グループが削除されます。",
-    "leaveRoomBody": "このグループや最近のメッセージにアクセスできなくなります。",
-    "leaveRoomPrimary": "退出",
-    "leaveRoomTitle": "「{0}」から退出しますか？",
-    "removeMemberBody": "このメンバーはグループや過去のメッセージにアクセスできなくなります。",
-    "removeMemberPrimary": "退出させる",
-    "removeMemberTitle": "「{0}」を退出させますか？",
-    "roomNamePlaceholder": "グループ名（1〜20文字）",
-    "rotateInviteBody": "現在のコードはすぐに無効になります。この操作は取り消せません。",
-    "rotateInvitePrimary": "再発行",
-    "rotateInviteTitle": "招待コードを再発行しますか？",
-    "updateBody": "SIDEY {0}をダウンロードしますか？",
-    "updateTitle": "新しいアップデートがあります"
-  },
-  "error": {
-    "chatRateLimited": "メッセージの送信が速すぎます。",
-    "fatalTitle": "SIDEY 起動エラー",
-    "generic": "エラーが発生しました：{0}",
-    "launch": "SIDEYの起動中にエラーが発生しました。アプリを閉じて、もう一度お試しください。",
-    "messageSendFailed": "メッセージを送信できませんでした：{0}",
-    "missingConfiguration": "SIDEYの接続設定が見つかりません。",
-    "preferencesSaveFailed": "設定を保存できませんでした：{0}",
-    "serverConnectionNotConfigured": "SIDEYのサーバー接続が設定されていません。",
-    "serverNotConfigured": "SIDEYのサーバーが設定されていません。配布時の設定をご確認ください。",
-    "startup": "SIDEYを起動できませんでした。",
-    "startupWithLog": "SIDEYを起動できませんでした。\n\n診断ログ：{0}",
-    "trayStart": "トレイアイコンを起動できませんでした。ウィンドウを閉じるとSIDEYが終了します。",
-    "typingUpdateFailed": "入力状態を更新できませんでした：{0}"
+  "external_link": {
+    "open": {
+      "failed": "既定のブラウザーでページを開けませんでした。"
+    }
   },
   "groups": {
-    "active": "表示中",
+    "action": {
+      "join_by_code": "コードで参加"
+    },
     "collapse": "グループを折りたたむ",
-    "copyInvite": "招待コードをコピー",
-    "copyInviteTooltip": "グループの招待コードをクリップボードにコピーします。",
-    "create": "グループを作成",
-    "createDescription": "グループを作って、招待コードで友だちを誘いましょう。",
-    "createTitle": "新しいグループを作る",
-    "createTooltip": "この名前で新しい非公開グループを作ります。",
-    "created": "「{0}」を作成しました。招待コード：{1}",
-    "createdSimple": "グループを作成しました。",
-    "creating": "作成中…",
-    "delete": "グループを削除",
-    "deleteDialogBody": "「{0}」を削除しますか？この操作は取り消せません。",
-    "deleteDialogTitle": "グループを削除",
-    "deleteTooltip": "このグループを完全に削除します。",
-    "deleted": "グループを削除しました。",
+    "create": {
+      "action": "グループを作成",
+      "description": "グループを作って、招待コードで友だちを誘いましょう。",
+      "in_progress": "作成中…",
+      "name": {
+        "placeholder": "新しいグループ名"
+      },
+      "result_missing": "グループの作成を完了できませんでした。もう一度お試しください。",
+      "success": {
+        "default": "グループを作成しました。"
+      },
+      "tooltip": "入力した名前でグループを作成します。"
+    },
+    "delete": {
+      "action": "グループを削除",
+      "confirmation": {
+        "message": "メンバー情報とメッセージが完全に削除されます。この操作は取り消せません。",
+        "title": "「{0}」を削除しますか？"
+      },
+      "final_confirmation": {
+        "message": "「{0}」とすべてのメッセージが、今すぐ完全に削除されます。",
+        "title": "このグループを完全に削除しますか？"
+      },
+      "success": "グループを削除しました。",
+      "tooltip": "このグループを完全に削除します。"
+    },
     "description": "画面に表示するグループを切り替えたり、メンバーを管理したりできます。各グループの定員は12人です。",
-    "details": "{0}/12人 · 招待コード {1}",
-    "detailsRotationRequired": "{0}/12人 · 招待コードの再発行が必要です",
-    "emptyDescription": "新しいグループを作るか、友だちからの招待コードを入力してください。",
-    "emptyTitle": "まだグループがありません",
+    "empty": {
+      "description": "新しいグループを作るか、友だちからの招待コードを入力してください。",
+      "title": "まだグループがありません"
+    },
+    "error": {
+      "not_found": "グループが見つかりません。"
+    },
     "expand": "グループを展開",
-    "expandUnavailable": "定員の拡張機能は準備中です。",
-    "invite": "招待",
-    "inviteCode": "招待コード",
-    "inviteCopied": "招待コードをコピーしました。",
-    "inviteCopyComplete": "コピーしました",
-    "inviteMissing": "この端末に招待コードが保存されていません。",
-    "inviteReplaced": "この端末の招待コードは更新されています。オーナーに新しいコードを確認してください。",
-    "inviteRevoked": "以前の招待コードは無効になりました。オーナーによる再発行が必要です。",
-    "inviteRotated": "招待コードを再発行し、このパソコンに安全に保存しました。",
-    "join": "このグループを表示",
-    "joinByCode": "コードで参加",
-    "joinByCodeTooltip": "この招待コードのグループに参加します。",
-    "joinDescription": "友だちからのコードを入力して、非公開グループに参加できます。",
-    "joinTitle": "招待コードで参加",
-    "joinTooltip": "表示するグループを切り替えます。",
-    "joined": "「{0}」に参加しました。",
-    "joinedSimple": "グループに参加しました。",
-    "joining": "参加中…",
-    "leave": "グループを退出",
-    "leaveTooltip": "このグループから退出します。",
-    "left": "グループから退出しました。",
-    "memberCount": "{0}/{1}人",
-    "memberRemoved": "メンバーを退出させました。",
-    "notFound": "グループが見つかりません。",
-    "operationBusy": "ほかのグループ操作が終わってから、もう一度お試しください。",
-    "owner": "オーナー",
-    "removeDialogBody": "「{0}」をグループから退出させますか？",
-    "removeDialogTitle": "メンバーを退出させる",
-    "removeMember": "退出させる",
-    "removeMemberTooltip": "このメンバーをグループから退出させます。",
-    "rename": "名前を変更",
-    "renameDialogPlaceholder": "新しいグループ名",
-    "renameDialogPrimary": "変更",
-    "renameDialogTitle": "グループ名を変更",
-    "renameTooltip": "グループ名を変更します。",
-    "renamed": "グループ名を変更しました。",
-    "roomName": "グループ名",
-    "roomNamePlaceholder": "新しいグループ名",
-    "rotateInvite": "招待コードを再発行",
-    "switched": "表示するグループを変更しました。",
-    "switching": "接続中…",
-    "title": "参加中のグループ",
-    "upgrade": "定員を増やす",
-    "upgradeTooltip": "グループの定員を増やします。"
+    "invite": {
+      "code": {
+        "label": "招待コード",
+        "missing": "この端末に招待コードが保存されていません。",
+        "replaced": "この端末の招待コードは更新されています。オーナーに新しいコードを確認してください。",
+        "revoked": "以前の招待コードは無効になりました。オーナーによる再発行が必要です。"
+      },
+      "copy": {
+        "action": "招待コードをコピー",
+        "complete": "コピーしました"
+      },
+      "rotate": {
+        "action": "招待コードを再発行",
+        "code_missing": "新しい招待コードが空です。",
+        "confirmation": {
+          "action": "再発行",
+          "message": "現在のコードはすぐに無効になります。この操作は取り消せません。",
+          "title": "招待コードを再発行しますか？"
+        },
+        "success": "招待コードを再発行し、このパソコンに安全に保存しました。"
+      }
+    },
+    "join": {
+      "description": "友だちから受け取った招待コードでグループに参加できます。",
+      "failed": "グループに参加できませんでした。招待コードを確認して、もう一度お試しください。（{0}）",
+      "in_progress": "参加中…",
+      "result_missing": "参加したグループを読み込めませんでした。もう一度お試しください。",
+      "room_id_missing": "グループへの参加を完了できませんでした。もう一度お試しください。",
+      "success": {
+        "default": "グループに参加しました。"
+      },
+      "tooltip": "この招待コードのグループに参加します。"
+    },
+    "leave": {
+      "action": "グループを退出",
+      "confirmation": {
+        "action": "退出",
+        "member_message": "このグループや最近のメッセージにアクセスできなくなります。",
+        "owner_message": "残ったメンバーのうち、最も早く参加した人がオーナーになります。誰も残らない場合は、グループが削除されます。",
+        "title": "「{0}」から退出しますか？"
+      },
+      "success": "グループから退出しました。",
+      "tooltip": "このグループから退出します。"
+    },
+    "member": {
+      "remove": {
+        "action": "退出させる",
+        "confirmation": {
+          "message": "このメンバーはグループや過去のメッセージにアクセスできなくなります。",
+          "title": "「{0}」を退出させますか？"
+        },
+        "success": "メンバーを退出させました。",
+        "tooltip": "このメンバーをグループから退出させます。"
+      }
+    },
+    "navigation_label": "グループ",
+    "operation": {
+      "busy": "ほかのグループ操作が終わってから、もう一度お試しください。"
+    },
+    "refresh": {
+      "failed": "グループの最新情報を読み込めませんでした。もう一度お試しください。（{0}）"
+    },
+    "rename": {
+      "action": "名前を変更",
+      "name_placeholder": "グループ名（1〜20文字）",
+      "success": "グループ名を変更しました。",
+      "title": "グループ名を変更",
+      "tooltip": "グループ名を変更します。"
+    },
+    "room_name": {
+      "label": "グループ名"
+    },
+    "state": {
+      "active": "表示中"
+    },
+    "summary": {
+      "invite_ready": "{0}/12人 · 招待コード {1}",
+      "invite_rotation_required": "{0}/12人 · 招待コードの再発行が必要です"
+    },
+    "switch": {
+      "action": "このグループを表示",
+      "in_progress": "接続中…",
+      "success": "表示するグループを変更しました。",
+      "tooltip": "表示するグループを切り替えます。"
+    },
+    "title": "参加中のグループ"
   },
   "history": {
-    "delivered": "配信済み",
-    "empty": "まだメッセージがありません。",
-    "emptyDescription": "このグループの最近のメッセージがここに表示されます。",
-    "exhausted": "過去3日分の履歴はここまでです",
-    "failed": "送信失敗",
-    "initialFailed": "メッセージ履歴を読み込めませんでした",
-    "joinPrompt": "グループに参加すると、最近のメッセージを確認できます。",
-    "keepOnTop": "常に手前に表示",
-    "keepOnTopShortcut": "常に手前に表示（Alt+上矢印）",
-    "loadMoreFailed": "以前のメッセージを読み込めませんでした",
+    "empty": {
+      "description": "このグループの最近のメッセージがここに表示されます。",
+      "title": "まだメッセージがありません。"
+    },
+    "group": {
+      "none": "表示中のグループがありません",
+      "required": "グループに参加すると、最近のメッセージを確認できます。"
+    },
+    "load": {
+      "initial_failed": "メッセージ履歴を読み込めませんでした",
+      "retry": "再試行"
+    },
+    "load_more": {
+      "failed": "以前のメッセージを読み込めませんでした",
+      "loading": "以前のメッセージを読み込み中…"
+    },
     "loading": "最近のメッセージを読み込み中…",
-    "loadingMore": "以前のメッセージを読み込み中…",
-    "noActiveRoom": "表示中のグループがありません",
-    "read": "既読",
-    "recentTitle": "最近のメッセージ",
-    "retentionNotice": "メッセージは3日後にサーバーから自動削除されます。",
-    "retry": "再試行",
-    "retryDescription": "しばらくしてから履歴を開き直してください。",
-    "roomTitle": "最近のメッセージ · {0}",
-    "scrollToLatest": "最新のメッセージへ移動",
-    "sending": "送信中",
-    "sent": "送信済み",
-    "stopKeepingOnTop": "常に手前に表示を解除",
-    "stopKeepingOnTopShortcut": "最前面表示を解除（Alt+下矢印）",
-    "title": "{0} · メッセージ履歴",
-    "unknownUser": "不明なユーザー"
+    "pagination": {
+      "exhausted": "過去3日分の履歴はここまでです"
+    },
+    "recent": {
+      "title": "最近のメッセージ"
+    },
+    "retention": {
+      "notice": "メッセージは3日後にSIDEYから自動削除されます。",
+      "reload_failed": "過去のメッセージを再読み込みできませんでした。しばらくしてから、もう一度お試しください。（{0}）"
+    },
+    "scroll": {
+      "latest": "最新のメッセージへ移動"
+    },
+    "user": {
+      "unknown": "不明なユーザー"
+    },
+    "window": {
+      "always_on_top": {
+        "disable": "常に手前に表示を解除",
+        "disable_shortcut": "最前面表示を解除（Alt+下矢印）",
+        "enable": "常に手前に表示",
+        "enable_shortcut": "常に手前に表示（Alt+上矢印）"
+      },
+      "title": "SIDEYメッセージ履歴"
+    }
   },
-  "launcher": {
-    "fatalTitle": "SIDEY 起動エラー",
-    "runtimeMissing": "起動に必要なファイルが見つかりません。SIDEYを再インストールしてください。",
-    "startupFailed": "SIDEYを起動できませんでした。"
+  "legal": {
+    "description": "利用規約とポリシーを確認できます。",
+    "privacy": {
+      "action": "プライバシーポリシーを見る"
+    },
+    "refund": {
+      "action": "キャンセル・返金ポリシーを見る"
+    },
+    "terms": {
+      "action": "利用規約を見る"
+    },
+    "title": "ポリシー"
   },
-  "metrics": {
-    "exportFailed": "指標の保存に失敗しました：{0}",
-    "exportPath": "保存先：{0}",
-    "exported": "現在の指標をJSONで保存しました。手動検証はnot_runのままです。",
-    "noSamples": "計測データなし",
-    "rendererNotRunning": "計測用レンダラーが動作していません。",
-    "rendererNotStarted": "計測用レンダラーが起動していません。",
-    "summary": "経過 {0:F0}秒 · {1}サンプル · 最大フレーム {2:F2}ms · メモリ {3:F1}MB（最大 {4:F1}MB） · GDI {5} · USER {6}"
-  },
-  "motion": {
-    "disabled": "Windowsのアニメーション効果がオフになっています。"
-  },
-  "navigation": {
-    "about": "情報",
-    "connection": "接続状態",
-    "groups": "グループ",
-    "profile": "マイプロフィール",
-    "settings": "設定",
-    "store": "着せ替え・ストア"
+  "message": {
+    "delivery": {
+      "recheck_failed": "メッセージの送信を確認できませんでした。もう一度お試しください。（{0}）"
+    },
+    "send": {
+      "accessibility": "メッセージを送信",
+      "failed": "メッセージを送信できませんでした。もう一度お試しください。（{0}）",
+      "rate_limited": "メッセージの送信が速すぎます。"
+    }
   },
   "onboarding": {
-    "character": "自分のキャラクター",
-    "complete": "設定が完了しました",
-    "completeDescription": "グループの作成や参加は、あとから設定でもできます。",
-    "completeTitle": "SIDEYの準備ができました",
-    "connected": "接続済み",
-    "create": "グループを作成",
-    "createDescription": "新しい非公開グループを自分で作れます。",
-    "createPath": "新しいグループを作る",
-    "creatingRoom": "グループを作成中…",
-    "disconnected": "未接続",
-    "getStarted": "始める",
-    "googleCancel": "ログインをキャンセル",
-    "googleContinue": "Googleで続ける",
-    "googleDescription": "Googleと連携してSIDEYを始めましょう。既存のプロフィール、グループ、会話履歴は保持されます。",
-    "googlePending": "ブラウザでGoogleログインを完了してください。",
-    "groupDescription": "グループを作るか、受け取った招待コードで参加すると、ピクセルワールドが現れます。",
-    "groupPath": "グループへの参加方法",
-    "groupTitle": "友だちとつながりましょう",
-    "inviteCaseNotice": "1つのグループには最大12人まで参加できます。",
-    "inviteCode": "招待コード",
-    "inviteCodePlaceholder": "友だちからの招待コード",
-    "inviteRequired": "招待コードを入力してください。",
-    "join": "参加",
-    "joinPath": "招待コードを使う",
-    "joiningRoom": "グループに参加中…",
-    "landingDescription": "いくつか設定するだけで、すぐに始められます。",
-    "launch": "SIDEYを始める",
-    "nickname": "ニックネーム",
-    "nicknamePlaceholder": "2〜8文字",
-    "nicknameRequired": "ニックネームを入力してください。",
-    "profileDescription": "あとから設定でいつでも変更できます。",
-    "profileTitle": "SIDEYで使う名前を決めましょう",
-    "roomName": "グループ名",
-    "roomNamePlaceholder": "例：みんなの部屋",
-    "roomNameRequired": "グループ名を入力してください。",
-    "saving": "設定を保存中…",
-    "serverConnected": "SIDEYに接続しました",
-    "serverConnecting": "SIDEYに接続中…",
-    "stepComplete": "完了",
-    "stepGroup": "グループ",
-    "stepProfile": "プロフィール",
+    "auth": {
+      "google": {
+        "cancel": "ログインをキャンセル",
+        "continue": "Googleで続ける",
+        "description": "Googleアカウントを連携して始めましょう。既存のプロフィール、グループ、会話履歴はそのまま保持されます。",
+        "pending": "ブラウザーでGoogleへのログインを完了してください。"
+      },
+      "start": "始める"
+    },
+    "character": {
+      "label": "自分のキャラクター"
+    },
+    "complete": {
+      "description": "グループの作成や参加は、あとから設定でもできます。",
+      "title": "準備ができました"
+    },
+    "connection": {
+      "connected": "サーバーに接続しました",
+      "connecting": "サーバーに接続中…"
+    },
+    "group": {
+      "create": {
+        "description": "グループを作成できます。"
+      },
+      "description": "グループを作るか、招待コードで参加すると、ピクセルワールドが現れます。",
+      "invite_code": {
+        "label": "招待コード",
+        "member_limit": "1つのグループには最大12人まで参加できます。",
+        "placeholder": "友だちからの招待コード",
+        "required": "招待コードを入力してください。"
+      },
+      "join": {
+        "action": "参加"
+      },
+      "name": {
+        "placeholder": "例：みんなの部屋"
+      },
+      "path": {
+        "label": "グループへの参加方法"
+      },
+      "title": "友だちとグループを始める"
+    },
+    "launch": {
+      "action": "始める"
+    },
+    "profile": {
+      "description": "あとから設定でいつでも変更できます。",
+      "title": "表示名を決める"
+    },
+    "step": {
+      "complete": "完了",
+      "group": "グループ",
+      "profile": "プロフィール"
+    },
     "tagline": "画面のすみで、友だちと一緒に。"
   },
   "overlay": {
-    "currentUser": "{0} · 自分"
+    "current_user": "{0} · 私"
   },
   "platform": {
-    "noMonitor": "利用できるディスプレイがありません。"
-  },
-  "preferences": {
-    "invalidFolder": "設定フォルダーのパスが正しくありません。",
-    "readFailed": "SIDEYの設定ファイルを読み込めませんでした。"
-  },
-  "preview": {
-    "dubu": "とうふ",
-    "enableSound": "プレビューの音をオン",
-    "leftMessage": "今日の晩ごはん、どうする？",
-    "moka": "モカ",
-    "muteSound": "プレビューの音をオフ",
-    "rightMessage": "カレーにしない？",
-    "treeMovementHint": "木を右クリックすると止まり、もう一度右クリックすると歩きます。"
+    "requirements": {
+      "description": "SIDEYにはWindows 10 1809（ビルド17763）以降のx64版が必要です。",
+      "title": "対応していないWindowsです",
+      "window_title": "SIDEY — 非対応のWindows"
+    }
   },
   "profile": {
     "applying": "適用中",
-    "bubble": "吹き出し",
-    "bubbleDescription": "持っている吹き出しを選ぶと、すべてのグループにすぐ反映されます。",
-    "changeNickname": "ニックネームを変更",
-    "changeNicknameTooltip": "変更したニックネームを保存します。",
-    "character": "キャラクター",
-    "characterDescription": "友だちの画面に表示する、あなたのキャラクターを選びます。",
-    "characterSaved": "キャラクターを変更しました。",
-    "cosmeticDefault": "標準",
-    "cosmeticSaved": "変更を反映しました。",
-    "defaultBubble": "標準の吹き出し",
-    "defaultThrowable": "標準のやわらかボール",
+    "character": {
+      "description": "友だちの画面に表示する、あなたのキャラクターを選びます。",
+      "label": "キャラクター",
+      "save": {
+        "success": "キャラクターを変更しました。"
+      }
+    },
+    "cosmetics": {
+      "bubble": {
+        "default": "標準の吹き出し",
+        "description": "持っている吹き出しを選ぶと、すべてのグループにすぐ反映されます。",
+        "title": "吹き出し"
+      },
+      "equipped": "装着中",
+      "save": {
+        "success": "変更を反映しました。"
+      },
+      "throwable": {
+        "default": "標準のやわらかボール",
+        "description": "持っている投げて遊ぶおもちゃを選ぶと、すべてのグループにすぐ反映されます。",
+        "title": "投げて遊ぶおもちゃ"
+      }
+    },
     "description": "友だちに表示される名前とキャラクターを設定できます。",
-    "duplicateNotice": "友だちと同じ名前やキャラクターも使えます。",
-    "equipped": "装着中",
-    "nickname": "ニックネーム",
-    "nicknameDescription": "画面やメッセージに表示される名前（2〜8文字）",
-    "save": "プロフィールを保存",
-    "saveTooltip": "ニックネームとキャラクターの変更を保存します。",
-    "saved": "プロフィールを保存しました。",
-    "throwable": "投げるアイテム",
-    "throwableDescription": "持っているアイテムを選ぶと、すべてのグループにすぐ反映されます。",
+    "duplicates": {
+      "notice": "友だちと同じ名前やキャラクターも使えます。"
+    },
+    "nickname": {
+      "description": "画面やメッセージに表示される名前（2〜8文字）",
+      "label": "ニックネーム",
+      "placeholder": "2〜8文字",
+      "save": {
+        "action": "ニックネームを変更",
+        "tooltip": "変更したニックネームを保存します。"
+      }
+    },
+    "save": {
+      "success": "プロフィールを保存しました。"
+    },
     "title": "マイプロフィール"
   },
   "settings": {
-    "characterSounds": "キャラクターの効果音",
-    "characterSoundsDescription": "現在のグループでキャラクターに投げたものが当たると、効果音を再生します。",
-    "checkNow": "今すぐ確認",
-    "checkNowTooltip": "SIDEYの新しいバージョンを確認します。",
-    "checkUpdate": "アップデートを確認",
-    "checkUpdateDescription": "新しいバージョンがあれば、安全にダウンロードしてインストールできます。",
-    "displayDescription": "友だちの状態やメッセージの表示方法を調整できます。",
-    "displayTitle": "表示",
-    "edge": "表示する位置",
-    "edgeBottom": "下",
-    "edgeDescription": "キャラクターが歩く画面の端を選びます。",
-    "edgeLeft": "左",
-    "edgeRight": "右",
-    "edgeTooltip": "ピクセルワールドを表示する画面の端",
-    "edgeTop": "上",
-    "exportMetrics": "現在の指標をJSONで保存",
-    "exportMetricsTooltip": "現在の描画パフォーマンス指標をJSONで保存します。",
-    "generalDescription": "SIDEYの表示や起動方法を設定できます。",
-    "generalTitle": "一般",
-    "hotkeyAlreadyRegistered": "このショートカットはシステムまたは別のアプリで既に使用されています。",
-    "hotkeyAvailabilityUnverified": "このショートカットを使用できるか確認できませんでした。",
-    "hotkeyComposer": "メッセージ入力を開く／閉じる",
-    "hotkeyHistory": "最近の履歴を開く／閉じる",
-    "hotkeyInvalid": "無効なショートカット",
-    "hotkeyNeedsModifier": "ショートカットは Win、Ctrl、Alt、Shift のいずれかで始めてください。",
-    "hotkeyOverlay": "オーバーレイ表示を切り替える",
-    "hotkeyQuietMode": "静音モードを切り替える",
-    "hotkeyRecorderEmpty": "ショートカットを変更するには、キーの組み合わせを押してください。",
-    "hotkeyRecorderHelp": "選択してから修飾キーと別のキーを押してください。Escでキャンセルできます。",
-    "hotkeyRecorderReset": "リセット",
-    "hotkeyRecording": "ショートカットを入力…",
-    "hotkeySideyConflict": "この組み合わせはSIDEYの別のショートカットで使用中です。保存すると割り当てが入れ替わります。",
-    "hotkeySystemShortcut": "このショートカットはシステムの標準ショートカットとして使用されています。",
-    "hotkeysDescription": "ショートカットを選択し、設定するキーの組み合わせを押してください。使用中の組み合わせを指定すると、2つの割り当てが入れ替わります。",
-    "hotkeysTitle": "キーボードショートカット",
-    "language": "言語 / Language",
-    "languageDescription": "アプリで使用する言語を選択します。変更はすぐに反映されます。",
-    "monitor": "モニター",
-    "monitorDescription": "ピクセルワールドとメッセージ入力欄を表示するモニターを選びます。",
-    "monitorTooltip": "ピクセルワールドとメッセージ入力欄のモニター",
-    "muteSound": "ミュート",
-    "offlineMembers": "オフラインのメンバーを表示",
-    "offlineMembersDescription": "オフラインの友だちも、眠ったキャラクターと赤い状態マークで表示します。",
-    "offlineMembersTooltip": "オフラインのメンバーの表示を切り替えます",
-    "overlay": "ピクセルワールドを表示",
-    "overlayDescription": "選んだ画面の端に、友だちのピクセルワールドを表示します。",
-    "overlayTooltip": "ピクセルワールドの表示を切り替えます",
-    "quietMode": "サイレントモード",
-    "quietModeDescription": "メッセージの吹き出しと入力中の表示を隠し、未読数は維持します。",
-    "quietModeTooltip": "サイレントモードを切り替えます",
-    "releaseNotes": "更新内容",
-    "rendererMetrics": "内部レンダリング指標",
-    "rightClickThrow": "右ダブルクリックで投げる",
-    "rightClickThrowDescription": "オフでは友だちをクリックして投げられます。オンでは自分のキャラクターを右ダブルクリックすると、10秒間投げられます。",
-    "rightClickThrowTooltip": "投げる前に自分のキャラクターの右ダブルクリックを必要にする",
-    "saved": "設定を保存しました。",
-    "soundDescription": "キャラクターの効果音の再生を設定します。",
-    "soundTitle": "サウンド",
-    "soundVolume": "音量",
-    "span": "歩く範囲",
-    "spanDescription": "選んだ画面の端で、キャラクターが歩ける範囲を選びます。",
-    "spanFull": "端から端まで",
-    "spanTooltip": "ピクセルワールドの表示範囲",
-    "startup": "サインイン時に自動起動",
-    "startupDescription": "Windowsへのサインイン時にSIDEYを自動で起動します。",
-    "startupTooltip": "Windowsサインイン時の自動起動を切り替えます",
-    "theme": "テーマ",
-    "themeDark": "ダーク",
-    "themeDescription": "Windows の色設定",
-    "themeLight": "ライト",
-    "themeSystem": "Windows の既定",
-    "unmuteSound": "ミュートを解除",
-    "updateCheckedToday": "今日 {0}",
-    "updateCheckedYesterday": "昨日 {0}",
-    "updateDescription": "SIDEYの新しいバージョンを確認できます。",
-    "updateLastChecked": "最終確認：{0}",
-    "updateNeverChecked": "まだ確認していません",
-    "updateTitle": "アップデート",
-    "worldDescription": "キャラクターを表示する画面や歩く範囲を選びます。",
-    "worldTitle": "キャラクターの表示位置"
+    "display": {
+      "description": "友だちの状態やメッセージの表示方法を調整できます。",
+      "offline_members": {
+        "description": "オフラインの友だちも、眠ったキャラクターと赤い状態マークで表示します。",
+        "title": "オフラインのメンバーを表示",
+        "tooltip": "オフラインのメンバーの表示を切り替えます"
+      },
+      "quiet_mode": {
+        "description": "メッセージの吹き出しと入力中の表示を隠し、未読数は維持します。",
+        "title": "ひかえめモード",
+        "tooltip": "ひかえめモードを切り替えます"
+      },
+      "throw_guard": {
+        "description": "オフでは友だちを左クリックして投げられます。オンでは自分のキャラクターを右ボタンでダブルクリックすると、10秒間投げられます。",
+        "title": "右ボタンのダブルクリックで投げる",
+        "tooltip": "投げる前に自分のキャラクターを右ボタンでダブルクリックするように設定"
+      }
+    },
+    "general": {
+      "description": "基本の表示方法と起動方法を設定できます。"
+    },
+    "language": {
+      "description": "アプリで使用する言語を選択します。変更はすぐに反映されます。",
+      "title": "言語 / Language"
+    },
+    "navigation_label": "設定",
+    "overlay": {
+      "description": "選んだ画面の端に、友だちのピクセルワールドを表示します。",
+      "title": "ピクセルワールドを表示",
+      "tooltip": "ピクセルワールドの表示を切り替えます"
+    },
+    "placement": {
+      "description": "キャラクターを表示する画面や歩く範囲を選びます。",
+      "edge": {
+        "bottom": "下",
+        "description": "キャラクターが歩く画面の端を選びます。",
+        "left": "左",
+        "right": "右",
+        "title": "表示する位置",
+        "tooltip": "ピクセルワールドを表示する画面の端",
+        "top": "上"
+      },
+      "monitor": {
+        "description": "ピクセルワールドとメッセージ入力欄を表示するモニターを選びます。",
+        "title": "モニター",
+        "tooltip": "ピクセルワールドとメッセージ入力欄のモニター",
+        "unavailable": "利用できるディスプレイがありません。"
+      },
+      "span": {
+        "description": "選んだ画面の端で、キャラクターが歩ける範囲を選びます。",
+        "full": "端から端まで",
+        "title": "歩く範囲",
+        "tooltip": "ピクセルワールドの表示範囲"
+      },
+      "title": "キャラクターの表示位置"
+    },
+    "save": {
+      "failed": "設定を保存できませんでした。もう一度お試しください。（{0}）"
+    },
+    "section": {
+      "display": {
+        "title": "表示"
+      },
+      "general": {
+        "title": "一般"
+      },
+      "sound": {
+        "title": "サウンド"
+      }
+    },
+    "shortcuts": {
+      "action": {
+        "composer": "メッセージ入力を開く／閉じる",
+        "history": "最近の履歴を開く／閉じる",
+        "overlay": "オーバーレイ表示を切り替える",
+        "quiet_mode": "ひかえめモードを切り替える"
+      },
+      "description": "ショートカットを選択し、設定するキーの組み合わせを押してください。使用中の組み合わせを指定すると、2つの割り当てが入れ替わります。",
+      "error": {
+        "already_registered": "このショートカットはシステムまたは別のアプリで既に使用されています。",
+        "availability_unverified": "このショートカットを使用できるか確認できませんでした。",
+        "in_app_conflict": "この組み合わせはアプリ内の別のショートカットで使用中です。保存すると割り当てが入れ替わります。",
+        "invalid": "無効なショートカット",
+        "modifier_required": "ショートカットは Win、Ctrl、Alt、Shift のいずれかで始めてください。",
+        "system_conflict": "このショートカットはシステムの標準ショートカットとして使用されています。"
+      },
+      "recorder": {
+        "empty": "ショートカットを変更するには、キーの組み合わせを押してください。",
+        "help": "選択してから修飾キーと別のキーを押してください。Escでキャンセルできます。",
+        "recording": "ショートカットを入力…",
+        "reset": "リセット"
+      },
+      "title": "キーボードショートカット"
+    },
+    "sound": {
+      "character_effects": {
+        "description": "現在のグループでキャラクターに投げたものが当たると、効果音を再生します。",
+        "title": "キャラクターの効果音"
+      },
+      "description": "キャラクターの効果音の再生を設定します。",
+      "mute": "ミュート",
+      "unmute": "ミュートを解除",
+      "volume": "音量"
+    },
+    "startup": {
+      "description": "ログインすると、アプリが自動的に起動します。",
+      "title": "ログイン時に自動起動"
+    },
+    "storage": {
+      "folder_invalid": "設定を保存するフォルダーを開けませんでした。アプリを再起動してください。",
+      "read_failed": "保存した設定を読み込めませんでした。アプリを再起動してください。"
+    },
+    "theme": {
+      "dark": "ダーク",
+      "description": "アプリのテーマをライト、ダーク、またはシステム設定から選びます。",
+      "light": "ライト",
+      "system": "Windowsの既定",
+      "system_colors": {
+        "action": "色の設定を開く"
+      },
+      "title": "テーマ"
+    },
+    "update": {
+      "check": {
+        "action": "アップデートを確認"
+      },
+      "check_now": {
+        "tooltip": "新しいバージョンがあるか確認します。"
+      },
+      "description": "新しいバージョンがあるか確認できます。",
+      "last_checked": {
+        "never": "まだ確認していません",
+        "today": "今日 {0}",
+        "value": "最終確認：{0}",
+        "yesterday": "昨日 {0}"
+      },
+      "release_notes": {
+        "action": "更新内容"
+      },
+      "title": "アップデート"
+    },
+    "window": {
+      "title": "SIDEY設定"
+    }
   },
   "store": {
-    "bouncyHeartDescription": "ぽんぽん弾みながら、気持ちを届けるハートです。",
-    "browserOpenFailed": "既定のブラウザーを開けませんでした。",
-    "bunnyPinkBubbleDescription": "うさぎの飾りと読みやすい濃い文字がついた、ピンクの吹き出しです。",
-    "butterChickBubbleDescription": "ひよこの飾りと読みやすい濃い文字がついた、バター色の吹き出しです。",
-    "checkoutOpened": "ブラウザーでお支払いを完了してください。",
-    "chinchillaDescription": "大きな丸い耳とふわふわの灰色の毛がかわいいチンチラ。青いマフラーがお似合いです。",
-    "comingSoon": "現在は購入できません",
-    "comingSoonDescription": "現在のストアではプレビューのみ利用できます。購入機能はまだ利用できません。",
-    "confirming": "お支払いを確認中…",
-    "connectGoogle": "Googleアカウントを連携",
-    "description": "キャラクターや吹き出し、投げるアイテムの動きをプレビューできます。",
-    "emptyDescription": "検索キーワードや絞り込み条件を変えてみてください。",
-    "emptyTitle": "条件に合う商品がありません",
-    "filter": "並べ替え・絞り込み",
-    "googleConnected": "Googleアカウントを連携しました。",
-    "googleConnectionFailed": "Googleアカウントの連携を開始できませんでした。",
-    "googleConnectionOpened": "ブラウザーでGoogleアカウントの連携を完了してください。",
-    "guineaPigDescription": "ころんとまあるいモルモット。左右で違う三毛模様がチャームポイントです。",
-    "hideOwned": "所持済みを非表示",
-    "interaction": {
-      "pixel_chinchilla": "友だちのキャラクターをクリックすると、砂浴び用の小さな砂袋を投げます。",
-      "pixel_guinea_pig": "友だちのキャラクターをクリックすると、ミニパプリカをぽんっと投げます。",
-      "pixel_monkey": "友だちのキャラクターをクリックすると、熟れたバナナを投げます。",
-      "pixel_starlight_upalupa": "友だちのキャラクターをクリックすると、きらめく星の玉を投げます。"
+    "auth": {
+      "google": {
+        "failed": "Googleアカウントの連携を開始できませんでした。"
+      }
     },
-    "keepsake": "お気に入りの品",
-    "kindBubble": "吹き出し",
-    "kindCharacter": "キャラクター",
-    "kindThrowable": "投げるアイテム",
-    "monkeyDescription": "ぴょこんとはねた前髪と水色のマフラーがトレードマーク。元気いっぱいの小さなおさるです。",
-    "openPreview": "プレビュー",
-    "openingCheckout": "決済画面を開いています…",
-    "owned": "所持済み",
-    "paymentTimedOut": "お支払いの確認がタイムアウトしました。ストアを開き直して状態をご確認ください。",
-    "previewOnly": "プレビュー",
-    "previewUnavailable": "プレビューを読み込めませんでした。",
-    "priceKrw": "{0:N0}ウォン",
+    "availability": {
+      "coming_soon": {
+        "description": "現在のストアではプレビューのみ利用できます。購入機能はまだ利用できません。",
+        "title": "現在は購入できません"
+      }
+    },
+    "catalog": {
+      "bubble_bunny_pink": {
+        "description": "うさぎの飾りがついたピンクの吹き出しです。",
+        "name": "ピンクうさぎの吹き出し"
+      },
+      "bubble_butter_chick": {
+        "description": "ひよこの飾りがついたバター色の吹き出しです。",
+        "name": "バターひよこの吹き出し"
+      },
+      "bubble_starry_cat": {
+        "description": "星ねこの飾りがついた青紫色の吹き出しです。",
+        "name": "星空ねこの吹き出し"
+      },
+      "character_chinchilla": {
+        "description": "砂浴びを終えて遊びに来ました。あいさつより先に、ふわふわの毛を自慢します。"
+      },
+      "character_duck": {
+        "description": "知らんぷりなら得意です。何しろ本物のアヒルの足がありますから。"
+      },
+      "character_guinea_pig": {
+        "description": "おやつを隠した場所を忘れました。ほっぺがパンパンなので、遠くはなさそうです。"
+      },
+      "character_monkey": {
+        "description": "バナナを分けに来ました。途中でひと口だけ食べたそうですが…半分しかありませんね？"
+      },
+      "character_otter": {
+        "description": "お気に入りの貝を見せに来ました。見るのはいいけれど、持っていくとすねます。"
+      },
+      "character_pig": {
+        "description": "おやつの匂いを追ってきて、そのまま居つきました。もうここを自分の家だと思っています。"
+      },
+      "character_poop": {
+        "description": "誰に呼ばれたのかはわかりませんが、とりあえず出てきました。"
+      },
+      "character_quokka": {
+        "description": "いつも笑顔です。さっき葉っぱを投げたのもこの子です。"
+      },
+      "character_shiba": {
+        "description": "散歩はもう行きました。柴犬はその事実を認めていません。"
+      },
+      "character_starlight_upalupa": {
+        "description": "迷子の星をひとつ連れてきました。眠るときもぎゅっと抱いているそうです。"
+      },
+      "character_tree": {
+        "description": "散歩に出てきた小さな木です。少し休んでと言ったら、根を下ろす場所を選び始めました。"
+      },
+      "character_tteokbokki": {
+        "description": "甘口だと聞きました。誰にとっての甘口かは教えてくれませんでした。"
+      },
+      "throwable_banana": {
+        "description": "こざるが譲ってくれたバナナです。本当に譲ってくれたのかは、まだ聞けていません。",
+        "name": "こざるのバナナ"
+      },
+      "throwable_baseball": {
+        "description": "赤い縫い目のボールが、ぺちゃんとつぶれて弾みます。",
+        "name": "野球ボール"
+      },
+      "throwable_bouncy_heart": {
+        "description": "ぴょんぴょん弾みながら飛んでいくハートの投げアイテムです。",
+        "name": "はずむハート"
+      },
+      "throwable_clam": {
+        "description": "カワウソが大事に抱えていた貝です。真珠はないけれど、未練は少しあります。",
+        "name": "カワウソの貝"
+      },
+      "throwable_dujjonku": {
+        "description": "ココアの皮と緑の中身がつぶれて、サクッと音を立てます。",
+        "name": "ドバイチョコもちもちクッキー"
+      },
+      "throwable_dust_bath_pouch": {
+        "description": "チンチラの砂浴び用の砂です。洗ってほしくて投げるわけでは…たぶんありません。",
+        "name": "チンチラの砂袋"
+      },
+      "throwable_fish_cake_skewer": {
+        "description": "食べてほしくて渡したのに、どうして振り回しているんですか？",
+        "name": "オムク串（練り天）"
+      },
+      "throwable_leaf": {
+        "description": "クオッカのお弁当です。投げてもいいかは聞いていません。",
+        "name": "葉っぱ"
+      },
+      "throwable_mini_paprika": {
+        "description": "大切に取っておいたおやつです。投げたあとも3秒以内に拾えば大丈夫ですよね？",
+        "name": "モルモットのミニパプリカ"
+      },
+      "throwable_pork": {
+        "description": "ぺちっ！ところで、お隣のぶたさんをここ数日見かけませんね…？",
+        "name": "こぶたの豚肉"
+      },
+      "throwable_snowflake": {
+        "description": "当たると小さな結晶のかけらになって散らばる雪の結晶です。",
+        "name": "雪の結晶"
+      },
+      "throwable_squeaky_duck": {
+        "description": "アヒルがアヒルを投げます。家族げんかではなさそうです。",
+        "name": "キュッキュッアヒル"
+      },
+      "throwable_starlight_orb": {
+        "description": "星明かりをぎゅっと丸めました。空の星がひとつ減ったそうですが？",
+        "name": "星明かりのウーパールーパーの星玉"
+      },
+      "throwable_tennis_ball": {
+        "description": "投げる人は決まりました。拾ってくる人はまだ決まっていません。",
+        "name": "テニスボール"
+      },
+      "throwable_timber": {
+        "description": "木が小さな木を投げます。まずは家系図から確認してみましょうか。",
+        "name": "小さな木のちび木"
+      },
+      "throwable_tissue_ball": {
+        "description": "使用済みのトイレットペーパーかどうかは不明です。とにかく避けて！",
+        "name": "ティッシュのかたまり"
+      },
+      "throwable_toy_cannon": {
+        "description": "導火線つきの弾を撃つ、ミニ大砲の投げアイテムです。",
+        "name": "ミニ大砲"
+      },
+      "throwable_wakkuball": {
+        "description": "ザクザク！ワックボールがかけらに砕ける、軽快な音を楽しんでください。",
+        "name": "ワックボール"
+      }
+    },
+    "checkout": {
+      "opening": "決済画面を開いています…"
+    },
+    "description": "キャラクターや吹き出し、投げて遊ぶおもちゃの動きをプレビューできます。",
+    "empty": {
+      "description": "検索キーワードや絞り込み条件を変えてみてください。",
+      "title": "条件に合う商品がありません"
+    },
+    "filter": {
+      "hide_owned": "所持済みを非表示",
+      "menu": "並べ替え・絞り込み",
+      "reset": "すべてリセット",
+      "search": {
+        "label": "検索",
+        "placeholder": "商品名や説明を検索"
+      }
+    },
+    "kind": {
+      "bubble": "吹き出し",
+      "character": "キャラクター",
+      "keepsake": "大切な品",
+      "throwable": "投げて遊ぶおもちゃ"
+    },
+    "navigation_label": "着せ替え・ストア",
+    "preview": {
+      "member": {
+        "dubu": "とうふ",
+        "moka": "モカ"
+      },
+      "message": {
+        "left": "今日の晩ごはん、どうする？",
+        "right": "カレーにしない？"
+      },
+      "open": "プレビュー",
+      "sound": {
+        "off": "プレビューの音をオフ",
+        "on": "プレビューの音をオン"
+      },
+      "tree_movement_hint": "木を右クリックすると止まり、もう一度右クリックすると歩きます。",
+      "unavailable": "プレビューを読み込めませんでした。"
+    },
+    "price": {
+      "krw": "{0:N0}ウォン"
+    },
     "product": {
-      "bubble_bunny_pink": "ピンクうさぎの吹き出し",
-      "bubble_butter_chick": "バターひよこの吹き出し",
-      "bubble_starry_cat": "星空ねこの吹き出し",
-      "character_duck": "アヒル",
-      "character_poop": "うんち",
-      "character_quokka": "クオッカ",
-      "character_shiba": "柴犬",
-      "character_tteokbokki": "トッポッキ",
-      "throwable_banana": "こざるのバナナ",
-      "throwable_baseball": "野球ボール",
-      "throwable_bouncy_heart": "はずむハート",
-      "throwable_clam": "カワウソの貝",
-      "throwable_dujjonku": "ドゥチョンク",
-      "throwable_dust_bath_pouch": "チンチラの砂袋",
-      "throwable_fish_cake_skewer": "オムク串（練り天）",
-      "throwable_leaf": "葉っぱ",
-      "throwable_mini_paprika": "モルモットのミニパプリカ",
-      "throwable_pork": "こぶたの豚肉",
-      "throwable_snowflake": "雪の結晶",
-      "throwable_squeaky_duck": "キュッキュッアヒル",
-      "throwable_starlight_orb": "星明かりのウーパールーパーの星玉",
-      "throwable_tennis_ball": "テニスボール",
-      "throwable_timber": "小さな木のちび木",
-      "throwable_tissue_ball": "ティッシュのかたまり",
-      "throwable_toy_cannon": "ミニ大砲",
-      "throwable_wakkuball": "ワックボール"
+      "sold_separately": "キャラクターとは別売り"
     },
-    "productDescriptions": {
-      "bubble_bunny_pink": "うさぎの飾りがついたピンクの吹き出しです。",
-      "bubble_butter_chick": "ひよこの飾りがついたバター色の吹き出しです。",
-      "bubble_starry_cat": "星ねこの飾りがついた青紫色の吹き出しです。",
-      "character_chinchilla": "砂浴びを終えて遊びに来ました。あいさつより先に、ふわふわの毛を自慢します。",
-      "character_duck": "知らんぷりなら得意です。何しろ本物のアヒルの足がありますから。",
-      "character_guinea_pig": "おやつを隠した場所を忘れました。ほっぺがパンパンなので、遠くはなさそうです。",
-      "character_monkey": "バナナを分けに来ました。途中でひと口だけ食べたそうですが…半分しかありませんね？",
-      "character_otter": "お気に入りの貝を見せに来ました。見るのはいいけれど、持っていくとすねます。",
-      "character_pig": "おやつの匂いを追ってきて、そのまま居つきました。もうここを自分の家だと思っています。",
-      "character_poop": "誰に呼ばれたのかはわかりませんが、とりあえず出てきました。",
-      "character_quokka": "いつも笑顔です。さっき葉っぱを投げたのもこの子です。",
-      "character_shiba": "散歩はもう行きました。柴犬はその事実を認めていません。",
-      "character_starlight_upalupa": "迷子の星をひとつ連れてきました。眠るときもぎゅっと抱いているそうです。",
-      "character_tree": "散歩に出てきた小さな木です。少し休んでと言ったら、根を下ろす場所を選び始めました。",
-      "character_tteokbokki": "甘口だと聞きました。誰にとっての甘口かは教えてくれませんでした。",
-      "throwable_banana": "こざるが譲ってくれたバナナです。本当に譲ってくれたのかは、まだ聞けていません。",
-      "throwable_baseball": "赤い縫い目のボールが、ぺちゃんとつぶれて弾みます。",
-      "throwable_bouncy_heart": "ぴょんぴょん弾みながら飛んでいくハートの投げアイテムです。",
-      "throwable_clam": "カワウソが大事に抱えていた貝です。真珠はないけれど、未練は少しあります。",
-      "throwable_dujjonku": "ココアの皮と緑の中身がつぶれて、サクッと音を立てます。",
-      "throwable_dust_bath_pouch": "チンチラの砂浴び用の砂です。洗ってほしくて投げるわけでは…たぶんありません。",
-      "throwable_fish_cake_skewer": "食べてほしくて渡したのに、どうして振り回しているんですか？",
-      "throwable_leaf": "クオッカのお弁当です。投げてもいいかは聞いていません。",
-      "throwable_mini_paprika": "大切に取っておいたおやつです。投げたあとも3秒以内に拾えば大丈夫ですよね？",
-      "throwable_pork": "ぺちっ！ところで、お隣のぶたさんをここ数日見かけませんね…？",
-      "throwable_snowflake": "当たると小さな結晶のかけらになって散らばる雪の結晶です。",
-      "throwable_squeaky_duck": "アヒルがアヒルを投げます。家庭の事情ではなさそうです。",
-      "throwable_starlight_orb": "星明かりをぎゅっと丸めました。空の星がひとつ減ったそうですが？",
-      "throwable_tennis_ball": "投げる人は決まりました。拾ってくる人はまだ決まっていません。",
-      "throwable_timber": "木が小さな木を投げます。まずは家系図から確認してみましょうか。",
-      "throwable_tissue_ball": "使用済みのトイレットペーパーかは不明です。とにかく避けて！",
-      "throwable_toy_cannon": "導火線つきの弾を撃つ、ミニ大砲の投げアイテムです。",
-      "throwable_wakkuball": "ザクザク！ワックボールがかけらに砕ける、軽快な音を楽しんでください。"
+    "purchase": {
+      "action": "{0}で購入",
+      "confirming": "お支払いを確認中…",
+      "failed": "購入状況を確認できませんでした。",
+      "owned": "所持済み",
+      "success": "購入が完了しました。",
+      "timeout": "お支払いの確認がタイムアウトしました。ストアを開き直して状態を確認してください。",
+      "unavailable": "現在購入できません。しばらくしてからもう一度お試しください。"
     },
-    "productKind": "商品カテゴリ",
-    "purchase": "{0}で購入",
-    "purchaseCompleted": "購入が完了しました。",
-    "purchaseFailed": "購入状況を確認できませんでした。",
-    "resetAll": "すべてリセット",
-    "retry": "再試行",
-    "search": "検索",
-    "searchPlaceholder": "商品名や説明を検索",
-    "soldSeparately": "キャラクターとは別売り",
-    "sort": "並べ替え",
-    "sortCatalog": "標準",
-    "sortPriceAscending": "価格が安い順",
-    "sortPriceDescending": "価格が高い順",
-    "squeakyDuckDescription": "黄色いアヒルがくるくる飛んでいく、遊び心いっぱいのアイテムです。",
-    "starlightUpalupaDescription": "真珠色の体に星のようなエラを持つウーパールーパー。オンライン中は小さな星がきらめき、ダブルクリックすると二重の星の輪が広がります。",
-    "starryCatBubbleDescription": "星ねこの飾りと明るい文字がついた、深い紫の吹き出しです。",
-    "stateUnavailable": "ストアの状態を読み込めませんでした。しばらくしてからお試しください。",
-    "title": "着せ替え・ストア",
-    "toyCannonDescription": "キャラクターの前に小さな大砲が現れ、弾を発射。相手に当たると、ぽんっとはじけます。",
-    "unavailable": "現在購入できません。しばらくしてからもう一度お試しください。"
+    "sort": {
+      "catalog": "標準",
+      "label": "並べ替え",
+      "price_ascending": "価格が安い順",
+      "price_descending": "価格が高い順"
+    },
+    "status": {
+      "retry": "再試行",
+      "unavailable": "ストアの状態を読み込めませんでした。しばらくしてからお試しください。"
+    },
+    "title": "着せ替え・ストア"
+  },
+  "support": {
+    "diagnostics": {
+      "description": "ログファイルを圧縮してデスクトップに保存します。共有いただくと、不具合の修正に役立ちます。",
+      "export": {
+        "action": "エクスポート",
+        "failed": "診断データをエクスポートできませんでした。",
+        "success": "診断データをデスクトップに保存しました。"
+      },
+      "title": "診断データをエクスポート"
+    },
+    "feedback": {
+      "action": "フィードバックを送る",
+      "description": "問題がある場合やサポートが必要な場合は、GitHub Issueを作成してお問い合わせいただけます。",
+      "title": "フィードバック"
+    }
   },
   "tray": {
-    "activeGroup": "表示中のグループ",
-    "checkUpdates": "アップデートを確認…",
-    "compose": "メッセージを書く…",
-    "connectionFailedBody": "接続状態で「再接続」を選んでください。それでも接続できない場合は、診断ログを添えてお問い合わせください。",
-    "connectionFailedTitle": "SIDEYの接続が切れました",
-    "exit": "終了",
-    "groups": "グループ設定…",
-    "hideOverlay": "オーバーレイを隠す",
-    "history": "最近のメッセージ…",
-    "hotkeyRegistrationFailedBody": "次のショートカットは使用できません：{0}。他のアプリで使用されている可能性があります。トレイメニューをご利用ください。",
-    "noGroups": "接続中のグループなし",
-    "open": "開く",
-    "quietMode": "サイレントモード",
-    "settings": "設定…",
-    "showOverlay": "オーバーレイを表示",
-    "startup": "サインイン時に自動起動",
-    "store": "ストア…",
-    "unreadTooltip": "SIDEY · 未読 {0}件",
-    "updateAvailable": "アップデートがあります。{0}",
-    "updateCheckFailed": "アップデートを確認できませんでした。しばらくしてからお試しください。",
-    "updateInstalled": "SIDEY {0} へのアップデートが完了しました。クリックして変更内容を確認できます。",
-    "updateLatest": "最新バージョンです。"
-  },
-  "unsupported": {
-    "description": "SIDEYにはWindows 10 1809（ビルド17763）以降のx64版が必要です。",
-    "title": "対応していないWindowsです",
-    "windowTitle": "SIDEY — 非対応のWindows"
+    "app": {
+      "exit": "終了"
+    },
+    "connection": {
+      "error": {
+        "message": "接続状態で「再接続」を選んでください。それでも接続できない場合は、診断ログを添えてお問い合わせください。",
+        "title": "SIDEYの接続が切れました"
+      }
+    },
+    "group": {
+      "active": "表示中のグループ"
+    },
+    "groups": {
+      "empty": "接続中のグループなし",
+      "open": "グループ設定…"
+    },
+    "history": {
+      "open": "最近のメッセージ…"
+    },
+    "message": {
+      "compose": "メッセージを書く…"
+    },
+    "overlay": {
+      "hide": "オーバーレイを隠す"
+    },
+    "quiet_mode": {
+      "toggle": "ひかえめモード"
+    },
+    "settings": {
+      "open": "設定…"
+    },
+    "shortcuts": {
+      "registration_failed": "次のショートカットは使用できません：{0}。他のアプリで使用されている可能性があります。トレイメニューをご利用ください。"
+    },
+    "start": {
+      "failed": "トレイアイコンを起動できませんでした。ウィンドウを閉じるとSIDEYが終了します。"
+    },
+    "store": {
+      "open": "ストア…"
+    },
+    "unread": {
+      "tooltip": "SIDEY · 未読 {0}件"
+    },
+    "update": {
+      "available": "アップデートがあります。{0}",
+      "check": "アップデートを確認…",
+      "check_failed": "アップデートを確認できませんでした。しばらくしてからお試しください。",
+      "installed": "SIDEY {0} へのアップデートが完了しました。左クリックして変更内容を確認できます。",
+      "latest": "最新バージョンです。"
+    }
   },
   "update": {
     "available": "SIDEY {0}を利用できます。",
     "checking": "アップデートを確認中…",
-    "downloading": "アップデートをダウンロード中…",
-    "downloadingProgress": "アップデートをダウンロード中…（{0}%）",
+    "download": {
+      "hash_mismatch": "アップデートファイルを確認できませんでした。もう一度ダウンロードしてください。",
+      "in_progress": "アップデートをダウンロード中…",
+      "progress": "アップデートをダウンロード中…（{0}%）"
+    },
     "failed": "アップデートを完了できませんでした。しばらくしてからお試しください。",
-    "hashMismatch": "アップデートファイルを確認できませんでした。もう一度ダウンロードしてください。",
-    "installCancelled": "アップデートのインストールをキャンセルしました。",
-    "installerLaunchFailed": "インストーラーを開けませんでした。「アップデートを確認」からもう一度お試しください。",
-    "installerLaunched": "ダウンロードが完了し、インストーラーを開きました。",
-    "invalidInstaller": "SIDEY Windows版のインストーラー情報が正しくありません。",
-    "invalidManifest": "SIDEY Windows版のアップデート情報が正しくありません。",
+    "install": {
+      "cancelled": "アップデートのインストールをキャンセルしました。",
+      "invalid": "アップデートのインストール情報を確認できませんでした。しばらくしてから、もう一度お試しください。",
+      "launch_failed": "インストーラーを開けませんでした。「アップデートを確認」からもう一度お試しください。",
+      "launched": "ダウンロードが完了し、インストーラーを開きました。",
+      "missing": "現在、アップデートをインストールできません。しばらくしてから、もう一度お試しください。"
+    },
     "latest": "最新バージョンを使用しています。",
-    "missingInstaller": "SIDEYのアップデート用インストーラー情報がありません。",
-    "notPublished": "Windows版のアップデート情報はまだ公開されていません。",
-    "releaseNotesFailed": "リリース情報を開けませんでした：{0}",
-    "startupAvailable": "バージョン{0}を利用できます。「アップデートを確認」からリリースページを開いてください。"
+    "metadata": {
+      "invalid": "アップデート情報を確認できませんでした。しばらくしてから、もう一度お試しください。"
+    },
+    "not_published": "新しいアップデートはまだ利用できません。しばらくしてから、もう一度ご確認ください。",
+    "prompt": {
+      "download": "ダウンロード",
+      "later": "あとで",
+      "message": "SIDEY {0}をダウンロードしますか？",
+      "title": "新しいアップデートがあります"
+    },
+    "release_notes": {
+      "open_failed": "アップデート内容を開けませんでした。もう一度お試しください。（{0}）"
+    }
   },
   "validation": {
-    "invalidInviteCode": "有効な招待コードを入力してください。",
-    "messageLength": "メッセージを1〜200文字で入力してください。",
-    "nicknameLength": "ニックネームを2〜8文字で入力してください。",
-    "roomNameLength": "グループ名を1〜20文字で入力してください。"
-  },
-  "window": {
-    "composerTitle": "SIDEY メッセージ",
-    "historyTitle": "SIDEY メッセージ履歴",
-    "onboardingTitle": "SIDEYへようこそ",
-    "settingsTitle": "SIDEY 設定"
+    "message": {
+      "length": "メッセージを1〜200文字で入力してください。"
+    },
+    "nickname": {
+      "length": "ニックネームを2〜8文字で入力してください。"
+    },
+    "room_name": {
+      "length": "グループ名を1〜20文字で入力してください。"
+    }
   }
 }

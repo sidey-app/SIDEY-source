@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Supabase 覆盖配置需要 HTTPS URL (localhost 可使用 HTTP) 和发布密钥。不得使用 secret 或 service-role 密钥。"
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "由于未设置后端服务器环境变量，当前正在以包含 12 个角色的本地预览模式运行。"
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "指标渲染器未在运行。",
+      "not_started": "指标渲染器尚未启动。"
+    },
+    "export": {
+      "action": "导出当前指标 JSON",
+      "failed": "导出指标失败: {0}",
+      "path": "导出路径: {0}",
+      "success": "当前指标 JSON 已导出，手动结果仍为 not_run。",
+      "tooltip": "将当前渲染性能指标保存为 JSON。"
+    },
+    "preview_notice": "内部仓鼠限定渲染指标模式，尚未记录手动验证结果。",
+    "samples": {
+      "empty": "没有指标样本"
+    },
+    "summary": "用时 {0:F0} 秒 · {1} 个样本 · 最大帧耗时 {2:F2} 毫秒 · 工作集 {3:F1} MB (峰值 {4:F1} MB) · GDI {5} · USER {6}",
+    "title": "内部渲染指标"
+  }
+}

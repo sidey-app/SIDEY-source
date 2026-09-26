@@ -12,8 +12,36 @@ from .process import run
 
 WINDOWS_UI_LOCALIZATION_MIRRORS = {
     f"windows/src/Sidey.App/Langs/{locale}.json"
-    for locale in ("en-US", "ja-JP", "ko-KR", "ru-RU", "uk-UA", "zh-CN", "zh-TW")
+    for locale in (
+        "bg-BG", "cs-CZ", "de-DE", "en-US", "es-ES", "fr-FR", "he-IL",
+        "it-IT", "ja-JP", "ko-KR", "nl-BE", "nl-NL", "pl-PL", "pt-BR",
+        "pt-PT", "ro-RO", "ru-RU", "sr-Cyrl-RS", "sr-Latn-RS", "tr-TR",
+        "uk-UA", "zh-CN", "zh-TW",
+    )
 }
+WINDOWS_INTERNAL_LOCALIZATION_MIRRORS = {
+    f"windows/src/Sidey.App/InternalLangs/{locale}.json"
+    for locale in (
+        "bg-BG", "cs-CZ", "de-DE", "en-US", "es-ES", "fr-FR", "he-IL",
+        "it-IT", "ja-JP", "ko-KR", "nl-BE", "nl-NL", "pl-PL", "pt-BR",
+        "pt-PT", "ro-RO", "ru-RU", "sr-Cyrl-RS", "sr-Latn-RS", "tr-TR",
+        "uk-UA", "zh-CN", "zh-TW",
+    )
+}
+MACOS_LOCALIZATION_MIRRORS = {
+    "macos/SIDEY/Resources/Localizable.xcstrings",
+    "macos/SIDEY/Resources/InternalLocalizable.xcstrings",
+    "macos/SIDEY/Resources/Commerce/commerce-localizations.json",
+    "macos/SIDEYAppStore.storekit",
+}
+# Locale-source changes must keep the one macOS source adapter and all checked-in
+# platform mirrors atomic.
+LOCALIZATION_PLATFORM_PATHS = (
+    WINDOWS_UI_LOCALIZATION_MIRRORS
+    | WINDOWS_INTERNAL_LOCALIZATION_MIRRORS
+    | MACOS_LOCALIZATION_MIRRORS
+    | {"scripts/macos/sync_commerce_localizations.py"}
+)
 
 
 def git(root: str | Path, *args: str) -> str:
@@ -102,16 +130,53 @@ def validate_paths(
 
     platform = match[1]
     mac_build_change = platform == "macos" and "release/version.json" in paths
-    windows_localization_change = (
-        platform == "shared" and "assets/v1/ui-localizations.json" in paths
+    localization_source_change = (
+        platform == "shared"
+        and any(
+            path == "assets/v1/ui-localizations.json"
+            or path.startswith(
+                (
+                    "assets/v1/locale/client/",
+                    "assets/v1/locale/commerce/",
+                    "assets/v1/locale/internal/",
+                )
+            )
+            for path in paths
+        )
+    )
+    # The per-locale source split removes this legacy file exactly once. That
+    # migration also changes both native consumers atomically so no temporary
+    # compatibility keys or broken intermediate main revision are required.
+    # Check the revisions themselves so a later change cannot recreate the
+    # path merely to reopen this platform-boundary exception.
+    legacy_source = "assets/v1/commerce-localizations.json"
+    locale_source_split_change = (
+        localization_source_change
+        and legacy_source in paths
+        and root is not None
+        and base is not None
+        and git(root, "ls-tree", "--name-only", base, "--", legacy_source)
+        == legacy_source
+        and not git(
+            root,
+            "ls-tree",
+            "--name-only",
+            revision,
+            "--",
+            legacy_source,
+        )
     )
     invalid = [
         path for path in paths
         if platform_for(path) != platform
         and not (mac_build_change and path == "release/version.json")
         and not (
-            windows_localization_change
-            and path in WINDOWS_UI_LOCALIZATION_MIRRORS
+            localization_source_change
+            and path in LOCALIZATION_PLATFORM_PATHS
+        )
+        and not (
+            locale_source_split_change
+            and platform_for(path) in {"macos", "windows"}
         )
     ]
     if invalid:

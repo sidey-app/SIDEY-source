@@ -158,7 +158,7 @@ public sealed partial class StorePreviewStage : UserControl
 
     private void RefreshSoundButton()
     {
-        string label = I18n.Get(_previewSoundEnabled ? "preview.muteSound" : "preview.enableSound");
+        string label = I18n.Get(_previewSoundEnabled ? "store.preview.sound.off" : "store.preview.sound.on");
         PreviewSoundIcon.Symbol = _previewSoundEnabled ? Symbol.Volume : Symbol.Mute;
         ToolTipService.SetToolTip(PreviewSoundButton, label);
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(PreviewSoundButton, label);
@@ -191,7 +191,7 @@ public sealed partial class StorePreviewStage : UserControl
         _lastSceneElapsed = 0;
         _movementAgents.Clear();
         BuildMovementAgents();
-        _motionNotice.Text = I18n.Get("motion.disabled");
+        _motionNotice.Text = I18n.Get("accessibility.motion.disabled");
         _motionNotice.Visibility = enabled ? Visibility.Collapsed : Visibility.Visible;
         if (_isPresented && _resourcesLoaded)
             StartAnimation();
@@ -444,7 +444,7 @@ public sealed partial class StorePreviewStage : UserControl
                 _loadFailed = true;
                 LoadingRing.IsActive = false;
                 LoadingRing.Visibility = Visibility.Collapsed;
-                ErrorText.Text = I18n.Get("store.previewUnavailable");
+                ErrorText.Text = I18n.Get("store.preview.unavailable");
                 ErrorText.Visibility = Visibility.Visible;
             }
             StartupDiagnostics.NonFatal("store-preview-load", exception);
@@ -942,7 +942,7 @@ public sealed partial class StorePreviewStage : UserControl
         bool typing = local < 1;
         BubbleText.Text = typing
             ? new string('.', 1 + ((int)(local / TypingFrameSeconds) % 3))
-            : I18n.Get(fromLeft ? "preview.leftMessage" : "preview.rightMessage");
+            : I18n.Get(fromLeft ? "store.preview.message.left" : "store.preview.message.right");
         BubbleText.FontSize = typing ? BubbleTypingFontSize : BubbleMessageFontSize;
         BubbleText.Margin = typing
             ? new Thickness(6, 1.5, 6, 1.5)

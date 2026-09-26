@@ -116,15 +116,15 @@ enum RuntimeConfigurationError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .incompleteEnvironment:
-            L10n.text("configuration.error.incomplete_environment")
+            InternalL10n.text("configuration.error.incomplete_environment")
         case .secretKeyNotAllowed:
-            L10n.text("configuration.error.secret_key_not_allowed")
+            InternalL10n.text("configuration.error.secret_key_not_allowed")
         case .missingDevelopmentConfiguration:
-            L10n.text("configuration.error.missing_development_configuration")
+            InternalL10n.text("configuration.error.missing_development_configuration")
         case .productionBackendNotAllowedInDevelopment:
-            L10n.text("configuration.error.production_backend_in_development")
+            InternalL10n.text("configuration.error.production_backend_in_development")
         case .invalidRealtimeTransport:
-            L10n.text("configuration.error.unsupported_realtime_protocol")
+            InternalL10n.text("configuration.error.unsupported_realtime_protocol")
         }
     }
 }

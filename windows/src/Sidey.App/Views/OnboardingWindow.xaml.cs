@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Sidey.App.Localization;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
 using Sidey.Presentation.Services;
@@ -16,12 +17,13 @@ public sealed partial class OnboardingWindow : Window
     public OnboardingWindow(AppCoordinator coordinator)
     {
         InitializeComponent();
+        RefreshLocalizationLayout();
         ViewModel = new OnboardingViewModel(coordinator);
         OnboardingRoot.DataContext = ViewModel;
         SideyWindowTheme.Apply(OnboardingRoot, coordinator.State.Preferences.Theme);
         ViewModel.Completed += OnCompleted;
         Closed += OnWindowClosed;
-        Title = I18n.Get("window.settingsTitle");
+        Title = I18n.Get("settings.window.title");
         AppTitleBar.IconSource = new ImageIconSource
         {
             ImageSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(Path.Combine(
@@ -53,6 +55,8 @@ public sealed partial class OnboardingWindow : Window
     public event Action? Completed;
 
     public OnboardingViewModel ViewModel { get; }
+
+    public void RefreshLocalizationLayout() => LocalizationLayout.Apply(OnboardingRoot);
 
     public void ApplyState(CoordinatorState state)
     {

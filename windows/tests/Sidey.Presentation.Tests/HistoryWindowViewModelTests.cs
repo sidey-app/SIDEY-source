@@ -56,8 +56,8 @@ public sealed class HistoryWindowViewModelTests
 
         await viewModel.ActivateAsync();
 
-        Assert.Equal("활성 그룹 없음", viewModel.EmptyMessage);
-        Assert.Equal("그룹에 참가하면 최근 메시지를 확인할 수 있습니다.", viewModel.EmptyDescription);
+        Assert.Equal("사용 중인 그룹 없음", viewModel.EmptyMessage);
+        Assert.Equal("그룹에 참여하면 최근 메시지를 확인할 수 있습니다.", viewModel.EmptyDescription);
         Assert.True(viewModel.IsEmptyStateVisible);
     }
 

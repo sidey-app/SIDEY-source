@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Přepsání nastavení Supabase vyžaduje adresu URL HTTPS (nebo HTTP pro localhost) a veřejný klíč. Tajné klíče a klíče service-role nejsou povolené."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "Spouští se místní náhled s 12 postavami, protože nejsou nastavené proměnné prostředí serveru."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "Modul pro měření vykreslování neběží.",
+      "not_started": "Modul pro měření vykreslování nebyl spuštěn."
+    },
+    "export": {
+      "action": "Exportovat aktuální metriky do JSON",
+      "failed": "Metriky se nepodařilo exportovat: {0}",
+      "path": "Cesta k exportu: {0}",
+      "success": "Aktuální metriky byly exportovány do JSON. Výsledek ručního ověření zůstává ve stavu not_run.",
+      "tooltip": "Uložit aktuální metriky výkonu vykreslování do souboru JSON."
+    },
+    "preview_notice": "Interní režim měření vykreslování pouze s křečkem. Výsledek ručního ověření zatím nebyl zaznamenán.",
+    "samples": {
+      "empty": "Žádné vzorky metrik"
+    },
+    "summary": "Uplynulo {0:F0} s · Vzorky: {1} · Nejdelší snímek: {2:F2} ms · Pracovní sada: {3:F1} MB (maximum: {4:F1} MB) · GDI: {5} · USER: {6}",
+    "title": "Interní metriky vykreslování"
+  }
+}

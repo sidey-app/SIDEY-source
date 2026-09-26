@@ -175,13 +175,13 @@
         <CornerRadius x:Key="NavigationViewContentGridCornerRadius">0</CornerRadius>
       </NavigationView.Resources>
       <NavigationView.MenuItems>
-        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=navigation.profile}, Mode=OneWay}" Icon="Contact" Tag="profile" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=navigation.profile}, Mode=OneWay}" />
-        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=navigation.groups}, Mode=OneWay}" Icon="People" Tag="groups" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=navigation.groups}, Mode=OneWay}" />
-        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=navigation.store}, Mode=OneWay}" Icon="Shop" Tag="store" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=navigation.store}, Mode=OneWay}" />
+        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=profile.title}, Mode=OneWay}" Icon="Contact" Tag="profile" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=profile.title}, Mode=OneWay}" />
+        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=groups.navigation_label}, Mode=OneWay}" Icon="People" Tag="groups" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.navigation_label}, Mode=OneWay}" />
+        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=store.navigation_label}, Mode=OneWay}" Icon="Shop" Tag="store" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=store.navigation_label}, Mode=OneWay}" />
       </NavigationView.MenuItems>
       <NavigationView.FooterMenuItems>
-        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=navigation.settings}, Mode=OneWay}" Icon="Setting" Tag="settings" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=navigation.settings}, Mode=OneWay}" />
-        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=navigation.about}, Mode=OneWay}" Tag="about" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=navigation.about}, Mode=OneWay}">
+        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=settings.navigation_label}, Mode=OneWay}" Icon="Setting" Tag="settings" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.navigation_label}, Mode=OneWay}" />
+        <NavigationViewItem Content="{Binding Value, Source={i18n:I18n Key=app.info.navigation_label}, Mode=OneWay}" Tag="about" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=app.info.navigation_label}, Mode=OneWay}">
           <NavigationViewItem.Icon><FontIcon Glyph="&#xE946;" /></NavigationViewItem.Icon>
         </NavigationViewItem>
       </NavigationView.FooterMenuItems>
@@ -198,24 +198,24 @@
                 <StackPanel x:Name="ProfileCardContent" Spacing="20">
                   <controls:ResponsiveFormPanel x:Name="ProfileNameLayout">
                     <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=profile.nickname}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.nicknameDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=profile.nickname.label}, Mode=OneWay}" />
+                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.nickname.description}, Mode=OneWay}" TextWrapping="Wrap" />
                     </StackPanel>
                     <StackPanel x:Name="ProfileNameEditor" Spacing="8">
-                      <TextBox MaxLength="8" PlaceholderText="{Binding Value, Source={i18n:I18n Key=onboarding.nicknamePlaceholder}, Mode=OneWay}" Text="{Binding Nickname, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                      <TextBox MaxLength="8" PlaceholderText="{Binding Value, Source={i18n:I18n Key=profile.nickname.placeholder}, Mode=OneWay}" Text="{Binding Nickname, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                       <Button
                           Command="{Binding SaveProfileCommand}"
-                          Content="{Binding Value, Source={i18n:I18n Key=profile.changeNickname}, Mode=OneWay}"
+                          Content="{Binding Value, Source={i18n:I18n Key=profile.nickname.save.action}, Mode=OneWay}"
                           HorizontalAlignment="Right"
                           Style="{StaticResource AccentButtonStyle}"
-                          ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=profile.changeNicknameTooltip}, Mode=OneWay}"
+                          ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=profile.nickname.save.tooltip}, Mode=OneWay}"
                           Visibility="{Binding HasNicknameChanges, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </StackPanel>
                   </controls:ResponsiveFormPanel>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <StackPanel Spacing="4">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=profile.character}, Mode=OneWay}" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.characterDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=profile.character.label}, Mode=OneWay}" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.character.description}, Mode=OneWay}" TextWrapping="Wrap" />
                   </StackPanel>
                   <StackPanel>
                     <GridView
@@ -308,8 +308,8 @@
                   </StackPanel>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <StackPanel Spacing="4">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=profile.bubble}, Mode=OneWay}" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.bubbleDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=profile.cosmetics.bubble.title}, Mode=OneWay}" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.cosmetics.bubble.description}, Mode=OneWay}" TextWrapping="Wrap" />
                   </StackPanel>
                   <StackPanel>
                     <GridView
@@ -381,8 +381,8 @@
                   </StackPanel>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <StackPanel Spacing="4">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=profile.throwable}, Mode=OneWay}" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.throwableDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=profile.cosmetics.throwable.title}, Mode=OneWay}" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.cosmetics.throwable.description}, Mode=OneWay}" TextWrapping="Wrap" />
                   </StackPanel>
                   <StackPanel>
                     <GridView
@@ -452,7 +452,7 @@
                       <StackPanel VerticalAlignment="Center" Spacing="12"><controls:SkeletonBar Width="58" Height="50" HorizontalAlignment="Center" /><controls:SkeletonBar Width="62" Height="12" HorizontalAlignment="Center" /></StackPanel>
                     </controls:ResponsiveSelectionPanel>
                   </StackPanel>
-                  <TextBlock Foreground="{ThemeResource TextFillColorTertiaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.duplicateNotice}, Mode=OneWay}" TextWrapping="Wrap" />
+                  <TextBlock Foreground="{ThemeResource TextFillColorTertiaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=profile.duplicates.notice}, Mode=OneWay}" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
             </StackPanel>
@@ -473,8 +473,8 @@
                   <Border Style="{StaticResource SideySettingsCardStyle}" Visibility="{Binding HasRooms, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
                   <StackPanel HorizontalAlignment="Center" Spacing="8">
                     <SymbolIcon HorizontalAlignment="Center" Symbol="People" />
-                    <TextBlock HorizontalAlignment="Center" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=groups.emptyTitle}, Mode=OneWay}" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=groups.emptyDescription}, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap" />
+                    <TextBlock HorizontalAlignment="Center" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=groups.empty.title}, Mode=OneWay}" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=groups.empty.description}, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap" />
                   </StackPanel>
                   </Border>
                   <ListView IsItemClickEnabled="False" ItemsSource="{Binding Rooms}" SelectionMode="None" Visibility="{Binding HasRooms, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -565,9 +565,9 @@
                               </StackPanel>
                             </Grid>
                             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                              <TextBlock IsHitTestVisible="False" Foreground="{ThemeResource SystemFillColorSuccessBrush}" Text="{Binding Value, Source={i18n:I18n Key=groups.active}, Mode=OneWay}" VerticalAlignment="Center" Visibility="{Binding IsActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                              <TextBlock IsHitTestVisible="False" Foreground="{ThemeResource SystemFillColorSuccessBrush}" Text="{Binding Value, Source={i18n:I18n Key=groups.state.active}, Mode=OneWay}" VerticalAlignment="Center" Visibility="{Binding IsActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
                               <ProgressRing Width="20" Height="20" IsActive="{Binding IsSwitching}" IsHitTestVisible="False" Visibility="{Binding IsSwitching, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                              <Button Command="{Binding JoinCommand}" Content="{Binding JoinActionText}" IsEnabled="{Binding IsJoinEnabled}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.joinTooltip}, Mode=OneWay}" Visibility="{Binding CanJoin, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                              <Button Command="{Binding JoinCommand}" Content="{Binding JoinActionText}" IsEnabled="{Binding IsJoinEnabled}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.switch.tooltip}, Mode=OneWay}" Visibility="{Binding CanJoin, Converter={StaticResource BooleanToVisibilityConverter}}" />
                               <Button Command="{Binding InviteCommand}" IsEnabled="{Binding IsInviteActionEnabled}" ToolTipService.ToolTip="{Binding InviteActionText}">
                                 <Grid>
                                   <TextBlock Text="{Binding InviteActionText}" Visibility="{Binding IsInviteCopyConfirmed, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
@@ -634,16 +634,16 @@
                                             Text="{Binding Value, Source={i18n:I18n Key=common.me}, Mode=OneWay}" />
                                       </Border>
                                     </StackPanel>
-                                    <Button Grid.Column="2" Command="{Binding RemoveCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.removeMember}, Mode=OneWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.removeMemberTooltip}, Mode=OneWay}" Visibility="{Binding CanRemove, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <Button Grid.Column="2" Command="{Binding RemoveCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.member.remove.action}, Mode=OneWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.member.remove.tooltip}, Mode=OneWay}" Visibility="{Binding CanRemove, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                   </Grid>
                                 </DataTemplate>
                               </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                              <Button Command="{Binding LeaveCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.leave}, Mode=OneWay}" IsEnabled="{Binding AreRoomActionsEnabled}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.leaveTooltip}, Mode=OneWay}" />
-                              <Button Command="{Binding RenameCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.rename}, Mode=OneWay}" IsEnabled="{Binding AreOwnerActionsEnabled}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.renameTooltip}, Mode=OneWay}" Visibility="{Binding IsOwner, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                              <Button Command="{Binding DeleteCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.delete}, Mode=OneWay}" IsEnabled="{Binding AreOwnerActionsEnabled}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.deleteTooltip}, Mode=OneWay}" Visibility="{Binding IsOwner, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                              <Button Command="{Binding LeaveCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.leave.action}, Mode=OneWay}" IsEnabled="{Binding AreRoomActionsEnabled}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.leave.tooltip}, Mode=OneWay}" />
+                              <Button Command="{Binding RenameCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.rename.action}, Mode=OneWay}" IsEnabled="{Binding AreOwnerActionsEnabled}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.rename.tooltip}, Mode=OneWay}" Visibility="{Binding IsOwner, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                              <Button Command="{Binding DeleteCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.delete.action}, Mode=OneWay}" IsEnabled="{Binding AreOwnerActionsEnabled}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.delete.tooltip}, Mode=OneWay}" Visibility="{Binding IsOwner, Converter={StaticResource BooleanToVisibilityConverter}}" />
                               </StackPanel>
                             </StackPanel>
                           </Grid>
@@ -674,28 +674,28 @@
               </Grid>
 
               <StackPanel Spacing="8">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=groups.createTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=groups.createDescription}, Mode=OneWay}" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=groups.create.action}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=groups.create.description}, Mode=OneWay}" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}">
                 <Grid ColumnSpacing="12" RowSpacing="12">
                   <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                   <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                  <TextBox Header="{Binding Value, Source={i18n:I18n Key=groups.roomName}, Mode=OneWay}" IsEnabled="{Binding AreGroupMutationsEnabled}" MaxLength="20" PlaceholderText="{Binding Value, Source={i18n:I18n Key=groups.roomNamePlaceholder}, Mode=OneWay}" Text="{Binding CreateRoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                  <Button x:Name="GroupCreateAction" Grid.Column="1" Command="{Binding CreateRoomCommand}" Content="{Binding CreateRoomActionText}" IsEnabled="{Binding AreGroupMutationsEnabled}" VerticalAlignment="Bottom" Style="{StaticResource AccentButtonStyle}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.createTooltip}, Mode=OneWay}" />
+                  <TextBox Header="{Binding Value, Source={i18n:I18n Key=groups.room_name.label}, Mode=OneWay}" IsEnabled="{Binding AreGroupMutationsEnabled}" MaxLength="20" PlaceholderText="{Binding Value, Source={i18n:I18n Key=groups.create.name.placeholder}, Mode=OneWay}" Text="{Binding CreateRoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                  <Button x:Name="GroupCreateAction" Grid.Column="1" Command="{Binding CreateRoomCommand}" Content="{Binding CreateRoomActionText}" IsEnabled="{Binding AreGroupMutationsEnabled}" VerticalAlignment="Bottom" Style="{StaticResource AccentButtonStyle}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.create.tooltip}, Mode=OneWay}" />
                 </Grid>
               </Border>
 
               <StackPanel Spacing="8">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=groups.joinTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=groups.joinDescription}, Mode=OneWay}" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=groups.action.join_by_code}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=groups.join.description}, Mode=OneWay}" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}">
                 <Grid ColumnSpacing="12" RowSpacing="12">
                   <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                   <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                  <TextBox Header="{Binding Value, Source={i18n:I18n Key=groups.inviteCode}, Mode=OneWay}" IsEnabled="{Binding AreGroupMutationsEnabled}" PlaceholderText="{Binding Value, Source={i18n:I18n Key=groups.inviteCode}, Mode=OneWay}" Text="{Binding InviteCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                  <Button x:Name="GroupJoinAction" Grid.Column="1" Command="{Binding JoinRoomCommand}" Content="{Binding JoinRoomActionText}" IsEnabled="{Binding AreGroupMutationsEnabled}" VerticalAlignment="Bottom" Style="{StaticResource AccentButtonStyle}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.joinByCodeTooltip}, Mode=OneWay}" />
+                  <TextBox Header="{Binding Value, Source={i18n:I18n Key=groups.invite.code.label}, Mode=OneWay}" IsEnabled="{Binding AreGroupMutationsEnabled}" PlaceholderText="{Binding Value, Source={i18n:I18n Key=groups.invite.code.label}, Mode=OneWay}" Text="{Binding InviteCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                  <Button x:Name="GroupJoinAction" Grid.Column="1" Command="{Binding JoinRoomCommand}" Content="{Binding JoinRoomActionText}" IsEnabled="{Binding AreGroupMutationsEnabled}" VerticalAlignment="Bottom" Style="{StaticResource AccentButtonStyle}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=groups.join.tooltip}, Mode=OneWay}" />
                 </Grid>
               </Border>
 
@@ -725,7 +725,7 @@
                       x:Name="StoreCharacterKindChip"
                       AutomationProperties.AutomationId="StoreCharacterKindChip"
                       Checked="OnStoreKindChipChecked"
-                      Content="{Binding Value, Source={i18n:I18n Key=store.kindCharacter}, Mode=OneWay}"
+                      Content="{Binding Value, Source={i18n:I18n Key=store.kind.character}, Mode=OneWay}"
                       GroupName="StoreProductKind"
                       IsChecked="True"
                       Style="{StaticResource SideyStoreKindChipSelectedStyle}"
@@ -734,7 +734,7 @@
                       x:Name="StoreBubbleKindChip"
                       AutomationProperties.AutomationId="StoreBubbleKindChip"
                       Checked="OnStoreKindChipChecked"
-                      Content="{Binding Value, Source={i18n:I18n Key=store.kindBubble}, Mode=OneWay}"
+                      Content="{Binding Value, Source={i18n:I18n Key=store.kind.bubble}, Mode=OneWay}"
                       GroupName="StoreProductKind"
                       Style="{StaticResource SideyStoreKindChipStyle}"
                       Tag="1" />
@@ -742,7 +742,7 @@
                       x:Name="StoreThrowableKindChip"
                       AutomationProperties.AutomationId="StoreThrowableKindChip"
                       Checked="OnStoreKindChipChecked"
-                      Content="{Binding Value, Source={i18n:I18n Key=store.kindThrowable}, Mode=OneWay}"
+                      Content="{Binding Value, Source={i18n:I18n Key=store.kind.throwable}, Mode=OneWay}"
                       GroupName="StoreProductKind"
                       Style="{StaticResource SideyStoreKindChipStyle}"
                       Tag="2" />
@@ -754,10 +754,10 @@
                     AutomationProperties.AutomationId="StoreFilterToggle"
                     Click="OnStoreFilterToggleClick"
                     Style="{StaticResource SideyStoreFilterToggleStyle}"
-                    ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=store.filter}, Mode=OneWay}">
+                    ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=store.filter.menu}, Mode=OneWay}">
                   <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon FontSize="14" Glyph="&#xE71C;" />
-                    <TextBlock Text="{Binding Value, Source={i18n:I18n Key=store.filter}, Mode=OneWay}" />
+                    <TextBlock Text="{Binding Value, Source={i18n:I18n Key=store.filter.menu}, Mode=OneWay}" />
                     <FontIcon x:Name="StoreFilterChevron" FontSize="12" Glyph="&#xE70D;" RenderTransformOrigin="0.5,0.5">
                       <FontIcon.RenderTransform><RotateTransform /></FontIcon.RenderTransform>
                     </FontIcon>
@@ -786,8 +786,8 @@
                       <TextBox
                           x:Name="StoreSearchTextBox"
                           AutomationProperties.AutomationId="StoreSearchTextBox"
-                          Header="{Binding Value, Source={i18n:I18n Key=store.search}, Mode=OneWay}"
-                          PlaceholderText="{Binding Value, Source={i18n:I18n Key=store.searchPlaceholder}, Mode=OneWay}"
+                          Header="{Binding Value, Source={i18n:I18n Key=store.filter.search.label}, Mode=OneWay}"
+                          PlaceholderText="{Binding Value, Source={i18n:I18n Key=store.filter.search.placeholder}, Mode=OneWay}"
                           Text="{Binding StoreSearchText, Mode=OneWay}"
                           TextChanged="OnStoreSearchTextChanged" />
                       <Button
@@ -795,14 +795,14 @@
                           HorizontalAlignment="Left"
                           AutomationProperties.AutomationId="StoreResetFiltersButton"
                           Click="OnResetStoreFiltersClick"
-                          Content="{Binding Value, Source={i18n:I18n Key=store.resetAll}, Mode=OneWay}" />
+                          Content="{Binding Value, Source={i18n:I18n Key=store.filter.reset}, Mode=OneWay}" />
                     </StackPanel>
                     <StackPanel x:Name="StoreSortStack" Grid.Column="1" Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=store.sort}, Mode=OneWay}" />
+                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=store.sort.label}, Mode=OneWay}" />
                       <ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding SelectedStoreSortIndex, Mode=TwoWay}">
-                        <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=store.sortCatalog}, Mode=OneWay}" />
-                        <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=store.sortPriceAscending}, Mode=OneWay}" />
-                        <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=store.sortPriceDescending}, Mode=OneWay}" />
+                        <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=store.sort.catalog}, Mode=OneWay}" />
+                        <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=store.sort.price_ascending}, Mode=OneWay}" />
+                        <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=store.sort.price_descending}, Mode=OneWay}" />
                       </ComboBox>
                     </StackPanel>
                     <CheckBox
@@ -810,7 +810,7 @@
                         Grid.Column="2"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
-                        Content="{Binding Value, Source={i18n:I18n Key=store.hideOwned}, Mode=OneWay}"
+                        Content="{Binding Value, Source={i18n:I18n Key=store.filter.hide_owned}, Mode=OneWay}"
                         IsChecked="{Binding HidesOwnedStoreProducts, Mode=TwoWay}" />
                   </Grid>
                 </Border>
@@ -826,8 +826,8 @@
                     Spacing="8"
                     Visibility="{Binding HasVisibleStoreProducts, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                   <FontIcon HorizontalAlignment="Center" FontSize="28" Glyph="&#xE735;" />
-                  <TextBlock HorizontalAlignment="Center" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=store.emptyTitle}, Mode=OneWay}" />
-                  <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=store.emptyDescription}, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap" />
+                  <TextBlock HorizontalAlignment="Center" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=store.empty.title}, Mode=OneWay}" />
+                  <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=store.empty.description}, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap" />
                   </StackPanel>
                   <ItemsRepeater
                     x:Name="StoreProductRepeater"
@@ -851,7 +851,7 @@
                           BorderThickness="1"
                           Command="{Binding PreviewCommand}"
                           CornerRadius="8"
-                          ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=store.openPreview}, Mode=OneWay}">
+                          ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=store.preview.open}, Mode=OneWay}">
                         <Grid RowSpacing="8">
                           <Grid.RowDefinitions>
                             <RowDefinition Height="116" />
@@ -941,7 +941,7 @@
               <TextBlock
                   HorizontalAlignment="Center"
                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                  Text="{Binding Value, Source={i18n:I18n Key=store.comingSoonDescription}, Mode=OneWay}"
+                  Text="{Binding Value, Source={i18n:I18n Key=store.availability.coming_soon.description}, Mode=OneWay}"
                   Visibility="{Binding IsStorePreviewOnly, Converter={StaticResource BooleanToVisibilityConverter}}"
                   TextAlignment="Center"
                   TextWrapping="Wrap" />
@@ -952,45 +952,45 @@
           <ScrollViewer x:Name="SettingsPage" HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled" Visibility="Collapsed">
             <StackPanel x:Name="SettingsPageContent" Padding="32,24" MaxWidth="820" HorizontalAlignment="Stretch" Spacing="20">
               <StackPanel Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level1" Style="{ThemeResource TitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.generalTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.generalDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                <TextBlock AutomationProperties.HeadingLevel="Level1" Style="{ThemeResource TitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.section.general.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.general.description}, Mode=OneWay}" TextWrapping="Wrap" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}">
                 <StackPanel Spacing="16">
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.overlay}, Mode=OneWay}" />
-                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.overlayDescription}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.overlay.title}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.overlay.description}, Mode=OneWay}" />
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding IsOverlayVisible, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.overlayTooltip}, Mode=OneWay}" />
+                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding IsOverlayVisible, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.overlay.tooltip}, Mode=OneWay}" />
                   </Grid>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.startup}, Mode=OneWay}" />
-                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.startupDescription}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.startup.title}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.startup.description}, Mode=OneWay}" />
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding StartAtLogin, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.startupTooltip}, Mode=OneWay}" />
+                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding StartAtLogin, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.startup.description}, Mode=OneWay}" />
                   </Grid>
                 </StackPanel>
               </Border>
 
               <StackPanel Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeysTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeysDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.description}, Mode=OneWay}" TextWrapping="Wrap" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}">
                 <StackPanel Spacing="12">
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyOverlay}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.action.overlay}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="OverlayHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
                         Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
                         AutomationProperties.Name="{Binding OverlayHotkeyAccessibleName, Mode=OneWay}"
-                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}">
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.recorder.help}, Mode=OneWay}">
                       <StackPanel Orientation="Horizontal" Spacing="8">
                         <ItemsControl IsHitTestVisible="False" ItemTemplate="{StaticResource HotkeyKeycapTemplate}" ItemsPanel="{StaticResource HotkeyKeycapPanel}" ItemsSource="{Binding OverlayHotkeyKeys, Mode=OneWay}" />
                         <FontIcon FontSize="14" Glyph="&#xE70F;" VerticalAlignment="Center" />
@@ -1000,12 +1000,12 @@
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyQuietMode}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.action.quiet_mode}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="QuietModeHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
                         Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
                         AutomationProperties.Name="{Binding QuietModeHotkeyAccessibleName, Mode=OneWay}"
-                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}">
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.recorder.help}, Mode=OneWay}">
                       <StackPanel Orientation="Horizontal" Spacing="8">
                         <ItemsControl IsHitTestVisible="False" ItemTemplate="{StaticResource HotkeyKeycapTemplate}" ItemsPanel="{StaticResource HotkeyKeycapPanel}" ItemsSource="{Binding QuietModeHotkeyKeys, Mode=OneWay}" />
                         <FontIcon FontSize="14" Glyph="&#xE70F;" VerticalAlignment="Center" />
@@ -1015,12 +1015,12 @@
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyComposer}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.action.composer}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="ComposerHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
                         Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
                         AutomationProperties.Name="{Binding ComposerHotkeyAccessibleName, Mode=OneWay}"
-                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}">
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.recorder.help}, Mode=OneWay}">
                       <StackPanel Orientation="Horizontal" Spacing="8">
                         <ItemsControl IsHitTestVisible="False" ItemTemplate="{StaticResource HotkeyKeycapTemplate}" ItemsPanel="{StaticResource HotkeyKeycapPanel}" ItemsSource="{Binding ComposerHotkeyKeys, Mode=OneWay}" />
                         <FontIcon FontSize="14" Glyph="&#xE70F;" VerticalAlignment="Center" />
@@ -1030,12 +1030,12 @@
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.hotkeyHistory}, Mode=OneWay}" VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.action.history}, Mode=OneWay}" VerticalAlignment="Center" />
                     <Button x:Name="HistoryHotkeyRecorder" Grid.Column="1" MinWidth="180" HorizontalContentAlignment="Center"
                         Style="{StaticResource SubtleButtonStyle}" Background="Transparent" BorderThickness="0"
                         IsEnabled="{Binding IsHotkeySelectionEnabled}" Click="OnHotkeyRecorderClick"
                         AutomationProperties.Name="{Binding HistoryHotkeyAccessibleName, Mode=OneWay}"
-                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.hotkeyRecorderHelp}, Mode=OneWay}">
+                        AutomationProperties.HelpText="{Binding Value, Source={i18n:I18n Key=settings.shortcuts.recorder.help}, Mode=OneWay}">
                       <StackPanel Orientation="Horizontal" Spacing="8">
                         <ItemsControl IsHitTestVisible="False" ItemTemplate="{StaticResource HotkeyKeycapTemplate}" ItemsPanel="{StaticResource HotkeyKeycapPanel}" ItemsSource="{Binding HistoryHotkeyKeys, Mode=OneWay}" />
                         <FontIcon FontSize="14" Glyph="&#xE70F;" VerticalAlignment="Center" />
@@ -1046,51 +1046,51 @@
               </Border>
 
               <StackPanel Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.displayTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.displayDescription}, Mode=OneWay}" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.section.display.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.display.description}, Mode=OneWay}" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}">
                 <StackPanel Spacing="16">
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.quietMode}, Mode=OneWay}" />
-                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.quietModeDescription}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.display.quiet_mode.title}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.display.quiet_mode.description}, Mode=OneWay}" />
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding IsQuietMode, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.quietModeTooltip}, Mode=OneWay}" />
+                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding IsQuietMode, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.display.quiet_mode.tooltip}, Mode=OneWay}" />
                   </Grid>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.rightClickThrow}, Mode=OneWay}" />
-                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.rightClickThrowDescription}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.display.throw_guard.title}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.display.throw_guard.description}, Mode=OneWay}" />
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding RequiresRightClickToThrow, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.rightClickThrowTooltip}, Mode=OneWay}" />
+                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding RequiresRightClickToThrow, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.display.throw_guard.tooltip}, Mode=OneWay}" />
                   </Grid>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.offlineMembers}, Mode=OneWay}" />
-                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.offlineMembersDescription}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.display.offline_members.title}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.display.offline_members.description}, Mode=OneWay}" />
                     </StackPanel>
-                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding ShowOfflineMembers, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.offlineMembersTooltip}, Mode=OneWay}" />
+                    <ToggleSwitch Grid.Column="1" Width="48" MinWidth="0" HorizontalAlignment="Right" IsOn="{Binding ShowOfflineMembers, Mode=TwoWay}" VerticalAlignment="Center" OffContent="" OnContent="" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.display.offline_members.tooltip}, Mode=OneWay}" />
                   </Grid>
                 </StackPanel>
               </Border>
 
               <StackPanel Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.soundTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Text="{Binding Value, Source={i18n:I18n Key=settings.soundDescription}, Mode=OneWay}" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.section.sound.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Text="{Binding Value, Source={i18n:I18n Key=settings.sound.description}, Mode=OneWay}" />
               </StackPanel>
               <Border x:Name="SoundSettingsCard" Style="{StaticResource SideySettingsCardStyle}">
                 <Grid x:Name="SoundSettingsLayout" ColumnSpacing="16" RowSpacing="0">
                   <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                   <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                   <StackPanel VerticalAlignment="Center" Spacing="4">
-                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.characterSounds}, Mode=OneWay}" />
-                    <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.characterSoundsDescription}, Mode=OneWay}" />
+                    <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.sound.character_effects.title}, Mode=OneWay}" />
+                    <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.sound.character_effects.description}, Mode=OneWay}" />
                   </StackPanel>
                   <Grid x:Name="SoundControlsGrid" Grid.Column="1" Width="340" ColumnSpacing="8">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="36" /><ColumnDefinition Width="44" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
@@ -1103,13 +1103,13 @@
                       </Grid>
                     </Button>
                     <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding CharacterSoundVolumeLabel}" />
-                    <controls:SoundVolumeSlider x:Name="CharacterSoundVolumeSlider" Style="{StaticResource DefaultSliderStyle}" Grid.Column="2" VerticalAlignment="Center" Minimum="0" Maximum="100" StepFrequency="1" SmallChange="1" LargeChange="10" Value="{Binding CharacterSoundEffectsVolume, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.soundVolume}, Mode=OneWay}" />
+                    <controls:SoundVolumeSlider x:Name="CharacterSoundVolumeSlider" Style="{StaticResource DefaultSliderStyle}" Grid.Column="2" VerticalAlignment="Center" Minimum="0" Maximum="100" StepFrequency="1" SmallChange="1" LargeChange="10" Value="{Binding CharacterSoundEffectsVolume, Mode=TwoWay}" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.sound.volume}, Mode=OneWay}" />
                   </Grid>
                 </Grid>
               </Border>
               <StackPanel Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.worldTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.worldDescription}, Mode=OneWay}" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.placement.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.placement.description}, Mode=OneWay}" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}">
                 <StackPanel Spacing="12">
@@ -1117,11 +1117,11 @@
                     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="EdgeControlColumn" Width="220" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.edge}, Mode=OneWay}" />
-                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.edgeDescription}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.placement.edge.title}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.placement.edge.description}, Mode=OneWay}" />
                     </StackPanel>
-                    <ComboBox x:Name="EdgeComboBox" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{Binding SelectedEdgeIndex, Mode=TwoWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.edgeTooltip}, Mode=OneWay}">
-                      <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.edgeBottom}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.edgeLeft}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.edgeRight}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.edgeTop}, Mode=OneWay}" />
+                    <ComboBox x:Name="EdgeComboBox" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{Binding SelectedEdgeIndex, Mode=TwoWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.placement.edge.tooltip}, Mode=OneWay}">
+                      <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.placement.edge.bottom}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.placement.edge.left}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.placement.edge.right}, Mode=OneWay}" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.placement.edge.top}, Mode=OneWay}" />
                     </ComboBox>
                   </Grid>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
@@ -1129,11 +1129,11 @@
                     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="SpanControlColumn" Width="220" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.span}, Mode=OneWay}" />
-                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.spanDescription}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.placement.span.title}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.placement.span.description}, Mode=OneWay}" />
                     </StackPanel>
-                    <ComboBox x:Name="SpanComboBox" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{Binding SelectedSpanIndex, Mode=TwoWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.spanTooltip}, Mode=OneWay}">
-                      <ComboBoxItem Content="1/3" /><ComboBoxItem Content="1/2" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.spanFull}, Mode=OneWay}" />
+                    <ComboBox x:Name="SpanComboBox" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{Binding SelectedSpanIndex, Mode=TwoWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.placement.span.tooltip}, Mode=OneWay}">
+                      <ComboBoxItem Content="1/3" /><ComboBoxItem Content="1/2" /><ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.placement.span.full}, Mode=OneWay}" />
                     </ComboBox>
                   </Grid>
                   <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
@@ -1141,20 +1141,20 @@
                     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition x:Name="MonitorControlColumn" Width="220" /></Grid.ColumnDefinitions>
                     <StackPanel Spacing="4">
-                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.monitor}, Mode=OneWay}" />
-                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.monitorDescription}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowTitleStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.placement.monitor.title}, Mode=OneWay}" />
+                      <TextBlock Style="{StaticResource SideySettingsRowDescriptionStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.placement.monitor.description}, Mode=OneWay}" />
                     </StackPanel>
-                    <ComboBox x:Name="MonitorComboBox" Grid.Column="1" HorizontalAlignment="Stretch" DisplayMemberPath="Name" ItemsSource="{Binding Monitors}" SelectedValue="{Binding SelectedMonitorIdentifier, Mode=TwoWay}" SelectedValuePath="Identifier" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.monitorTooltip}, Mode=OneWay}" />
+                    <ComboBox x:Name="MonitorComboBox" Grid.Column="1" HorizontalAlignment="Stretch" DisplayMemberPath="Name" ItemsSource="{Binding Monitors}" SelectedValue="{Binding SelectedMonitorIdentifier, Mode=TwoWay}" SelectedValuePath="Identifier" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.placement.monitor.tooltip}, Mode=OneWay}" />
                   </Grid>
                 </StackPanel>
               </Border>
 
               <Border Style="{StaticResource SideySettingsCardStyle}" Visibility="{Binding IsValidationMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Spacing="8">
-                  <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.rendererMetrics}, Mode=OneWay}" />
+                  <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=renderer_metrics.title}, Mode=OneWay}" />
                   <TextBlock Text="{Binding ValidationMetricsText}" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding ValidationPathText}" TextWrapping="Wrap" />
-                  <Button Command="{Binding ExportValidationMetricsCommand}" Content="{Binding Value, Source={i18n:I18n Key=settings.exportMetrics}, Mode=OneWay}" HorizontalAlignment="Left" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.exportMetricsTooltip}, Mode=OneWay}" />
+                  <Button Command="{Binding ExportValidationMetricsCommand}" Content="{Binding Value, Source={i18n:I18n Key=renderer_metrics.export.action}, Mode=OneWay}" HorizontalAlignment="Left" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=renderer_metrics.export.tooltip}, Mode=OneWay}" />
                 </StackPanel>
               </Border>
             </StackPanel>
@@ -1163,8 +1163,8 @@
           <ScrollViewer x:Name="AboutPage" HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled" Visibility="Collapsed">
             <StackPanel x:Name="AboutPageContent" Padding="32,24" MaxWidth="820" HorizontalAlignment="Stretch" Spacing="20">
               <StackPanel Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level1" Style="{ThemeResource TitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=about.title}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.description}, Mode=OneWay}" TextWrapping="Wrap" />
+                <TextBlock AutomationProperties.HeadingLevel="Level1" Style="{ThemeResource TitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=app.info.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=app.info.description}, Mode=OneWay}" TextWrapping="Wrap" />
               </StackPanel>
 
               <Border Style="{StaticResource SideySettingsCardStyle}">
@@ -1172,7 +1172,7 @@
                   <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                   <Ellipse Width="10" Height="10" VerticalAlignment="Center" Fill="{Binding IsConnected, Converter={StaticResource ConnectionBrushConverter}}" />
                   <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding ConnectionText}" VerticalAlignment="Center" />
-                  <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding RetryConnectionCommand}" Content="{Binding Value, Source={i18n:I18n Key=connection.retry}, Mode=OneWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=connection.retry}, Mode=OneWay}" />
+                  <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding RetryConnectionCommand}" Content="{Binding Value, Source={i18n:I18n Key=connection.retry.action}, Mode=OneWay}" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=connection.retry.action}, Mode=OneWay}" />
                 </Grid>
               </Border>
 
@@ -1182,17 +1182,33 @@
                   <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition x:Name="LanguageControlColumn" Width="220" /></Grid.ColumnDefinitions>
                   <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="24" Glyph="&#xF2B7;" VerticalAlignment="Center" />
                   <StackPanel x:Name="LanguageDescription" Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.language}, Mode=OneWay}" />
-                    <TextBlock x:Name="LanguageDescriptionText" Text="{Binding Value, Source={i18n:I18n Key=settings.languageDescription}, Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.language.title}, Mode=OneWay}" />
+                    <TextBlock x:Name="LanguageDescriptionText" Text="{Binding Value, Source={i18n:I18n Key=settings.language.description}, Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                   </StackPanel>
-                  <ComboBox x:Name="LanguageComboBox" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.language}, Mode=OneWay}" IsEnabled="{Binding IsLanguageSelectionEnabled}" SelectedIndex="{Binding SelectedLanguageIndex, Mode=TwoWay}">
+                  <ComboBox x:Name="LanguageComboBox" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.language.title}, Mode=OneWay}" IsEnabled="{Binding IsLanguageSelectionEnabled}" SelectedIndex="{Binding SelectedLanguageIndex, Mode=TwoWay}">
                     <ComboBoxItem Content="한국어" />
                     <ComboBoxItem Content="English" />
                     <ComboBoxItem Content="日本語" />
-                    <ComboBoxItem Content="简体中文" />
-                    <ComboBoxItem Content="繁體中文" />
-                    <ComboBoxItem Content="Українська" />
-                    <ComboBoxItem Content="Русский" />
+                    <ComboBoxItem Content="中文（简体）" />
+                    <ComboBoxItem Content="中文（繁體）" />
+                    <ComboBoxItem Content="українська" />
+                    <ComboBoxItem Content="русский" />
+                    <ComboBoxItem Content="italiano" />
+                    <ComboBoxItem Content="português" />
+                    <ComboBoxItem Content="español" />
+                    <ComboBoxItem Content="čeština" />
+                    <ComboBoxItem Content="Türkçe" />
+                    <ComboBoxItem Content="română" />
+                    <ComboBoxItem Content="български" />
+                    <ComboBoxItem Content="português (Brasil)" />
+                    <ComboBoxItem Content="српски (ћирилица)" />
+                    <ComboBoxItem Content="polski" />
+                    <ComboBoxItem Content="srpski" />
+                    <ComboBoxItem Content="Nederlands (België)" />
+                    <ComboBoxItem Content="français" />
+                    <ComboBoxItem Content="Nederlands" />
+                    <ComboBoxItem Content="עברית" />
+                    <ComboBoxItem Content="Deutsch" />
                   </ComboBox>
                 </Grid>
               </Border>
@@ -1203,32 +1219,33 @@
                   <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition x:Name="ThemeControlColumn" Width="220" /></Grid.ColumnDefinitions>
                   <FontIcon FontSize="24" Glyph="&#xE790;" VerticalAlignment="Center" />
                   <StackPanel x:Name="ThemeDescription" Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.theme}, Mode=OneWay}" />
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=settings.theme.title}, Mode=OneWay}" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.theme.description}, Mode=OneWay}" TextWrapping="Wrap" />
                     <HyperlinkButton
                         Padding="0"
                         HorizontalAlignment="Left"
                         Command="{Binding OpenExternalLinkCommand}"
                         CommandParameter="ms-settings:colors"
-                        Content="{Binding Value, Source={i18n:I18n Key=settings.themeDescription}, Mode=OneWay}" />
+                        Content="{Binding Value, Source={i18n:I18n Key=settings.theme.system_colors.action}, Mode=OneWay}" />
                   </StackPanel>
                   <ComboBox
                       x:Name="ThemeComboBox"
                       Grid.Column="2"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Center"
-                      AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.theme}, Mode=OneWay}"
+                      AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=settings.theme.title}, Mode=OneWay}"
                       IsEnabled="{Binding IsThemeSelectionEnabled}"
                       SelectedIndex="{Binding SelectedThemeIndex, Mode=TwoWay}">
-                    <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.themeSystem}, Mode=OneWay}" />
-                    <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.themeLight}, Mode=OneWay}" />
-                    <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.themeDark}, Mode=OneWay}" />
+                    <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.theme.system}, Mode=OneWay}" />
+                    <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.theme.light}, Mode=OneWay}" />
+                    <ComboBoxItem Content="{Binding Value, Source={i18n:I18n Key=settings.theme.dark}, Mode=OneWay}" />
                   </ComboBox>
                 </Grid>
               </Border>
 
               <StackPanel x:Name="UpdateSection" Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.updateTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.updateDescription}, Mode=OneWay}" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=settings.update.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=settings.update.description}, Mode=OneWay}" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}">
                 <Grid ColumnSpacing="16">
@@ -1243,9 +1260,9 @@
                         <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding UpdateActivityText}" TextWrapping="Wrap" />
                       </StackPanel>
                     </Grid>
-                    <HyperlinkButton HorizontalAlignment="Left" Padding="0" Command="{Binding OpenReleaseNotesCommand}" Content="{Binding Value, Source={i18n:I18n Key=settings.releaseNotes}, Mode=OneWay}" />
+                    <HyperlinkButton HorizontalAlignment="Left" Padding="0" Command="{Binding OpenReleaseNotesCommand}" Content="{Binding Value, Source={i18n:I18n Key=settings.update.release_notes.action}, Mode=OneWay}" />
                   </StackPanel>
-                  <Button Grid.Column="2" Command="{Binding CheckForUpdatesCommand}" Content="{Binding Value, Source={i18n:I18n Key=settings.checkUpdate}, Mode=OneWay}" VerticalAlignment="Center" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.checkNowTooltip}, Mode=OneWay}" />
+                  <Button Grid.Column="2" Command="{Binding CheckForUpdatesCommand}" Content="{Binding Value, Source={i18n:I18n Key=settings.update.check.action}, Mode=OneWay}" VerticalAlignment="Center" ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=settings.update.check_now.tooltip}, Mode=OneWay}" />
                 </Grid>
               </Border>
 
@@ -1254,10 +1271,10 @@
                   <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                   <FontIcon FontSize="22" Glyph="&#xE939;" VerticalAlignment="Center" />
                   <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=about.feedbackTitle}, Mode=OneWay}" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.feedbackDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=support.feedback.title}, Mode=OneWay}" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=support.feedback.description}, Mode=OneWay}" TextWrapping="Wrap" />
                   </StackPanel>
-                  <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding OpenExternalLinkCommand}" CommandParameter="https://github.com/sidey-app/SIDEY/issues/new/choose" Content="{Binding Value, Source={i18n:I18n Key=about.sendFeedback}, Mode=OneWay}" />
+                  <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding OpenExternalLinkCommand}" CommandParameter="https://github.com/sidey-app/SIDEY/issues/new/choose" Content="{Binding Value, Source={i18n:I18n Key=support.feedback.action}, Mode=OneWay}" />
                 </Grid>
               </Border>
 
@@ -1266,16 +1283,16 @@
                   <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                   <FontIcon FontSize="22" Glyph="&#xE90F;" VerticalAlignment="Center" />
                   <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=about.diagnosticsTitle}, Mode=OneWay}" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.diagnosticsDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=support.diagnostics.title}, Mode=OneWay}" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=support.diagnostics.description}, Mode=OneWay}" TextWrapping="Wrap" />
                   </StackPanel>
-                  <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding ExportDiagnosticDataCommand}" Content="{Binding Value, Source={i18n:I18n Key=about.exportDiagnostics}, Mode=OneWay}" />
+                  <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding ExportDiagnosticDataCommand}" Content="{Binding Value, Source={i18n:I18n Key=support.diagnostics.export.action}, Mode=OneWay}" />
                 </Grid>
               </Border>
 
               <StackPanel Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=about.accountTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.accountDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=account.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=account.description}, Mode=OneWay}" TextWrapping="Wrap" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}" Padding="8">
                 <StackPanel Spacing="0">
@@ -1283,42 +1300,42 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <FontIcon FontSize="22" Glyph="&#xE748;" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=about.signOut}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.signOutDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=account.sign_out.title}, Mode=OneWay}" />
+                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=account.sign_out.description}, Mode=OneWay}" TextWrapping="Wrap" />
                     </StackPanel>
-                    <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding SignOutCommand}" Content="{Binding Value, Source={i18n:I18n Key=about.signOut}, Mode=OneWay}" />
+                    <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding SignOutCommand}" Content="{Binding Value, Source={i18n:I18n Key=account.sign_out.title}, Mode=OneWay}" />
                   </Grid>
                   <Rectangle Height="1" Margin="12,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Grid Padding="12" ColumnSpacing="16">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <FontIcon FontSize="22" Foreground="{ThemeResource SystemFillColorCriticalBrush}" Glyph="&#xE74D;" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                      <TextBlock FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccount}, Mode=OneWay}" />
-                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccountDescription}, Mode=OneWay}" TextWrapping="Wrap" />
+                      <TextBlock FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{Binding Value, Source={i18n:I18n Key=account.delete.title}, Mode=OneWay}" />
+                      <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=account.delete.description}, Mode=OneWay}" TextWrapping="Wrap" />
                     </StackPanel>
                     <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding DeleteAccountCommand}">
-                      <TextBlock Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.deleteAccount}, Mode=OneWay}" />
+                      <TextBlock Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{Binding Value, Source={i18n:I18n Key=account.delete.confirmation.action}, Mode=OneWay}" />
                     </Button>
                   </Grid>
                 </StackPanel>
               </Border>
 
               <StackPanel Spacing="4">
-                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=about.policiesTitle}, Mode=OneWay}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=about.policiesDescription}, Mode=OneWay}" />
+                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=legal.title}, Mode=OneWay}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=legal.description}, Mode=OneWay}" />
               </StackPanel>
               <Border Style="{StaticResource SideySettingsCardStyle}" Padding="8">
                 <StackPanel Spacing="0">
                   <Button Padding="12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Style="{StaticResource SubtleButtonStyle}" Command="{Binding OpenExternalLinkCommand}" CommandParameter="https://sidey-app.github.io/SIDEY/terms/">
-                    <Grid><TextBlock Text="{Binding Value, Source={i18n:I18n Key=about.terms}, Mode=OneWay}" /><FontIcon HorizontalAlignment="Right" Glyph="&#xE8A7;" /></Grid>
+                    <Grid><TextBlock Text="{Binding Value, Source={i18n:I18n Key=legal.terms.action}, Mode=OneWay}" /><FontIcon HorizontalAlignment="Right" Glyph="&#xE8A7;" /></Grid>
                   </Button>
                   <Rectangle Height="1" Margin="12,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Button Padding="12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Style="{StaticResource SubtleButtonStyle}" Command="{Binding OpenExternalLinkCommand}" CommandParameter="https://sidey-app.github.io/SIDEY/privacy/">
-                    <Grid><TextBlock Text="{Binding Value, Source={i18n:I18n Key=about.privacy}, Mode=OneWay}" /><FontIcon HorizontalAlignment="Right" Glyph="&#xE8A7;" /></Grid>
+                    <Grid><TextBlock Text="{Binding Value, Source={i18n:I18n Key=legal.privacy.action}, Mode=OneWay}" /><FontIcon HorizontalAlignment="Right" Glyph="&#xE8A7;" /></Grid>
                   </Button>
                   <Rectangle Height="1" Margin="12,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
                   <Button Padding="12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Style="{StaticResource SubtleButtonStyle}" Command="{Binding OpenExternalLinkCommand}" CommandParameter="https://sidey-app.github.io/SIDEY/refund/">
-                    <Grid><TextBlock Text="{Binding Value, Source={i18n:I18n Key=about.refund}, Mode=OneWay}" /><FontIcon HorizontalAlignment="Right" Glyph="&#xE8A7;" /></Grid>
+                    <Grid><TextBlock Text="{Binding Value, Source={i18n:I18n Key=legal.refund.action}, Mode=OneWay}" /><FontIcon HorizontalAlignment="Right" Glyph="&#xE8A7;" /></Grid>
                   </Button>
                 </StackPanel>
               </Border>

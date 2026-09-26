@@ -4,11 +4,15 @@
 
 현재 상품명, 가격, 내부·판매·복원 ID, 정렬과 asset 연결은
 [`assets/v1/commerce-catalog.json`](../../assets/v1/commerce-catalog.json)이 소유한다.
-상품별 한국어·영어·일본어·번체 중국어 표시명과 App Store 설명, 앱·웹 상세 설명은
-[`assets/v1/commerce-localizations.json`](../../assets/v1/commerce-localizations.json)이
-소유한다. 기존 catalog의 한국어 이름과 설명은 호환용 mirror이며 localization source와
-일치해야 한다. 과거 Apple product ID는 restore mapping으로만 유지하고 신규 판매
-metadata 대상으로 다시 만들지 않는다.
+상품별 표시명과 설명은 언어별
+[`assets/v1/locale/commerce/`](../../assets/v1/locale/commerce/) 파일이 소유한다. 모든 상품과
+언어는 30자 이하의 `display_name`, 앱과 웹에서 사용하는 `description`, 45자 이하의
+App Store용 `iap_description`을 함께 명시한다. 현재 App Store에 내보내는 언어가 아니어도 이후 지원 범위를 넓힐 때 같은
+원본을 사용할 수 있도록 두 설명을 모두 보관한다. 기존 catalog의 한국어 이름과 설명은
+호환용 mirror이며 localization source와 일치해야 한다. 과거 Apple product ID는 restore
+mapping으로만 유지하고 신규 판매 metadata 대상으로 다시 만들지 않는다.
+유료 캐릭터 이름은 프로필 선택 화면에서도 이 commerce 번역을 사용한다. 무료 캐릭터 이름과
+상품 정보가 아닌 색상 설명은 client 번역이 소유한다.
 이 문서는 그 값을 표로 복제하지 않는다. Asset 형식과 플랫폼 지원 범위는
 [`assets/v1/manifest.json`](../../assets/v1/manifest.json)이 소유한다. 공개 웹과
 네이티브 bundle의 catalog는 이 두 source에서 생성되고 일치 여부를 검사한다.

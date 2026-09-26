@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Sidey.App.Controls;
+using Sidey.App.Localization;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
@@ -58,6 +59,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         IUpdateService updateService)
     {
         InitializeComponent();
+        RefreshLocalizationLayout();
         _coordinator = coordinator;
         AppTitleBar.IconSource = new ImageIconSource
         {
@@ -116,6 +118,8 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
 
     public MainWindowViewModel ViewModel { get; }
 
+    public void RefreshLocalizationLayout() => LocalizationLayout.Apply(MainRoot);
+
     public event Action<bool>? HotkeyRecordingChanged;
 
     private async void OnHotkeyRecorderClick(object sender, RoutedEventArgs args)
@@ -139,7 +143,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         captureHost.Children.Add(keycaps);
         var emptyPrompt = new TextBlock
         {
-            Text = I18n.Get("settings.hotkeyRecorderEmpty"),
+            Text = I18n.Get("settings.shortcuts.recorder.empty"),
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             TextWrapping = TextWrapping.Wrap,
@@ -154,7 +158,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             MinHeight = 110,
             Style = (Style)MainRoot.Resources["HotkeyEditorCaptureStyle"],
         };
-        AutomationProperties.SetName(capture, I18n.Get("settings.hotkeyRecorderHelp"));
+        AutomationProperties.SetName(capture, I18n.Get("settings.shortcuts.recorder.help"));
         var warningText = new TextBlock
         {
             MaxWidth = contentWidth - 72,
@@ -176,7 +180,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         });
         resetContent.Children.Add(new TextBlock
         {
-            Text = I18n.Get("settings.hotkeyRecorderReset"),
+            Text = I18n.Get("settings.shortcuts.recorder.reset"),
             Style = (Style)MainRoot.Resources["HotkeyEditorActionTextStyle"],
         });
         var reset = new Button
@@ -203,7 +207,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         };
         GlobalHotkeyBinding defaultBinding = GlobalHotkeySettings.Default.BindingFor(action);
         AutomationProperties.SetName(reset,
-            $"{I18n.Get("settings.hotkeyRecorderReset")}: {defaultBinding.ToDisplayText()}");
+            $"{I18n.Get("settings.shortcuts.recorder.reset")}: {defaultBinding.ToDisplayText()}");
         AutomationProperties.SetName(delete, I18n.Get("common.delete"));
         ToolTipService.SetToolTip(reset, defaultBinding.ToDisplayText());
         var actions = new StackPanel
@@ -224,7 +228,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             content.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         var help = new TextBlock
         {
-            Text = I18n.Get("settings.hotkeyRecorderHelp"),
+            Text = I18n.Get("settings.shortcuts.recorder.help"),
             TextWrapping = TextWrapping.Wrap,
         };
         content.Children.Add(help);
@@ -270,23 +274,23 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             SetHotkeyEditorKeys(keycaps, labels, invalidShortcut is not null);
             dialog.IsPrimaryButtonEnabled = candidate is { } valid
                 && (valid.IsValid() || valid == GlobalHotkeyBinding.Disabled);
-            string? warning = invalidShortcut is null ? null : I18n.Get("settings.hotkeyInvalid");
+            string? warning = invalidShortcut is null ? null : I18n.Get("settings.shortcuts.error.invalid");
             if (candidate is { } selected && !selected.IsDisabled)
             {
                 if (ViewModel.ConflictingHotkeyAction(action, selected) is not null)
                 {
-                    warning = I18n.Get("settings.hotkeySideyConflict");
+                    warning = I18n.Get("settings.shortcuts.error.in_app_conflict");
                 }
                 else if (selected.IsValid())
                 {
                     warning = WindowsHotkeyAvailability.Check(selected) switch
                     {
                         WindowsHotkeyAvailabilityResult.SystemShortcut =>
-                            I18n.Get("settings.hotkeySystemShortcut"),
+                            I18n.Get("settings.shortcuts.error.system_conflict"),
                         WindowsHotkeyAvailabilityResult.AlreadyRegistered =>
-                            I18n.Get("settings.hotkeyAlreadyRegistered"),
+                            I18n.Get("settings.shortcuts.error.already_registered"),
                         WindowsHotkeyAvailabilityResult.Unverified =>
-                            I18n.Get("settings.hotkeyAvailabilityUnverified"),
+                            I18n.Get("settings.shortcuts.error.availability_unverified"),
                         _ => null,
                     };
                 }
@@ -296,7 +300,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
             warningText.Text = warning ?? string.Empty;
             AutomationProperties.SetName(capture, invalidShortcut ?? (candidate is { } selectedBinding
                 ? MainWindowViewModel.HotkeyBindingText(selectedBinding)
-                : I18n.Get("settings.hotkeyRecorderHelp")));
+                : I18n.Get("settings.shortcuts.recorder.help")));
         }
 
         bool RecordKey(uint virtualKey, GlobalHotkeyModifiers modifiers)
@@ -503,10 +507,10 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
 
     private static string HotkeyActionTitle(GlobalHotkeyAction action) => I18n.Get(action switch
     {
-        GlobalHotkeyAction.ToggleOverlay => "settings.hotkeyOverlay",
-        GlobalHotkeyAction.ToggleQuietMode => "settings.hotkeyQuietMode",
-        GlobalHotkeyAction.Compose => "settings.hotkeyComposer",
-        GlobalHotkeyAction.History => "settings.hotkeyHistory",
+        GlobalHotkeyAction.ToggleOverlay => "settings.shortcuts.action.overlay",
+        GlobalHotkeyAction.ToggleQuietMode => "settings.shortcuts.action.quiet_mode",
+        GlobalHotkeyAction.Compose => "settings.shortcuts.action.composer",
+        GlobalHotkeyAction.History => "settings.shortcuts.action.history",
         _ => throw new ArgumentOutOfRangeException(nameof(action)),
     });
 
@@ -731,9 +735,9 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Get("dialogs.rotateInviteTitle"),
-            Content = I18n.Get("dialogs.rotateInviteBody"),
-            PrimaryButtonText = I18n.Get("dialogs.rotateInvitePrimary"),
+            Title = I18n.Get("groups.invite.rotate.confirmation.title"),
+            Content = I18n.Get("groups.invite.rotate.confirmation.message"),
+            PrimaryButtonText = I18n.Get("groups.invite.rotate.confirmation.action"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
@@ -877,11 +881,11 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         }
         var header = new TextBlock
         {
-            Text = I18n.Get(isKeepsake ? "store.keepsake" : product.Kind switch
+            Text = I18n.Get(isKeepsake ? "store.kind.keepsake" : product.Kind switch
             {
-                CommerceProductKind.Character => "profile.character",
-                CommerceProductKind.Bubble => "profile.bubble",
-                _ => "profile.throwable",
+                CommerceProductKind.Character => "profile.character.label",
+                CommerceProductKind.Bubble => "profile.cosmetics.bubble.title",
+                _ => "profile.cosmetics.throwable.title",
             }),
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             FontSize = 12,
@@ -934,7 +938,7 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         {
             footer.Children.Add(new TextBlock
             {
-                Text = I18n.Get("store.soldSeparately"),
+                Text = I18n.Get("store.product.sold_separately"),
                 TextWrapping = TextWrapping.Wrap,
                 TextAlignment = TextAlignment.Center,
                 FontSize = 12,
@@ -982,12 +986,12 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         {
             Text = currentName,
             MaxLength = 20,
-            PlaceholderText = I18n.Get("dialogs.roomNamePlaceholder"),
+            PlaceholderText = I18n.Get("groups.rename.name_placeholder"),
         };
         var dialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Get("groups.renameDialogTitle"),
+            Title = I18n.Get("groups.rename.title"),
             Content = input,
             PrimaryButtonText = I18n.Get("common.save"),
             CloseButtonText = I18n.Get("common.cancel"),
@@ -1015,9 +1019,9 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Format("dialogs.removeMemberTitle", nickname),
-            Content = I18n.Format("dialogs.removeMemberBody", nickname),
-            PrimaryButtonText = I18n.Get("dialogs.removeMemberPrimary"),
+            Title = I18n.Format("groups.member.remove.confirmation.title", nickname),
+            Content = I18n.Format("groups.member.remove.confirmation.message", nickname),
+            PrimaryButtonText = I18n.Get("groups.member.remove.action"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
@@ -1041,11 +1045,11 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Format("dialogs.leaveRoomTitle", roomName),
+            Title = I18n.Format("groups.leave.confirmation.title", roomName),
             Content = I18n.Get(isOwner
-                ? "dialogs.leaveOwnedRoomBody"
-                : "dialogs.leaveRoomBody"),
-            PrimaryButtonText = I18n.Get("dialogs.leaveRoomPrimary"),
+                ? "groups.leave.confirmation.owner_message"
+                : "groups.leave.confirmation.member_message"),
+            PrimaryButtonText = I18n.Get("groups.leave.confirmation.action"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
@@ -1069,9 +1073,9 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var impactDialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Format("dialogs.deleteRoomTitle", roomName),
-            Content = I18n.Get("dialogs.deleteRoomBody"),
-            PrimaryButtonText = I18n.Get("dialogs.deleteRoomContinue"),
+            Title = I18n.Format("groups.delete.confirmation.title", roomName),
+            Content = I18n.Get("groups.delete.confirmation.message"),
+            PrimaryButtonText = I18n.Get("common.continue"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
@@ -1092,8 +1096,8 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var finalDialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Get("dialogs.deleteRoomFinalTitle"),
-            Content = I18n.Format("dialogs.deleteRoomFinalBody", roomName),
+            Title = I18n.Get("groups.delete.final_confirmation.title"),
+            Content = I18n.Format("groups.delete.final_confirmation.message", roomName),
             PrimaryButtonText = I18n.Get("common.delete"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
@@ -1116,9 +1120,9 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Get("about.signOutTitle"),
-            Content = I18n.Get("about.signOutBody"),
-            PrimaryButtonText = I18n.Get("about.signOutPrimary"),
+            Title = I18n.Get("account.sign_out.confirmation.title"),
+            Content = I18n.Get("account.sign_out.confirmation.message"),
+            PrimaryButtonText = I18n.Get("account.sign_out.confirmation.action"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
@@ -1140,9 +1144,9 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var impactDialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Get("about.deleteAccountTitle"),
-            Content = I18n.Get("about.deleteAccountBody"),
-            PrimaryButtonText = I18n.Get("about.deleteAccountContinue"),
+            Title = I18n.Get("account.delete.confirmation.title"),
+            Content = I18n.Get("account.delete.confirmation.message"),
+            PrimaryButtonText = I18n.Get("common.continue"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
@@ -1159,9 +1163,9 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var finalDialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Get("about.deleteAccountFinalTitle"),
-            Content = I18n.Get("about.deleteAccountFinalBody"),
-            PrimaryButtonText = I18n.Get("about.deleteAccountPrimary"),
+            Title = I18n.Get("account.delete.final_confirmation.title"),
+            Content = I18n.Get("account.delete.final_confirmation.message"),
+            PrimaryButtonText = I18n.Get("account.delete.confirmation.action"),
             CloseButtonText = I18n.Get("common.cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
@@ -1185,10 +1189,10 @@ public sealed partial class MainWindow : Window, IMainWindowDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = xamlRoot,
-            Title = I18n.Get("dialogs.updateTitle"),
-            Content = I18n.Format("dialogs.updateBody", version),
-            PrimaryButtonText = I18n.Get("dialogs.download"),
-            CloseButtonText = I18n.Get("dialogs.later"),
+            Title = I18n.Get("update.prompt.title"),
+            Content = I18n.Format("update.prompt.message", version),
+            PrimaryButtonText = I18n.Get("update.prompt.download"),
+            CloseButtonText = I18n.Get("update.prompt.later"),
             DefaultButton = ContentDialogButton.Primary,
         };
         try

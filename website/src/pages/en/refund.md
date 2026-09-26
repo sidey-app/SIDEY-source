@@ -30,7 +30,7 @@ A full refund will be issued when a legally recognized reason is confirmed, incl
 
 1. For a Mac App Store purchase, request a refund through Apple's Report a Problem process. If payment is offered through PortOne in a direct distribution build, send support only the purchasing Account, payment time, and information needed to locate the order. Do not send a full payment-card number or password.
 2. After Apple or the payment service provider confirms the refund, the entitlement granted by that payment source will be revoked.
-3. If no other valid grant covers the revoked item and it is currently equipped, that category returns to its default item: the default hamster, default speech bubble, or default throwable.
+3. If no other valid grant covers the revoked item and it is currently equipped, that category returns to its default item: the default hamster, default speech bubble, or default tossable toy.
 
 ## Account deletion and refunds
 

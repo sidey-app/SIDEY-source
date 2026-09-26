@@ -10,9 +10,15 @@ from typing import Any
 from urllib.parse import urlparse
 
 try:
-    from commerce_localizations import app_store_display_name
+    from commerce_localizations import (
+        app_store_display_name,
+        read_source as read_commerce_source,
+    )
 except ModuleNotFoundError:  # Imported as scripts.app_store_connect.model.
-    from scripts.commerce_localizations import app_store_display_name
+    from scripts.commerce_localizations import (
+        app_store_display_name,
+        read_source as read_commerce_source,
+    )
 
 APP_STORE_LOCALES = ("ko", "en-US", "en-GB", "en-CA", "en-AU", "ja", "zh-Hant")
 COMMERCE_LOCALES = ("ko", "en", "ja", "zh-Hant")
@@ -219,13 +225,13 @@ def validate_products(
                 maximum=30,
             )
             _require_string(
+                localized.get("description"),
+                f"{product_id}.{locale}.description",
+            )
+            _require_string(
                 localized.get("iap_description"),
                 f"{product_id}.{locale}.iap_description",
                 maximum=45,
-            )
-            _require_string(
-                localized.get("marketing_description"),
-                f"{product_id}.{locale}.marketing_description",
             )
         product["app_store_product_id"] = apple_id
         product["legacy_app_store_product_ids"] = tuple(legacy)
@@ -266,7 +272,13 @@ def load_desired_state(manifest_path: Path, commerce_path: Path, catalog_path: P
             raise ValidationError(
                 "App Store localization release differs from release/macos.json"
             )
-    products = validate_products(read_json(commerce_path), read_json(catalog_path))
+    try:
+        commerce_source = read_commerce_source(commerce_path)
+    except (OSError, ValueError) as error:
+        raise ValidationError(
+            f"Cannot load commerce localizations from {commerce_path}: {error}"
+        ) from error
+    products = validate_products(commerce_source, read_json(catalog_path))
     return DesiredState(manifest=manifest, products=products)
 
 

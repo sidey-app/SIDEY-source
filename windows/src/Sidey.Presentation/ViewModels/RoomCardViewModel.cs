@@ -224,7 +224,7 @@ public sealed class RoomCardViewModel : ObservableObject, IDisposable
     internal void ShowInviteCopyConfirmation()
     {
         _inviteCopyFeedback?.Cancel();
-        InviteActionText = I18n.Get("groups.inviteCopyComplete");
+        InviteActionText = I18n.Get("groups.invite.copy.complete");
         IsInviteCopyConfirmed = true;
         DelayedAction? feedback = null;
         feedback = DelayedAction.Start(

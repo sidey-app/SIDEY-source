@@ -89,7 +89,7 @@ public partial class App : Application
             if (_mainWindow is not null)
             {
                 _mainWindow.ShowFatalError(new InvalidOperationException(
-                    I18n.Get("error.launch"),
+                    I18n.Get("app.launch.failed"),
                     exception));
                 return;
             }
@@ -212,7 +212,7 @@ public partial class App : Application
         catch (Exception exception)
         {
             StartupDiagnostics.NonFatal("tray-start", exception);
-            var error = new InvalidOperationException(I18n.Get("error.trayStart"), exception);
+            var error = new InvalidOperationException(I18n.Get("tray.start.failed"), exception);
             if (!backgroundLaunch)
                 EnsureMainWindow().ShowFatalError(error);
         }
@@ -658,7 +658,7 @@ public partial class App : Application
         var viewModel = new ComposerViewModel(
             (roomId, body) => _coordinator is { } coordinator && !_shuttingDown
                 ? coordinator.SendMessageAsync(roomId, body)
-                : Task.FromException(new InvalidOperationException(I18n.Get("error.serverNotConfigured"))),
+                : Task.FromException(new InvalidOperationException(I18n.Get("connection.server.not_configured"))),
             autoCloseAfterSend);
         viewModel.TypingChanged += active =>
         {
@@ -950,8 +950,8 @@ public partial class App : Application
                 return true;
             }
             string message = errorCode == "identity_already_exists"
-                ? I18n.Get("auth.googleAlreadyLinked")
-                : I18n.Get("auth.googleCancelled");
+                ? I18n.Get("auth.google.already_linked")
+                : I18n.Get("auth.google.cancelled");
             if (errorCode is not null && errorCode != "identity_already_exists")
             {
                 message = $"{message} [{errorCode}]";
@@ -1002,7 +1002,7 @@ public partial class App : Application
         if (_onboardingWindow is { } onboarding)
             onboarding.ShowGoogleSignInComplete();
         else
-            _mainWindow?.ViewModel.ReportSuccess(I18n.Get("auth.googleSignInComplete"));
+            _mainWindow?.ViewModel.ReportSuccess(I18n.Get("auth.google.sign_in_complete"));
         _tray?.NotifyGoogleSignInComplete();
     }
 
@@ -1132,11 +1132,14 @@ public partial class App : Application
                 return;
             I18n.SetLanguage(language);
             Localization.LocalizedText.RefreshAll();
+            _mainWindow?.RefreshLocalizationLayout();
             _mainWindow?.ViewModel.RefreshLocalizedText();
-            _composer?.Title = I18n.Get("window.composerTitle");
+            _composer?.RefreshLocalizationLayout();
+            _onboardingWindow?.RefreshLocalizationLayout();
+            _composer?.Title = I18n.Get("composer.window.title");
             if (_historyWindow is not null)
             {
-                _historyWindow.Title = I18n.Get("window.historyTitle");
+                _historyWindow.Title = I18n.Get("history.window.title");
                 _historyWindow.RefreshLocalizedText();
             }
             StartupDiagnostics.Stage($"language-applied language={language}");
@@ -1358,7 +1361,7 @@ public partial class App : Application
             MainWindow mainWindow = EnsureMainWindow();
             mainWindow.ShowPage("about");
             mainWindow.ViewModel.ReportError(new InvalidOperationException(
-                I18n.Format("update.releaseNotesFailed", exception.Message),
+                I18n.Format("update.release_notes.open_failed", exception.Message),
                 exception));
         }
     }

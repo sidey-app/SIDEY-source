@@ -46,12 +46,12 @@ struct GroupsSettingsView: View {
             }
 
             SettingsSection(
-                title: "groups.create.title",
+                title: "groups.create.action",
                 subtitle: "groups.create.subtitle",
                 systemImage: "plus.circle"
             ) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("groups.create.name.title")
+                    Text("groups.room_name.label")
                         .font(.headline)
                     Text("groups.create.name.description")
                         .font(.subheadline)
@@ -84,7 +84,7 @@ struct GroupsSettingsView: View {
             }
 
             SettingsSection(
-                title: "groups.join.title",
+                title: "groups.action.join_by_code",
                 subtitle: "groups.join.subtitle",
                 systemImage: "ticket"
             ) {
@@ -388,7 +388,7 @@ struct RoomRow: View {
 
     private var renameEditor: some View {
         HStack(spacing: 8) {
-            TextField("groups.rename.placeholder", text: $renameDraft)
+            TextField("groups.rename.name_placeholder", text: $renameDraft)
                 .textFieldStyle(.roundedBorder)
                 .onChange(of: renameDraft) { _, value in
                     let limited = RoomNameValidator.limitedDraft(value)
@@ -429,7 +429,7 @@ struct RoomRow: View {
                 }
                 Text(verbatim: member.nickname)
                 if member.userID == currentUserID {
-                    Text("groups.member.me")
+                    Text("common.me")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)

@@ -286,7 +286,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
     {
         if (!ProfileValidator.IsValidNickname(nickname))
         {
-            throw new ArgumentException(I18n.Get("validation.nicknameLength"), nameof(nickname));
+            throw new ArgumentException(I18n.Get("validation.nickname.length"), nameof(nickname));
         }
         // Rendering may fall back for unknown IDs; a profile mutation must never
         // turn a cleared UI selection into a saved hamster.
@@ -384,7 +384,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
             .ConfigureAwait(false);
         BackendSnapshot snapshot = await FetchSnapshotAsync(cancellationToken).ConfigureAwait(false);
         Room room = snapshot.Rooms.SingleOrDefault(room => room.Id == row.RoomId)
-            ?? throw new InvalidDataException(I18n.Get("backend.createdRoomMissing"));
+            ?? throw new InvalidDataException(I18n.Get("groups.create.result_missing"));
         return new CreateRoomResult(room, row.InviteCode);
     }
 
@@ -395,7 +395,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         string normalized = inviteCode.Trim().ToUpperInvariant();
         if (normalized.Length == 0)
         {
-            throw new ArgumentException(I18n.Get("onboarding.inviteRequired"), nameof(inviteCode));
+            throw new ArgumentException(I18n.Get("onboarding.group.invite_code.required"), nameof(inviteCode));
         }
 
         object parameters = new { p_invite_code = normalized };
@@ -408,7 +408,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
                 cancellationToken).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(v2.ErrorCode))
             {
-                throw new InvalidOperationException(I18n.Format("backend.joinFailed", v2.ErrorCode));
+                throw new InvalidOperationException(I18n.Format("groups.join.failed", v2.ErrorCode));
             }
             await _realtime.ConvergeGrantAsync(
                 RequireAccessRevision(v2.AccessRevision),
@@ -424,19 +424,19 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         }
         if (!string.IsNullOrEmpty(row.ErrorCode))
         {
-            throw new InvalidOperationException(I18n.Format("backend.joinFailed", row.ErrorCode));
+            throw new InvalidOperationException(I18n.Format("groups.join.failed", row.ErrorCode));
         }
 
         if (row.RoomId is not { } roomId)
         {
-            throw new InvalidDataException(I18n.Get("backend.joinRoomIdMissing"));
+            throw new InvalidDataException(I18n.Get("groups.join.room_id_missing"));
         }
 
         await _credentials.WriteInviteCodeAsync(roomId, normalized, cancellationToken)
             .ConfigureAwait(false);
         BackendSnapshot snapshot = await FetchSnapshotAsync(cancellationToken).ConfigureAwait(false);
         return snapshot.Rooms.SingleOrDefault(room => room.Id == roomId)
-            ?? throw new InvalidDataException(I18n.Get("backend.joinedRoomMissing"));
+            ?? throw new InvalidDataException(I18n.Get("groups.join.result_missing"));
     }
 
     public async Task LeaveRoomAsync(Guid roomId, CancellationToken cancellationToken = default)
@@ -468,7 +468,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
             cancellationToken).ConfigureAwait(false);
         if (string.IsNullOrWhiteSpace(inviteCode))
         {
-            throw new InvalidDataException(I18n.Get("backend.emptyInviteCode"));
+            throw new InvalidDataException(I18n.Get("groups.invite.rotate.code_missing"));
         }
 
         await _credentials.WriteInviteCodeAsync(roomId, inviteCode, cancellationToken)
@@ -546,7 +546,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         string normalized = MessageValidator.Normalize(body);
         if (!MessageValidator.IsValid(normalized))
         {
-            throw new ArgumentException(I18n.Get("validation.messageLength"), nameof(body));
+            throw new ArgumentException(I18n.Get("validation.message.length"), nameof(body));
         }
 
         if (!_realtime.UsesFirebaseChat)
@@ -661,7 +661,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
         }
         if (!_roomEpochs.TryGetValue(roomId, out long realtimeEpoch))
         {
-            throw new InvalidOperationException(I18n.Get("backend.realtimeEpochMissing"));
+            throw new InvalidOperationException(I18n.Get("connection.group_revision_missing"));
         }
 
         return RpcNoResultAsync(
@@ -880,7 +880,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
                             cancellationToken).ConfigureAwait(false);
                         await output.WriteAsync(
                             new BackendEvent.TechnicalError(
-                                I18n.Format("backend.messageRecheckFailed", exception.Message)),
+                                I18n.Format("message.delivery.recheck_failed", exception.Message)),
                             cancellationToken).ConfigureAwait(false);
                     }
                     continue;
@@ -905,7 +905,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
                             cancellationToken).ConfigureAwait(false);
                         await output.WriteAsync(
                             new BackendEvent.TechnicalError(
-                                I18n.Format("backend.expiredMessagesFailed", exception.Message)),
+                                I18n.Format("history.retention.reload_failed", exception.Message)),
                             cancellationToken).ConfigureAwait(false);
                     }
                     continue;
@@ -999,7 +999,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
                     cancellationToken).ConfigureAwait(false);
                 await output.WriteAsync(
                     new BackendEvent.TechnicalError(
-                        I18n.Format("backend.realtimeResyncFailed", exception.Message)),
+                        I18n.Format("connection.group_resync_failed", exception.Message)),
                     cancellationToken).ConfigureAwait(false);
                 await Task.Delay(
                     RealtimeRecoveryPolicy.DelayForAttempt(attempt + 1),
@@ -1109,7 +1109,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
             output.TryWrite(new BackendEvent.Diagnostic(
                 $"room-snapshot-error {FailureDiagnostic(exception)}"));
             output.TryWrite(new BackendEvent.TechnicalError(
-                I18n.Format("backend.roomSnapshotFailed", exception.Message)));
+                I18n.Format("groups.refresh.failed", exception.Message)));
         }
     }
 
@@ -1321,7 +1321,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
     {
         if (!_roomEpochs.TryGetValue(roomId, out long realtimeEpoch))
         {
-            throw new InvalidOperationException(I18n.Get("backend.realtimeEpochMissing"));
+            throw new InvalidOperationException(I18n.Get("connection.group_revision_missing"));
         }
 
         return RpcNoResultAsync(
@@ -1351,7 +1351,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
     private async ValueTask<StoredSupabaseSession> RequiredSessionAsync(
         CancellationToken cancellationToken) =>
         await _sessions.GetStoredSessionAsync(cancellationToken).ConfigureAwait(false)
-        ?? throw new InvalidOperationException(I18n.Get("auth.sessionMissing"));
+        ?? throw new InvalidOperationException(I18n.Get("auth.session.expired"));
 
     private static async Task<T> ReadRequiredAsync<T>(
         HttpResponseMessage response,
@@ -1435,7 +1435,7 @@ public sealed class SupabaseBackendGateway : IBackendGateway, IAsyncDisposable
     {
         if (!RoomNameValidator.IsValid(name))
         {
-            throw new ArgumentException(I18n.Get("validation.roomNameLength"), nameof(name));
+            throw new ArgumentException(I18n.Get("validation.room_name.length"), nameof(name));
         }
     }
 

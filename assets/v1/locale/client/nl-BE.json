@@ -1,0 +1,1633 @@
+{
+  "character": {
+    "pixel_cat": {
+      "display_name": "Babykat"
+    },
+    "pixel_hamster": {
+      "display_name": "Babyhamster"
+    },
+    "pixel_penguin": {
+      "display_name": "Babypinguïn"
+    },
+    "pixel_puppy": {
+      "display_name": "Babypuppy"
+    },
+    "pixel_rabbit": {
+      "display_name": "Babykonijn"
+    },
+    "unknown": {
+      "display_name": "Personage"
+    }
+  },
+  "common": {
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "continue": "Doorgaan",
+    "me": "Ik",
+    "next": "Volgende",
+    "save": "Opslaan"
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "Deelnemen met uitnodigingscode"
+    },
+    "collapse": "Groep samenvouwen",
+    "create": {
+      "action": "Groep maken",
+      "name": {
+        "placeholder": "Groepsnaam"
+      }
+    },
+    "delete": {
+      "action": "Groep verwijderen"
+    },
+    "expand": "Groep uitvouwen",
+    "member": {
+      "remove": {
+        "action": "Verwijderen"
+      }
+    },
+    "rename": {
+      "action": "Naam wijzigen",
+      "name_placeholder": "Groepsnaam, 1–20 tekens"
+    },
+    "room_name": {
+      "label": "Groepsnaam"
+    }
+  },
+  "history": {
+    "load_more": {
+      "failed": "Eerdere berichten konden niet worden geladen.",
+      "loading": "Eerdere berichten laden…"
+    },
+    "loading": "Recente berichten laden…"
+  },
+  "message": {
+    "send": {
+      "accessibility": "Bericht verzenden"
+    }
+  },
+  "onboarding": {
+    "character": {
+      "label": "Mijn personage"
+    },
+    "group": {
+      "create": {
+        "description": "Maak een groep."
+      },
+      "description": "Maak een groep of neem deel met een uitnodigingscode om de pixelwereld tot leven te brengen.",
+      "title": "Maak een groep met vrienden"
+    },
+    "step": {
+      "group": "Groep",
+      "profile": "Profiel"
+    }
+  },
+  "platforms": {
+    "macos": {
+      "account": {
+        "delete": {
+          "failed": "Je account kan niet worden verwijderd. Probeer het opnieuw."
+        }
+      },
+      "account_delete": {
+        "error": {
+          "request_failed": "Het verzoek om je account te verwijderen kan niet worden voltooid. Probeer het opnieuw."
+        }
+      },
+      "app": {
+        "settings": {
+          "navigation_label": "Appinstellingen"
+        }
+      },
+      "apple_auth": {
+        "error": {
+          "missing_authorization_code": "Inloggen met Apple kan niet worden voltooid. Probeer het opnieuw.",
+          "missing_identity_token": "Inloggen met Apple kan niet worden voltooid. Probeer het opnieuw.",
+          "missing_request_nonce": "Inloggen met Apple kan niet worden voltooid. Probeer het opnieuw."
+        }
+      },
+      "auth": {
+        "apple": {
+          "description": "In de App Store-versie moet je inloggen met Apple om aankopen te herstellen en je account te beschermen.",
+          "title": "Log in met Apple",
+          "verifying": "Inloggen controleren"
+        },
+        "apple_sign_in": {
+          "failed": "Inloggen met Apple is mislukt. Probeer het opnieuw."
+        }
+      },
+      "backend": {
+        "connect": {
+          "failed_detail": "Er kan geen verbinding met de server worden gemaakt. Controleer je internetverbinding en probeer het opnieuw. (%@)"
+        },
+        "connection": {
+          "connecting": "Verbinding maken…",
+          "failed": "Verbindingsfout",
+          "idle": "Wachten",
+          "online": "Verbonden"
+        },
+        "error": {
+          "already_member": "Je bent al lid van deze groep.",
+          "authentication_required": "Log opnieuw in om door te gaan.",
+          "current_user_unavailable": "Je login kan niet worden gecontroleerd. Log opnieuw in.",
+          "generic": "Het verzoek kan niet worden voltooid. Probeer het later opnieuw.",
+          "invalid_invite_code": "Controleer de uitnodigingscode en probeer het opnieuw.",
+          "invalid_message": "Voer een bericht in van maximaal 200 tekens en 3 regels.",
+          "invalid_profile": "Voer een bijnaam van 2–8 tekens in zonder regeleinden.",
+          "invalid_room_name": "Voer een groepsnaam van 1–20 tekens in zonder regeleinden.",
+          "invalid_timestamp": "De berichtgegevens kunnen niet worden gelezen. Probeer het later opnieuw.",
+          "invite_rate_limited": "Je hebt te vaak een uitnodigingscode geprobeerd. Probeer het over 10 minuten opnieuw.",
+          "malformed_response": "Het verzoek kan niet worden voltooid. Probeer het later opnieuw.",
+          "member_limit_reached": {
+            "one": "Deze groep zit al vol met %lld lid.",
+            "other": "Deze groep zit al vol met %lld leden."
+          },
+          "member_not_found": "Het te verwijderen lid kan niet worden gevonden.",
+          "membership_required": "Alleen leden van deze groep kunnen dit doen.",
+          "message_receive_failed": "Er kan geen bericht worden ontvangen. Probeer het later opnieuw.",
+          "no_active_room": "Kies een groep voordat je een bericht verstuurt.",
+          "owner_cannot_remove_self": "De eigenaar van de groep kan zichzelf niet verwijderen.",
+          "owner_required": "Alleen de eigenaar van de groep kan dit doen.",
+          "profile_required": "Sla eerst je profiel op.",
+          "realtime_unavailable": "De serververbinding wordt nog voorbereid. Probeer het zo nog eens.",
+          "room_limit_reached": "Iedereen kan maximaal 5 groepen gebruiken.",
+          "room_resync_failed": "De nieuwste status van de groep kan niet worden geladen. Probeer het later opnieuw.",
+          "session_recovery_failed": "Je vorige login kan niet worden hersteld. Er is geen nieuw account gemaakt. Log opnieuw in of contacteer de ondersteuning.",
+          "stale_realtime_epoch": "De toegang tot de groep is gewijzigd. Maak opnieuw verbinding om door te gaan."
+        },
+        "realtime_recovery_failed": "Er kan niet opnieuw verbinding met de server worden gemaakt. Probeer het zo nog eens. (%@)"
+      },
+      "commerce": {
+        "character": {
+          "equip": {
+            "failed": "Het personage kan niet worden ingesteld. Probeer het opnieuw. (%@)",
+            "success": "%@ is ingesteld."
+          }
+        },
+        "equipment": {
+          "success": {
+            "default_bubble": "De standaardtekstballon is ingesteld.",
+            "default_character": "Het standaardpersonage is ingesteld.",
+            "default_throwable": "De standaardzachte bal is ingesteld.",
+            "named": "%@ is ingesteld."
+          }
+        },
+        "error": {
+          "catalog_unavailable": "De winkel kan niet worden geladen. Probeer het later opnieuw."
+        },
+        "kind": {
+          "bubble": "Ballon",
+          "character": "Personage",
+          "throwable": "Werpspeelgoed"
+        }
+      },
+      "common": {
+        "retry": "Opnieuw proberen"
+      },
+      "composer": {
+        "drag": {
+          "accessibility": "Greep van berichtinvoer verplaatsen",
+          "tooltip": "Berichtinvoer verplaatsen"
+        }
+      },
+      "connection": {
+        "state": {
+          "connecting": "Wisselen van groep…",
+          "failed": "Verbindingsfout",
+          "idle": "Inactief",
+          "online": "Verbonden"
+        }
+      },
+      "firebase": {
+        "auth": {
+          "error": {
+            "account_mismatch": "Je ingelogde account is gewijzigd. Log opnieuw in.",
+            "invalid_rollout_lease_claim": "Je login voor de serververbinding kan niet worden gecontroleerd. Log opnieuw in.",
+            "invalid_session_claim": "Je login kan niet worden gecontroleerd. Log opnieuw in.",
+            "login_mismatch": "Je login komt niet overeen met het huidige account. Log opnieuw in.",
+            "malformed_account_identifier": "Je account kan niet worden gecontroleerd. Log opnieuw in.",
+            "rollout_lease_expired": "Je aanmelding is verlopen. Meld je opnieuw aan.",
+            "rollout_lease_mismatch": "Met je huidige login kan geen verbinding met de server worden gemaakt. Log opnieuw in.",
+            "session_mismatch": "Je login komt niet overeen met het huidige account. Log opnieuw in.",
+            "token_refresh_validation_failed": "Je login kan niet worden gecontroleerd. Log opnieuw in."
+          }
+        },
+        "bootstrap": {
+          "error": {
+            "authentication_required": "Je aanmelding is verlopen. Meld je opnieuw aan.",
+            "grant_not_converged": "De serververbinding wordt nog voorbereid. Probeer het zo nog eens.",
+            "invalid_argument": "Er kan geen verbinding met de server worden gemaakt. Probeer het later opnieuw.",
+            "invalid_http_response": "Er kan geen verbinding met de server worden gemaakt. Probeer het later opnieuw.",
+            "malformed_success": "Er kan geen verbinding met de server worden gemaakt. Probeer het later opnieuw.",
+            "method_not_allowed": "Deze versie kan geen verbinding met de server maken. Werk de app bij.",
+            "missing_access_token": "Je aanmelding is verlopen. Meld je opnieuw aan.",
+            "rate_limited": "Er zijn te veel verbindingspogingen gedaan. Probeer het zo nog eens.",
+            "rollout_disabled": "Er kan nu geen verbinding met de server worden gemaakt. De app blijft het automatisch proberen.",
+            "unavailable": "Er kan geen verbinding met de server worden gemaakt. Probeer het later opnieuw.",
+            "unexpected_contract": "Deze versie kan geen verbinding met de server maken. Werk de app bij."
+          }
+        },
+        "chat": {
+          "error": {
+            "authentication_expired": "Je aanmelding is verlopen. Meld je opnieuw aan.",
+            "invalid_message": "Controleer het bericht en verstuur het opnieuw.",
+            "permission_denied": "Je mag in deze groep geen berichten versturen.",
+            "rate_limited": "Je verstuurt te snel berichten.",
+            "state_conflict": "Het bericht kan niet worden verstuurd. Probeer het zo nog eens."
+          }
+        },
+        "configuration": {
+          "error": {
+            "invalid_plist": "De verbindingsinstellingen van de app kunnen niet worden gelezen. Installeer de app opnieuw.",
+            "missing_plist": "De verbindingsinstellingen van de app ontbreken. Installeer de app opnieuw.",
+            "sdk_app_unavailable": "De appverbinding kan niet worden gestart. Open de app opnieuw.",
+            "sdk_options_unavailable": "De appverbinding kan niet worden voorbereid. Open de app opnieuw.",
+            "unexpected_app": "De verbindingsinstellingen van de app zijn onjuist. Installeer de app opnieuw.",
+            "unexpected_bundle": "De verbindingsinstellingen van de app zijn onjuist. Installeer de app opnieuw.",
+            "unexpected_database": "De verbindingsinstellingen van de app zijn onjuist. Installeer de app opnieuw.",
+            "unexpected_project": "De verbindingsinstellingen van de app zijn onjuist. Installeer de app opnieuw."
+          }
+        },
+        "production": {
+          "error": {
+            "app_version_unavailable": "De appversie kan niet worden gecontroleerd. Daarom kan de serververbinding niet worden gestart. Open de app opnieuw.",
+            "duplicate_wire_code": "Een probleem met de appgegevens blokkeert de serververbinding. Installeer de app opnieuw."
+          }
+        },
+        "transport": {
+          "error": {
+            "access_grant_closed": "De toegang tot de groep wordt nog gecontroleerd. Probeer het zo nog eens.",
+            "listener_failed": "De berichtenverbinding is verbroken. Maak opnieuw verbinding om door te gaan.",
+            "live_listener_unavailable": "De berichtenverbinding kan niet worden voorbereid. Maak zo opnieuw verbinding.",
+            "reconciliation_failed": "De nieuwste groepsstatus kan niet worden gecontroleerd. Probeer het zo nog eens.",
+            "room_not_authorized": "De toegang tot deze groep kan niet worden gecontroleerd. Maak opnieuw verbinding om door te gaan.",
+            "shut_down": "De serververbinding is verbroken. Maak opnieuw verbinding om door te gaan."
+          }
+        }
+      },
+      "group": {
+        "create": {
+          "in_progress": "Maken…",
+          "keychain_warning": "De groep is gemaakt, maar de uitnodigingscode kan niet in Sleutelhanger worden bewaard. Bewaar de weergegeven code nu op een veilige plek.",
+          "realtime_grant_pending": "De groep is gemaakt, maar de serververbinding kan niet worden voltooid. Controleer het zo opnieuw. (%@)"
+        },
+        "delete": {
+          "success": "De groep ‘%@’ is verwijderd."
+        },
+        "join": {
+          "in_progress": "Deelnemen…",
+          "keychain_warning": "Je bent lid geworden van de groep, maar de uitnodigingscode kan niet in Sleutelhanger worden bewaard. Bewaar de ontvangen code op een veilige plek.",
+          "realtime_grant_pending": "Je bent lid geworden van de groep, maar de serververbinding kan niet worden voltooid. Controleer het zo opnieuw. (%@)"
+        },
+        "leave": {
+          "confirmation": {
+            "last_member": "Omdat je het laatste lid bent, worden de groep en alle berichten definitief verwijderd en kunnen ze niet worden hersteld.",
+            "member": "Je hebt geen toegang meer tot de groep of de bestaande berichten.",
+            "owner_transfer": "Het eigendom gaat over naar het overgebleven lid dat als eerste lid werd. Je hebt daarna geen toegang meer tot de groep of de bestaande berichten."
+          },
+          "success": "Je hebt de groep ‘%@’ verlaten."
+        },
+        "name": {
+          "unknown": "Groep"
+        },
+        "remove_member": {
+          "success": "%@ is uit de groep verwijderd."
+        },
+        "rename": {
+          "success": "De groep is hernoemd."
+        },
+        "switch": {
+          "failed": "Er kan niet van groep worden gewisseld. Probeer het opnieuw. (%@)"
+        }
+      },
+      "groups": {
+        "active": "Actief",
+        "create": {
+          "invite_code": {
+            "description": "Alleen vrienden die deze code ontvangen, kunnen lid worden van de groep.",
+            "title": "Nieuwe uitnodigingscode"
+          },
+          "name": {
+            "description": "Voer een naam van 1–20 tekens in om een groep te maken."
+          },
+          "subtitle": "Maak een groep en deel de uitnodigingscode met vrienden."
+        },
+        "current": {
+          "empty": {
+            "description": "Maak een groep of voer een uitnodigingscode van een vriend in.",
+            "title": "Je neemt nog niet deel aan een groep"
+          },
+          "subtitle": {
+            "one": "Beheer de groepen die je met vrienden deelt. Elke groep kan maximaal %lld lid hebben.",
+            "other": "Beheer de groepen die je met vrienden deelt. Elke groep kan maximaal %lld leden hebben."
+          },
+          "title": "Huidige groep"
+        },
+        "delete": {
+          "confirmation_title": "De groep ‘%@’ verwijderen?",
+          "message": "De groep en alle berichten worden definitief verwijderd en kunnen niet worden hersteld."
+        },
+        "invite_code": {
+          "copy": {
+            "action": "Uitnodigingscode kopiëren",
+            "complete": "Gekopieerd",
+            "help": "De uitnodigingscode uit Sleutelhanger op dit apparaat kopiëren."
+          },
+          "rotate": {
+            "$value": "Uitnodigingscode vervangen",
+            "help": "Trek de mogelijk gelekte code in en geef één nieuwe 128-bits code uit."
+          }
+        },
+        "join": {
+          "invite_code": {
+            "description": "Voer een uitnodigingscode in om te controleren of je lid kunt worden en of er plek is in de groep.",
+            "placeholder": "Uitnodigingscode",
+            "title": "Uitnodigingscode"
+          },
+          "subtitle": "Word lid van een groep met een uitnodigingscode van een vriend."
+        },
+        "leave": {
+          "action": "Groep verlaten",
+          "confirmation_title": "De groep ‘%@’ verlaten?",
+          "message": {
+            "last_owner": "Omdat je het laatste lid bent, worden de groep en alle berichten definitief verwijderd en kunnen ze niet worden hersteld.",
+            "member": "Je hebt geen toegang meer tot de groep of de bestaande berichten.",
+            "owner_transfer": "Het eigendom gaat over naar het overgebleven lid dat als eerste lid werd. Je hebt daarna geen toegang meer tot de groep of de bestaande berichten."
+          }
+        },
+        "management": {
+          "navigation_label": "Groepen"
+        },
+        "member": {
+          "owner": "Eigenaar",
+          "remove": {
+            "confirmation_title": "%@ verwijderen?",
+            "message": "Dit lid heeft daarna geen toegang meer tot de groep of de bestaande berichten.",
+            "title": "Lid verwijderen"
+          }
+        },
+        "members": {
+          "empty": "Geen leden om weer te geven."
+        },
+        "operation": {
+          "creating": "Maken…",
+          "joining": "Deelnemen…",
+          "select": "Van groep wisselen",
+          "switching": "Wisselen van groep…"
+        },
+        "room": {
+          "summary": {
+            "invite_ready": {
+              "one": "%1$lld/%2$lld lid · Uitnodigingscode %3$@",
+              "other": "%1$lld/%2$lld leden · Uitnodigingscode %3$@"
+            },
+            "invite_rotation_required": {
+              "one": "%1$lld/%2$lld lid · Uitnodigingscode moet worden vervangen",
+              "other": "%1$lld/%2$lld leden · Uitnodigingscode moet worden vervangen"
+            }
+          }
+        }
+      },
+      "history": {
+        "close": {
+          "accessibility": "Recente berichten sluiten"
+        },
+        "empty": {
+          "description": "Recente berichten in deze groep verschijnen hier.",
+          "title": "Nog geen berichten"
+        },
+        "error": {
+          "load_failed": "Recente berichten kunnen niet worden geladen."
+        },
+        "older": {
+          "exhausted": {
+            "one": "Je hebt alle berichten van de afgelopen %lld dag gezien.",
+            "other": "Je hebt alle berichten van de afgelopen %lld dagen gezien."
+          }
+        },
+        "retention_notice": {
+          "one": "Berichten worden na %lld dag automatisch verwijderd.",
+          "other": "Berichten worden na %lld dagen automatisch verwijderd."
+        },
+        "title": "Recente geschiedenis",
+        "window": {
+          "title": "%@ · Recente berichten"
+        }
+      },
+      "invite": {
+        "error": {
+          "backend_unavailable": "De uitnodigingscode kan nu niet worden gecontroleerd. Probeer het zo nog eens.",
+          "clipboard_failed": "De uitnodigingscode kan niet worden gekopieerd. Probeer het opnieuw.",
+          "not_stored_on_device": "De uitnodigingscode is niet op dit apparaat bewaard. Maak een nieuwe code of vraag de eigenaar om een code.",
+          "read_failed": "De uitnodigingscode kan niet worden gelezen. Probeer het opnieuw. (%@)",
+          "revoked": "De vorige uitnodigingscode voor deze groep is ingetrokken. De eigenaar van de groep moet een nieuwe uitgeven."
+        },
+        "rotate": {
+          "keychain_warning": "Er is een nieuwe code uitgegeven, maar deze kan niet in Sleutelhanger worden bewaard. Bewaar de weergegeven code nu op een veilige plek.",
+          "success": "Er is een nieuwe uitnodigingscode uitgegeven."
+        }
+      },
+      "keychain": {
+        "error": {
+          "status": "Sleutelhangerfout %lld"
+        },
+        "operation_reason": "Veilig toegang krijgen tot je inloggegevens en uitnodigingscodes voor groepen.",
+        "transition": {
+          "message": "De app gebruikt Sleutelhanger in macOS om je inloggegevens en uitnodigingscodes voor groepen veilig te bewaren en op te halen.",
+          "migration_explanation": "Wanneer de app voor het eerst gegevens van een oudere versie laadt, kan macOS om het inlogwachtwoord van je Mac vragen. Kies ‘Sta altijd toe’ in het volgende macOS-venster om deze vraag niet opnieuw te krijgen. Als je ‘Sta toe’ kiest, kan het venster afhankelijk van de bewaarde gegevens nog enkele keren of de volgende keer bij het openen van de app verschijnen.",
+          "privacy_explanation": "De app ziet of bewaart het ingevoerde wachtwoord niet.",
+          "quit": "Stop SIDEY"
+        }
+      },
+      "landing": {
+        "accessibility": {
+          "ready": "Startscherm van SIDEY",
+          "restoring": "SIDEY herstelt je vorige login"
+        },
+        "status": {
+          "ready": "Klik om te beginnen.",
+          "restoring": "Je vorige login herstellen…"
+        },
+        "tagline": "Je vrienden zijn aan de rand van je scherm aangekomen."
+      },
+      "launch_at_login": {
+        "update_failed": "De instelling ‘Open bij inloggen’ kan niet worden gewijzigd. Probeer het opnieuw. (%@)"
+      },
+      "message": {
+        "composer": {
+          "placeholder": "Voer een bericht in"
+        },
+        "delivery": {
+          "failed": "Versturen mislukt",
+          "pending": "Versturen"
+        },
+        "error": {
+          "realtime_disconnected": "De serververbinding is verbroken. Maak opnieuw verbinding voordat je een bericht verstuurt.",
+          "wait_for_group_switch": "Wacht tot het wisselen van groep is voltooid voordat je verstuurt."
+        },
+        "retention_sync_failed": "De instelling voor het bewaren van berichten kan niet worden toegepast. Probeer het opnieuw. (%@)",
+        "send": {
+          "failed": "Het bericht kan niet worden verstuurd. Probeer het opnieuw. (%@)"
+        }
+      },
+      "mutation": {
+        "post_commit_sync_failed": "De wijziging is opgeslagen, maar het scherm kan niet worden vernieuwd. Controleer het zo opnieuw. (%@)",
+        "realtime_recovering": "Je wijzigingen zijn opgeslagen. Opnieuw verbinding maken met de server…"
+      },
+      "onboarding": {
+        "group": {
+          "invite_code": {
+            "placeholder": "Uitnodigingscode van een vriend"
+          },
+          "member_limit": {
+            "one": "Een groep kan maximaal %lld lid hebben.",
+            "other": "Een groep kan maximaal %lld leden hebben."
+          },
+          "path": {
+            "accessibility": "Kies hoe je lid wilt worden van een groep"
+          }
+        },
+        "profile": {
+          "description": "Je kunt dit later wijzigen in Instellingen.",
+          "nickname": {
+            "placeholder": "Bijnaam, 2–8 tekens"
+          },
+          "title": "Kies een naam"
+        }
+      },
+      "overlay": {
+        "span": {
+          "full": "Volledig"
+        }
+      },
+      "pixel_world": {
+        "doze_label": "Zzz",
+        "interaction": {
+          "throw": "Klik met de linkermuisknop op een vriend om de standaardzachte bal te gooien.",
+          "tree": "Klik met de rechtermuisknop op de boom om deze te stoppen of weer te laten lopen."
+        },
+        "nickname": {
+          "current_user": "%@ · Jij"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Kies een pixelpersonage dat jou op de schermen van vrienden voorstelt.",
+          "selection": {
+            "accessibility": "Personage kiezen"
+          },
+          "state": {
+            "equipping": "Instellen"
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "description": "Kies een tekstballon die je hebt. Deze wordt meteen in al je groepen gebruikt.",
+            "selection": {
+              "accessibility": "Tekstballon kiezen"
+            }
+          },
+          "character": {
+            "description": "Kies een personage dat je hebt. Dit wordt meteen in al je groepen gebruikt.",
+            "selection": {
+              "accessibility": "Personage kiezen"
+            }
+          },
+          "default_bubble": "Standaardballon",
+          "default_throwable": "Standaard zachte bal",
+          "hint": {
+            "current": "Momenteel in gebruik",
+            "select": "Wordt meteen in al je groepen gebruikt"
+          },
+          "throwable": {
+            "description": "Kies werpspeelgoed dat je hebt. Dit wordt meteen in al je groepen gebruikt.",
+            "selection": {
+              "accessibility": "Werpspeelgoed kiezen"
+            }
+          }
+        },
+        "current_user": {
+          "badge": "Jij"
+        },
+        "duplicates_allowed": "Je kunt hetzelfde personage of dezelfde bijnaam gebruiken als een ander groepslid.",
+        "error": {
+          "character_not_owned": "Kies voor je profiel een personage dat je hebt."
+        },
+        "nickname": {
+          "description": "De naam die je vrienden in pixelwerelden en berichten zien · 2–8 tekens",
+          "save": "Bijnaam wijzigen",
+          "unknown": "Vriend",
+          "unknown_friend": "Onbekende vriend",
+          "unknown_member": "Lid"
+        },
+        "onboarding": {
+          "next_hint": "Maak na het opslaan van je profiel een groep of word lid met een uitnodigingscode."
+        },
+        "selection": {
+          "state": {
+            "not_selected": "Niet geselecteerd",
+            "selected": "Geselecteerd"
+          }
+        },
+        "subtitle": "Stel de naam en het personage in die je vrienden zien.",
+        "success": {
+          "nickname_updated": "Je bijnaam is gewijzigd.",
+          "saved": "Je profiel is opgeslagen."
+        }
+      },
+      "realtime": {
+        "kill_switch": {
+          "error": {
+            "legacy_connection_creation_failed": "Er kan geen verbinding met de server worden gemaakt. Probeer het straks opnieuw.",
+            "legacy_connection_recovery_failed": "Er kan niet opnieuw verbinding met de server worden gemaakt. Probeer het zo nog eens."
+          },
+          "transition_failed": "Er kan geen verbinding met de server worden gemaakt. Maak zo opnieuw verbinding. (%@)"
+        },
+        "rollout": {
+          "error": {
+            "cache_unavailable": "De status van de serververbinding kan niet worden opgeslagen. Open de app opnieuw.",
+            "contract_mismatch": "Deze versie kan geen verbinding met de server maken. Werk de app bij.",
+            "enabled_policy_unavailable": "Er kan geen verbinding met de server worden gemaakt. Probeer het later opnieuw.",
+            "malformed_response": "Er kan geen verbinding met de server worden gemaakt. Probeer het later opnieuw."
+          }
+        }
+      },
+      "settings": {
+        "account": {
+          "delete": {
+            "authentication_notice": "Voer ‘DELETE’ in en log opnieuw in met Apple om het account meteen te verwijderen.",
+            "confirmation_phrase": "DELETE",
+            "description": "Hiermee worden je profiel, berichten en gegevens over de groepen waarvan je lid was verwijderd. Aankoopgegevens kunnen afzonderlijk van je account worden bewaard wanneer dat nodig is voor de boekhouding en fraudepreventie.",
+            "placeholder": "Typ ‘DELETE’ om te bevestigen",
+            "reveal": "Account verwijderen…",
+            "title": "Account verwijderen"
+          },
+          "privacy_policy": "Privacybeleid",
+          "restore_purchases": "Aankopen herstellen",
+          "subtitle": "Accountgegevens en in-app aankopen beheren.",
+          "terms": "Servicevoorwaarden",
+          "title": "Account en privacy"
+        },
+        "display": {
+          "offline_members": {
+            "description": "Toon ook offline vrienden als slapende personages met een rode statusstip.",
+            "title": "Offlineleden weergeven"
+          },
+          "quiet_mode": {
+            "description": "Berichtballonnen en typindicatoren verbergen, maar de verbindingsstatus en aantallen ongelezen berichten behouden."
+          },
+          "subtitle": "Bepaal hoe de status en berichten van vrienden op het scherm verschijnen.",
+          "throw_guard": {
+            "description": "Als dit uitstaat, klik je met de linkermuisknop op het personage van een vriend om meteen speelgoed te gooien. Als dit aanstaat, dubbelklik je eerst met de rechtermuisknop op je eigen personage en klik je binnen 10 seconden met de linkermuisknop op het personage van een vriend.",
+            "title": "Tweemaal met de rechtermuisknop klikken voor het gooien"
+          }
+        },
+        "general": {
+          "overlay_visible": {
+            "description": "Toon de pixelwereld van je vrienden langs de gekozen schermrand."
+          },
+          "subtitle": "De basisweergave en het opstartgedrag van de app instellen."
+        },
+        "placement": {
+          "edge": {
+            "description": "Kies de schermrand waar de personages rondlopen.",
+            "picker": "Schermrand",
+            "title": "Schermrand"
+          },
+          "monitor": {
+            "description": "Kies het scherm voor de pixelwereld. Verplaats de berichtinvoer afzonderlijk met de greep links.",
+            "picker": "Weergave",
+            "title": "Weergave"
+          },
+          "span": {
+            "description": "Kies hoeveel van de geselecteerde rand de wereld inneemt.",
+            "full": "Volledig",
+            "half": "1/2",
+            "picker": "Lengte",
+            "third": "1/3",
+            "title": "Lengte van wereld"
+          },
+          "subtitle": "Plaats het scherm en de pixelpersonages.",
+          "title": "Plaatsing van wereld"
+        },
+        "shortcuts": {
+          "key": {
+            "picker": "Toets"
+          },
+          "restore_default": {
+            "accessibility": "Standaardsneltoets herstellen",
+            "help": "Standaardsneltoets herstellen"
+          },
+          "subtitle": "Kies minstens één speciale toets en een letter- of cijfertoets. Wijzigingen worden meteen toegepast.",
+          "title": "Algemene sneltoetsen"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Een geluid afspelen wanneer een personage in de huidige groep wordt geraakt door werpspeelgoed.",
+            "title": "Geluidseffecten van personages"
+          },
+          "subtitle": "Geluidseffecten voor personages instellen."
+        }
+      },
+      "shortcut": {
+        "action": {
+          "composer": "Berichtvenster openen/sluiten",
+          "history": "Recente berichten openen",
+          "overlay": "Pixelwereld weergeven of verbergen",
+          "quiet_mode": "Discrete modus"
+        },
+        "error": {
+          "duplicate": "Wordt al gebruikt door ‘%@’. De bestaande sneltoets blijft behouden.",
+          "modifier_required": "Kies minstens één speciale toets. De bestaande sneltoets blijft behouden.",
+          "new_binding_registration_failed": "De nieuwe sneltoets kan niet worden geregistreerd. De bestaande sneltoets blijft behouden.",
+          "new_binding_used_by_other_app": "Deze combinatie wordt door een andere app gebruikt. De bestaande sneltoets blijft behouden.",
+          "registration_failed": "De sneltoets kan niet worden geregistreerd. Kies een andere sneltoets.",
+          "used_by_other_app": "Deze sneltoets wordt door een andere app gebruikt. Kies een andere of controleer de instellingen van de conflicterende app."
+        },
+        "modifier": {
+          "command": "Command",
+          "control": "Control",
+          "option": "Option",
+          "shift": "Shift"
+        },
+        "status": {
+          "change_failed": "Wijzigen mislukt",
+          "unavailable": "Sneltoets niet beschikbaar"
+        }
+      },
+      "status": {
+        "icon": {
+          "unread": {
+            "accessibility": "%@, ongelezen berichten"
+          }
+        },
+        "menu": {
+          "active_group": "Actieve groep",
+          "compose": "Nieuw bericht…",
+          "group_settings": "Groepsinstellingen…",
+          "history": "Recente geschiedenis…",
+          "no_connected_groups": "Van geen enkele groep lid",
+          "overlay": {
+            "hide": "Overlay verbergen",
+            "show": "Pixelwereld weergeven"
+          },
+          "quiet_mode": "Discrete modus",
+          "quit": "Stop %@",
+          "settings": "Instellingen…",
+          "store": "Winkel…"
+        },
+        "room": {
+          "unread_count": " (%@)"
+        },
+        "tooltip": {
+          "unread": "%@ · Ongelezen berichten"
+        }
+      },
+      "store": {
+        "coming_soon": {
+          "badge": "Binnenkort beschikbaar",
+          "detail": "De winkel wordt voorbereid. Tot snel.",
+          "product": {
+            "accessibility": "%@, binnenkort beschikbaar"
+          }
+        },
+        "empty": {
+          "description": "Wijzig het producttype of het filter voor items die je hebt.",
+          "title": "Geen overeenkomende producten"
+        },
+        "error": {
+          "auto_equip_failed": "Je aankoop is voltooid, maar het item kan niet automatisch worden ingesteld. Stel het handmatig in bij Profiel.",
+          "auto_equip_realtime_grant_pending": "Het item is ingesteld. Als het niet meteen verschijnt, controleer je het zo opnieuw. (%@)",
+          "entitlements_reconcile_failed": "Je in-app aankopen kunnen niet worden gecontroleerd. Probeer Aankopen herstellen opnieuw.",
+          "equipment_realtime_grant_pending": "Het item is ingesteld. Als het niet meteen verschijnt, controleer je het zo opnieuw. (%@)",
+          "equipment_update_failed": "Het ingestelde item kan niet worden bijgewerkt.",
+          "product_unavailable": "Dit product is niet beschikbaar in de App Store.",
+          "products_load_failed": "App Store-producten kunnen niet worden geladen. Probeer het later opnieuw.",
+          "purchase_failed": "De aankoop van %@ kan niet worden voltooid. Probeer het later opnieuw.",
+          "purchase_pending": "De aankoop wacht op goedkeuring. Na goedkeuring verschijnt het item automatisch.",
+          "purchase_status_failed": "De aankoop kan niet worden bevestigd. Controleer het zo opnieuw.",
+          "server_rejected": "Je in-app aankopen kunnen niet worden gecontroleerd. Probeer Aankopen herstellen opnieuw.",
+          "transaction_update_failed": "Je aankoop kan niet worden toegepast. Probeer Aankopen herstellen opnieuw.",
+          "unknown_result": "Het aankoopresultaat kan niet worden bevestigd. Controleer het zo opnieuw.",
+          "unverified_transaction": "De aankoop kan niet worden gecontroleerd en is daarom niet toegepast. Probeer Aankopen herstellen opnieuw.",
+          "verifier_not_configured": "Aankopen kunnen nu niet worden gecontroleerd. Probeer het later opnieuw."
+        },
+        "filter": {
+          "hide_owned": "Verberg in bezit",
+          "kind": {
+            "$value": "Producttype",
+            "accessibility": "Producttype in winkel"
+          },
+          "menu": "Sorteren en filteren"
+        },
+        "footer": {
+          "app_store": {
+            "entitlement": "In-app aankopen worden verwerkt door de App Store. Je kunt een item gebruiken zodra je aankoop is bevestigd.",
+            "headline": "Prijzen worden weergegeven en aankopen worden verwerkt door de App Store.",
+            "refund": "Voor terugbetalingen en vragen over facturering gelden het beleid en de procedures van Apple voor de App Store."
+          },
+          "coming_soon": "De winkel is binnenkort beschikbaar. Je kunt items die je al hebt blijven gebruiken.",
+          "direct": {
+            "entitlement": "De weergegeven prijzen zijn inclusief belasting. Je kunt personalisatie-items gebruiken zodra de betaling is bevestigd.",
+            "refund": "Nadat de toegang is ingegaan, is geen terugbetaling mogelijk omdat je van gedachten bent veranderd. Waar de wet dit vereist, wordt het volledige bedrag terugbetaald, bijvoorbeeld bij niet-levering, afwijking, dubbele of ongeautoriseerde betaling."
+          }
+        },
+        "kind": {
+          "bubble": "Ballonnen",
+          "character": "Personage",
+          "keepsake": "Dierbaar voorwerp",
+          "throwable": "Werpspeelgoed"
+        },
+        "navigation_label": "Uiterlijk en winkel",
+        "preview": {
+          "accessibility": "Voorvertoning van %@",
+          "character_interaction_hint": "Klik met de linkermuisknop op het andere personage om %@ te proberen te gooien. Dubbelklik met de linkermuisknop op een personage om de reactieballon te zien.",
+          "default_throwable": "Standaard zachte bal",
+          "double_click_hint": "Dubbelklik met de linkermuisknop op een personage om de reactieballon te zien.",
+          "member": {
+            "dubu": "Dubu",
+            "moka": "Moka"
+          },
+          "message": {
+            "left": "Wat zullen we eten?",
+            "right": "Wat dacht je van pittige kipstoofpot?"
+          },
+          "reduce_motion_hint": "Verminder beweging staat aan. Daarom wordt een stilstaand tafereel weergegeven.",
+          "sound": {
+            "off": "Geluid van voorvertoning uitschakelen",
+            "on": "Geluid van voorvertoning inschakelen"
+          },
+          "tree_toggle_hint": "Klik met de rechtermuisknop op de boom om deze te stoppen. Klik nogmaals om deze weer te laten lopen."
+        },
+        "price": {
+          "loading": {
+            "$value": "Prijs laden…",
+            "short": "Prijs controleren"
+          },
+          "required": "Prijscontrole vereist",
+          "retry": "Prijs opnieuw controleren",
+          "unavailable": {
+            "$value": "De App Store-prijs is niet beschikbaar.",
+            "short": "Prijs niet beschikbaar"
+          }
+        },
+        "processing": "Verwerken",
+        "product": {
+          "detail": {
+            "close": "Productgegevens sluiten",
+            "hint": "Details bekijken"
+          },
+          "equipped": "In gebruik",
+          "preview": {
+            "hint": "Voorvertoning bekijken"
+          },
+          "processing": {
+            "accessibility": "%@ verwerken"
+          },
+          "sold_separately": "Afzonderlijk verkocht",
+          "status": {
+            "accessibility": "%@, %@"
+          },
+          "unavailable": {
+            "detail": "Dit product kan nog niet worden gekocht."
+          }
+        },
+        "purchase": {
+          "accessibility": "%@ kopen voor %@",
+          "action": "%@ kopen · %@",
+          "available": "Beschikbaar",
+          "confirming": "Bevestigen",
+          "error": "Fout",
+          "opening_checkout": "Aankoop openen…",
+          "owned": "In bezit",
+          "refunded": "Terugbetaald",
+          "success": "%@ gekocht.",
+          "unavailable": "Momenteel niet beschikbaar"
+        },
+        "purchase_and_equip": {
+          "success": "%@ gekocht en ingesteld."
+        },
+        "restore": {
+          "action": "Aankopen herstellen",
+          "failed": "Aankopen kunnen niet worden hersteld. Probeer het opnieuw.",
+          "success": "Aankopen zijn hersteld."
+        },
+        "sort": {
+          "price_ascending": "Laagste prijs eerst",
+          "price_descending": "Hoogste prijs eerst"
+        },
+        "status": {
+          "retry": "Status opnieuw controleren"
+        },
+        "subtitle": "Kies personages, tekstballonnen en werpspeelgoed.",
+        "title": "Uiterlijk en winkel"
+      },
+      "tree_movement": {
+        "error": {
+          "save_failed": "De instelling voor de beweging van de boom kan niet worden opgeslagen. Probeer het opnieuw."
+        }
+      }
+    },
+    "windows": {
+      "accessibility": {
+        "motion": {
+          "disabled": "Animatie-effecten zijn uitgeschakeld in Windows."
+        }
+      },
+      "account": {
+        "delete": {
+          "confirmation": {
+            "action": "Account verwijderen",
+            "message": "Je profiel en groepslidmaatschappen worden permanent verwijderd. Aankopen worden losgekoppeld van je account.",
+            "title": "Account verwijderen?"
+          },
+          "description": "Persoonsgegevens die aan je account zijn gekoppeld, permanent verwijderen.",
+          "final_confirmation": {
+            "message": "Een verwijderd account en de bijbehorende gegevens kunnen niet worden hersteld.",
+            "title": "Account verwijderen?"
+          },
+          "title": "Account verwijderen"
+        },
+        "description": "Meld je af of beheer je account.",
+        "sign_out": {
+          "confirmation": {
+            "action": "Afmelden",
+            "message": "Je wordt alleen op deze pc afgemeld. Meld je opnieuw aan met Google om SIDEY weer te gebruiken.",
+            "title": "Afmelden?"
+          },
+          "description": "Alleen op deze pc afmelden.",
+          "title": "Afmelden"
+        },
+        "title": "Account"
+      },
+      "app": {
+        "info": {
+          "description": "Bekijk versie- en ondersteuningsinformatie.",
+          "navigation_label": "Info",
+          "title": "Info"
+        },
+        "launch": {
+          "failed": "De app kan niet worden gestart. Sluit de app en probeer het opnieuw."
+        },
+        "startup": {
+          "error": {
+            "title": "SIDEY-opstartfout"
+          },
+          "failed": "SIDEY kan niet worden gestart.",
+          "failed_with_log": "SIDEY kan niet worden gestart.\\\n\\\nDiagnostisch logboek: {0}",
+          "runtime_missing": "Bestanden die SIDEY nodig heeft, ontbreken. Installeer de app opnieuw."
+        }
+      },
+      "auth": {
+        "google": {
+          "already_linked": "Dit Google-account is al aan het huidige profiel gekoppeld. Je profiel en gegevens zijn niet gewijzigd.",
+          "cancelled": "Aanmelden met Google is geannuleerd of niet voltooid. Probeer het opnieuw.",
+          "identity_changed": "Dit is niet het Google-account dat aan je huidige account is gekoppeld. Je bestaande profiel en gegevens zijn niet gewijzigd.",
+          "link_expired": "Het verzoek om aan te melden met Google is verlopen. Annuleer het aanmelden en begin opnieuw.",
+          "required": "Koppel je Google-account.",
+          "sign_in_complete": "Aanmelden met Google is voltooid. Je kunt het aanmeldingstabblad in de browser sluiten."
+        },
+        "request": {
+          "failed": "Aanmelden is mislukt. Probeer het straks opnieuw. (Foutcode: {0})"
+        },
+        "response": {
+          "empty": "Aanmelden kan niet worden voltooid. Probeer het opnieuw."
+        },
+        "session": {
+          "expired": "Je aanmelding is verlopen. Meld je opnieuw aan.",
+          "replace_blocked": "Er staan nog aanmeldgegevens op deze pc. Start de app opnieuw en meld je daarna aan.",
+          "restore_failed": "Je vorige aanmelding kan niet worden hersteld. Er is geen nieuw account gemaakt. Meld je opnieuw aan.",
+          "stored_invalid": "Opgeslagen aanmeldgegevens kunnen niet worden gelezen. Meld je opnieuw aan.",
+          "values_missing": "Aanmelden kan niet worden voltooid. Probeer het opnieuw."
+        }
+      },
+      "common": {
+        "back": "Terug",
+        "delete": "Verwijderen",
+        "friend": "Vriend",
+        "skip": "Overslaan"
+      },
+      "composer": {
+        "drag": {
+          "tooltip": "Sleep om het invoerveld te verplaatsen"
+        },
+        "group": {
+          "required": "Stel je profiel in en selecteer een groep waarnaar je een bericht wilt sturen."
+        },
+        "message": {
+          "placeholder": "Typ een bericht"
+        },
+        "window": {
+          "title": "SIDEY-bericht"
+        }
+      },
+      "connection": {
+        "configuration": {
+          "not_configured": "De instellingen voor de serververbinding ontbreken. Installeer de app opnieuw."
+        },
+        "error": {
+          "access_required": "De toegang tot je account of groep kan niet worden gecontroleerd. Selecteer Opnieuw verbinden bij Serververbinding. Blijft het probleem bestaan, contacteer dan de ondersteuning en voeg het diagnostische logboek toe.",
+          "busy": "Het is momenteel druk op de server, waardoor verbinding maken langer duurt. Er wordt automatisch opnieuw verbinding gemaakt. Is er na enkele minuten nog geen verbinding, contacteer dan de ondersteuning en voeg het diagnostische logboek toe.",
+          "configuration_unavailable": "De serververbinding kan momenteel niet worden gestart. Selecteer straks Opnieuw verbinden bij Serververbinding. Blijft het probleem bestaan, contacteer dan de ondersteuning en voeg het diagnostische logboek toe.",
+          "network_unavailable": "Er kan geen verbinding met de server worden gemaakt. Controleer je internetverbinding en selecteer daarna Opnieuw verbinden bij Serververbinding. Kun je andere websites wel openen, contacteer dan de ondersteuning en voeg het diagnostische logboek toe.",
+          "secure_connection_failed": "Er kan geen beveiligde verbinding worden gemaakt. Controleer of de datum en tijd in Windows juist zijn en probeer opnieuw verbinding te maken. Blijft dit mislukken, contacteer dan de ondersteuning en voeg het diagnostische logboek toe.",
+          "service_unavailable": "Er kan geen verbinding met de server worden gemaakt. Er wordt automatisch opnieuw verbinding gemaakt. Is er na enkele minuten nog geen verbinding, selecteer dan Opnieuw verbinden bij Serververbinding. Blijft het probleem bestaan, contacteer dan de ondersteuning en voeg het diagnostische logboek toe."
+        },
+        "group_resync_failed": "De nieuwste groepsstatus kan niet worden geladen. Maak opnieuw verbinding. ({0})",
+        "group_revision_missing": "De verbindingsgegevens van de groep zijn gewijzigd. Maak opnieuw verbinding.",
+        "notice": {
+          "connected": "Verbonden met de server.",
+          "reconnecting": "Opnieuw verbinding maken met de server…"
+        },
+        "retry": {
+          "action": "Opnieuw verbinden"
+        },
+        "server": {
+          "not_configured": "De instellingen voor de serververbinding ontbreken. Installeer de app opnieuw."
+        },
+        "state": {
+          "connected": "Verbonden",
+          "disconnected": "Niet verbonden",
+          "reconnecting": "Verbinding maken…"
+        },
+        "unavailable": "Er kan geen verbinding met de server worden gemaakt. Probeer het straks opnieuw."
+      },
+      "external_link": {
+        "open": {
+          "failed": "De pagina kan niet in de standaardbrowser worden geopend. Probeer het opnieuw."
+        }
+      },
+      "groups": {
+        "create": {
+          "description": "Maak een groep en deel de uitnodigingscode met vrienden.",
+          "in_progress": "Maken…",
+          "result_missing": "De groep kan niet worden gemaakt. Probeer het opnieuw.",
+          "success": {
+            "default": "Groep gemaakt."
+          },
+          "tooltip": "Maak een groep met de ingevoerde naam."
+        },
+        "delete": {
+          "confirmation": {
+            "message": "De groep en alle berichten worden permanent verwijderd en kunnen niet worden hersteld.",
+            "title": "Groep ‘{0}’ verwijderen?"
+          },
+          "final_confirmation": {
+            "message": "Groep ‘{0}’ en alle berichten worden nu permanent verwijderd.",
+            "title": "Groep permanent verwijderen?"
+          },
+          "success": "Groep verwijderd.",
+          "tooltip": "Deze groep permanent verwijderen."
+        },
+        "description": "Beheer groepen met vrienden. Elke groep kan maximaal 12 leden hebben.",
+        "empty": {
+          "description": "Maak een groep of voer een uitnodigingscode van een vriend in.",
+          "title": "Je neemt nog niet deel aan een groep"
+        },
+        "error": {
+          "not_found": "De groep kan niet worden gevonden. Controleer de groepslijst."
+        },
+        "invite": {
+          "code": {
+            "label": "Uitnodigingscode",
+            "missing": "Er is geen uitnodigingscode op dit apparaat opgeslagen. Maak een nieuwe uitnodigingscode.",
+            "replaced": "De uitnodigingscode die op dit apparaat is opgeslagen, is al vervangen. Vraag de eigenaar om de nieuwe code.",
+            "revoked": "De oude uitnodigingscode van deze groep is ingetrokken. De eigenaar moet een nieuwe code maken."
+          },
+          "copy": {
+            "action": "Uitnodigingscode kopiëren",
+            "complete": "Gekopieerd"
+          },
+          "rotate": {
+            "action": "Nieuwe uitnodigingscode maken",
+            "code_missing": "Er kan geen nieuwe uitnodigingscode worden gemaakt. Probeer het opnieuw.",
+            "confirmation": {
+              "action": "Nieuwe code maken",
+              "message": "De bestaande code wordt direct ingetrokken. Dit kan niet ongedaan worden gemaakt.",
+              "title": "Nieuwe uitnodigingscode maken?"
+            },
+            "success": "Er is een nieuwe uitnodigingscode gemaakt en op deze pc opgeslagen."
+          }
+        },
+        "join": {
+          "description": "Neem deel aan een groep met de uitnodigingscode van een vriend.",
+          "failed": "Deelnemen aan de groep is mislukt. Controleer de uitnodigingscode en probeer het opnieuw. ({0})",
+          "in_progress": "Deelnemen…",
+          "result_missing": "De groep waaraan je deelneemt, kan niet worden geladen. Probeer het opnieuw.",
+          "room_id_missing": "Deelname aan de groep kan niet worden voltooid. Probeer het opnieuw.",
+          "success": {
+            "default": "Je neemt nu deel aan de groep."
+          },
+          "tooltip": "Neem deel aan de groep van deze uitnodigingscode."
+        },
+        "leave": {
+          "action": "Groep verlaten",
+          "confirmation": {
+            "action": "Verlaten",
+            "member_message": "Je hebt geen toegang meer tot de groep en de bestaande berichten.",
+            "owner_message": "Het lid dat het eerst deelnam, wordt de nieuwe eigenaar. Als er geen leden overblijven, wordt de groep verwijderd.",
+            "title": "Groep ‘{0}’ verlaten?"
+          },
+          "success": "Je hebt de groep verlaten.",
+          "tooltip": "Deze groep verlaten."
+        },
+        "member": {
+          "remove": {
+            "confirmation": {
+              "message": "Dit lid heeft geen toegang meer tot de groep en de bestaande berichten.",
+              "title": "‘{0}’ uit de groep verwijderen?"
+            },
+            "success": "Lid verwijderd.",
+            "tooltip": "Dit lid uit de groep verwijderen."
+          }
+        },
+        "navigation_label": "Groepen",
+        "operation": {
+          "busy": "Wacht tot de andere groepsbewerking is voltooid en probeer het opnieuw."
+        },
+        "refresh": {
+          "failed": "De groepsinformatie kan niet worden vernieuwd. Probeer het straks opnieuw. ({0})"
+        },
+        "rename": {
+          "success": "Groepsnaam gewijzigd.",
+          "title": "Groepsnaam wijzigen",
+          "tooltip": "Wijzig de groepsnaam."
+        },
+        "state": {
+          "active": "Actief"
+        },
+        "summary": {
+          "invite_ready": "{0}/12 leden · uitnodigingscode {1}",
+          "invite_rotation_required": "{0}/12 leden · nieuwe uitnodigingscode vereist"
+        },
+        "switch": {
+          "action": "Van groep wisselen",
+          "in_progress": "Wisselen van groep…",
+          "success": "De actieve groep is gewijzigd.",
+          "tooltip": "Naar deze groep wisselen."
+        },
+        "title": "Huidige groep"
+      },
+      "history": {
+        "empty": {
+          "description": "Recente berichten in deze groep verschijnen hier.",
+          "title": "Nog geen berichten"
+        },
+        "group": {
+          "none": "Geen actieve groep",
+          "required": "Neem deel aan een groep om recente berichten te bekijken."
+        },
+        "load": {
+          "initial_failed": "Recente berichten kunnen niet worden geladen.",
+          "retry": "Opnieuw proberen"
+        },
+        "pagination": {
+          "exhausted": "Je hebt alle berichten van de afgelopen 3 dagen bekeken."
+        },
+        "recent": {
+          "title": "Recente geschiedenis"
+        },
+        "retention": {
+          "notice": "Berichten worden na 3 dagen automatisch verwijderd.",
+          "reload_failed": "Eerdere berichten kunnen niet opnieuw worden geladen. Probeer het straks opnieuw. ({0})"
+        },
+        "scroll": {
+          "latest": "Naar het nieuwste bericht"
+        },
+        "user": {
+          "unknown": "Onbekende vriend"
+        },
+        "window": {
+          "always_on_top": {
+            "disable": "Altijd op voorgrond uitschakelen",
+            "disable_shortcut": "Altijd op voorgrond uitschakelen (Alt+pijl-omlaag)",
+            "enable": "Altijd op voorgrond",
+            "enable_shortcut": "Altijd op voorgrond (Alt+pijl-omhoog)"
+          },
+          "title": "Recente SIDEY-geschiedenis"
+        }
+      },
+      "legal": {
+        "description": "Bekijk de voorwaarden en het beleid.",
+        "privacy": {
+          "action": "Privacyverklaring bekijken"
+        },
+        "refund": {
+          "action": "Herroepings- en terugbetalingsbeleid bekijken"
+        },
+        "terms": {
+          "action": "Gebruiksvoorwaarden bekijken"
+        },
+        "title": "Beleid"
+      },
+      "message": {
+        "delivery": {
+          "recheck_failed": "Er kan niet worden gecontroleerd of het bericht is verzonden. Controleer het straks opnieuw. ({0})"
+        },
+        "send": {
+          "failed": "Het bericht kan niet worden verzonden. Probeer het opnieuw. ({0})",
+          "rate_limited": "Je verzendt te snel berichten. Probeer het straks opnieuw."
+        }
+      },
+      "onboarding": {
+        "auth": {
+          "google": {
+            "cancel": "Aanmelden annuleren",
+            "continue": "Doorgaan met Google",
+            "description": "Koppel je Google-account om aan de slag te gaan. Je bestaande profiel, groepen en gespreksgeschiedenis blijven behouden.",
+            "pending": "Voltooi het aanmelden met Google in de browser."
+          },
+          "start": "Aan de slag"
+        },
+        "complete": {
+          "description": "Je kunt later altijd groepen maken of eraan deelnemen via Instellingen.",
+          "title": "Je bent klaar om te beginnen."
+        },
+        "connection": {
+          "connected": "Verbonden met de server",
+          "connecting": "Verbinding maken met de server…"
+        },
+        "group": {
+          "invite_code": {
+            "label": "Uitnodigingscode",
+            "member_limit": "Een groep kan maximaal 12 leden hebben.",
+            "placeholder": "Code van een vriend",
+            "required": "Voer een uitnodigingscode in."
+          },
+          "join": {
+            "action": "Deelnemen"
+          },
+          "name": {
+            "placeholder": "Bijvoorbeeld: Onze vriendengroep"
+          },
+          "path": {
+            "label": "Manier van deelnemen"
+          }
+        },
+        "launch": {
+          "action": "Starten"
+        },
+        "profile": {
+          "description": "Je kunt dit later altijd wijzigen via Instellingen.",
+          "title": "Kies een naam"
+        },
+        "step": {
+          "complete": "Voltooid"
+        },
+        "tagline": "Je vrienden zijn naast je scherm aangekomen."
+      },
+      "overlay": {
+        "current_user": "{0} · ik"
+      },
+      "platform": {
+        "requirements": {
+          "description": "Voor SIDEY heb je Windows 10 versie 1809 (build 17763) of hoger en een x64-pc nodig.",
+          "title": "Niet-ondersteunde Windows-versie",
+          "window_title": "SIDEY — niet-ondersteunde Windows-versie"
+        }
+      },
+      "profile": {
+        "character": {
+          "description": "Kies een pixelpersonage dat jou op de schermen van vrienden voorstelt.",
+          "save": {
+            "success": "Personage gewijzigd."
+          }
+        },
+        "cosmetics": {
+          "bubble": {
+            "default": "Standaardballon",
+            "description": "Kies een ballon die je bezit. De ballon wordt direct in alle groepen gebruikt.",
+            "title": "Ballonnen"
+          },
+          "equipped": "In gebruik",
+          "save": {
+            "success": "Uiterlijk toegepast."
+          },
+          "throwable": {
+            "default": "Standaard zachte bal",
+            "description": "Kies werpspeelgoed dat je hebt. Je gebruikt het meteen in al je groepen.",
+            "title": "Werpspeelgoed"
+          }
+        },
+        "description": "Stel de naam en het personage in die vrienden zien.",
+        "duplicates": {
+          "notice": "Groepsleden mogen hetzelfde personage of dezelfde bijnaam gebruiken."
+        },
+        "nickname": {
+          "description": "Deze naam verschijnt in de pixelwereld en berichten van je vrienden. Gebruik 2–8 tekens.",
+          "save": {
+            "action": "Bijnaam wijzigen",
+            "tooltip": "Sla de gewijzigde bijnaam op."
+          }
+        },
+        "save": {
+          "success": "Profiel opgeslagen."
+        }
+      },
+      "settings": {
+        "display": {
+          "description": "Stel in hoe de status en berichten van vrienden op het scherm verschijnen.",
+          "offline_members": {
+            "description": "Toon ook offline vrienden als slapende personages met een rode statusstip.",
+            "title": "Offlineleden weergeven",
+            "tooltip": "Offlineleden weergeven"
+          },
+          "quiet_mode": {
+            "description": "Verberg berichtballonnen en typindicatoren, maar behoud de verbindingsstatus en het aantal ongelezen berichten.",
+            "tooltip": "Discrete modus in- of uitschakelen"
+          },
+          "throw_guard": {
+            "description": "Als dit is uitgeschakeld, klik je met de linkermuisknop op het personage van een vriend om meteen te gooien. Als dit is ingeschakeld, dubbelklik je eerst met de rechtermuisknop op je eigen personage. Daarna kun je 10 seconden met de linkermuisknop op een vriend klikken om te gooien.",
+            "title": "Pas gooien na dubbelklikken met de rechtermuisknop op mijn personage",
+            "tooltip": "Vereis een dubbele klik met de rechtermuisknop op mijn personage voordat ik gooi"
+          }
+        },
+        "general": {
+          "description": "Stel de standaardweergave en het opstartgedrag in."
+        },
+        "language": {
+          "description": "Kies de taal voor de app. De wijziging wordt direct toegepast.",
+          "title": "Taal / Language"
+        },
+        "navigation_label": "Instellingen",
+        "overlay": {
+          "description": "Toon de pixelwereld van je vrienden langs de gekozen schermrand.",
+          "tooltip": "Pixelwereld weergeven"
+        },
+        "placement": {
+          "description": "Kies het scherm en de positie van de pixelpersonages.",
+          "edge": {
+            "description": "Kies de schermrand waar de personages rondlopen.",
+            "title": "Schermrand",
+            "tooltip": "Schermrand voor de pixelwereld"
+          },
+          "monitor": {
+            "description": "Kies het scherm waarop de pixelwereld en het berichtvenster verschijnen.",
+            "title": "Scherm",
+            "tooltip": "Scherm voor de pixelwereld en het berichtvenster",
+            "unavailable": "Er is geen scherm beschikbaar. Sluit een scherm aan en probeer het opnieuw."
+          },
+          "span": {
+            "description": "Kies hoeveel ruimte de wereld langs de gekozen rand inneemt.",
+            "full": "Volledig",
+            "title": "Lengte van gebied",
+            "tooltip": "Schermgebied dat de pixelwereld inneemt"
+          },
+          "title": "Plaatsing van wereld"
+        },
+        "save": {
+          "failed": "De instellingen kunnen niet worden opgeslagen. Probeer het opnieuw. ({0})"
+        },
+        "shortcuts": {
+          "action": {
+            "composer": "Berichtvenster openen/sluiten",
+            "history": "Recente geschiedenis openen/sluiten",
+            "overlay": "Overlay weergeven/verbergen",
+            "quiet_mode": "Discrete modus in- of uitschakelen"
+          },
+          "description": "Selecteer een sneltoets en druk op de gewenste toetsencombinatie. Als je een combinatie kiest die al in gebruik is, wisselen de twee sneltoetsen om.",
+          "error": {
+            "already_registered": "Deze sneltoets wordt al door het systeem of een andere app gebruikt. Kies een andere sneltoets.",
+            "availability_unverified": "Er kan niet worden gecontroleerd of deze sneltoets beschikbaar is. Kies een andere sneltoets.",
+            "in_app_conflict": "Een andere sneltoets in de app gebruikt deze combinatie. Als je opslaat, wisselen de twee sneltoetsen om.",
+            "invalid": "Ongeldige sneltoets",
+            "modifier_required": "Een sneltoets moet beginnen met Win, Ctrl, Alt of Shift.",
+            "system_conflict": "Deze sneltoets wordt al door Windows gebruikt. Kies een andere sneltoets."
+          },
+          "recorder": {
+            "empty": "Druk op een toetsencombinatie om deze sneltoets te wijzigen.",
+            "help": "Druk op Win, Ctrl, Alt of Shift samen met een andere toets. Druk op Esc om te annuleren.",
+            "recording": "Druk op een sneltoets…",
+            "reset": "Opnieuw instellen"
+          },
+          "title": "Sneltoetsen"
+        },
+        "sound": {
+          "character_effects": {
+            "description": "Speel een geluid af wanneer werpspeelgoed in de huidige groep een personage raakt.",
+            "title": "Geluidseffecten van personages"
+          },
+          "description": "Stel de geluidseffecten van personages in.",
+          "mute": "Dempen",
+          "unmute": "Dempen opheffen",
+          "volume": "Volume"
+        },
+        "storage": {
+          "folder_invalid": "De map voor het opslaan van instellingen kan niet worden geopend. Start de app opnieuw.",
+          "read_failed": "Opgeslagen instellingen kunnen niet worden gelezen. Start de app opnieuw."
+        },
+        "theme": {
+          "dark": "Donker",
+          "description": "Kies voor de app een licht, donker of systeemthema.",
+          "light": "Licht",
+          "system": "Windows-standaard",
+          "system_colors": {
+            "action": "Kleurinstellingen openen"
+          },
+          "title": "Thema"
+        },
+        "update": {
+          "check": {
+            "action": "Controleren op updates"
+          },
+          "check_now": {
+            "tooltip": "Controleer of er een nieuwe versie is."
+          },
+          "description": "Controleer of er een nieuwe versie is.",
+          "last_checked": {
+            "never": "Laatst gecontroleerd: nog nooit",
+            "today": "Vandaag om {0}",
+            "value": "Laatst gecontroleerd: {0}",
+            "yesterday": "Gisteren om {0}"
+          },
+          "release_notes": {
+            "action": "Wat is er nieuw"
+          },
+          "title": "Updates"
+        }
+      },
+      "store": {
+        "auth": {
+          "google": {
+            "failed": "Het koppelen van het Google-account kan niet worden gestart. Probeer het opnieuw."
+          }
+        },
+        "availability": {
+          "coming_soon": {
+            "description": "De winkel is momenteel alleen beschikbaar als voorbeeld. Aankopen zijn nog niet beschikbaar.",
+            "title": "Aankopen binnenkort beschikbaar"
+          }
+        },
+        "checkout": {
+          "opening": "Afrekenvenster openen…"
+        },
+        "description": "Bekijk hoe personages, ballonnen en werpspeelgoed op het scherm bewegen.",
+        "empty": {
+          "description": "Wijzig de zoekterm, het producttype of het filter voor bezittingen.",
+          "title": "Geen overeenkomende producten"
+        },
+        "filter": {
+          "hide_owned": "Verberg in bezit",
+          "menu": "Sorteren en filteren",
+          "reset": "Filters wissen",
+          "search": {
+            "label": "Zoeken",
+            "placeholder": "Zoeken op productnaam of beschrijving"
+          }
+        },
+        "kind": {
+          "bubble": "Ballon",
+          "character": "Personage",
+          "keepsake": "Dierbaar voorwerp",
+          "throwable": "Werpspeelgoed"
+        },
+        "navigation_label": "Uiterlijk en winkel",
+        "preview": {
+          "member": {
+            "dubu": "Dubu",
+            "moka": "Moka"
+          },
+          "message": {
+            "left": "Wat zullen we eten?",
+            "right": "Wat dacht je van kipstoofpot?"
+          },
+          "open": "Voorbeeld",
+          "sound": {
+            "off": "Geluid in voorbeeld uitschakelen",
+            "on": "Geluid in voorbeeld inschakelen"
+          },
+          "tree_movement_hint": "Klik met de rechtermuisknop op de boom om deze te stoppen. Klik nogmaals om verder te lopen.",
+          "unavailable": "Het voorbeeld kan niet worden geladen. Probeer het opnieuw."
+        },
+        "price": {
+          "krw": "₩{0:N0}"
+        },
+        "product": {
+          "sold_separately": "Apart verkocht van het personage"
+        },
+        "purchase": {
+          "action": "Kopen voor {0}",
+          "confirming": "Betaling controleren…",
+          "failed": "De aankoopstatus kan niet worden gecontroleerd. Controleer het straks opnieuw.",
+          "owned": "In bezit",
+          "success": "Aankoop voltooid.",
+          "timeout": "Het controleren van de betaling duurde te lang. Open de winkel opnieuw om de status te controleren.",
+          "unavailable": "Kan momenteel niet worden gekocht. Probeer het straks opnieuw."
+        },
+        "sort": {
+          "price_ascending": "Laagste prijs eerst",
+          "price_descending": "Hoogste prijs eerst"
+        },
+        "status": {
+          "retry": "Opnieuw proberen",
+          "unavailable": "De winkelstatus kan niet worden geladen. Probeer het straks opnieuw."
+        },
+        "title": "Uiterlijk en winkel"
+      },
+      "support": {
+        "diagnostics": {
+          "description": "Comprimeer de logboekbestanden en sla ze op het bureaublad op. Deel ze met ondersteuning om een probleem op te lossen.",
+          "export": {
+            "action": "Exporteren",
+            "failed": "Diagnostische gegevens kunnen niet worden geëxporteerd. Probeer het opnieuw.",
+            "success": "Diagnostische gegevens zijn op het bureaublad opgeslagen."
+          },
+          "title": "Diagnostische gegevens exporteren"
+        },
+        "feedback": {
+          "action": "Feedback verzenden",
+          "description": "Heb je een probleem of hulp nodig? Maak dan een issue op GitHub.",
+          "title": "Feedback"
+        }
+      },
+      "tray": {
+        "app": {
+          "exit": "Afsluiten"
+        },
+        "connection": {
+          "error": {
+            "message": "Selecteer Opnieuw verbinden bij Serververbinding. Blijft het probleem bestaan, contacteer dan de ondersteuning en voeg het diagnostische logboek toe.",
+            "title": "Fout met SIDEY-serververbinding"
+          }
+        },
+        "group": {
+          "active": "Actieve groep"
+        },
+        "groups": {
+          "empty": "Je neemt nog niet deel aan een groep",
+          "open": "Groepsinstellingen…"
+        },
+        "history": {
+          "open": "Recente geschiedenis…"
+        },
+        "message": {
+          "compose": "Bericht opstellen…"
+        },
+        "overlay": {
+          "hide": "Overlay verbergen"
+        },
+        "quiet_mode": {
+          "toggle": "Discrete modus"
+        },
+        "settings": {
+          "open": "Instellingen…"
+        },
+        "shortcuts": {
+          "registration_failed": "De sneltoets {0} kan niet worden gebruikt. Mogelijk wordt deze door een andere app gebruikt. Gebruik het systeemvakmenu."
+        },
+        "start": {
+          "failed": "Het systeemvakpictogram kan niet worden gestart. Als je het venster sluit, wordt SIDEY afgesloten."
+        },
+        "store": {
+          "open": "Winkel…"
+        },
+        "unread": {
+          "tooltip": "SIDEY · {0} ongelezen berichten"
+        },
+        "update": {
+          "available": "Er is een update voor SIDEY {0}.",
+          "check": "Controleren op updates…",
+          "check_failed": "Er kan niet op updates worden gecontroleerd. Probeer het straks opnieuw.",
+          "installed": "De update naar SIDEY {0} is voltooid. Selecteer deze melding om de wijzigingen te bekijken.",
+          "latest": "Je hebt de nieuwste versie."
+        }
+      },
+      "update": {
+        "available": "Er is een update voor SIDEY {0}.",
+        "checking": "Controleren op updates…",
+        "download": {
+          "hash_mismatch": "Het gedownloade updatebestand kan niet worden geverifieerd. Download het opnieuw.",
+          "in_progress": "De update wordt gedownload.",
+          "progress": "De update wordt gedownload. ({0}%)"
+        },
+        "failed": "De update kan niet worden voltooid. Probeer het straks opnieuw.",
+        "install": {
+          "cancelled": "De installatie van de update is geannuleerd.",
+          "invalid": "De installatiegegevens voor de update kunnen niet worden gecontroleerd. Probeer het straks opnieuw.",
+          "launch_failed": "Het installatieprogramma kan niet worden geopend. Selecteer Controleren op updates en probeer het opnieuw.",
+          "launched": "De download is voltooid en het installatieprogramma is gestart.",
+          "missing": "De update kan momenteel niet worden geïnstalleerd. Probeer het straks opnieuw."
+        },
+        "latest": "Je gebruikt de nieuwste versie.",
+        "metadata": {
+          "invalid": "De updategegevens kunnen niet worden gecontroleerd. Probeer het straks opnieuw."
+        },
+        "not_published": "De nieuwe update is nog niet beschikbaar. Controleer het straks opnieuw.",
+        "prompt": {
+          "download": "Downloaden",
+          "later": "Later",
+          "message": "SIDEY {0} downloaden?",
+          "title": "Er is een update"
+        },
+        "release_notes": {
+          "open_failed": "Wat is er nieuw kan niet worden geopend. Probeer het opnieuw. ({0})"
+        }
+      },
+      "validation": {
+        "message": {
+          "length": "Een bericht moet 1–200 tekens bevatten."
+        },
+        "nickname": {
+          "length": "Een bijnaam moet 2–8 tekens bevatten."
+        },
+        "room_name": {
+          "length": "Een groepsnaam moet 1–20 tekens bevatten."
+        }
+      }
+    }
+  },
+  "profile": {
+    "applying": "Toepassen…",
+    "character": {
+      "label": "Personage"
+    },
+    "nickname": {
+      "label": "Bijnaam",
+      "placeholder": "2–8 tekens"
+    },
+    "title": "Mijn profiel"
+  },
+  "settings": {
+    "display": {
+      "quiet_mode": {
+        "title": "Discrete modus"
+      }
+    },
+    "overlay": {
+      "title": "Pixelwereld weergeven"
+    },
+    "placement": {
+      "edge": {
+        "bottom": "Onder",
+        "left": "Links",
+        "right": "Rechts",
+        "top": "Boven"
+      }
+    },
+    "section": {
+      "display": {
+        "title": "Weergave"
+      },
+      "general": {
+        "title": "Algemeen"
+      },
+      "sound": {
+        "title": "Geluid"
+      }
+    },
+    "window": {
+      "title": "SIDEY-instellingen"
+    },
+    "startup": {
+      "title": "Automatisch starten na aanmelden",
+      "description": "De app wordt automatisch gestart wanneer je je aanmeldt."
+    }
+  },
+  "store": {
+    "sort": {
+      "catalog": "Standaard",
+      "label": "Sorteren"
+    }
+  }
+}

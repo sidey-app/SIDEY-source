@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Otevřete aplikaci znovu pomocí scripts/macos/open_current.sh nebo ji sestavte a spusťte v Xcode.",
+          "unverified_source": "Nelze ověřit, zda byla aplikace sestavena z aktuálního zdrojového kódu."
+        }
+      },
+      "common": {
+        "quit": "Ukončit"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Nastavte SIDEY_SUPABASE_URL i SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "Sidey-dev vyžaduje adresu URL a publishable key prostředí SIDEY-staging.",
+          "production_backend_in_development": "Sidey-dev se nemůže připojit k produkčnímu projektu Supabase.",
+          "secret_key_not_allowed": "Klient nemůže používat secret key ani service-role key služby Supabase.",
+          "unsupported_realtime_protocol": "Nastavení realtime protokolu SIDEY obsahuje nepodporovanou hodnotu."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Nepotvrzené změny"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Kontrola obchodu · Snímek se nezdařil",
+          "ownership": {
+            "$value": "Vlastnictví",
+            "all": "Obojí",
+            "character": "Pouze postavička",
+            "keepsake": "Pouze oblíbený předmět",
+            "none": "Nic"
+          },
+          "product": "Produkt",
+          "purchase_disabled": "Na této kontrolní obrazovce nikdy nedochází ke skutečným nákupům.",
+          "window": {
+            "title": "Sidey-dev · Kontrola obchodu · Bez skutečných nákupů"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Spouští se místní náhled s 12 postavami, protože nejsou nastavené proměnné prostředí serveru."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "Modul pro měření vykreslování neběží.",
+          "not_started": "Modul pro měření vykreslování nebyl spuštěn."
+        },
+        "export": {
+          "action": "Exportovat aktuální metriky do JSON",
+          "failed": "Metriky se nepodařilo exportovat: {0}",
+          "path": "Cesta k exportu: {0}",
+          "success": "Aktuální metriky byly exportovány do JSON. Výsledek ručního ověření zůstává ve stavu not_run.",
+          "tooltip": "Uložit aktuální metriky výkonu vykreslování do souboru JSON."
+        },
+        "preview_notice": "Interní režim měření vykreslování pouze s křečkem. Výsledek ručního ověření zatím nebyl zaznamenán.",
+        "samples": {
+          "empty": "Žádné vzorky metrik"
+        },
+        "summary": "Uplynulo {0:F0} s · Vzorky: {1} · Nejdelší snímek: {2:F2} ms · Pracovní sada: {3:F1} MB (maximum: {4:F1} MB) · GDI: {5} · USER: {6}",
+        "title": "Interní metriky vykreslování"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Přepsání nastavení Supabase vyžaduje adresu URL HTTPS (nebo HTTP pro localhost) a veřejný klíč. Tajné klíče a klíče service-role nejsou povolené."
+        }
+      }
+    }
+  }
+}

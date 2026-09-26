@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Axolotl étoilé",
+    "description": "Cet axolotl a ramené une étoile perdue chez lui et la serre fort contre lui, même en dormant.",
+    "iap_description": "Un axolotl qui serre une étoile en dormant."
+  },
+  "character_guinea_pig": {
+    "display_name": "Bébé cochon d’Inde",
+    "description": "Il a oublié où il avait caché son goûter. À voir ses joues bien remplies, il ne doit pas être loin.",
+    "iap_description": "Goûter si bien caché qu’il l’a perdu."
+  },
+  "character_monkey": {
+    "display_name": "Bébé singe",
+    "description": "Il est venu partager une banane. Il dit n’en avoir pris qu’une bouchée en chemin… alors pourquoi en manque-t-il la moitié ?",
+    "iap_description": "Banane à partager… Où est passée la moitié ?"
+  },
+  "character_chinchilla": {
+    "display_name": "Bébé chinchilla",
+    "description": "Tout juste sorti de son bain de sable, il est venu jouer. Mais avant de dire bonjour, il doit montrer sa fourrure toute douce.",
+    "iap_description": "Tout juste sorti du bain de sable, tout doux."
+  },
+  "character_otter": {
+    "display_name": "Bébé loutre",
+    "description": "Elle est venue montrer son coquillage préféré. Vous pouvez regarder, mais elle boudera si vous le prenez.",
+    "iap_description": "Son coquillage préféré est juste à regarder."
+  },
+  "character_pig": {
+    "display_name": "Bébé cochon",
+    "description": "Il a suivi l’odeur des en-cas et a décidé de rester. Maintenant, il pense être chez lui.",
+    "iap_description": "Attiré par les en-cas, il s’est installé."
+  },
+  "character_tree": {
+    "display_name": "Petit arbre",
+    "description": "Un petit arbre est parti se promener. Quand on lui a proposé de faire une pause, il a commencé à choisir où prendre racine.",
+    "iap_description": "En balade, il cherche où prendre racine."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Bulle lapin rose",
+    "description": "Une bulle rose décorée d’un petit lapin.",
+    "iap_description": "Une bulle rose décorée d’un petit lapin."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Bulle poussin jaune beurre",
+    "description": "Une bulle jaune beurre décorée d’un poussin.",
+    "iap_description": "Une bulle jaune beurre décorée d’un poussin."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Bulle chat étoilé",
+    "description": "Une bulle violet profond décorée d’un chat étoilé.",
+    "iap_description": "Bulle violette avec un chat étoilé."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Cœur bondissant",
+    "description": "Un cœur à lancer qui rebondit pendant son vol.",
+    "iap_description": "Un cœur à lancer qui bondit dans les airs."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Mini-canon",
+    "description": "Un mini-canon à lancer qui tire un obus à la mèche allumée.",
+    "iap_description": "Un mini-canon avec un obus à mèche."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Canard couineur",
+    "description": "Un canard qui lance un canard. Ce n’est probablement pas une dispute de famille.",
+    "iap_description": "Un canard lance un canard. Pas de dispute."
+  },
+  "throwable_snowflake": {
+    "display_name": "Flocon de neige",
+    "description": "Un flocon qui se disperse en petits éclats de cristal à l’impact.",
+    "iap_description": "Se disperse en cristaux au premier impact."
+  },
+  "throwable_baseball": {
+    "display_name": "Balle de baseball",
+    "description": "Une balle aux coutures rouges qui s’écrase à l’impact avant de rebondir.",
+    "iap_description": "Coutures rouges, un choc et un rebond."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Balle Wakku",
+    "description": "Crac ! Savourez le son croustillant de la balle Wakku qui vole en éclats.",
+    "iap_description": "Crac ! La balle Wakku vole en éclats."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Cookie moelleux chocolat Dubaï",
+    "description": "Sa coque au cacao et sa garniture verte s’écrasent dans un craquement très satisfaisant.",
+    "iap_description": "Coque cacao et garniture verte. Crac !"
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Mini-poivron du cochon d’Inde",
+    "description": "Un goûter précieusement gardé. Si vous le ramassez dans les trois secondes après l’avoir lancé, ça compte quand même, non ?",
+    "iap_description": "Goûter gardé. Règle des 3 secondes !"
+  },
+  "throwable_banana": {
+    "display_name": "Banane du bébé singe",
+    "description": "Le petit singe a partagé cette banane. Nous n’avons pas encore pu lui demander si c’était volontaire.",
+    "iap_description": "Une banane partagée. Enfin, paraît-il."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Sac de sable du chinchilla",
+    "description": "C’est le sable de bain du chinchilla. Le lancer ne veut probablement pas dire que vous devriez vous laver.",
+    "iap_description": "Sable de bain, pas une invitation à se laver."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Orbe étoilé de l’axolotl",
+    "description": "De la lumière d’étoile concentrée dans un petit orbe. Quelqu’un a vérifié s’il manquait une étoile dans le ciel ?",
+    "iap_description": "Lumière d’étoile. Une étoile manque au ciel ?"
+  },
+  "throwable_clam": {
+    "display_name": "Coquillage de la loutre",
+    "description": "Le coquillage que la loutre emportait partout. Il n’y a pas de perle dedans, seulement un peu d’attachement.",
+    "iap_description": "Pas de perle, juste beaucoup d’attachement."
+  },
+  "throwable_pork": {
+    "display_name": "Porc du bébé cochon",
+    "description": "Une bonne claque bien ferme ! Au fait, quelqu’un a vu le cochon d’à côté récemment ?",
+    "iap_description": "Paf ! Où est passé le cochon d’à côté ?"
+  },
+  "throwable_timber": {
+    "display_name": "Petit arbre du petit arbre",
+    "description": "Un arbre lance un petit arbre. Il faudrait peut-être vérifier l’arbre généalogique avant.",
+    "iap_description": "Un arbre lancé. Quel arbre généalogique !"
+  },
+  "character_shiba": {
+    "display_name": "Shiba inu",
+    "description": "Nous sommes déjà allés nous promener. Le shiba refuse de l’admettre.",
+    "iap_description": "Promenade faite. Le shiba nie tout."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Balle de tennis",
+    "description": "Nous avons trouvé quelqu’un pour la lancer. Nous cherchons encore quelqu’un pour la rapporter.",
+    "iap_description": "Quelqu’un la lance. Qui va la rapporter ?"
+  },
+  "character_duck": {
+    "display_name": "Canard",
+    "description": "Un expert pour esquiver ses responsabilités. Ses pattes de canard le prouvent.",
+    "iap_description": "Esquive tout, même ses responsabilités."
+  },
+  "character_poop": {
+    "display_name": "Crotte",
+    "description": "Nous ne savons pas qui l’a appelée, mais la voici.",
+    "iap_description": "On ignore qui l’a appelée, mais la voici."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Boule de papier toilette",
+    "description": "Personne ne sait si ce papier toilette a servi. Esquivez-la !",
+    "iap_description": "Usagé ou non ? Personne ne sait. Esquivez !"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "On nous avait dit que ce n’était pas épicé. Personne n’a précisé pour qui.",
+    "iap_description": "On disait doux. Mais doux pour qui ?"
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Brochette de pâte de poisson",
+    "description": "C’était fait pour être mangé. Pourquoi l’agitez-vous comme ça ?",
+    "iap_description": "C’était à manger. Pourquoi l’agiter ?"
+  },
+  "character_quokka": {
+    "display_name": "Quokka",
+    "description": "Toujours souriant. Oui, c’est bien lui qui vient de lancer cette feuille.",
+    "iap_description": "Sourit encore après avoir lancé la feuille."
+  },
+  "throwable_leaf": {
+    "display_name": "Feuille",
+    "description": "C’est le déjeuner à emporter du quokka. Nous ne lui avons pas demandé si nous pouvions le lancer.",
+    "iap_description": "Le déjeuner du quokka, lancé sans permission."
+  }
+}

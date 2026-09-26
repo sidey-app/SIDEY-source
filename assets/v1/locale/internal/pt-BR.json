@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Abra o app novamente com scripts/macos/open_current.sh ou compile e execute pelo Xcode.",
+          "unverified_source": "Não foi possível verificar se este app foi compilado usando o código-fonte atual."
+        }
+      },
+      "common": {
+        "quit": "Sair"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Defina SIDEY_SUPABASE_URL e SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "O Sidey-dev requer a URL do SIDEY-staging e uma publishable key.",
+          "production_backend_in_development": "O Sidey-dev não pode se conectar ao projeto de produção do Supabase.",
+          "secret_key_not_allowed": "Uma Supabase secret key ou service-role key não pode ser usada no cliente.",
+          "unsupported_realtime_protocol": "A configuração do protocolo em tempo real do SIDEY contém um valor sem suporte."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Alterações sem commit"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Análise da loja · Falha na captura",
+          "ownership": {
+            "$value": "Propriedade",
+            "all": "Ambos",
+            "character": "Somente personagem",
+            "keepsake": "Somente objeto querido",
+            "none": "Nenhum"
+          },
+          "product": "Produto",
+          "purchase_disabled": "Esta tela de análise nunca faz compras reais.",
+          "window": {
+            "title": "Sidey-dev · Análise da loja · Sem compras reais"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "A prévia local com 12 personagens está em execução porque faltam as variáveis de ambiente do servidor."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "O renderizador de métricas não está em execução.",
+          "not_started": "O renderizador de métricas não foi iniciado."
+        },
+        "export": {
+          "action": "Exportar o JSON das métricas atuais",
+          "failed": "Falha ao exportar métricas: {0}",
+          "path": "Caminho de exportação: {0}",
+          "success": "O JSON das métricas atuais foi exportado. Os resultados manuais permanecem como not_run.",
+          "tooltip": "Salve as métricas atuais de desempenho de renderização como JSON."
+        },
+        "preview_notice": "Modo interno de métricas do renderizador limitado ao hamster. A verificação manual não foi registrada.",
+        "samples": {
+          "empty": "Nenhuma amostra de métrica"
+        },
+        "summary": "Decorrido: {0:F0} s · {1} amostras · quadro máx.: {2:F2} ms · conjunto de trabalho: {3:F1} MB (pico: {4:F1} MB) · GDI: {5} · USER: {6}",
+        "title": "Métricas internas do renderizador"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Uma substituição do Supabase exige uma URL HTTPS (ou HTTP localhost) e uma chave publicável. Chaves secret e service-role não são permitidas."
+        }
+      }
+    }
+  }
+}

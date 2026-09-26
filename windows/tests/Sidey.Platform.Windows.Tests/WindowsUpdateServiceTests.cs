@@ -41,7 +41,7 @@ public sealed class WindowsUpdateServiceTests
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => service.CheckAsync());
 
-        Assert.Equal("Windows 업데이트 정보가 아직 게시되지 않았습니다.", exception.Message);
+        Assert.Equal("새 업데이트를 아직 사용할 수 없습니다. 잠시 후 다시 확인해 주세요.", exception.Message);
     }
 
     [Fact]

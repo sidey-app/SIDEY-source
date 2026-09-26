@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "Supabase override는 HTTPS(또는 localhost HTTP) URL과 publishable key를 함께 사용해야 하며 secret/service-role 키는 금지됩니다."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "서버 환경 변수가 설정되지 않아 12개 캐릭터 로컬 미리보기로 실행 중입니다."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "계측 렌더러가 실행 중이 아닙니다.",
+      "not_started": "계측 렌더러가 시작되지 않았습니다."
+    },
+    "export": {
+      "action": "현재 계측 JSON 내보내기",
+      "failed": "계측 내보내기 실패: {0}",
+      "path": "내보내기 경로: {0}",
+      "success": "현재 계측 JSON을 내보냈습니다. 수동 결과는 not_run 상태입니다.",
+      "tooltip": "현재 렌더링 성능 계측을 JSON 파일로 저장합니다."
+    },
+    "preview_notice": "내부 햄스터 제한 렌더러 계측 모드입니다. 수동 검증 결과는 아직 기록되지 않았습니다.",
+    "samples": {
+      "empty": "계측 샘플 없음"
+    },
+    "summary": "경과 {0:F0}초 · 샘플 {1}개 · 최대 프레임 {2:F2}ms · 작업 집합 {3:F1}MB(최대 {4:F1}MB) · GDI {5} · USER {6}",
+    "title": "내부 렌더러 계측"
+  }
+}

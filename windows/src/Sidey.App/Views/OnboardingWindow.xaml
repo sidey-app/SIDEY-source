@@ -45,7 +45,7 @@
         Canvas.ZIndex="10"
         IsBackButtonVisible="False"
         IsPaneToggleButtonVisible="False"
-        Title="{Binding Value, Source={i18n:I18n Key=window.settingsTitle}, Mode=OneWay}" />
+        Title="{Binding Value, Source={i18n:I18n Key=settings.window.title}, Mode=OneWay}" />
 
     <Grid
         Grid.RowSpan="2"
@@ -108,7 +108,7 @@
             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
             TextAlignment="Center"
             TextWrapping="Wrap"
-            Text="{Binding Value, Source={i18n:I18n Key=onboarding.googleDescription}, Mode=OneWay}" />
+            Text="{Binding Value, Source={i18n:I18n Key=onboarding.auth.google.description}, Mode=OneWay}" />
         <Button
             MinWidth="152"
             HorizontalAlignment="Center"
@@ -119,10 +119,10 @@
             Style="{StaticResource AccentButtonStyle}" />
         <TextBlock HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
             Visibility="{Binding IsGooglePending, Converter={StaticResource BooleanToVisibilityConverter}}"
-            Text="{Binding Value, Source={i18n:I18n Key=onboarding.googlePending}, Mode=OneWay}" />
+            Text="{Binding Value, Source={i18n:I18n Key=onboarding.auth.google.pending}, Mode=OneWay}" />
         <Button HorizontalAlignment="Center" Command="{Binding CancelGoogleCommand}"
             Visibility="{Binding IsGooglePending, Converter={StaticResource BooleanToVisibilityConverter}}"
-            Content="{Binding Value, Source={i18n:I18n Key=onboarding.googleCancel}, Mode=OneWay}" />
+            Content="{Binding Value, Source={i18n:I18n Key=onboarding.auth.google.cancel}, Mode=OneWay}" />
         <InfoBar IsOpen="{Binding HasError}" Severity="Error" IsClosable="False" Message="{Binding ErrorMessage}" />
       </StackPanel>
       </ScrollViewer>
@@ -149,21 +149,21 @@
           <Border Width="28" Height="28" Background="{ThemeResource AccentFillColorDefaultBrush}" CornerRadius="14">
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" FontWeight="SemiBold" Text="1" />
           </Border>
-          <TextBlock x:Name="StepProfileLabel" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=onboarding.stepProfile}, Mode=OneWay}" />
+          <TextBlock x:Name="StepProfileLabel" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=onboarding.step.profile}, Mode=OneWay}" />
         </StackPanel>
         <Rectangle x:Name="StepSeparatorOne" Grid.Column="1" Width="72" Height="1" Margin="16,0" VerticalAlignment="Center" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
         <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
           <Border Width="28" Height="28" Background="{ThemeResource AccentFillColorDefaultBrush}" CornerRadius="14">
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" FontWeight="SemiBold" Text="2" />
           </Border>
-          <TextBlock x:Name="StepGroupLabel" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=onboarding.stepGroup}, Mode=OneWay}" />
+          <TextBlock x:Name="StepGroupLabel" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=onboarding.step.group}, Mode=OneWay}" />
         </StackPanel>
         <Rectangle x:Name="StepSeparatorTwo" Grid.Column="3" Width="72" Height="1" Margin="16,0" VerticalAlignment="Center" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
         <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="8">
           <Border Width="28" Height="28" Background="{ThemeResource AccentFillColorDefaultBrush}" CornerRadius="14">
             <FontIcon HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" Glyph="&#xE73E;" />
           </Border>
-          <TextBlock x:Name="StepCompleteLabel" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=onboarding.stepComplete}, Mode=OneWay}" />
+          <TextBlock x:Name="StepCompleteLabel" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=onboarding.step.complete}, Mode=OneWay}" />
         </StackPanel>
       </Grid>
 
@@ -180,12 +180,12 @@
                   FontFamily="Segoe UI Variable Display, Segoe UI"
                   FontSize="32"
                   FontWeight="SemiBold"
-                  Text="{Binding Value, Source={i18n:I18n Key=onboarding.profileTitle}, Mode=OneWay}" />
-              <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.profileDescription}, Mode=OneWay}" />
+                  Text="{Binding Value, Source={i18n:I18n Key=onboarding.profile.title}, Mode=OneWay}" />
+              <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.profile.description}, Mode=OneWay}" />
             </StackPanel>
             <Border Style="{StaticResource SideySettingsCardStyle}">
               <StackPanel Spacing="16">
-                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=onboarding.character}, Mode=OneWay}" />
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=onboarding.character.label}, Mode=OneWay}" />
                 <GridView
                     x:Name="OnboardingCharacterSelector"
                     ItemsSource="{Binding CharacterSelections}"
@@ -218,9 +218,9 @@
                   </GridView.ItemTemplate>
                 </GridView>
                 <TextBox
-                    Header="{Binding Value, Source={i18n:I18n Key=onboarding.nickname}, Mode=OneWay}"
+                    Header="{Binding Value, Source={i18n:I18n Key=profile.nickname.label}, Mode=OneWay}"
                     MaxLength="8"
-                    PlaceholderText="{Binding Value, Source={i18n:I18n Key=onboarding.nicknamePlaceholder}, Mode=OneWay}"
+                    PlaceholderText="{Binding Value, Source={i18n:I18n Key=profile.nickname.placeholder}, Mode=OneWay}"
                     Text="{Binding Nickname, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Button
                     HorizontalAlignment="Right"
@@ -245,24 +245,24 @@
                   FontFamily="Segoe UI Variable Display, Segoe UI"
                   FontSize="32"
                   FontWeight="SemiBold"
-                  Text="{Binding Value, Source={i18n:I18n Key=onboarding.groupTitle}, Mode=OneWay}" />
-              <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.groupDescription}, Mode=OneWay}" />
+                  Text="{Binding Value, Source={i18n:I18n Key=onboarding.group.title}, Mode=OneWay}" />
+              <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.group.description}, Mode=OneWay}" />
             </StackPanel>
             <Border Style="{StaticResource SideySettingsCardStyle}">
               <StackPanel Spacing="20">
-                <RadioButtons Header="{Binding Value, Source={i18n:I18n Key=onboarding.groupPath}, Mode=OneWay}" MaxColumns="2" SelectedIndex="{Binding GroupPathIndex, Mode=TwoWay}">
-                  <RadioButton Content="{Binding Value, Source={i18n:I18n Key=onboarding.createPath}, Mode=OneWay}" />
-                  <RadioButton Content="{Binding Value, Source={i18n:I18n Key=onboarding.joinPath}, Mode=OneWay}" />
+                <RadioButtons Header="{Binding Value, Source={i18n:I18n Key=onboarding.group.path.label}, Mode=OneWay}" MaxColumns="2" SelectedIndex="{Binding GroupPathIndex, Mode=TwoWay}">
+                  <RadioButton Content="{Binding Value, Source={i18n:I18n Key=groups.create.action}, Mode=OneWay}" />
+                  <RadioButton Content="{Binding Value, Source={i18n:I18n Key=groups.action.join_by_code}, Mode=OneWay}" />
                 </RadioButtons>
                 <StackPanel Spacing="12" Visibility="{Binding GroupPathIndex, Converter={StaticResource ZeroToVisibilityConverter}}">
-                  <TextBox Header="{Binding Value, Source={i18n:I18n Key=onboarding.roomName}, Mode=OneWay}" MaxLength="20" PlaceholderText="{Binding Value, Source={i18n:I18n Key=onboarding.roomNamePlaceholder}, Mode=OneWay}" Text="{Binding RoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                  <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.createDescription}, Mode=OneWay}" TextWrapping="Wrap" />
-                  <Button HorizontalAlignment="Right" Command="{Binding CreateRoomCommand}" Content="{Binding Value, Source={i18n:I18n Key=onboarding.create}, Mode=OneWay}" IsEnabled="{Binding CanCreateRoom}" Style="{StaticResource AccentButtonStyle}" />
+                  <TextBox Header="{Binding Value, Source={i18n:I18n Key=groups.room_name.label}, Mode=OneWay}" MaxLength="20" PlaceholderText="{Binding Value, Source={i18n:I18n Key=onboarding.group.name.placeholder}, Mode=OneWay}" Text="{Binding RoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                  <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.group.create.description}, Mode=OneWay}" TextWrapping="Wrap" />
+                  <Button HorizontalAlignment="Right" Command="{Binding CreateRoomCommand}" Content="{Binding Value, Source={i18n:I18n Key=groups.create.action}, Mode=OneWay}" IsEnabled="{Binding CanCreateRoom}" Style="{StaticResource AccentButtonStyle}" />
                 </StackPanel>
                 <StackPanel Spacing="12" Visibility="{Binding GroupPathIndex, Converter={StaticResource OneToVisibilityConverter}}">
-                  <TextBox Header="{Binding Value, Source={i18n:I18n Key=onboarding.inviteCode}, Mode=OneWay}" PlaceholderText="{Binding Value, Source={i18n:I18n Key=onboarding.inviteCodePlaceholder}, Mode=OneWay}" Text="{Binding InviteCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                  <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.inviteCaseNotice}, Mode=OneWay}" />
-                  <Button HorizontalAlignment="Right" Command="{Binding JoinRoomCommand}" Content="{Binding Value, Source={i18n:I18n Key=onboarding.join}, Mode=OneWay}" IsEnabled="{Binding CanJoinRoom}" Style="{StaticResource AccentButtonStyle}" />
+                  <TextBox Header="{Binding Value, Source={i18n:I18n Key=onboarding.group.invite_code.label}, Mode=OneWay}" PlaceholderText="{Binding Value, Source={i18n:I18n Key=onboarding.group.invite_code.placeholder}, Mode=OneWay}" Text="{Binding InviteCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                  <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.group.invite_code.member_limit}, Mode=OneWay}" />
+                  <Button HorizontalAlignment="Right" Command="{Binding JoinRoomCommand}" Content="{Binding Value, Source={i18n:I18n Key=onboarding.group.join.action}, Mode=OneWay}" IsEnabled="{Binding CanJoinRoom}" Style="{StaticResource AccentButtonStyle}" />
                 </StackPanel>
               </StackPanel>
             </Border>
@@ -284,14 +284,14 @@
               FontFamily="Segoe UI Variable Display, Segoe UI"
               FontSize="32"
               FontWeight="SemiBold"
-              Text="{Binding Value, Source={i18n:I18n Key=onboarding.completeTitle}, Mode=OneWay}" />
-          <TextBlock HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.completeDescription}, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap" />
+              Text="{Binding Value, Source={i18n:I18n Key=onboarding.complete.title}, Mode=OneWay}" />
+          <TextBlock HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=onboarding.complete.description}, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap" />
           <Button
               MinWidth="168"
               Margin="0,8,0,0"
               HorizontalAlignment="Center"
               Command="{Binding FinishCommand}"
-              Content="{Binding Value, Source={i18n:I18n Key=onboarding.launch}, Mode=OneWay}"
+              Content="{Binding Value, Source={i18n:I18n Key=onboarding.launch.action}, Mode=OneWay}"
               Style="{StaticResource AccentButtonStyle}" />
         </StackPanel>
       </Grid>
@@ -325,7 +325,7 @@
         VerticalAlignment="Bottom"
         IsClosable="True"
         IsOpen="False"
-        Message="{Binding Value, Source={i18n:I18n Key=auth.googleSignInComplete}, Mode=OneWay}"
+        Message="{Binding Value, Source={i18n:I18n Key=auth.google.sign_in_complete}, Mode=OneWay}"
         Severity="Success" />
     <InfoBar
         Grid.Row="1"

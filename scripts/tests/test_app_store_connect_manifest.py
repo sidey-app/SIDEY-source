@@ -13,16 +13,16 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from app_store_connect.model import (  # noqa: E402
     APP_STORE_LOCALES,
     ValidationError,
-    expanded_iap_localizations,
     load_desired_state,
     validate_manifest,
 )
+from commerce_localizations import read_source as read_commerce_source  # noqa: E402
 
 
 class AppStoreConnectManifestTests(unittest.TestCase):
     def setUp(self) -> None:
         self.manifest_path = ROOT / "release" / "app-store-localizations.json"
-        self.commerce_path = ROOT / "assets" / "v1" / "commerce-localizations.json"
+        self.commerce_path = ROOT / "assets" / "v1" / "locale" / "commerce"
         self.catalog_path = ROOT / "assets" / "v1" / "commerce-catalog.json"
 
     def test_repository_sources_cover_all_app_and_iap_localizations(self) -> None:
@@ -46,17 +46,6 @@ class AppStoreConnectManifestTests(unittest.TestCase):
             for product in desired.products
         ))
 
-    def test_app_store_export_derives_safe_short_display_name_without_rewriting_source(self) -> None:
-        desired = load_desired_state(
-            self.manifest_path,
-            self.commerce_path,
-            self.catalog_path,
-        )
-        product = next(product for product in desired.products if product["id"] == "character_poop")
-
-        self.assertEqual(product["localizations"]["ko"]["display_name"], "똥")
-        self.assertEqual(expanded_iap_localizations(product)["ko"]["name"], "똥이")
-
     def test_rejects_missing_required_locale(self) -> None:
         manifest = json.loads(self.manifest_path.read_text(encoding="utf-8"))
         del manifest["app_localizations"]["zh-Hant"]
@@ -65,10 +54,9 @@ class AppStoreConnectManifestTests(unittest.TestCase):
             validate_manifest(manifest)
 
     def test_rejects_iap_description_over_45_characters(self) -> None:
-        document = json.loads(self.commerce_path.read_text(encoding="utf-8"))
+        document = read_commerce_source(self.commerce_path)
         document = deepcopy(document)
         document["products"][0]["localizations"]["en"]["iap_description"] = "x" * 46
-        temporary = self.commerce_path.parent / ".invalid-app-store-commerce.json"
         # Validate through the public source function without writing a fixture into the repository.
         from app_store_connect.model import read_json, validate_products
 

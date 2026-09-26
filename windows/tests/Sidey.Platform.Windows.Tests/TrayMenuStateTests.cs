@@ -51,15 +51,15 @@ public sealed class TrayMenuStateTests
 
     [Theory]
     [InlineData((int)TrayUpdateNotification.Latest, "", "최신 버전입니다.")]
-    [InlineData((int)TrayUpdateNotification.Available, "1.2.2", "업데이트가 있습니다. 1.2.2")]
+    [InlineData((int)TrayUpdateNotification.Available, "1.2.2", "SIDEY 1.2.2 업데이트가 있습니다.")]
     [InlineData(
         (int)TrayUpdateNotification.Failed,
         "",
-        "업데이트 확인에 실패했습니다. 잠시 후 다시 시도해 주세요.")]
+        "업데이트를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.")]
     [InlineData(
         (int)TrayUpdateNotification.Installed,
         "1.3.2",
-        "SIDEY 1.3.2 업데이트를 완료했습니다. 클릭해 변경 내용을 확인하세요.")]
+        "SIDEY 1.3.2 업데이트를 완료했습니다. 왼쪽 클릭하여 변경 내용을 확인해 주세요.")]
     public void UpdateNotificationsUseTheLocalizedBody(
         int notification,
         string version,

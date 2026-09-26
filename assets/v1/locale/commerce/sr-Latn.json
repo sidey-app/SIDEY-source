@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Zvezdani aksolotl",
+    "description": "Doneo je kući izgubljenu zvezdicu. Čvrsto je grli čak i dok spava.",
+    "iap_description": "Doneo je kući izgubljenu zvezdicu."
+  },
+  "character_guinea_pig": {
+    "display_name": "Malo morsko prase",
+    "description": "Zaboravilo je gde je sakrilo užinu. Sudeći po punim obrazima, ne može biti daleko.",
+    "iap_description": "Zaboravilo je gde je sakrilo užinu."
+  },
+  "character_monkey": {
+    "display_name": "Mali majmun",
+    "description": "Došao je da podeli bananu. Kaže da je usput zagrizao samo jednom… pa zašto onda nedostaje pola?",
+    "iap_description": "Došao je da podeli bananu."
+  },
+  "character_chinchilla": {
+    "display_name": "Mala činčila",
+    "description": "Posle kupanja u pesku došla je da se igra. Pre pozdrava mora da se pohvali mekanim krznom.",
+    "iap_description": "Posle kupanja u pesku došla je da se igra."
+  },
+  "character_otter": {
+    "display_name": "Mala vidra",
+    "description": "Došla je da pokaže omiljenu školjku. Možete da gledate, ali ako je uzmete, naljutiće se.",
+    "iap_description": "Došla je da pokaže omiljenu školjku."
+  },
+  "character_pig": {
+    "display_name": "Malo prase",
+    "description": "Pratilo je miris užine i odlučilo da ostane. Sada misli da je ovo njegov dom.",
+    "iap_description": "Pratilo je miris užine i odlučilo da ostane."
+  },
+  "character_tree": {
+    "display_name": "Malo drvo",
+    "description": "Malo drvo je krenulo u šetnju. Kada smo mu rekli da se odmori, počelo je da bira gde će pustiti korenje.",
+    "iap_description": "Malo drvo je krenulo u šetnju."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Ružičasti oblačić sa zecom",
+    "description": "Ružičasti oblačić poruke sa ukrasom u obliku zeca.",
+    "iap_description": "Ružičasti oblačić sa zecom."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Žuti oblačić s piletićem",
+    "description": "Oblačić poruke žut kao maslac, sa ukrasom u obliku pileta.",
+    "iap_description": "Žuti oblačić sa piletom."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Zvezdani mačji oblačić",
+    "description": "Tamnoljubičasti oblačić poruke sa ukrasom zvezdane mačke.",
+    "iap_description": "Ljubičasti oblačić sa zvezdanom mačkom."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Skakutavo srce",
+    "description": "Srce koje poskakuje dok leti.",
+    "iap_description": "Srce koje poskakuje dok leti."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Mini-top",
+    "description": "Mali top koji ispaljuje kuglu sa zapaljenim fitiljem.",
+    "iap_description": "Mini-top sa kuglom i zapaljenim fitiljem."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Piskava patkica",
+    "description": "Patka baca patku. Verovatno nije porodična svađa.",
+    "iap_description": "Patka baca patku."
+  },
+  "throwable_snowflake": {
+    "display_name": "Pahulja",
+    "description": "Pahulja koja se pri udaru rasprši u sitne kristale.",
+    "iap_description": "Pahulja koja se rasprši u sitne kristale."
+  },
+  "throwable_baseball": {
+    "display_name": "Loptica za bejzbol",
+    "description": "Loptica s crvenim šavovima koja se pri udaru spljošti i odskoči.",
+    "iap_description": "Crveni šavovi, spljoštavanje i odskakanje."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Vaku lopta",
+    "description": "Krc! Uživajte u reskom zvuku dok se Vaku lopta raspada na komadiće.",
+    "iap_description": "Krc! Vaku lopta se raspada na komadiće."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Mekani Dubai čokoladni keks",
+    "description": "Kakao omotač i zeleni fil spljošte se uz prijatno krckanje.",
+    "iap_description": "Kakao omotač i hrskavi zeleni fil."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Mini-paprika morskog praseta",
+    "description": "Pažljivo sačuvana užina. Ako je podignete u roku od tri sekunde posle bacanja, u redu je, zar ne?",
+    "iap_description": "Pažljivo sačuvana užina."
+  },
+  "throwable_banana": {
+    "display_name": "Majmunova banana",
+    "description": "Majmun je podelio ovu bananu. Još nismo stigli da pitamo da li je to uradio namerno.",
+    "iap_description": "Majmun je podelio ovu bananu."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Vrećica peska činčile",
+    "description": "Ovo je pesak za kupanje činčile. Ako ga baci, verovatno ne nagoveštava da treba da se okupate.",
+    "iap_description": "Ovo je pesak za kupanje činčile."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Zvezdana kugla aksolotla",
+    "description": "Zvezdana svetlost sabijena u malu kuglu. Da li je neko proverio nedostaje li jedna zvezda na nebu?",
+    "iap_description": "Zvezdana svetlost sabijena u malu kuglu."
+  },
+  "throwable_clam": {
+    "display_name": "Vidrina školjka",
+    "description": "Školjka koju je vidra svuda nosila. Unutra nema bisera, samo malo emotivne vezanosti.",
+    "iap_description": "Školjka koju je vidra svuda nosila."
+  },
+  "throwable_pork": {
+    "display_name": "Svinjetina malog praseta",
+    "description": "Baš sočan pljas! Uzgred, da li je neko skoro video prase iz komšiluka?",
+    "iap_description": "Baš sočan pljas!"
+  },
+  "throwable_timber": {
+    "display_name": "Drvcetovo drvce",
+    "description": "Drvo baca malo drvo. Možda prvo treba da proverimo porodično stablo.",
+    "iap_description": "Drvo baca malo drvo."
+  },
+  "character_shiba": {
+    "display_name": "Šiba inu",
+    "description": "Već smo bili u šetnji. Šiba odbija da prihvati tu činjenicu.",
+    "iap_description": "Već smo bili u šetnji."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Teniska loptica",
+    "description": "Izabrali smo ko će da baca. Još tražimo nekoga ko će da donese lopticu.",
+    "iap_description": "Izabrali smo ko će da baca."
+  },
+  "character_duck": {
+    "display_name": "Patka",
+    "description": "Stručnjak za izbegavanje odgovornosti. Pačje noge su dokaz.",
+    "iap_description": "Stručnjak za izbegavanje odgovornosti."
+  },
+  "character_poop": {
+    "display_name": "Kakica",
+    "description": "Ne znamo ko ju je zvao, ali evo je.",
+    "iap_description": "Ne znamo ko ju je zvao, ali evo je."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Kuglica od papira",
+    "description": "Niko ne zna da li je to korišćeni toalet-papir. Samo se sagnite!",
+    "iap_description": "Korišćen ili ne? Samo se sagnite!"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Rekli su da nije mnogo ljuto. Nisu rekli prema čijem ukusu.",
+    "iap_description": "Rekli su da nije mnogo ljuto."
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Ražnjić s korejskim eomukom",
+    "description": "To je bilo za jelo. Zašto mašete njime?",
+    "iap_description": "To je bilo za jelo. Zašto mašete njime?"
+  },
+  "character_quokka": {
+    "display_name": "Kvoka",
+    "description": "Uvek se smeši. Da, upravo je ona bacila taj list.",
+    "iap_description": "Uvek se smeši."
+  },
+  "throwable_leaf": {
+    "display_name": "List",
+    "description": "To je spakovana užina kvoke. Nismo pitali da li sme da se baca.",
+    "iap_description": "To je spakovana užina kvoke."
+  }
+}

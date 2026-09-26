@@ -61,9 +61,9 @@ final class BuildReview {
         } catch {
             NSLog("SIDEY build review: launch ticket rejected: %@", String(describing: error))
             let alert = NSAlert()
-            alert.messageText = L10n.text("build_review.error.unverified_source")
-            alert.informativeText = L10n.text("build_review.error.relaunch_instructions")
-            alert.addButton(withTitle: L10n.text("common.quit"))
+            alert.messageText = InternalL10n.text("build_review.error.unverified_source")
+            alert.informativeText = InternalL10n.text("build_review.error.relaunch_instructions")
+            alert.addButton(withTitle: InternalL10n.text("common.quit"))
             alert.runModal()
             return false
         }

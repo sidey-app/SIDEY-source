@@ -1,0 +1,77 @@
+{
+  "platforms": {
+    "macos": {
+      "build_review": {
+        "error": {
+          "relaunch_instructions": "Volte a abrir a aplicação com scripts/macos/open_current.sh ou compile-a e execute-a no Xcode.",
+          "unverified_source": "Não foi possível verificar se esta aplicação foi compilada a partir do código-fonte atual."
+        }
+      },
+      "common": {
+        "quit": "Sair"
+      },
+      "configuration": {
+        "error": {
+          "incomplete_environment": "Defina SIDEY_SUPABASE_URL e SIDEY_SUPABASE_PUBLISHABLE_KEY.",
+          "missing_development_configuration": "O Sidey-dev requer o URL do SIDEY-staging e uma publishable key.",
+          "production_backend_in_development": "O Sidey-dev não pode estabelecer ligação ao projeto de produção do Supabase.",
+          "secret_key_not_allowed": "Uma Supabase secret key ou service-role key não pode ser utilizada no cliente.",
+          "unsupported_realtime_protocol": "A definição do protocolo em tempo real do SIDEY contém um valor não suportado."
+        }
+      },
+      "debug": {
+        "build": {
+          "dirty": "Alterações sem commit"
+        }
+      },
+      "store": {
+        "review": {
+          "capture_failed": "Revisão da loja · Falha na captura",
+          "ownership": {
+            "$value": "Propriedade",
+            "all": "Ambos",
+            "character": "Apenas personagem",
+            "keepsake": "Apenas objeto estimado",
+            "none": "Nenhum"
+          },
+          "product": "Produto",
+          "purchase_disabled": "Este ecrã de revisão nunca efetua compras reais.",
+          "window": {
+            "title": "Sidey-dev · Revisão da loja · Sem compras reais"
+          }
+        }
+      }
+    },
+    "windows": {
+      "development": {
+        "local_preview": {
+          "notice": "Está em execução uma pré-visualização local com 12 personagens porque as variáveis de ambiente do servidor não estão configuradas."
+        }
+      },
+      "renderer_metrics": {
+        "error": {
+          "not_running": "O processador de métricas não está em execução.",
+          "not_started": "O processador de métricas não foi iniciado."
+        },
+        "export": {
+          "action": "Exportar o JSON das métricas atuais",
+          "failed": "Falha ao exportar métricas: {0}",
+          "path": "Caminho de exportação: {0}",
+          "success": "O JSON das métricas atuais foi exportado. Os resultados manuais permanecem como not_run.",
+          "tooltip": "Guarde as métricas atuais de desempenho de composição como JSON."
+        },
+        "preview_notice": "Modo interno de métricas do processador limitado ao hamster. A verificação manual não foi registada.",
+        "samples": {
+          "empty": "Sem amostras de métricas"
+        },
+        "summary": "Decorrido {0:F0} s · {1} amostras · fotograma máx. {2:F2} ms · conjunto de trabalho {3:F1} MB (pico {4:F1} MB) · GDI {5} · USER {6}",
+        "title": "Métricas internas do processador"
+      },
+      "configuration": {
+        "backend": {
+          "override_invalid": "Uma substituição do Supabase requer um URL HTTPS (ou HTTP localhost) e uma chave publicável. As chaves secret e service-role não são permitidas."
+        }
+      }
+    }
+  }
+}

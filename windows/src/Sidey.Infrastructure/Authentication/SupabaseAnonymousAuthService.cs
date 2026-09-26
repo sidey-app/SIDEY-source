@@ -65,7 +65,7 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
             if (await ReadStoredSessionAsync(cancellationToken).ConfigureAwait(false) is not null)
             {
                 throw new InvalidOperationException(
-                    I18n.Get("auth.cannotReplaceStoredSession"));
+                    I18n.Get("auth.session.replace_blocked"));
             }
 
             StoredSupabaseSession created = await RequestSessionAsync(
@@ -141,9 +141,9 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
         using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         AuthUser user = await response.Content.ReadFromJsonAsync<AuthUser>(s_serializerOptions, cancellationToken).ConfigureAwait(false)
-            ?? throw new InvalidDataException(I18n.Get("auth.emptyResponse"));
+            ?? throw new InvalidDataException(I18n.Get("auth.response.empty"));
         if (user.Id != session.UserId)
-            throw new InvalidOperationException(I18n.Get("auth.identityChanged"));
+            throw new InvalidOperationException(I18n.Get("auth.google.identity_changed"));
         return user.Identities?.Any(identity => StringComparer.Ordinal.Equals(identity.Provider, "google")) == true;
     }
 
@@ -162,9 +162,9 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
             // Existing installations must link, never replace their user and room ownership.
             StoredSupabaseSession? stored = await ReadStoredSessionAsync(cancellationToken).ConfigureAwait(false);
             if (!preserveStoredUser && stored is not null)
-                throw new InvalidOperationException(I18n.Get("auth.cannotReplaceStoredSession"));
+                throw new InvalidOperationException(I18n.Get("auth.session.replace_blocked"));
             if (preserveStoredUser && stored is null)
-                throw new InvalidOperationException(I18n.Get("auth.sessionMissing"));
+                throw new InvalidOperationException(I18n.Get("auth.session.expired"));
             string verifier = Base64Url(RandomNumberGenerator.GetBytes(64));
             string challenge = Base64Url(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(verifier)));
             _pendingIdentityLink = new PendingIdentityLink(stored?.UserId, verifier, DateTimeOffset.UtcNow.AddMinutes(10));
@@ -194,7 +194,7 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
         {
             StoredSupabaseSession session =
                 await RestoreStoredSessionWithinGateAsync(cancellationToken).ConfigureAwait(false)
-                ?? throw new InvalidOperationException(I18n.Get("auth.sessionMissing"));
+                ?? throw new InvalidOperationException(I18n.Get("auth.session.expired"));
             string verifier = Base64Url(RandomNumberGenerator.GetBytes(64));
             string challenge = Base64Url(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(verifier)));
             string query = string.Join('&',
@@ -215,11 +215,11 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
                 await response.Content.ReadFromJsonAsync<IdentityLinkEnvelope>(
                     s_serializerOptions,
                     cancellationToken).ConfigureAwait(false)
-                ?? throw new InvalidDataException(I18n.Get("auth.emptyResponse"));
+                ?? throw new InvalidDataException(I18n.Get("auth.response.empty"));
             if (!Uri.TryCreate(envelope.Url, UriKind.Absolute, out Uri? authorizationUri)
                 || authorizationUri.Scheme != Uri.UriSchemeHttps)
             {
-                throw new InvalidDataException(I18n.Get("auth.emptyResponse"));
+                throw new InvalidDataException(I18n.Get("auth.response.empty"));
             }
 
             _pendingIdentityLink = new PendingIdentityLink(
@@ -247,10 +247,10 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
         try
         {
             PendingIdentityLink pending = _pendingIdentityLink
-                ?? throw new InvalidOperationException(I18n.Get("auth.identityLinkExpired"));
+                ?? throw new InvalidOperationException(I18n.Get("auth.google.link_expired"));
             if (pending.ExpiresAt <= DateTimeOffset.UtcNow)
             {
-                throw new InvalidOperationException(I18n.Get("auth.identityLinkExpired"));
+                throw new InvalidOperationException(I18n.Get("auth.google.link_expired"));
             }
 
             StoredSupabaseSession linked = await RequestSessionAsync(
@@ -260,11 +260,11 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
                 cancellationToken).ConfigureAwait(false);
             if (pending.UserId is { } expectedUserId && linked.UserId != expectedUserId)
             {
-                throw new InvalidOperationException(I18n.Get("auth.identityChanged"));
+                throw new InvalidOperationException(I18n.Get("auth.google.identity_changed"));
             }
 
             if (!await VerifyGoogleIdentityAsync(linked, cancellationToken).ConfigureAwait(false))
-                throw new InvalidOperationException(I18n.Get("auth.googleRequired"));
+                throw new InvalidOperationException(I18n.Get("auth.google.required"));
             cancellationToken.ThrowIfCancellationRequested();
             await StoreAsync(linked, cancellationToken).ConfigureAwait(false);
             _pendingIdentityLink = null;
@@ -316,7 +316,7 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
         if (!response.IsSuccessStatusCode)
         {
             throw new HttpRequestException(
-                I18n.Format("auth.requestFailed", (int)response.StatusCode),
+                I18n.Format("auth.request.failed", (int)response.StatusCode),
                 inner: null,
                 response.StatusCode);
         }
@@ -324,12 +324,12 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
         AuthEnvelope envelope = await response.Content.ReadFromJsonAsync<AuthEnvelope>(
             s_serializerOptions,
             cancellationToken).ConfigureAwait(false)
-            ?? throw new InvalidDataException(I18n.Get("auth.emptyResponse"));
+            ?? throw new InvalidDataException(I18n.Get("auth.response.empty"));
         if (string.IsNullOrWhiteSpace(envelope.AccessToken)
             || string.IsNullOrWhiteSpace(envelope.RefreshToken)
             || envelope.User?.Id is not { } userId)
         {
-            throw new InvalidDataException(I18n.Get("auth.missingSessionValues"));
+            throw new InvalidDataException(I18n.Get("auth.session.values_missing"));
         }
 
         return new StoredSupabaseSession(
@@ -371,7 +371,7 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
         }
         catch (JsonException exception)
         {
-            throw new InvalidDataException(I18n.Get("auth.invalidStoredSession"), exception);
+            throw new InvalidDataException(I18n.Get("auth.session.stored_invalid"), exception);
         }
     }
 
@@ -390,7 +390,7 @@ public sealed class SupabaseAnonymousAuthService : IAuthService, IAuthSessionAcc
             new { refresh_token = stored.RefreshToken },
             cancellationToken).ConfigureAwait(false);
         if (refreshed.UserId != stored.UserId)
-            throw new InvalidOperationException(I18n.Get("auth.identityChanged"));
+            throw new InvalidOperationException(I18n.Get("auth.google.identity_changed"));
         await StoreAsync(refreshed, cancellationToken).ConfigureAwait(false);
         return refreshed;
     }

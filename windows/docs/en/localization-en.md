@@ -8,15 +8,32 @@ The Windows client supports the following BCP 47 language tags.
 
 | Tag | Language |
 | --- | --- |
+| `bg-BG` | Bulgarian |
+| `cs-CZ` | Czech |
+| `de-DE` | German |
 | `en-US` | English |
+| `es-ES` | Spanish |
+| `fr-FR` | French |
+| `he-IL` | Hebrew |
+| `it-IT` | Italian |
 | `ja-JP` | Japanese |
 | `ko-KR` | Korean |
+| `nl-BE` | Dutch (Belgium) |
+| `nl-NL` | Dutch (Netherlands) |
+| `pl-PL` | Polish |
+| `pt-BR` | Portuguese (Brazil) |
+| `pt-PT` | Portuguese (Portugal) |
+| `ro-RO` | Romanian |
 | `ru-RU` | Russian |
+| `sr-Cyrl-RS` | Serbian (Cyrillic) |
+| `sr-Latn-RS` | Serbian (Latin) |
+| `tr-TR` | Turkish |
 | `uk-UA` | Ukrainian |
 | `zh-CN` | Simplified Chinese |
 | `zh-TW` | Traditional Chinese |
 
 The default language is `ko-KR`. `I18n.SupportedLanguages` owns the supported set, and the `SIDEY_LANGUAGE` environment variable carries the selected language at runtime.
+Selecting Hebrew also changes the WinUI reading direction to right to left. The installer language list is maintained separately from the app catalogs, so a language not offered by Setup can still be selected in the app after installation.
 
 ## Store user-facing text in catalogs
 
@@ -70,7 +87,7 @@ A key added to only one file can appear as an empty string or as the key name it
 - placeholder numbers match the reference language; and
 - non-Korean catalogs contain no remaining Korean text.
 
-When adding text, update all seven files in the same change and run this test. Do not copy Korean source text into another language catalog while waiting for a translation. Provide an accurate translation or defer the feature change.
+When adding text, update every supported language file in the same change and run this test. Do not copy Korean source text into another language catalog while waiting for a translation. Provide an accurate translation or defer the feature change.
 
 ## Use system settings for dates and app settings for numbers
 
@@ -85,11 +102,11 @@ When adding a language, verify that every location below understands the same ta
 1. `I18n.SupportedLanguages` and the default-selection rules
 2. `Langs/<tag>.json`
 3. Launcher language forwarding and mapping
-4. Installer language selection and guidance
+4. Installer language selection and guidance when the installer is also gaining that language
 5. Rules that include the catalog in build and publish output
 6. `LanguageCatalogParityTests` and deployment checks
 
-Missing one location can make the installer and app select different languages or leave the published app unable to find its catalog. Treat every item in the list as part of the same language change.
+Missing the app catalog, launcher mapping, or publish rule can prevent the selected language from applying or leave the published app unable to find its catalog. When the installer also gains a language, update its language contract and tests in the same change.
 
 ## Check the running app after the tests pass
 

@@ -56,6 +56,13 @@ public sealed class RuntimeConfigurationTests
     {
         Assert.Equal("whtejsviizgejauasqqt.supabase.co", SupabaseRuntimeConfiguration.ProductionHost);
         Assert.StartsWith("sb_publishable_", SupabaseRuntimeConfiguration.ProductionPublishableKey);
+
+        var configuration =
+            SupabaseRuntimeConfiguration.FromEnvironment(allowOverride: false);
+        Assert.Equal(SupabaseRuntimeConfiguration.ProductionHost, configuration.Url.Host);
+        Assert.Equal(
+            SupabaseRuntimeConfiguration.ProductionPublishableKey,
+            configuration.PublishableKey);
     }
 
     [Theory]

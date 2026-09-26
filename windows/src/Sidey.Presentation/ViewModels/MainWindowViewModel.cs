@@ -37,7 +37,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SoundMuteActionText))]
     public partial bool CharacterSoundEffectsEnabled { get; set; } = true;
-    public string SoundMuteActionText => I18n.Get(CharacterSoundEffectsEnabled ? "settings.muteSound" : "settings.unmuteSound");
+    public string SoundMuteActionText => I18n.Get(CharacterSoundEffectsEnabled ? "settings.sound.mute" : "settings.sound.unmute");
 
     [RelayCommand]
     private void ToggleCharacterSoundMute() => CharacterSoundEffectsEnabled = !CharacterSoundEffectsEnabled;
@@ -194,10 +194,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public partial string InviteCode { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string CreateRoomActionText { get; set; } = I18n.Get("groups.create");
+    public partial string CreateRoomActionText { get; set; } = I18n.Get("groups.create.action");
 
     [ObservableProperty]
-    public partial string JoinRoomActionText { get; set; } = I18n.Get("groups.joinByCode");
+    public partial string JoinRoomActionText { get; set; } = I18n.Get("groups.action.join_by_code");
 
     [ObservableProperty]
     public partial bool AreGroupMutationsEnabled { get; set; } = true;
@@ -263,7 +263,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    public partial string ConnectionText { get; set; } = I18n.Get("connection.reconnecting");
+    public partial string ConnectionText { get; set; } = I18n.Get("connection.state.reconnecting");
 
     [ObservableProperty]
     public partial bool HasRooms { get; set; }
@@ -294,10 +294,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public IReadOnlyList<string> QuietModeHotkeyKeys => HotkeyKeys(GlobalHotkeyAction.ToggleQuietMode);
     public IReadOnlyList<string> ComposerHotkeyKeys => HotkeyKeys(GlobalHotkeyAction.Compose);
     public IReadOnlyList<string> HistoryHotkeyKeys => HotkeyKeys(GlobalHotkeyAction.History);
-    public string OverlayHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyOverlay", OverlayHotkeyText);
-    public string QuietModeHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyQuietMode", QuietModeHotkeyText);
-    public string ComposerHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyComposer", ComposerHotkeyText);
-    public string HistoryHotkeyAccessibleName => HotkeyAccessibleName("settings.hotkeyHistory", HistoryHotkeyText);
+    public string OverlayHotkeyAccessibleName => HotkeyAccessibleName("settings.shortcuts.action.overlay", OverlayHotkeyText);
+    public string QuietModeHotkeyAccessibleName => HotkeyAccessibleName("settings.shortcuts.action.quiet_mode", QuietModeHotkeyText);
+    public string ComposerHotkeyAccessibleName => HotkeyAccessibleName("settings.shortcuts.action.composer", ComposerHotkeyText);
+    public string HistoryHotkeyAccessibleName => HotkeyAccessibleName("settings.shortcuts.action.history", HistoryHotkeyText);
 
     [ObservableProperty]
     public partial int SelectedLanguageIndex { get; set; }
@@ -337,10 +337,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public partial string LastUpdateCheckText { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string ValidationPathText { get; set; } = I18n.Get("metrics.rendererNotStarted");
+    public partial string ValidationPathText { get; set; } = I18n.Get("renderer_metrics.error.not_started");
 
     [ObservableProperty]
-    public partial string ValidationMetricsText { get; set; } = I18n.Get("metrics.noSamples");
+    public partial string ValidationMetricsText { get; set; } = I18n.Get("renderer_metrics.samples.empty");
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ExportDiagnosticDataCommand))]
@@ -398,13 +398,13 @@ public sealed partial class MainWindowViewModel : ObservableObject
         PixelCharacterDefinition character = PixelCharacterCatalog.Get(product.CharacterId);
         string displayName = product.Kind == CommerceProductKind.Character
             ? character.DisplayName
-            : I18n.Get($"store.product.{product.Id}");
-        string description = I18n.Get($"store.productDescriptions.{product.Id}");
+            : I18n.Get($"store.catalog.{product.Id}.name");
+        string description = I18n.Get($"store.catalog.{product.Id}.description");
         return new StoreProductPreviewViewModel(
             product,
             displayName,
             description,
-            I18n.Format("store.priceKrw", product.AmountKrw),
+            I18n.Format("store.price.krw", product.AmountKrw),
             () => ActivateStoreProductAsync(product.Id),
             () => StorePreviewRequested?.Invoke(StoreProducts.FirstOrDefault(candidate =>
                 StringComparer.Ordinal.Equals(candidate.ProductId, product.Id))!));
@@ -485,15 +485,15 @@ public sealed partial class MainWindowViewModel : ObservableObject
             HasRooms = state.Rooms.Count > 0;
             AreGroupMutationsEnabled = state.GroupOperation == GroupOperation.Idle;
             CreateRoomActionText = state.GroupOperation == GroupOperation.Creating
-                ? I18n.Get("groups.creating")
-                : I18n.Get("groups.create");
+                ? I18n.Get("groups.create.in_progress")
+                : I18n.Get("groups.create.action");
             JoinRoomActionText = state.GroupOperation == GroupOperation.Joining
-                ? I18n.Get("groups.joining")
-                : I18n.Get("groups.joinByCode");
+                ? I18n.Get("groups.join.in_progress")
+                : I18n.Get("groups.action.join_by_code");
             IsConnected = state.Connected;
             ConnectionText = state.Connected
-                ? I18n.Get("connection.connected")
-                : I18n.Get("connection.disconnected");
+                ? I18n.Get("connection.state.connected")
+                : I18n.Get("connection.state.disconnected");
             IsOverlayVisible = state.Preferences.OverlayVisible;
             IsQuietMode = state.Preferences.QuietMode;
             if (!_savingSoundSettings)
@@ -542,8 +542,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
             character.DisplayName = PixelCharacterCatalog.Get(character.Id).DisplayName;
         foreach (CosmeticSelectionItemViewModel? cosmetic in BubbleSelections.Concat(ThrowableSelections))
             cosmetic.DisplayName = I18n.Get(cosmetic.CatalogItemId is { } id
-                ? $"store.product.{id}"
-                : cosmetic.Kind == CommerceProductKind.Bubble ? "profile.defaultBubble" : "profile.defaultThrowable");
+                ? $"store.catalog.{id}.name"
+                : cosmetic.Kind == CommerceProductKind.Bubble ? "profile.cosmetics.bubble.default" : "profile.cosmetics.throwable.default");
         foreach (StoreProductPreviewViewModel product in StoreProducts)
         {
             StoreProductPreviewViewModel localized = CreateStorePreview(WindowsCommerceCatalog.Products.First(item => item.Id == product.ProductId));
@@ -583,7 +583,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             await RunCommandAsync(
                 () => _coordinator.SaveProfileAsync(Nickname, SelectedCharacterId),
-                I18n.Get("profile.saved"));
+                I18n.Get("profile.save.success"));
         }
         finally
         {
@@ -603,7 +603,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         string submittedName = CreateRoomName;
         if (await RunCommandAsync(
             () => _coordinator.CreateRoomAsync(submittedName),
-            I18n.Get("groups.createdSimple"))
+            I18n.Get("groups.create.success.default"))
             && StringComparer.Ordinal.Equals(CreateRoomName, submittedName))
         {
             CreateRoomName = string.Empty;
@@ -616,7 +616,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         string submittedCode = InviteCode;
         if (await RunCommandAsync(
             () => _coordinator.JoinRoomAsync(submittedCode),
-            I18n.Get("groups.joinedSimple"))
+            I18n.Get("groups.join.success.default"))
             && StringComparer.Ordinal.Equals(InviteCode, submittedCode))
         {
             InviteCode = string.Empty;
@@ -647,27 +647,27 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 return;
             }
 
-            SetUpdateActivity("update.downloading");
+            SetUpdateActivity("update.download.in_progress");
             var downloadProgress = new Progress<int>(percentage =>
             {
                 SetUpdateActivity(
-                    "update.downloadingProgress",
+                    "update.download.progress",
                     percentage);
             });
             await _updates.DownloadAndLaunchInstallerAsync(
                 update,
                 progress: downloadProgress);
             RaiseNotice(
-                I18n.Get("update.installerLaunched"),
+                I18n.Get("update.install.launched"),
                 NoticeKind.Success);
         }
         catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
         {
-            RaiseNotice(I18n.Get("update.installCancelled"), NoticeKind.Informational);
+            RaiseNotice(I18n.Get("update.install.cancelled"), NoticeKind.Informational);
         }
         catch (Win32Exception)
         {
-            RaiseNotice(I18n.Get("update.installerLaunchFailed"), NoticeKind.Error);
+            RaiseNotice(I18n.Get("update.install.launch_failed"), NoticeKind.Error);
         }
         catch (Exception)
         {
@@ -716,7 +716,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         catch (Exception exception)
         {
             RaiseNotice(
-                I18n.Format("update.releaseNotesFailed", exception.Message),
+                I18n.Format("update.release_notes.open_failed", exception.Message),
                 NoticeKind.Error);
         }
     }
@@ -726,7 +726,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         CurrentVersionText = $"v{_updates.CurrentVersion}";
         if (_updates.LastCheckedAt is not { } checkedAt)
         {
-            LastUpdateCheckText = I18n.Get("settings.updateNeverChecked");
+            LastUpdateCheckText = I18n.Get("settings.update.last_checked.never");
             return;
         }
 
@@ -734,14 +734,14 @@ public sealed partial class MainWindowViewModel : ObservableObject
         DateTime today = DateTime.Today;
         string display = local.Date == today
             ? I18n.Format(
-                "settings.updateCheckedToday",
+                "settings.update.last_checked.today",
                 local.ToString("t", CultureInfo.CurrentCulture))
             : local.Date == today.AddDays(-1)
                 ? I18n.Format(
-                    "settings.updateCheckedYesterday",
+                    "settings.update.last_checked.yesterday",
                     local.ToString("t", CultureInfo.CurrentCulture))
                 : local.ToString("g", CultureInfo.CurrentCulture);
-        LastUpdateCheckText = I18n.Format("settings.updateLastChecked", display);
+        LastUpdateCheckText = I18n.Format("settings.update.last_checked.value", display);
     }
 
     [RelayCommand]
@@ -752,18 +752,18 @@ public sealed partial class MainWindowViewModel : ObservableObject
             string? path = await _coordinator.ExportValidationMetricsAsync();
             if (path is null)
             {
-                RaiseNotice(I18n.Get("metrics.rendererNotRunning"), NoticeKind.Warning);
+                RaiseNotice(I18n.Get("renderer_metrics.error.not_running"), NoticeKind.Warning);
                 return;
             }
 
-            ValidationPathText = I18n.Format("metrics.exportPath", path);
+            ValidationPathText = I18n.Format("renderer_metrics.export.path", path);
             RaiseNotice(
-                I18n.Get("metrics.exported"),
+                I18n.Get("renderer_metrics.export.success"),
                 NoticeKind.Success);
         }
         catch (Exception exception)
         {
-            RaiseNotice(I18n.Format("metrics.exportFailed", exception.Message), NoticeKind.Error);
+            RaiseNotice(I18n.Format("renderer_metrics.export.failed", exception.Message), NoticeKind.Error);
         }
     }
 
@@ -776,11 +776,11 @@ public sealed partial class MainWindowViewModel : ObservableObject
         try
         {
             await _coordinator.ExportDiagnosticDataAsync();
-            RaiseNotice(I18n.Get("about.diagnosticsExported"), NoticeKind.Success);
+            RaiseNotice(I18n.Get("support.diagnostics.export.success"), NoticeKind.Success);
         }
         catch (Exception)
         {
-            RaiseNotice(I18n.Get("about.diagnosticsExportFailed"), NoticeKind.Error);
+            RaiseNotice(I18n.Get("support.diagnostics.export.failed"), NoticeKind.Error);
         }
         finally
         {
@@ -836,7 +836,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
         catch (Exception)
         {
-            RaiseNotice(I18n.Get("about.linkOpenFailed"), NoticeKind.Error);
+            RaiseNotice(I18n.Get("external_link.open.failed"), NoticeKind.Error);
         }
     }
 
@@ -885,7 +885,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         if (!IsHotkeySelectionEnabled)
             return;
         _recordingHotkeyAction = action;
-        _hotkeyRecordingText = I18n.Get("settings.hotkeyRecording");
+        _hotkeyRecordingText = I18n.Get("settings.shortcuts.recorder.recording");
         NotifyHotkeyTextChanged();
     }
 
@@ -907,7 +907,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             return;
         string modifiersText = GlobalHotkeyBinding.ModifierDisplayText(modifiers);
         _hotkeyRecordingText = modifiersText.Length == 0
-            ? I18n.Get("settings.hotkeyRecording")
+            ? I18n.Get("settings.shortcuts.recorder.recording")
             : $"{modifiersText} + …";
         NotifyHotkeyTextChanged();
     }
@@ -916,7 +916,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         if (_recordingHotkeyAction != action)
             return;
-        _hotkeyRecordingText = I18n.Get("settings.hotkeyNeedsModifier");
+        _hotkeyRecordingText = I18n.Get("settings.shortcuts.error.modifier_required");
         NotifyHotkeyTextChanged();
     }
 
@@ -981,7 +981,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     }
 
     private string HotkeyText(GlobalHotkeyAction action) => _recordingHotkeyAction == action
-        ? _hotkeyRecordingText ?? I18n.Get("settings.hotkeyRecording")
+        ? _hotkeyRecordingText ?? I18n.Get("settings.shortcuts.recorder.recording")
         : HotkeyBindingText(_displayedGlobalHotkeys.BindingFor(action));
 
     private IReadOnlyList<string> HotkeyKeys(GlobalHotkeyAction action) =>
@@ -1135,7 +1135,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
         await RunCommandAsync(
             () => _coordinator.ActivateStoreProductAsync(productId),
-            I18n.Get("store.purchaseCompleted"));
+            I18n.Get("store.purchase.success"));
     }
 
     private async Task SaveCharacterSelectionAsync(string characterId)
@@ -1151,7 +1151,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         UpdateCharacterSelectionState();
         bool succeeded = await RunCommandAsync(
             () => _coordinator.SaveProfileAsync(_syncedProfileNickname, characterId),
-            I18n.Get("profile.characterSaved"), () => generation == _selectionGeneration);
+            I18n.Get("profile.character.save.success"), () => generation == _selectionGeneration);
         if (generation != _selectionGeneration)
             return;
         _pendingCharacterId = null;
@@ -1308,8 +1308,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 kind,
                 null,
                 I18n.Get(kind == CommerceProductKind.Bubble
-                    ? "profile.defaultBubble"
-                    : "profile.defaultThrowable"),
+                    ? "profile.cosmetics.bubble.default"
+                    : "profile.cosmetics.throwable.default"),
                 SelectedCharacterId,
                 selectedId is null,
                 !_pendingCosmeticKinds.Contains(kind),
@@ -1320,7 +1320,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 destination.Add(new CosmeticSelectionItemViewModel(
                     kind,
                     id,
-                    I18n.Get($"store.product.{product.Id}"),
+                    I18n.Get($"store.catalog.{product.Id}.name"),
                     SelectedCharacterId,
                     StringComparer.Ordinal.Equals(id, selectedId),
                     !_pendingCosmeticKinds.Contains(kind),
@@ -1352,7 +1352,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             await RunCommandAsync(
                 () => _coordinator.SetEquippedCosmeticAsync(kind, catalogItemId),
-                I18n.Get("profile.cosmeticSaved"), () => generation == _selectionGeneration);
+                I18n.Get("profile.cosmetics.save.success"), () => generation == _selectionGeneration);
         }
         finally
         {
@@ -1476,19 +1476,19 @@ public sealed partial class MainWindowViewModel : ObservableObject
         card.Update(
             room,
             room.InviteCodeReady
-                ? I18n.Format("groups.details", room.Members.Count, room.InviteCodeHint)
-                : I18n.Format("groups.detailsRotationRequired", room.Members.Count),
+                ? I18n.Format("groups.summary.invite_ready", room.Members.Count, room.InviteCodeHint)
+                : I18n.Format("groups.summary.invite_rotation_required", room.Members.Count),
             isActive,
             isOwner,
             isExpanded,
-            isSwitching ? I18n.Get("groups.switching") : I18n.Get("groups.join"),
+            isSwitching ? I18n.Get("groups.switch.in_progress") : I18n.Get("groups.switch.action"),
             !isActive
                 && !isSwitching
                 && (_state.GroupOperation is GroupOperation.Idle or GroupOperation.Switching),
             isSwitching,
             room.InviteCodeReady
-                ? I18n.Get("groups.copyInvite")
-                : I18n.Get("groups.rotateInvite"),
+                ? I18n.Get("groups.invite.copy.action")
+                : I18n.Get("groups.invite.rotate.action"),
             mutationsEnabled && (room.InviteCodeReady || isOwner),
             mutationsEnabled,
             mutationsEnabled && isOwner,
@@ -1504,7 +1504,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         await RunCommandAsync(
             () => _coordinator.SwitchRoomAsync(roomId),
-            I18n.Get("groups.switched"));
+            I18n.Get("groups.switch.success"));
     }
 
     private void ToggleRoom(Guid roomId)
@@ -1533,7 +1533,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
             await RunCommandAsync(
                 () => _coordinator.RotateInviteCodeAsync(room.Id),
-                I18n.Get("groups.inviteRotated"));
+                I18n.Get("groups.invite.rotate.success"));
             return;
         }
 
@@ -1541,7 +1541,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             if (!await _coordinator.CopyInviteCodeAsync(room.Id))
             {
-                throw new InvalidOperationException(I18n.Get("groups.inviteMissing"));
+                throw new InvalidOperationException(I18n.Get("groups.invite.code.missing"));
             }
             Rooms.FirstOrDefault(card => card.Room.Id == room.Id)
                 ?.ShowInviteCopyConfirmation();
@@ -1563,7 +1563,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         await RunCommandAsync(
             () => _coordinator.RenameRoomAsync(room.Id, name),
-            I18n.Get("groups.renamed"));
+            I18n.Get("groups.rename.success"));
     }
 
     private async Task RemoveMemberAsync(Guid roomId, Guid userId)
@@ -1577,7 +1577,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         await RunCommandAsync(
             () => _coordinator.RemoveRoomMemberAsync(roomId, userId),
-            I18n.Get("groups.memberRemoved"));
+            I18n.Get("groups.member.remove.success"));
     }
 
     private async Task LeaveRoomAsync(Guid roomId)
@@ -1595,7 +1595,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         await RunCommandAsync(
             () => _coordinator.LeaveRoomAsync(room.Id),
-            I18n.Get("groups.left"));
+            I18n.Get("groups.leave.success"));
     }
 
     private async Task DeleteRoomAsync(Guid roomId)
@@ -1612,7 +1612,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         await RunCommandAsync(
             () => _coordinator.DeleteRoomAsync(room.Id),
-            I18n.Get("groups.deleted"));
+            I18n.Get("groups.delete.success"));
     }
 
     private async Task<bool> RunCommandAsync(Func<Task> action, string? successMessage, Func<bool>? isCurrent = null)
@@ -1651,11 +1651,11 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
         else if (_hasAppliedState && state.Connected && !_previousState.Connected)
         {
-            RaiseNotice(I18n.Get("connection.serverConnected"), NoticeKind.Success);
+            RaiseNotice(I18n.Get("connection.notice.connected"), NoticeKind.Success);
         }
         else if (_hasAppliedState && !state.Connected && _previousState.Connected)
         {
-            RaiseNotice(I18n.Get("connection.serverReconnecting"), NoticeKind.Informational);
+            RaiseNotice(I18n.Get("connection.notice.reconnecting"), NoticeKind.Informational);
         }
     }
 
@@ -1706,13 +1706,13 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private void RefreshValidationMetrics()
     {
         ValidationPathText = _coordinator.ValidationMetricsPath is { } path
-            ? I18n.Format("metrics.exportPath", path)
-            : I18n.Get("metrics.rendererNotStarted");
+            ? I18n.Format("renderer_metrics.export.path", path)
+            : I18n.Get("renderer_metrics.error.not_started");
         ValidationMetricsSnapshot? summary = _coordinator.ValidationMetricsSummary;
         ValidationMetricsText = summary is null
-            ? I18n.Get("metrics.noSamples")
+            ? I18n.Get("renderer_metrics.samples.empty")
             : I18n.Format(
-                "metrics.summary",
+                "renderer_metrics.summary",
                 summary.ElapsedSeconds,
                 summary.SampleCount,
                 summary.MaximumFrameMilliseconds,

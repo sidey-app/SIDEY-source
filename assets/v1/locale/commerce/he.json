@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "אקסולוטל אור כוכבים",
+    "description": "האקסולוטל לקח הביתה כוכב קטן שהלך לאיבוד ומחבק אותו חזק גם מתוך שינה.",
+    "iap_description": "אקסולוטל שמחבק כוכב אבוד גם מתוך שינה."
+  },
+  "character_guinea_pig": {
+    "display_name": "שרקן קטן",
+    "description": "הוא שכח איפה החביא את החטיף. לפי הלחיים המלאות, הוא כנראה לא רחוק.",
+    "iap_description": "הוא שכח איפה החביא את החטיף."
+  },
+  "character_monkey": {
+    "display_name": "קופיף",
+    "description": "הוא בא לחלוק בננה. לדבריו הוא נגס רק פעם אחת בדרך… אז למה חצי ממנה נעלם?",
+    "iap_description": "הוא בא לחלוק בננה."
+  },
+  "character_chinchilla": {
+    "display_name": "צ׳ינצ׳ילה קטנה",
+    "description": "היא יצאה הרגע מאמבט חול ובאה לשחק. עוד לפני שאמרה שלום, היא הייתה חייבת להשוויץ בפרווה הרכה.",
+    "iap_description": "היא יצאה הרגע מאמבט חול ובאה לשחק."
+  },
+  "character_otter": {
+    "display_name": "לוטרה קטנה",
+    "description": "היא באה להשוויץ בצדפה האהובה עליה. אפשר להסתכל, אבל אם תיקח אותה היא תיעלב.",
+    "iap_description": "היא באה להשוויץ בצדפה האהובה עליה."
+  },
+  "character_pig": {
+    "display_name": "חזרזיר",
+    "description": "הוא עקב אחרי ריח החטיפים והחליט להישאר. עכשיו הוא משוכנע שזה הבית שלו.",
+    "iap_description": "הוא עקב אחרי ריח החטיפים והחליט להישאר."
+  },
+  "character_tree": {
+    "display_name": "עץ קטן",
+    "description": "עץ קטן יצא לטיול. כשאמרו לו לנוח, הוא מיד התחיל לבחור איפה להכות שורש.",
+    "iap_description": "עץ קטן יצא לטיול."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "בועת ארנב ורודה",
+    "description": "בועת דיבור ורודה עם קישוט של ארנב.",
+    "iap_description": "בועת דיבור ורודה עם קישוט של ארנב."
+  },
+  "bubble_butter_chick": {
+    "display_name": "בועת אפרוח חמאתית",
+    "description": "בועת דיבור צהובה-חמאתית עם קישוט של אפרוח.",
+    "iap_description": "בועת דיבור צהובה-חמאתית עם קישוט של אפרוח."
+  },
+  "bubble_starry_cat": {
+    "display_name": "בועת חתול כוכבים",
+    "description": "בועת דיבור סגולה כהה עם קישוט של חתול וכוכבים.",
+    "iap_description": "בועה סגולה כהה עם עיטור של חתול וכוכבים."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "לב קופצני",
+    "description": "לב לזריקה שמקפץ בעודו עף.",
+    "iap_description": "לב לזריקה שמקפץ בעודו עף."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "תותח קטן",
+    "description": "תותח קטן לזריקה שיורה פגז עם פתיל בוער.",
+    "iap_description": "תותח קטן לזריקה שיורה פגז עם פתיל בוער."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "ברווז מצפצף",
+    "description": "ברווז שזורק ברווז. כנראה לא סכסוך משפחתי.",
+    "iap_description": "ברווז שזורק ברווז. כנראה לא סכסוך משפחתי."
+  },
+  "throwable_snowflake": {
+    "display_name": "פתית שלג",
+    "description": "פתית שלג שמתפזר לרסיסי קרח קטנים בעת הפגיעה.",
+    "iap_description": "פתית שלג שמתפזר לרסיסי קרח קטנים בעת הפגיעה."
+  },
+  "throwable_baseball": {
+    "display_name": "כדור בייסבול",
+    "description": "כדור עם תפרים אדומים שנמעך בפגיעה ומקפץ הלאה.",
+    "iap_description": "כדור עם תפרים אדומים שנמעך בפגיעה ומקפץ הלאה."
+  },
+  "throwable_wakkuball": {
+    "display_name": "כדור וואקו",
+    "description": "קראנץ׳! אפשר ליהנות מהצליל הפריך כשכדור הוואקו מתנפץ לחתיכות.",
+    "iap_description": "קראנץ׳! כדור וואקו שמתנפץ לחתיכות."
+  },
+  "throwable_dujjonku": {
+    "display_name": "עוגיית שוקולד דובאי לעיסה",
+    "description": "קליפת הקקאו והמילוי הירוק נמעכים בקראנץ׳ מספק.",
+    "iap_description": "קליפת קקאו ומילוי ירוק בקראנץ׳ מספק."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "הפלפלון של השרקן",
+    "description": "חטיף שנשמר בקפידה. אם מרימים אותו בתוך שלוש שניות מהזריקה, זה עדיין נחשב, נכון?",
+    "iap_description": "חטיף שנשמר בקפידה."
+  },
+  "throwable_banana": {
+    "display_name": "הבננה של הקוף",
+    "description": "הקוף חלק את הבננה הזאת. עוד לא הספקנו לשאול אם הוא התכוון לכך.",
+    "iap_description": "הקוף חלק את הבננה הזאת."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "שקיק החול של הצ׳ינצ׳ילה",
+    "description": "זה חול הרחצה של הצ׳ינצ׳ילה. לזרוק אותו זו כנראה לא רמיזה שהגיע הזמן להתקלח.",
+    "iap_description": "זה חול הרחצה של הצ׳ינצ׳ילה."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "כדור הכוכבים של האקסולוטל",
+    "description": "אור כוכבים שנדחס לכדור קטן. מישהו בדק אם חסר כוכב בשמיים?",
+    "iap_description": "אור כוכבים שנדחס לכדור קטן."
+  },
+  "throwable_clam": {
+    "display_name": "הצדפה של הלוטרה",
+    "description": "הצדפה שהלוטרה לקחה לכל מקום. אין בפנים פנינה, רק קצת קשר רגשי.",
+    "iap_description": "הצדפה שהלוטרה לקחה לכל מקום."
+  },
+  "throwable_pork": {
+    "display_name": "נתח החזיר של החזרזיר",
+    "description": "סטירה מוצקה ומספקת! דרך אגב, מישהו ראה לאחרונה את החזרזיר מהשכנים?",
+    "iap_description": "סטירה מוצקה ומספקת!"
+  },
+  "throwable_timber": {
+    "display_name": "העץ הקטן של העץ",
+    "description": "עץ זורק עץ קטן. אולי כדאי לבדוק קודם את אילן היוחסין.",
+    "iap_description": "עץ זורק עץ קטן."
+  },
+  "character_shiba": {
+    "display_name": "שיבה אינו",
+    "description": "כבר יצאנו לטיול. השיבה מסרב להכיר בעובדה הזאת.",
+    "iap_description": "כבר יצאנו לטיול."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "כדור טניס",
+    "description": "מצאנו מי יזרוק. עכשיו נשאר למצוא מי יחזיר את הכדור.",
+    "iap_description": "מצאנו מי יזרוק."
+  },
+  "character_duck": {
+    "display_name": "ברווז",
+    "description": "מומחה בהתחמקות מאחריות. כפות הרגליים שלו הן ההוכחה.",
+    "iap_description": "מומחה בהתחמקות מאחריות."
+  },
+  "character_poop": {
+    "display_name": "קקי",
+    "description": "לא ברור מי קרא לו, אבל הנה הוא.",
+    "iap_description": "לא ברור מי קרא לו, אבל הנה הוא."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "כדור נייר טואלט",
+    "description": "אף אחד לא יודע אם זה נייר טואלט משומש. פשוט להתחמק!",
+    "iap_description": "אף אחד לא יודע אם זה נייר טואלט משומש."
+  },
+  "character_tteokbokki": {
+    "display_name": "טוקבוקי",
+    "description": "אמרו שזה עדין. לא אמרו לפי קנה המידה של מי.",
+    "iap_description": "אמרו שזה עדין. לא אמרו לפי קנה המידה של מי."
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "שיפוד אומוק",
+    "description": "זה אומוק מעיסת דגים שנועד לאכילה. אז למה מנופפים בו?",
+    "iap_description": "אומוק מעיסת דגים. אז למה מנופפים בו?"
+  },
+  "character_quokka": {
+    "display_name": "קואקה",
+    "description": "תמיד מחייכת. כן, זו היא שזרקה עכשיו את העלה.",
+    "iap_description": "תמיד מחייכת. כן, זו היא שזרקה עכשיו את העלה."
+  },
+  "throwable_leaf": {
+    "display_name": "עלה",
+    "description": "ארוחת הצהריים הארוזה של הקואקה. לא שאלנו אם מותר לזרוק אותה.",
+    "iap_description": "ארוחת הצהריים הארוזה של הקואקה."
+  }
+}

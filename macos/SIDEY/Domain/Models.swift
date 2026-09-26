@@ -63,13 +63,13 @@ enum GroupOperation: Equatable, Sendable {
     var createButtonTitle: String {
         self == .creating
             ? L10n.text("group.create.in_progress")
-            : L10n.text("group.create.action")
+            : L10n.text("groups.create.action")
     }
 
     var joinButtonTitle: String {
         self == .joining
             ? L10n.text("group.join.in_progress")
-            : L10n.text("group.join.action")
+            : L10n.text("groups.action.join_by_code")
     }
 }
 
@@ -113,15 +113,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Sendable {
     case app
 
     var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .profile: L10n.text("settings.page.profile")
-        case .groups: L10n.text("settings.page.groups")
-        case .store: L10n.text("settings.page.store")
-        case .app: L10n.text("settings.page.app")
-        }
-    }
 
     var systemImage: String {
         switch self {

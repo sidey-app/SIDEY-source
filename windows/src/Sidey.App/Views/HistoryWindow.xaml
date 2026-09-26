@@ -21,15 +21,15 @@
         <StackPanel Spacing="4">
           <TextBlock AutomationProperties.HeadingLevel="Level1" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Title}" />
           <TextBlock
-              Text="{Binding Value, Source={i18n:I18n Key=history.retentionNotice}, Mode=OneWay}"
+              Text="{Binding Value, Source={i18n:I18n Key=history.retention.notice}, Mode=OneWay}"
               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
               TextWrapping="Wrap" />
         </StackPanel>
         <ToggleButton x:Name="KeepOnTopButton" Grid.Column="1" Width="40" Height="40"
             Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
             VerticalAlignment="Top" Click="OnKeepOnTopClick"
-            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}"
-            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.keepOnTopShortcut}, Mode=OneWay}">
+            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.window.always_on_top.enable_shortcut}, Mode=OneWay}"
+            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.window.always_on_top.enable_shortcut}, Mode=OneWay}">
           <Canvas Width="24" Height="24" RenderTransformOrigin="0.5,0.5">
             <VisualStateManager.VisualStateGroups>
               <VisualStateGroup x:Name="KeepOnTopIconStates">
@@ -127,21 +127,21 @@
                 Spacing="8"
                 Visibility="{Binding IsLoadingMore, Converter={StaticResource BooleanToVisibilityConverter}}">
               <ProgressRing Width="18" Height="18" IsActive="True" />
-              <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=history.loadingMore}, Mode=OneWay}" />
+              <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding Value, Source={i18n:I18n Key=history.load_more.loading}, Mode=OneWay}" />
             </StackPanel>
             <StackPanel
                 HorizontalAlignment="Center"
                 Spacing="4"
                 Visibility="{Binding IsLoadMoreFailureVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-              <TextBlock HorizontalAlignment="Center" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=history.loadMoreFailed}, Mode=OneWay}" />
+              <TextBlock HorizontalAlignment="Center" FontWeight="SemiBold" Text="{Binding Value, Source={i18n:I18n Key=history.load_more.failed}, Mode=OneWay}" />
               <TextBlock HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding LoadMoreErrorMessage}" TextWrapping="Wrap" />
-              <Button HorizontalAlignment="Center" Command="{Binding RetryLoadMoreCommand}" Content="{Binding Value, Source={i18n:I18n Key=history.retry}, Mode=OneWay}" />
+              <Button HorizontalAlignment="Center" Command="{Binding RetryLoadMoreCommand}" Content="{Binding Value, Source={i18n:I18n Key=history.load.retry}, Mode=OneWay}" />
             </StackPanel>
             <TextBlock
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                Text="{Binding Value, Source={i18n:I18n Key=history.exhausted}, Mode=OneWay}"
+                Text="{Binding Value, Source={i18n:I18n Key=history.pagination.exhausted}, Mode=OneWay}"
                 Visibility="{Binding IsExhaustedVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
           </Grid>
         </ListView.Header>
@@ -150,8 +150,8 @@
       <Button x:Name="ScrollToLatestButton" Width="44" Height="44" Margin="0,0,16,16"
           HorizontalAlignment="Right" VerticalAlignment="Bottom" CornerRadius="22"
           Visibility="Collapsed" Click="OnScrollToLatestClick"
-          ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.scrollToLatest}, Mode=OneWay}"
-          AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.scrollToLatest}, Mode=OneWay}">
+          ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=history.scroll.latest}, Mode=OneWay}"
+          AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=history.scroll.latest}, Mode=OneWay}">
         <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74B;" FontSize="20" />
       </Button>
 
@@ -169,9 +169,9 @@
           Spacing="8"
           Visibility="{Binding IsInitialFailureVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
         <FontIcon HorizontalAlignment="Center" FontSize="34" Glyph="&#xE814;" />
-        <TextBlock HorizontalAlignment="Center" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=history.initialFailed}, Mode=OneWay}" />
+        <TextBlock HorizontalAlignment="Center" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Value, Source={i18n:I18n Key=history.load.initial_failed}, Mode=OneWay}" />
         <TextBlock HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding InitialErrorMessage}" TextAlignment="Center" TextWrapping="Wrap" />
-        <Button HorizontalAlignment="Center" Command="{Binding RetryInitialCommand}" Content="{Binding Value, Source={i18n:I18n Key=history.retry}, Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" Command="{Binding RetryInitialCommand}" Content="{Binding Value, Source={i18n:I18n Key=history.load.retry}, Mode=OneWay}" />
       </StackPanel>
       <StackPanel
           HorizontalAlignment="Center"
@@ -206,12 +206,12 @@
         </Grid.ColumnDefinitions>
         <TextBox x:Name="HistoryInput" Text="{Binding Draft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             IsEnabled="{Binding CanCompose}" AcceptsReturn="True" TextWrapping="Wrap" MaxHeight="104"
-            PlaceholderText="{Binding Value, Source={i18n:I18n Key=composer.placeholder}, Mode=OneWay}"
-            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=composer.placeholder}, Mode=OneWay}"
+            PlaceholderText="{Binding Value, Source={i18n:I18n Key=composer.message.placeholder}, Mode=OneWay}"
+            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=composer.message.placeholder}, Mode=OneWay}"
             PreviewKeyDown="OnMessageInputPreviewKeyDown" LostFocus="OnMessageInputLostFocus" />
         <Button Grid.Column="1" Command="{Binding SendCommand}" VerticalAlignment="Bottom"
-            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=composer.sendTooltip}, Mode=OneWay}"
-            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=composer.sendTooltip}, Mode=OneWay}">
+            ToolTipService.ToolTip="{Binding Value, Source={i18n:I18n Key=message.send.accessibility}, Mode=OneWay}"
+            AutomationProperties.Name="{Binding Value, Source={i18n:I18n Key=message.send.accessibility}, Mode=OneWay}">
           <SymbolIcon Symbol="Send" />
         </Button>
       </Grid>

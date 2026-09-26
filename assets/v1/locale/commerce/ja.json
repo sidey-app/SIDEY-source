@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "星明かりのウーパールーパー",
+    "description": "迷子の星をひとつ連れてきました。眠るときもぎゅっと抱いているそうです。",
+    "iap_description": "迷子の星をひとつ連れてきました。眠るときもぎゅっと抱いているそうです。"
+  },
+  "character_guinea_pig": {
+    "display_name": "こどもモルモット",
+    "description": "おやつを隠した場所を忘れました。ほっぺがパンパンなので、遠くはなさそうです。",
+    "iap_description": "おやつを隠した場所を忘れました。ほっぺがパンパンなので、遠くはなさそうです。"
+  },
+  "character_monkey": {
+    "display_name": "こざる",
+    "description": "バナナを分けに来ました。途中でひと口だけ食べたそうですが…半分しかありませんね？",
+    "iap_description": "バナナを分けに来ました。途中でひと口だけ食べたそうですが…半分しかありませんね？"
+  },
+  "character_chinchilla": {
+    "display_name": "こどもチンチラ",
+    "description": "砂浴びを終えて遊びに来ました。あいさつより先に、ふわふわの毛を自慢します。",
+    "iap_description": "砂浴びを終えて遊びに来ました。あいさつより先に、ふわふわの毛を自慢します。"
+  },
+  "character_otter": {
+    "display_name": "こどもカワウソ",
+    "description": "お気に入りの貝を見せに来ました。見るのはいいけれど、持っていくとすねます。",
+    "iap_description": "お気に入りの貝を見せに来ました。見るのはいいけれど、持っていくとすねます。"
+  },
+  "character_pig": {
+    "display_name": "こぶた",
+    "description": "おやつの匂いを追ってきて、そのまま居つきました。もうここを自分の家だと思っています。",
+    "iap_description": "おやつの匂いを追ってきて、そのまま居つきました。もうここを自分の家だと思っています。"
+  },
+  "character_tree": {
+    "display_name": "小さな木",
+    "description": "散歩に出てきた小さな木です。少し休んでと言ったら、根を下ろす場所を選び始めました。",
+    "iap_description": "散歩に出てきた小さな木です。少し休んでと言ったら、根を下ろす場所を選び始めました。"
+  },
+  "bubble_bunny_pink": {
+    "display_name": "ピンクうさぎの吹き出し",
+    "description": "うさぎの飾りがついたピンクの吹き出しです。",
+    "iap_description": "うさぎの飾りがついたピンクの吹き出しです。"
+  },
+  "bubble_butter_chick": {
+    "display_name": "バターひよこの吹き出し",
+    "description": "ひよこの飾りがついたバター色の吹き出しです。",
+    "iap_description": "ひよこの飾りがついたバター色の吹き出しです。"
+  },
+  "bubble_starry_cat": {
+    "display_name": "星空ねこの吹き出し",
+    "description": "星ねこの飾りがついた青紫色の吹き出しです。",
+    "iap_description": "星ねこの飾りがついた青紫色の吹き出しです。"
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "はずむハート",
+    "description": "ぴょんぴょん弾みながら飛んでいくハートの投げアイテムです。",
+    "iap_description": "ぴょんぴょん弾みながら飛んでいくハートの投げアイテムです。"
+  },
+  "throwable_toy_cannon": {
+    "display_name": "ミニ大砲",
+    "description": "導火線つきの弾を撃つ、ミニ大砲の投げアイテムです。",
+    "iap_description": "導火線つきの弾を撃つ、ミニ大砲の投げアイテムです。"
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "キュッキュッアヒル",
+    "description": "アヒルがアヒルを投げます。家族げんかではなさそうです。",
+    "iap_description": "アヒルがアヒルを投げます。家族げんかではなさそうです。"
+  },
+  "throwable_snowflake": {
+    "display_name": "雪の結晶",
+    "description": "当たると小さな結晶のかけらになって散らばる雪の結晶です。",
+    "iap_description": "当たると小さな結晶のかけらになって散らばる雪の結晶です。"
+  },
+  "throwable_baseball": {
+    "display_name": "野球ボール",
+    "description": "赤い縫い目のボールが、ぺちゃんとつぶれて弾みます。",
+    "iap_description": "赤い縫い目のボールが、ぺちゃんとつぶれて弾みます。"
+  },
+  "throwable_wakkuball": {
+    "display_name": "ワックボール",
+    "description": "ザクザク！ワックボールがかけらに砕ける、軽快な音を楽しんでください。",
+    "iap_description": "ザクザク！ワックボールがかけらに砕ける、軽快な音を楽しんでください。"
+  },
+  "throwable_dujjonku": {
+    "display_name": "ドバイチョコもちもちクッキー",
+    "description": "ココアの皮と緑の中身がつぶれて、サクッと音を立てます。",
+    "iap_description": "ココアの皮と緑の中身がつぶれて、サクッと音を立てます。"
+  },
+  "throwable_mini_paprika": {
+    "display_name": "モルモットのミニパプリカ",
+    "description": "大切に取っておいたおやつです。投げたあとも3秒以内に拾えば大丈夫ですよね？",
+    "iap_description": "大切に取っておいたおやつです。投げたあとも3秒以内に拾えば大丈夫ですよね？"
+  },
+  "throwable_banana": {
+    "display_name": "こざるのバナナ",
+    "description": "こざるが譲ってくれたバナナです。本当に譲ってくれたのかは、まだ聞けていません。",
+    "iap_description": "こざるが譲ってくれたバナナです。本当に譲ってくれたのかは、まだ聞けていません。"
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "チンチラの砂袋",
+    "description": "チンチラの砂浴び用の砂です。洗ってほしくて投げるわけでは…たぶんありません。",
+    "iap_description": "チンチラの砂浴び用の砂です。洗ってほしくて投げるわけでは…たぶんありません。"
+  },
+  "throwable_starlight_orb": {
+    "display_name": "星明かりのウーパールーパーの星玉",
+    "description": "星明かりをぎゅっと丸めました。空の星がひとつ減ったそうですが？",
+    "iap_description": "星明かりをぎゅっと丸めました。空の星がひとつ減ったそうですが？"
+  },
+  "throwable_clam": {
+    "display_name": "カワウソの貝",
+    "description": "カワウソが大事に抱えていた貝です。真珠はないけれど、未練は少しあります。",
+    "iap_description": "カワウソが大事に抱えていた貝です。真珠はないけれど、未練は少しあります。"
+  },
+  "throwable_pork": {
+    "display_name": "こぶたの豚肉",
+    "description": "ぺちっ！ところで、お隣のぶたさんをここ数日見かけませんね…？",
+    "iap_description": "ぺちっ！ところで、お隣のぶたさんをここ数日見かけませんね…？"
+  },
+  "throwable_timber": {
+    "display_name": "小さな木のちび木",
+    "description": "木が小さな木を投げます。まずは家系図から確認してみましょうか。",
+    "iap_description": "木が小さな木を投げます。まずは家系図から確認してみましょうか。"
+  },
+  "character_shiba": {
+    "display_name": "柴犬",
+    "description": "散歩はもう行きました。柴犬はその事実を認めていません。",
+    "iap_description": "散歩はもう行きました。柴犬はその事実を認めていません。"
+  },
+  "throwable_tennis_ball": {
+    "display_name": "テニスボール",
+    "description": "投げる人は決まりました。拾ってくる人はまだ決まっていません。",
+    "iap_description": "投げる人は決まりました。拾ってくる人はまだ決まっていません。"
+  },
+  "character_duck": {
+    "display_name": "アヒル",
+    "description": "知らんぷりなら得意です。何しろ本物のアヒルの足がありますから。",
+    "iap_description": "知らんぷりなら得意です。何しろ本物のアヒルの足がありますから。"
+  },
+  "character_poop": {
+    "display_name": "うんち",
+    "description": "誰に呼ばれたのかはわかりませんが、とりあえず出てきました。",
+    "iap_description": "誰に呼ばれたのかはわかりませんが、とりあえず出てきました。"
+  },
+  "throwable_tissue_ball": {
+    "display_name": "ティッシュのかたまり",
+    "description": "使用済みのトイレットペーパーかどうかは不明です。とにかく避けて！",
+    "iap_description": "使用済みのトイレットペーパーかどうかは不明です。とにかく避けて！"
+  },
+  "character_tteokbokki": {
+    "display_name": "トッポッキ",
+    "description": "甘口だと聞きました。誰にとっての甘口かは教えてくれませんでした。",
+    "iap_description": "甘口だと聞きました。誰にとっての甘口かは教えてくれませんでした。"
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "オムク串（練り天）",
+    "description": "食べてほしくて渡したのに、どうして振り回しているんですか？",
+    "iap_description": "食べてほしくて渡したのに、どうして振り回しているんですか？"
+  },
+  "character_quokka": {
+    "display_name": "クオッカ",
+    "description": "いつも笑顔です。さっき葉っぱを投げたのもこの子です。",
+    "iap_description": "いつも笑顔です。さっき葉っぱを投げたのもこの子です。"
+  },
+  "throwable_leaf": {
+    "display_name": "葉っぱ",
+    "description": "クオッカのお弁当です。投げてもいいかは聞いていません。",
+    "iap_description": "クオッカのお弁当です。投げてもいいかは聞いていません。"
+  }
+}

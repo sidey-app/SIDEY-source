@@ -107,7 +107,7 @@ public sealed class FirebaseRealtimeChatClientTests
         Assert.Equal(httpStatus, exception.StatusCode);
         if (expectedCode == "resource-exhausted")
         {
-            Assert.Equal(I18n.Get("error.chatRateLimited"), exception.Message);
+            Assert.Equal(I18n.Get("message.send.rate_limited"), exception.Message);
         }
         Assert.DoesNotContain("server-message-secret-body", exception.ToString(), StringComparison.Ordinal);
         Assert.DoesNotContain("secret-chat-body", exception.ToString(), StringComparison.Ordinal);

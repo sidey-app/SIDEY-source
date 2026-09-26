@@ -18,39 +18,39 @@ internal static class RealtimeUserErrorMessage
                 {
                     FailureKind: RealtimeSubscriptionFailureKind.Authorization,
                 }:
-                    return I18n.Get("connection.accessRequired");
+                    return I18n.Get("connection.error.access_required");
                 case RealtimeSubscriptionException
                 {
                     FailureKind: RealtimeSubscriptionFailureKind.Capacity,
                 }:
-                    return I18n.Get("connection.busy");
+                    return I18n.Get("connection.error.busy");
                 case RealtimeSubscriptionException
                 {
                     FailureKind: RealtimeSubscriptionFailureKind.Configuration,
                 }:
-                    return I18n.Get("connection.configurationUnavailable");
+                    return I18n.Get("connection.error.configuration_unavailable");
                 case RealtimeSubscriptionException:
-                    return I18n.Get("connection.serviceUnavailable");
+                    return I18n.Get("connection.error.service_unavailable");
                 case HttpRequestException { StatusCode: HttpStatusCode.TooManyRequests }:
-                    return I18n.Get("connection.busy");
+                    return I18n.Get("connection.error.busy");
                 case HttpRequestException { StatusCode: HttpStatusCode.Unauthorized }:
-                    return I18n.Get("connection.accessRequired");
+                    return I18n.Get("connection.error.access_required");
                 case HttpRequestException
                 {
                     StatusCode: HttpStatusCode.BadRequest or HttpStatusCode.Forbidden,
                 }:
-                    return I18n.Get("connection.configurationUnavailable");
+                    return I18n.Get("connection.error.configuration_unavailable");
                 case UnauthorizedAccessException:
-                    return I18n.Get("connection.accessRequired");
+                    return I18n.Get("connection.error.access_required");
                 case SocketException socketException
                     when IsLocalNetworkFailure(socketException.SocketErrorCode):
-                    return I18n.Get("connection.networkUnavailable");
+                    return I18n.Get("connection.error.network_unavailable");
                 case AuthenticationException:
-                    return I18n.Get("connection.secureConnectionFailed");
+                    return I18n.Get("connection.error.secure_connection_failed");
             }
         }
 
-        return I18n.Get("connection.serviceUnavailable");
+        return I18n.Get("connection.error.service_unavailable");
     }
 
     public static bool IsExpectedLocalAbort(Exception exception)

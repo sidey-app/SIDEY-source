@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Sidey.App.Localization;
 using Sidey.Core.Domain;
 using Sidey.Core.Localization;
 using Sidey.Platform.Windows;
@@ -40,8 +41,9 @@ public sealed partial class ComposerWindow : Window
         ViewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         _uiDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         InitializeComponent();
+        RefreshLocalizationLayout();
         ComposerRoot.DataContext = ViewModel;
-        Title = I18n.Get("window.composerTitle");
+        Title = I18n.Get("composer.window.title");
         SideyWindowIcon.Apply(AppWindow);
         AppWindow.IsShownInSwitchers = false;
         if (AppWindow.Presenter is OverlappedPresenter presenter)
@@ -66,6 +68,8 @@ public sealed partial class ComposerWindow : Window
     }
 
     public ComposerViewModel ViewModel { get; }
+
+    public void RefreshLocalizationLayout() => LocalizationLayout.Apply(ComposerRoot);
 
     public bool IsVisible => _isVisible && !_isClosed;
 

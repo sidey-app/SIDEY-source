@@ -1,0 +1,167 @@
+{
+  "character_starlight_upalupa": {
+    "display_name": "Gwiezdny aksolotl",
+    "description": "Przyniósł do domu zagubioną gwiazdkę. Nawet przez sen mocno ją przytula.",
+    "iap_description": "Przyniósł do domu zagubioną gwiazdkę."
+  },
+  "character_guinea_pig": {
+    "display_name": "Mała świnka morska",
+    "description": "Zapomniała, gdzie schowała przekąskę. Sądząc po pełnych policzkach, nie może być daleko.",
+    "iap_description": "Zapomniała, gdzie schowała przekąskę."
+  },
+  "character_monkey": {
+    "display_name": "Mała małpka",
+    "description": "Przyszła podzielić się bananem. Podobno po drodze ugryzła tylko raz… więc skąd zniknęła połowa?",
+    "iap_description": "Przyszła podzielić się bananem."
+  },
+  "character_chinchilla": {
+    "display_name": "Mała szynszyla",
+    "description": "Po kąpieli w piasku przyszła się pobawić. Zanim się przywita, musi pochwalić się puszystym futerkiem.",
+    "iap_description": "Po kąpieli w piasku przyszła się pobawić."
+  },
+  "character_otter": {
+    "display_name": "Mała wydra",
+    "description": "Przyszła pokazać swoją ulubioną muszlę. Możesz popatrzeć, ale jeśli ją zabierzesz, wydra się obrazi.",
+    "iap_description": "Przyszła pokazać swoją ulubioną muszlę."
+  },
+  "character_pig": {
+    "display_name": "Mała świnka",
+    "description": "Przyszła za zapachem przekąsek i postanowiła zostać. Teraz uważa, że to jej dom.",
+    "iap_description": "Przyszła za zapachem przekąsek i została."
+  },
+  "character_tree": {
+    "display_name": "Małe drzewko",
+    "description": "Małe drzewko wyszło na spacer. Gdy miało chwilę odpocząć, zaczęło wybierać miejsce, w którym zapuści korzenie.",
+    "iap_description": "Małe drzewko wyszło na spacer."
+  },
+  "bubble_bunny_pink": {
+    "display_name": "Różowa królicza chmurka",
+    "description": "Różowa chmurka wiadomości z ozdobą w kształcie króliczka.",
+    "iap_description": "Różowa chmurka z ozdobą króliczka."
+  },
+  "bubble_butter_chick": {
+    "display_name": "Maślana kurczaczkowa chmurka",
+    "description": "Maślanożółta chmurka wiadomości z ozdobą w kształcie kurczaczka.",
+    "iap_description": "Maślanożółta chmurka z kurczaczkiem."
+  },
+  "bubble_starry_cat": {
+    "display_name": "Kocia chmurka w gwiazdy",
+    "description": "Ciemnofioletowa chmurka wiadomości z gwiezdnym kotem.",
+    "iap_description": "Fioletowa chmurka z gwiezdnym kotem."
+  },
+  "throwable_bouncy_heart": {
+    "display_name": "Skaczące serce",
+    "description": "Serce, które podskakuje podczas lotu.",
+    "iap_description": "Serce, które podskakuje podczas lotu."
+  },
+  "throwable_toy_cannon": {
+    "display_name": "Miniarmata",
+    "description": "Mała armata wystrzeliwująca pocisk z zapalonym lontem.",
+    "iap_description": "Miniarmata z pociskiem o płonącym loncie."
+  },
+  "throwable_squeaky_duck": {
+    "display_name": "Piszcząca kaczuszka",
+    "description": "Kaczka rzuca kaczką. To raczej nie jest rodzinna sprzeczka.",
+    "iap_description": "Kaczka rzuca kaczką."
+  },
+  "throwable_snowflake": {
+    "display_name": "Płatek śniegu",
+    "description": "Płatek śniegu, który po uderzeniu rozpada się na drobne kryształki.",
+    "iap_description": "Płatek rozpadający się na drobne kryształki."
+  },
+  "throwable_baseball": {
+    "display_name": "Piłka baseballowa",
+    "description": "Piłka z czerwonym szwem, która po uderzeniu zgniata się i odbija.",
+    "iap_description": "Czerwone szwy, zgniecenie i odbicie."
+  },
+  "throwable_wakkuball": {
+    "display_name": "Piłka Wakku",
+    "description": "Chrup! Posłuchaj przyjemnego trzasku, z jakim piłka Wakku rozpada się na kawałki.",
+    "iap_description": "Chrup! Piłka Wakku rozpada się na kawałki."
+  },
+  "throwable_dujjonku": {
+    "display_name": "Ciągutkie ciastko dubajskie",
+    "description": "Kakaowa skorupka i zielone nadzienie zgniatają się z przyjemnym chrupnięciem.",
+    "iap_description": "Kakaowa skorupka i chrupiące nadzienie."
+  },
+  "throwable_mini_paprika": {
+    "display_name": "Mini papryka świnki morskiej",
+    "description": "Starannie zachowana przekąska. Jeśli podniesiesz ją w ciągu trzech sekund od rzutu, chyba wszystko będzie w porządku?",
+    "iap_description": "Starannie zachowana przekąska."
+  },
+  "throwable_banana": {
+    "display_name": "Banan małpki",
+    "description": "Małpka podzieliła się tym bananem. Nie zdążyliśmy zapytać, czy zrobiła to celowo.",
+    "iap_description": "Małpka podzieliła się tym bananem."
+  },
+  "throwable_dust_bath_pouch": {
+    "display_name": "Woreczek piasku szynszyli",
+    "description": "To piasek do kąpieli szynszyli. Rzucenie nim raczej nie jest sugestią, że trzeba się umyć.",
+    "iap_description": "To piasek do kąpieli szynszyli."
+  },
+  "throwable_starlight_orb": {
+    "display_name": "Gwiezdna kula aksolotla",
+    "description": "Blask gwiazd zamknięty w małej kuli. Czy ktoś sprawdził, czy na niebie nie brakuje jednej gwiazdy?",
+    "iap_description": "Blask gwiazd zamknięty w małej kuli."
+  },
+  "throwable_clam": {
+    "display_name": "Muszla wydry",
+    "description": "Muszla, którą wydra wszędzie ze sobą nosiła. W środku nie ma perły, tylko odrobina przywiązania.",
+    "iap_description": "Muszla, którą wydra wszędzie ze sobą nosiła."
+  },
+  "throwable_pork": {
+    "display_name": "Wieprzowina małej świnki",
+    "description": "Ale solidny plask! A tak przy okazji — widział ktoś ostatnio świnkę z sąsiedztwa?",
+    "iap_description": "Ale solidny plask!"
+  },
+  "throwable_timber": {
+    "display_name": "Małe drzewko drzewka",
+    "description": "Drzewo rzuca małym drzewem. Może najpierw sprawdźmy drzewo genealogiczne.",
+    "iap_description": "Drzewo rzuca małym drzewem."
+  },
+  "character_shiba": {
+    "display_name": "Shiba inu",
+    "description": "Spacer już był. Shiba stanowczo nie przyjmuje tego do wiadomości.",
+    "iap_description": "Spacer już był."
+  },
+  "throwable_tennis_ball": {
+    "display_name": "Piłka tenisowa",
+    "description": "Osoba do rzucania już wybrana. Nadal szukamy kogoś, kto przyniesie piłkę.",
+    "iap_description": "Osoba do rzucania już wybrana."
+  },
+  "character_duck": {
+    "display_name": "Kaczka",
+    "description": "Ekspertka w uchylaniu się od odpowiedzialności. Kacze łapy są niezbitym dowodem.",
+    "iap_description": "Ekspertka w unikaniu odpowiedzialności."
+  },
+  "character_poop": {
+    "display_name": "Kupka",
+    "description": "Nie wiadomo, kto wołał, ale już jest.",
+    "iap_description": "Nie wiadomo, kto wołał, ale już jest."
+  },
+  "throwable_tissue_ball": {
+    "display_name": "Kulka z papieru",
+    "description": "Nikt nie wie, czy to używany papier toaletowy. Lepiej zrób unik!",
+    "iap_description": "Używany czy nie? Lepiej unikaj tej kulki!"
+  },
+  "character_tteokbokki": {
+    "display_name": "Tteokbokki",
+    "description": "Miało być łagodne. Tylko nie powiedzieli, według czyjej skali.",
+    "iap_description": "Miało być łagodne."
+  },
+  "throwable_fish_cake_skewer": {
+    "display_name": "Szaszłyk z eomukiem",
+    "description": "To miało być do jedzenia. Dlaczego tym wymachujesz?",
+    "iap_description": "To miało być do jedzenia."
+  },
+  "character_quokka": {
+    "display_name": "Kuoka",
+    "description": "Zawsze się uśmiecha. Tak, to właśnie ona przed chwilą rzuciła tym liściem.",
+    "iap_description": "Zawsze się uśmiecha."
+  },
+  "throwable_leaf": {
+    "display_name": "Liść",
+    "description": "To drugie śniadanie kuoki. Nie zapytaliśmy, czy można nim rzucać.",
+    "iap_description": "To drugie śniadanie kuoki."
+  }
+}

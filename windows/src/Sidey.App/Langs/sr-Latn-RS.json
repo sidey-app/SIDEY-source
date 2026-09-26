@@ -1,0 +1,954 @@
+{
+  "accessibility": {
+    "motion": {
+      "disabled": "Efekti animacije su isključeni u operativnom sistemu Windows."
+    }
+  },
+  "account": {
+    "delete": {
+      "confirmation": {
+        "action": "Izbriši nalog",
+        "message": "Profil i podaci o grupama kojima ste se pridružili biće trajno izbrisani, a istorija kupovina više neće biti povezana s nalogom.",
+        "title": "Želite li da izbrišete nalog?"
+      },
+      "description": "Trajno izbrišite nalog i povezane lične podatke.",
+      "final_confirmation": {
+        "message": "Izbrisani nalog i podatke nije moguće vratiti.",
+        "title": "Želite li trajno da izbrišete nalog?"
+      },
+      "title": "Izbriši nalog"
+    },
+    "description": "Odjavite se ili upravljajte nalogom.",
+    "sign_out": {
+      "confirmation": {
+        "action": "Odjavi se",
+        "message": "Odjavićete se samo na ovom računaru. Da biste ponovo koristili aplikaciju, moraćete da se prijavite putem usluge Google.",
+        "title": "Želite li da se odjavite?"
+      },
+      "description": "Odjavite se samo na ovom računaru.",
+      "title": "Odjavi se"
+    },
+    "title": "Nalog"
+  },
+  "app": {
+    "info": {
+      "description": "Pogledajte informacije o verziji i podršci.",
+      "navigation_label": "Osnovni podaci",
+      "title": "Osnovni podaci"
+    },
+    "launch": {
+      "failed": "Došlo je do greške pri pokretanju aplikacije SIDEY. Zatvorite aplikaciju i pokušajte ponovo."
+    },
+    "startup": {
+      "error": {
+        "title": "Greška pri pokretanju aplikacije SIDEY"
+      },
+      "failed": "SIDEY nije mogao da se pokrene.",
+      "failed_with_log": "SIDEY nije mogao da se pokrene.\n\nDijagnostička evidencija: {0}",
+      "runtime_missing": "Neke datoteke aplikacije SIDEY nedostaju. Ponovo instalirajte aplikaciju."
+    }
+  },
+  "auth": {
+    "google": {
+      "already_linked": "Ovaj Google nalog je već povezan s trenutnim profilom. Profil i podaci nisu promenjeni.",
+      "cancelled": "Prijavljivanje putem usluge Google je otkazano ili nije moglo da se dovrši. Pokušajte ponovo.",
+      "identity_changed": "Ovaj Google nalog se ne podudara s nalogom povezanim s trenutnim nalogom. Profil i podaci nisu promenjeni.",
+      "link_expired": "Zahtev za prijavljivanje putem usluge Google je istekao. Otkažite prijavljivanje i pokušajte ponovo.",
+      "required": "Povežite Google nalog da biste nastavili.",
+      "sign_in_complete": "Prijavljivanje putem usluge Google je završeno. Zatvorite karticu za prijavljivanje u pregledaču."
+    },
+    "request": {
+      "failed": "Nije moguće prijaviti se. Pokušajte ponovo kasnije. (Kôd greške: {0})"
+    },
+    "response": {
+      "empty": "Prijavljivanje nije moglo da se dovrši. Pokušajte ponovo."
+    },
+    "session": {
+      "expired": "Prijavljivanje je isteklo. Prijavite se ponovo.",
+      "replace_blocked": "Na ovom računaru već postoje podaci za prijavljivanje. Ponovo pokrenite aplikaciju, pa se prijavite.",
+      "restore_failed": "Prijavljivanje nije moglo da se vrati. Novi nalog nije napravljen. Prijavite se ponovo.",
+      "stored_invalid": "Sačuvani podaci za prijavljivanje nisu mogli da se pročitaju. Prijavite se ponovo.",
+      "values_missing": "Prijavljivanje nije moglo da se dovrši. Pokušajte ponovo."
+    }
+  },
+  "character": {
+    "pixel_cat": {
+      "display_name": "Mače"
+    },
+    "pixel_chinchilla": {
+      "display_name": "Mala činčila"
+    },
+    "pixel_duck": {
+      "display_name": "Patka"
+    },
+    "pixel_guinea_pig": {
+      "display_name": "Malo morsko prase"
+    },
+    "pixel_hamster": {
+      "display_name": "Mali hrčak"
+    },
+    "pixel_monkey": {
+      "display_name": "Mali majmun"
+    },
+    "pixel_otter": {
+      "display_name": "Mala vidra"
+    },
+    "pixel_penguin": {
+      "display_name": "Mali pingvin"
+    },
+    "pixel_pig": {
+      "display_name": "Malo prase"
+    },
+    "pixel_poop": {
+      "display_name": "Kakica"
+    },
+    "pixel_puppy": {
+      "display_name": "Štene"
+    },
+    "pixel_quokka": {
+      "display_name": "Kvoka"
+    },
+    "pixel_rabbit": {
+      "display_name": "Zeka"
+    },
+    "pixel_shiba": {
+      "display_name": "Šiba inu"
+    },
+    "pixel_starlight_upalupa": {
+      "display_name": "Zvezdani aksolotl"
+    },
+    "pixel_tree": {
+      "display_name": "Malo drvo"
+    },
+    "pixel_tteokbokki": {
+      "display_name": "Tteokbokki"
+    },
+    "unknown": {
+      "display_name": "Lik"
+    }
+  },
+  "common": {
+    "back": "Nazad",
+    "cancel": "Otkaži",
+    "close": "Zatvori",
+    "continue": "Nastavi",
+    "delete": "Izbriši",
+    "friend": "Prijatelj",
+    "me": "Ja",
+    "next": "Dalje",
+    "save": "Sačuvaj",
+    "skip": "Preskoči"
+  },
+  "composer": {
+    "drag": {
+      "tooltip": "Prevucite da biste premestili prozor za unos"
+    },
+    "group": {
+      "required": "Podesite profil i izaberite grupu da biste poslali poruku."
+    },
+    "message": {
+      "placeholder": "Unesite poruku…"
+    },
+    "window": {
+      "title": "SIDEY poruka"
+    }
+  },
+  "connection": {
+    "configuration": {
+      "not_configured": "Nedostaju obavezna podešavanja veze sa serverom. Ponovo instalirajte aplikaciju."
+    },
+    "error": {
+      "access_required": "Nije moguće potvrditi pristup nalogu ili grupi. U odeljku Veza sa serverom izaberite Poveži se ponovo. Ako se ova poruka i dalje prikazuje, obratite nam se i priložite dijagnostičku evidenciju.",
+      "busy": "Mnogo ljudi se trenutno povezuje, pa uspostavljanje veze traje duže nego obično. Aplikacija će automatski nastaviti da pokušava. Ako veza ne bude uspostavljena ni posle nekoliko minuta, obratite nam se i priložite dijagnostičku evidenciju.",
+      "configuration_unavailable": "Veza sa serverom trenutno ne može da se pokrene. Sačekajte malo, pa u odeljku Veza sa serverom izaberite Poveži se ponovo. Ako se problem nastavi, obratite nam se i priložite dijagnostičku evidenciju.",
+      "network_unavailable": "Nije moguće povezati se sa serverom. Proverite internet vezu, pa u odeljku Veza sa serverom izaberite Poveži se ponovo. Ako druge lokacije rade, ali se problem nastavi, obratite nam se i priložite dijagnostičku evidenciju.",
+      "secure_connection_failed": "Nije moguće uspostaviti bezbednu vezu. Proverite da li su datum i vreme u operativnom sistemu Windows tačni, pa se ponovo povežite. Ako se problem nastavi, obratite nam se i priložite dijagnostičku evidenciju.",
+      "service_unavailable": "Nije moguće povezati se sa serverom. Aplikacija će automatski nastaviti da pokušava. Ako veza ne bude uspostavljena ni posle nekoliko minuta, u odeljku Veza sa serverom izaberite Poveži se ponovo. Ako to ne pomogne, obratite nam se i priložite dijagnostičku evidenciju."
+    },
+    "group_resync_failed": "Najnovije stanje grupe nije učitano. Ponovo se povežite da biste nastavili. ({0})",
+    "group_revision_missing": "Veza s grupom se promenila. Ponovo se povežite da biste nastavili.",
+    "notice": {
+      "connected": "Povezano sa serverom.",
+      "reconnecting": "Ponovno povezivanje sa serverom."
+    },
+    "retry": {
+      "action": "Poveži se ponovo"
+    },
+    "server": {
+      "not_configured": "Nedostaju obavezna podešavanja veze sa serverom. Ponovo instalirajte aplikaciju."
+    },
+    "state": {
+      "connected": "Povezano",
+      "disconnected": "Nije povezano",
+      "reconnecting": "Povezivanje"
+    },
+    "unavailable": "Nije moguće povezati se sa serverom. Pokušajte ponovo uskoro."
+  },
+  "external_link": {
+    "open": {
+      "failed": "Stranica nije otvorena u podrazumevanom pregledaču."
+    }
+  },
+  "groups": {
+    "action": {
+      "join_by_code": "Pridruži se pomoću koda"
+    },
+    "collapse": "Skupi grupu",
+    "create": {
+      "action": "Napravi grupu",
+      "description": "Napravite grupu i podelite kôd pozivnice s prijateljima.",
+      "in_progress": "Pravljenje…",
+      "name": {
+        "placeholder": "Ime nove grupe"
+      },
+      "result_missing": "Pravljenje grupe nije moglo da se dovrši. Pokušajte ponovo.",
+      "success": {
+        "default": "Grupa je napravljena."
+      },
+      "tooltip": "Napravite grupu s ovim imenom."
+    },
+    "delete": {
+      "action": "Izbriši grupu",
+      "confirmation": {
+        "message": "Svi članovi će biti uklonjeni iz grupe, a poruke će biti izbrisane. Ovu radnju nije moguće opozvati.",
+        "title": "Želite li da izbrišete „{0}“?"
+      },
+      "final_confirmation": {
+        "message": "Grupa „{0}“ i sve njene poruke sada će biti trajno izbrisane.",
+        "title": "Želite li trajno da izbrišete ovu grupu?"
+      },
+      "success": "Grupa je izbrisana.",
+      "tooltip": "Trajno izbrišite ovu grupu."
+    },
+    "description": "Upravljajte grupama koje delite s prijateljima. Svakoj grupi može da se pridruži najviše 12 osoba.",
+    "empty": {
+      "description": "Napravite novu grupu ili unesite kôd pozivnice koji ste dobili od prijatelja.",
+      "title": "Još nemate grupe"
+    },
+    "error": {
+      "not_found": "Grupa nije pronađena."
+    },
+    "expand": "Razvij grupu",
+    "invite": {
+      "code": {
+        "label": "Kôd pozivnice",
+        "missing": "Na ovom uređaju nije sačuvan kôd pozivnice.",
+        "replaced": "Kôd pozivnice sačuvan na ovom uređaju je zamenjen. Zatražite novi kôd od vlasnika.",
+        "revoked": "Prethodni kôd pozivnice je opozvan. Vlasnik mora da izda novi kôd."
+      },
+      "copy": {
+        "action": "Kopiraj kôd pozivnice",
+        "complete": "Kopirano"
+      },
+      "rotate": {
+        "action": "Izdaj novi kôd pozivnice",
+        "code_missing": "Novi kôd pozivnice je prazan.",
+        "confirmation": {
+          "action": "Napravi novi kôd",
+          "message": "Postojeći kôd će odmah biti opozvan. Ovu radnju nije moguće opozvati.",
+          "title": "Želite li da napravite novi kôd pozivnice?"
+        },
+        "success": "Novi kôd pozivnice je napravljen i bezbedno sačuvan na ovom uređaju."
+      }
+    },
+    "join": {
+      "description": "Unesite kôd pozivnice koji ste dobili od prijatelja da biste se pridružili grupi.",
+      "failed": "Nije moguće pridružiti se grupi. Proverite kôd pozivnice i pokušajte ponovo. ({0})",
+      "in_progress": "Pridruživanje…",
+      "result_missing": "Grupa kojoj ste se pridružili nije učitana. Pokušajte ponovo.",
+      "room_id_missing": "Pridruživanje grupi nije moglo da se dovrši. Pokušajte ponovo.",
+      "success": {
+        "default": "Pridružili ste se grupi."
+      },
+      "tooltip": "Pridružite se grupi pomoću ovog koda pozivnice."
+    },
+    "leave": {
+      "action": "Napusti grupu",
+      "confirmation": {
+        "action": "Napusti",
+        "member_message": "Više nećete moći da pristupate ovoj grupi ni njenim nedavnim porukama.",
+        "owner_message": "Član koji je najduže u grupi postaće vlasnik. Ako ne ostane nijedan član, grupa će biti izbrisana.",
+        "title": "Želite li da napustite „{0}“?"
+      },
+      "success": "Napustili ste grupu.",
+      "tooltip": "Napustite ovu grupu."
+    },
+    "member": {
+      "remove": {
+        "action": "Ukloni",
+        "confirmation": {
+          "message": "Ovaj član više neće moći da pristupa grupi ni njenoj istoriji poruka.",
+          "title": "Želite li da uklonite „{0}“?"
+        },
+        "success": "Član je uklonjen.",
+        "tooltip": "Uklonite ovog člana iz grupe."
+      }
+    },
+    "navigation_label": "Grupe",
+    "operation": {
+      "busy": "Pokušajte ponovo kada se završi druga radnja s grupom."
+    },
+    "refresh": {
+      "failed": "Podaci o grupi nisu osveženi. Pokušajte ponovo kasnije. ({0})"
+    },
+    "rename": {
+      "action": "Preimenuj",
+      "name_placeholder": "Ime grupe, 1–20 znakova",
+      "success": "Grupa je preimenovana.",
+      "title": "Preimenuj grupu",
+      "tooltip": "Preimenujte grupu."
+    },
+    "room_name": {
+      "label": "Ime grupe"
+    },
+    "state": {
+      "active": "Aktivna"
+    },
+    "summary": {
+      "invite_ready": "{0}/12 članova · Kôd pozivnice {1}",
+      "invite_rotation_required": "{0}/12 članova · Potreban je novi kôd pozivnice"
+    },
+    "switch": {
+      "action": "Prebaci na grupu",
+      "in_progress": "Povezivanje…",
+      "success": "Aktivna grupa je promenjena.",
+      "tooltip": "Prikažite ovu grupu na ekranu."
+    },
+    "title": "Vaše grupe"
+  },
+  "history": {
+    "empty": {
+      "description": "Ovde će se prikazati nedavne poruke iz ove grupe.",
+      "title": "Još nema poruka."
+    },
+    "group": {
+      "none": "Nema aktivne grupe",
+      "required": "Pridružite se grupi da biste videli nedavne poruke."
+    },
+    "load": {
+      "initial_failed": "Istorija poruka nije učitana",
+      "retry": "Pokušaj ponovo"
+    },
+    "load_more": {
+      "failed": "Starije poruke nisu učitane",
+      "loading": "Učitavanje starijih poruka…"
+    },
+    "loading": "Učitavanje nedavnih poruka…",
+    "pagination": {
+      "exhausted": "Stigli ste do kraja poruka iz poslednja 3 dana"
+    },
+    "recent": {
+      "title": "Nedavne poruke"
+    },
+    "retention": {
+      "notice": "Poruke se automatski brišu posle 3 dana.",
+      "reload_failed": "Starije poruke nisu ponovo učitane. Pokušajte ponovo uskoro. ({0})"
+    },
+    "scroll": {
+      "latest": "Pređi na najnovije poruke"
+    },
+    "user": {
+      "unknown": "Nepoznat član"
+    },
+    "window": {
+      "always_on_top": {
+        "disable": "Isključi opciju Uvek na vrhu",
+        "disable_shortcut": "Isključi opciju Uvek na vrhu (Alt+strelica nadole)",
+        "enable": "Uvek na vrhu",
+        "enable_shortcut": "Uvek na vrhu (Alt+strelica nagore)"
+      },
+      "title": "Istorija SIDEY poruka"
+    }
+  },
+  "legal": {
+    "description": "Pregledajte uslove i smernice.",
+    "privacy": {
+      "action": "Pogledaj smernice za privatnost"
+    },
+    "refund": {
+      "action": "Pogledaj smernice za otkazivanje i povraćaj novca"
+    },
+    "terms": {
+      "action": "Pogledaj uslove"
+    },
+    "title": "Smernice"
+  },
+  "message": {
+    "delivery": {
+      "recheck_failed": "Nije moguće potvrditi da je poruka poslata. Proverite ponovo uskoro. ({0})"
+    },
+    "send": {
+      "accessibility": "Pošalji poruku",
+      "failed": "Nije moguće poslati poruku. Pokušajte ponovo. ({0})",
+      "rate_limited": "Prebrzo šaljete poruke."
+    }
+  },
+  "onboarding": {
+    "auth": {
+      "google": {
+        "cancel": "Otkaži prijavljivanje",
+        "continue": "Nastavi putem usluge Google",
+        "description": "Povežite Google nalog da biste nastavili. Postojeći profil, grupe i istorija ćaskanja biće sačuvani.",
+        "pending": "Dovršite prijavljivanje putem usluge Google u pregledaču."
+      },
+      "start": "Počni"
+    },
+    "character": {
+      "label": "Moj lik"
+    },
+    "complete": {
+      "description": "Grupu možete da napravite ili da joj se pridružite u bilo kom trenutku u Podešavanjima.",
+      "title": "Sve je spremno"
+    },
+    "connection": {
+      "connected": "Veza je uspostavljena",
+      "connecting": "Uspostavljanje veze…"
+    },
+    "group": {
+      "create": {
+        "description": "Napravite grupu."
+      },
+      "description": "Napravite grupu ili joj se pridružite pomoću koda pozivnice da biste oživeli svoj svet piksela.",
+      "invite_code": {
+        "label": "Kôd pozivnice",
+        "member_limit": "Svaka grupa može da ima najviše 12 osoba.",
+        "placeholder": "Kôd od prijatelja",
+        "required": "Unesite kôd pozivnice."
+      },
+      "join": {
+        "action": "Pridruži se"
+      },
+      "name": {
+        "placeholder": "npr. Naše mesto"
+      },
+      "path": {
+        "label": "Kako želite da počnete?"
+      },
+      "title": "Napravite grupu s prijateljima"
+    },
+    "launch": {
+      "action": "Pokreni"
+    },
+    "profile": {
+      "description": "Ovo možete da promenite u bilo kom trenutku u Podešavanjima.",
+      "title": "Izaberite svoje ime"
+    },
+    "step": {
+      "complete": "Gotovo",
+      "group": "Grupa",
+      "profile": "Profil"
+    },
+    "tagline": "Neka vam prijatelji uvek budu blizu."
+  },
+  "overlay": {
+    "current_user": "{0} · Ja"
+  },
+  "platform": {
+    "requirements": {
+      "description": "SIDEY zahteva Windows 10 1809 (verzija 17763) ili noviji za x64.",
+      "title": "Nepodržana verzija operativnog sistema Windows",
+      "window_title": "SIDEY — nepodržani Windows"
+    }
+  },
+  "profile": {
+    "applying": "Primena",
+    "character": {
+      "description": "Izaberite pikselizovanog lika koji će vas predstavljati na ekranima prijatelja.",
+      "label": "Lik",
+      "save": {
+        "success": "Lik je promenjen."
+      }
+    },
+    "cosmetics": {
+      "bubble": {
+        "default": "Podrazumevani oblačić za ćaskanje",
+        "description": "Izaberite oblačić koji posedujete. Koristiće se u svim vašim grupama.",
+        "title": "Oblačić za ćaskanje"
+      },
+      "equipped": "Koristi se",
+      "save": {
+        "success": "Vaš novi izgled je spreman."
+      },
+      "throwable": {
+        "default": "Podrazumevana mekana loptica",
+        "description": "Izaberite igračku koju posedujete. Koristiće se u svim vašim grupama.",
+        "title": "Igračka za bacanje"
+      }
+    },
+    "description": "Podesite ime i lik koje vide vaši prijatelji.",
+    "duplicates": {
+      "notice": "Možete da koristite isto ime ili lik kao prijatelj."
+    },
+    "nickname": {
+      "description": "Ime koje prijatelji vide na ekranu i u porukama · 2–8 znakova",
+      "label": "Nadimak",
+      "placeholder": "2–8 znakova",
+      "save": {
+        "action": "Promeni nadimak",
+        "tooltip": "Sačuvajte promenjeni nadimak."
+      }
+    },
+    "save": {
+      "success": "Profil je sačuvan."
+    },
+    "title": "Moj profil"
+  },
+  "settings": {
+    "display": {
+      "description": "Podesite kako se prikazuju status prijatelja i poruke.",
+      "offline_members": {
+        "description": "Prikažite prijatelje koji su van mreže kao uspavane likove s crvenom tačkom statusa.",
+        "title": "Prikaži članove van mreže",
+        "tooltip": "Uključi ili isključi članove van mreže"
+      },
+      "quiet_mode": {
+        "description": "Sakrijte oblačiće poruka i pokazatelje kucanja, ali zadržite broj nepročitanih poruka.",
+        "title": "Sakrivanje poruka",
+        "tooltip": "Sakrij ili prikaži poruke"
+      },
+      "throw_guard": {
+        "description": "Kada je opcija isključena, kliknite levim tasterom na prijatelja da biste bacili igračku. Kada je uključena, dvaput kliknite desnim tasterom miša na svoj lik, pa u narednih 10 sekundi kliknite levim tasterom na prijatelja da biste bacili igračku.",
+        "title": "Dvaput kliknite desnim tasterom za bacanje",
+        "tooltip": "Zahtevaj dvostruki klik desnim tasterom na svoj lik pre bacanja"
+      }
+    },
+    "general": {
+      "description": "Izaberite izgled aplikacije i kada se pokreće."
+    },
+    "language": {
+      "description": "Izaberite jezik aplikacije. Promene se primenjuju odmah.",
+      "title": "Jezik"
+    },
+    "navigation_label": "Podešavanja",
+    "overlay": {
+      "description": "Prikažite svet piksela svojih prijatelja duž izabrane ivice ekrana.",
+      "title": "Prikaži svet piksela",
+      "tooltip": "Uključi ili isključi svet piksela"
+    },
+    "placement": {
+      "description": "Izaberite gde će se likovi prikazivati.",
+      "edge": {
+        "bottom": "Dole",
+        "description": "Izaberite ivicu ekrana po kojoj će likovi hodati.",
+        "left": "Levo",
+        "right": "Desno",
+        "title": "Ivica",
+        "tooltip": "Ivica ekrana za svet piksela",
+        "top": "Gore"
+      },
+      "monitor": {
+        "description": "Izaberite ekran za svet piksela i polje za poruke.",
+        "title": "Monitor",
+        "tooltip": "Monitor za svet piksela i polje za poruke",
+        "unavailable": "Nema dostupnog ekrana."
+      },
+      "span": {
+        "description": "Izaberite koliko ivice ekrana likovi mogu da istraže.",
+        "full": "Cela ivica",
+        "title": "Oblast kretanja",
+        "tooltip": "Opseg ekrana koji zauzima svet piksela"
+      },
+      "title": "Položaj likova"
+    },
+    "save": {
+      "failed": "Podešavanja nisu sačuvana. Pokušajte ponovo. ({0})"
+    },
+    "section": {
+      "display": {
+        "title": "Prikaz"
+      },
+      "general": {
+        "title": "Opšte"
+      },
+      "sound": {
+        "title": "Zvuk"
+      }
+    },
+    "shortcuts": {
+      "action": {
+        "composer": "Otvori ili zatvori unos poruke",
+        "history": "Otvori ili zatvori nedavnu istoriju",
+        "overlay": "Uključi ili isključi preklop",
+        "quiet_mode": "Sakrij ili prikaži poruke"
+      },
+      "description": "Izaberite prečicu, pa pritisnite željenu kombinaciju tastera. Ako dodelite kombinaciju koja se već koristi, dve prečice će zameniti mesta.",
+      "error": {
+        "already_registered": "Ovu prečicu već koristi sistem ili druga aplikacija.",
+        "availability_unverified": "Nije moguće proveriti da li je ova prečica dostupna.",
+        "in_app_conflict": "Druga prečica aplikacije koristi ovu kombinaciju. Čuvanjem će dve prečice zameniti mesta.",
+        "invalid": "Nevažeća prečica",
+        "modifier_required": "Prečica mora da počne tasterom Win, Ctrl, Alt ili Shift.",
+        "system_conflict": "Ova prečica se već koristi kao sistemska prečica."
+      },
+      "recorder": {
+        "empty": "Pritisnite kombinaciju tastera da biste promenili ovu prečicu.",
+        "help": "Izaberite, pa pritisnite taster za izmenu i još jedan taster. Pritisnite Esc da biste otkazali.",
+        "recording": "Pritisnite prečicu…",
+        "reset": "Uspostavi početne vrednosti"
+      },
+      "title": "Tasterske prečice"
+    },
+    "sound": {
+      "character_effects": {
+        "description": "Reprodukujte zvučne efekte kada su likovi u trenutnoj grupi pogođeni.",
+        "title": "Zvučni efekti likova"
+      },
+      "description": "Podesite zvučne efekte likova.",
+      "mute": "Privremeno isključi zvuk",
+      "unmute": "Uključi zvuk",
+      "volume": "Jačina zvuka"
+    },
+    "startup": {
+      "description": "Aplikacija se automatski pokreće kada se prijavite.",
+      "title": "Pokreni pri prijavljivanju"
+    },
+    "storage": {
+      "folder_invalid": "Fascikla s podešavanjima nije otvorena. Ponovo pokrenite aplikaciju.",
+      "read_failed": "Sačuvana podešavanja nisu pročitana. Ponovo pokrenite aplikaciju."
+    },
+    "theme": {
+      "dark": "Tamna",
+      "description": "Izaberite svetlu, tamnu ili sistemsku temu aplikacije.",
+      "light": "Svetla",
+      "system": "Kao u sistemu Windows",
+      "system_colors": {
+        "action": "Otvori postavke boja"
+      },
+      "title": "Tema"
+    },
+    "update": {
+      "check": {
+        "action": "Proveri da li postoje ispravke"
+      },
+      "check_now": {
+        "tooltip": "Proverite da li postoji novija verzija."
+      },
+      "description": "Proverite da li postoji novija verzija.",
+      "last_checked": {
+        "never": "Poslednja provera: nikad",
+        "today": "Danas u {0}",
+        "value": "Poslednja provera: {0}",
+        "yesterday": "Juče u {0}"
+      },
+      "release_notes": {
+        "action": "Detalji ispravke"
+      },
+      "title": "Ispravke"
+    },
+    "window": {
+      "title": "SIDEY podešavanja"
+    }
+  },
+  "store": {
+    "auth": {
+      "google": {
+        "failed": "Povezivanje Google naloga nije pokrenuto."
+      }
+    },
+    "availability": {
+      "coming_soon": {
+        "description": "Prodavnica trenutno nudi samo preglede. Kupovina još nije dostupna.",
+        "title": "Još nije dostupno za kupovinu"
+      }
+    },
+    "catalog": {
+      "bubble_bunny_pink": {
+        "description": "Ružičasti oblačić poruke sa ukrasom u obliku zeca.",
+        "name": "Ružičasti oblačić sa zecom"
+      },
+      "bubble_butter_chick": {
+        "description": "Oblačić poruke žut kao maslac, sa ukrasom u obliku pileta.",
+        "name": "Žuti oblačić s piletićem"
+      },
+      "bubble_starry_cat": {
+        "description": "Tamnoljubičasti oblačić poruke sa ukrasom zvezdane mačke.",
+        "name": "Zvezdani mačji oblačić"
+      },
+      "character_chinchilla": {
+        "description": "Posle kupanja u pesku došla je da se igra. Pre pozdrava mora da se pohvali mekanim krznom."
+      },
+      "character_duck": {
+        "description": "Stručnjak za izbegavanje odgovornosti. Pačje noge su dokaz."
+      },
+      "character_guinea_pig": {
+        "description": "Zaboravilo je gde je sakrilo užinu. Sudeći po punim obrazima, ne može biti daleko."
+      },
+      "character_monkey": {
+        "description": "Došao je da podeli bananu. Kaže da je usput zagrizao samo jednom… pa zašto onda nedostaje pola?"
+      },
+      "character_otter": {
+        "description": "Došla je da pokaže omiljenu školjku. Možete da gledate, ali ako je uzmete, naljutiće se."
+      },
+      "character_pig": {
+        "description": "Pratilo je miris užine i odlučilo da ostane. Sada misli da je ovo njegov dom."
+      },
+      "character_poop": {
+        "description": "Ne znamo ko ju je zvao, ali evo je."
+      },
+      "character_quokka": {
+        "description": "Uvek se smeši. Da, upravo je ona bacila taj list."
+      },
+      "character_shiba": {
+        "description": "Već smo bili u šetnji. Šiba odbija da prihvati tu činjenicu."
+      },
+      "character_starlight_upalupa": {
+        "description": "Doneo je kući izgubljenu zvezdicu. Čvrsto je grli čak i dok spava."
+      },
+      "character_tree": {
+        "description": "Malo drvo je krenulo u šetnju. Kada smo mu rekli da se odmori, počelo je da bira gde će pustiti korenje."
+      },
+      "character_tteokbokki": {
+        "description": "Rekli su da nije mnogo ljuto. Nisu rekli prema čijem ukusu."
+      },
+      "throwable_banana": {
+        "description": "Majmun je podelio ovu bananu. Još nismo stigli da pitamo da li je to uradio namerno.",
+        "name": "Majmunova banana"
+      },
+      "throwable_baseball": {
+        "description": "Loptica s crvenim šavovima koja se pri udaru spljošti i odskoči.",
+        "name": "Loptica za bejzbol"
+      },
+      "throwable_bouncy_heart": {
+        "description": "Srce koje poskakuje dok leti.",
+        "name": "Skakutavo srce"
+      },
+      "throwable_clam": {
+        "description": "Školjka koju je vidra svuda nosila. Unutra nema bisera, samo malo emotivne vezanosti.",
+        "name": "Vidrina školjka"
+      },
+      "throwable_dujjonku": {
+        "description": "Kakao omotač i zeleni fil spljošte se uz prijatno krckanje.",
+        "name": "Mekani Dubai čokoladni keks"
+      },
+      "throwable_dust_bath_pouch": {
+        "description": "Ovo je pesak za kupanje činčile. Ako ga baci, verovatno ne nagoveštava da treba da se okupate.",
+        "name": "Vrećica peska činčile"
+      },
+      "throwable_fish_cake_skewer": {
+        "description": "To je bilo za jelo. Zašto mašete njime?",
+        "name": "Ražnjić s korejskim eomukom"
+      },
+      "throwable_leaf": {
+        "description": "To je spakovana užina kvoke. Nismo pitali da li sme da se baca.",
+        "name": "List"
+      },
+      "throwable_mini_paprika": {
+        "description": "Pažljivo sačuvana užina. Ako je podignete u roku od tri sekunde posle bacanja, u redu je, zar ne?",
+        "name": "Mini-paprika morskog praseta"
+      },
+      "throwable_pork": {
+        "description": "Baš sočan pljas! Uzgred, da li je neko skoro video prase iz komšiluka?",
+        "name": "Svinjetina malog praseta"
+      },
+      "throwable_snowflake": {
+        "description": "Pahulja koja se pri udaru rasprši u sitne kristale.",
+        "name": "Pahulja"
+      },
+      "throwable_squeaky_duck": {
+        "description": "Patka baca patku. Verovatno nije porodična svađa.",
+        "name": "Piskava patkica"
+      },
+      "throwable_starlight_orb": {
+        "description": "Zvezdana svetlost sabijena u malu kuglu. Da li je neko proverio nedostaje li jedna zvezda na nebu?",
+        "name": "Zvezdana kugla aksolotla"
+      },
+      "throwable_tennis_ball": {
+        "description": "Izabrali smo ko će da baca. Još tražimo nekoga ko će da donese lopticu.",
+        "name": "Teniska loptica"
+      },
+      "throwable_timber": {
+        "description": "Drvo baca malo drvo. Možda prvo treba da proverimo porodično stablo.",
+        "name": "Drvcetovo drvce"
+      },
+      "throwable_tissue_ball": {
+        "description": "Niko ne zna da li je to korišćeni toalet-papir. Samo se sagnite!",
+        "name": "Kuglica od papira"
+      },
+      "throwable_toy_cannon": {
+        "description": "Mali top koji ispaljuje kuglu sa zapaljenim fitiljem.",
+        "name": "Mini-top"
+      },
+      "throwable_wakkuball": {
+        "description": "Krc! Uživajte u reskom zvuku dok se Vaku lopta raspada na komadiće.",
+        "name": "Vaku lopta"
+      }
+    },
+    "checkout": {
+      "opening": "Otvaranje plaćanja…"
+    },
+    "description": "Pogledajte likove, oblačiće za ćaskanje i igračke u pokretu.",
+    "empty": {
+      "description": "Probajte drugu pretragu ili promenite filtere.",
+      "title": "Nema rezultata"
+    },
+    "filter": {
+      "hide_owned": "Sakrij ono što imate",
+      "menu": "Sortiranje i filteri",
+      "reset": "Uspostavi početne vrednosti za sve",
+      "search": {
+        "label": "Pretraži",
+        "placeholder": "Pretražite imena ili opise"
+      }
+    },
+    "kind": {
+      "bubble": "Oblačići za ćaskanje",
+      "character": "Likovi",
+      "keepsake": "Omiljena stvar",
+      "throwable": "Igračke za bacanje"
+    },
+    "navigation_label": "Prilagodi i kupi",
+    "preview": {
+      "member": {
+        "dubu": "Tofu",
+        "moka": "Moka"
+      },
+      "message": {
+        "left": "Šta ćemo za večeru?",
+        "right": "Možda picu?"
+      },
+      "open": "Otvori pregled",
+      "sound": {
+        "off": "Privremeno isključi zvuk pregleda",
+        "on": "Uključi zvuk pregleda"
+      },
+      "tree_movement_hint": "Kliknite desnim tasterom na drvo da biste ga zaustavili. Kliknite ponovo desnim tasterom da biste ga pustili da hoda.",
+      "unavailable": "Pregled nije učitan."
+    },
+    "price": {
+      "krw": "₩{0:N0}"
+    },
+    "product": {
+      "sold_separately": "Prodaje se odvojeno od lika"
+    },
+    "purchase": {
+      "action": "Kupi za {0}",
+      "confirming": "Potvrđivanje plaćanja…",
+      "failed": "Kupovina nije potvrđena. Proverite ponovo za nekoliko trenutaka.",
+      "owned": "Imate",
+      "success": "Kupovina je završena.",
+      "timeout": "Vreme za potvrdu plaćanja je isteklo. Ponovo otvorite prodavnicu da biste proverili status.",
+      "unavailable": "Kupovina trenutno nije dostupna. Pokušajte ponovo uskoro."
+    },
+    "sort": {
+      "catalog": "Podrazumevano",
+      "label": "Sortiraj",
+      "price_ascending": "Prvo najjeftinije",
+      "price_descending": "Prvo najskuplje"
+    },
+    "status": {
+      "retry": "Pokušaj ponovo",
+      "unavailable": "Prodavnica nije učitana. Pokušajte ponovo za nekoliko trenutaka."
+    },
+    "title": "Prilagodi i kupi"
+  },
+  "support": {
+    "diagnostics": {
+      "description": "Datoteke evidencije biće komprimovane i sačuvane na radnoj površini. Ako ih podelite s nama, možete nam pomoći da otklonimo greške.",
+      "export": {
+        "action": "Izvezi",
+        "failed": "Dijagnostički podaci nisu izvezeni.",
+        "success": "Dijagnostički podaci su sačuvani na radnoj površini."
+      },
+      "title": "Izvezi dijagnostičke podatke"
+    },
+    "feedback": {
+      "action": "Pošalji povratne informacije",
+      "description": "Ako nešto ne radi ili vam je potrebna pomoć, otvorite problem na lokaciji GitHub.",
+      "title": "Povratne informacije"
+    }
+  },
+  "tray": {
+    "app": {
+      "exit": "Izađi"
+    },
+    "connection": {
+      "error": {
+        "message": "U odeljku Veza sa serverom izaberite Poveži se ponovo. Ako veza i dalje ne može da se uspostavi, obratite nam se i priložite dijagnostičku evidenciju.",
+        "title": "Greška veze aplikacije SIDEY sa serverom"
+      }
+    },
+    "group": {
+      "active": "Aktivna grupa"
+    },
+    "groups": {
+      "empty": "Nema povezanih grupa",
+      "open": "Podešavanja grupe…"
+    },
+    "history": {
+      "open": "Nedavna istorija…"
+    },
+    "message": {
+      "compose": "Napiši poruku…"
+    },
+    "overlay": {
+      "hide": "Sakrij preklop"
+    },
+    "quiet_mode": {
+      "toggle": "Sakrivanje poruka"
+    },
+    "settings": {
+      "open": "Podešavanja…"
+    },
+    "shortcuts": {
+      "registration_failed": "Ove prečice nisu dostupne: {0}. Možda ih koristi druga aplikacija. Umesto njih koristite meni na sistemskoj traci poslova."
+    },
+    "start": {
+      "failed": "Ikona na sistemskoj traci poslova nije mogla da se pokrene. Zatvaranjem prozora zatvorićete SIDEY."
+    },
+    "store": {
+      "open": "Prodavnica…"
+    },
+    "unread": {
+      "tooltip": "SIDEY · Nepročitane poruke: {0}"
+    },
+    "update": {
+      "available": "Dostupna je ispravka. {0}",
+      "check": "Proveri da li postoje ispravke…",
+      "check_failed": "Nije moguće proveriti da li postoje ispravke. Pokušajte ponovo uskoro.",
+      "installed": "SIDEY je ažuriran na verziju {0}. Kliknite da biste videli promene.",
+      "latest": "Koristite najnoviju verziju."
+    }
+  },
+  "update": {
+    "available": "Dostupan je SIDEY {0}.",
+    "checking": "Provera da li postoje ispravke…",
+    "download": {
+      "hash_mismatch": "Datoteka ispravke nije potvrđena. Preuzmite je ponovo.",
+      "in_progress": "Preuzimanje ispravke…",
+      "progress": "Preuzimanje ispravke… ({0}%)"
+    },
+    "failed": "Ispravka nije mogla da se dovrši. Pokušajte ponovo uskoro.",
+    "install": {
+      "cancelled": "Instaliranje ispravke je otkazano.",
+      "invalid": "Detalji instaliranja ispravke nisu potvrđeni. Pokušajte ponovo kasnije.",
+      "launch_failed": "Instalacioni program nije otvoren. Izaberite Proveri da li postoje ispravke da biste pokušali ponovo.",
+      "launched": "Preuzimanje je završeno. Instalacioni program je otvoren.",
+      "missing": "Ispravku trenutno nije moguće instalirati. Pokušajte ponovo kasnije."
+    },
+    "latest": "Koristite najnoviju verziju.",
+    "metadata": {
+      "invalid": "Informacije o ispravci nisu potvrđene. Pokušajte ponovo kasnije."
+    },
+    "not_published": "Nova ispravka još nije dostupna. Proverite ponovo kasnije.",
+    "prompt": {
+      "download": "Preuzmi",
+      "later": "Kasnije",
+      "message": "Želite li da preuzmete SIDEY {0}?",
+      "title": "Dostupna je ispravka"
+    },
+    "release_notes": {
+      "open_failed": "Detalji ispravke nisu otvoreni. Pokušajte ponovo. ({0})"
+    }
+  },
+  "validation": {
+    "message": {
+      "length": "Unesite poruku dužine 1–200 znakova."
+    },
+    "nickname": {
+      "length": "Unesite nadimak dužine 2–8 znakova."
+    },
+    "room_name": {
+      "length": "Unesite ime grupe dužine 1–20 znakova."
+    }
+  }
+}

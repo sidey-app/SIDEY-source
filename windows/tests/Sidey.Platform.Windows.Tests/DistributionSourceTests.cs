@@ -42,6 +42,12 @@ public sealed class DistributionSourceTests
         Assert.Equal("SIDEY", Value(project, "AssemblyTitle"));
         Assert.Equal("SIDEY", Value(project, "Product"));
 
+        XElement internalLanguages = project.Descendants("None").Single(element =>
+            (string?)element.Attribute("Update") == "InternalLangs\\*.json");
+        Assert.Equal("'$(Configuration)' == 'Debug'", (string?)internalLanguages.Attribute("Condition"));
+        Assert.Equal("PreserveNewest", internalLanguages.Element("CopyToOutputDirectory")?.Value);
+        Assert.Equal("PreserveNewest", internalLanguages.Element("CopyToPublishDirectory")?.Value);
+
         Assert.Empty(project.Descendants("ExcludeFromSingleFile"));
         Assert.DoesNotContain(
             project.Descendants("Target"),
@@ -226,6 +232,25 @@ public sealed class DistributionSourceTests
         Assert.Contains("InstallerLanguages.AppLanguage", launcher, StringComparison.Ordinal);
         Assert.Contains("start.EnvironmentVariables[LanguageEnvironmentVariable] = language", launcher, StringComparison.Ordinal);
         Assert.Contains("InstallerLanguages.cs", organizer, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PublicLauncherReadsNestedStartupMessagesFromEveryCatalog()
+    {
+        string languageDirectory = RepositoryPath("windows", "src", "Sidey.App", "Langs");
+        string[] catalogs = Directory.GetFiles(languageDirectory, "*.json");
+        Assert.NotEmpty(catalogs);
+
+        foreach (string path in catalogs)
+        {
+            string json = File.ReadAllText(path);
+            using var document = JsonDocument.Parse(json);
+            JsonElement startup = document.RootElement.GetProperty("app").GetProperty("startup");
+
+            AssertLocalizedValue(json, "app.startup.runtime_missing", startup.GetProperty("runtime_missing"));
+            AssertLocalizedValue(json, "app.startup.error.title", startup.GetProperty("error").GetProperty("title"));
+            AssertLocalizedValue(json, "app.startup.failed", startup.GetProperty("failed"));
+        }
     }
 
     [Fact]
@@ -453,6 +478,12 @@ public sealed class DistributionSourceTests
     }
 
     private static string ReadSetupScript() => File.ReadAllText(AssetPath("Sidey.Setup.nsi"));
+
+    private static void AssertLocalizedValue(string json, string key, JsonElement expected)
+    {
+        Assert.True(LauncherLocalization.TryGet(json, key, out string? actual), key);
+        Assert.Equal(expected.GetString(), actual);
+    }
 
     [Fact]
     public void SelfContainedPayloadIsStagedBeforeReplacingTheExistingApp()

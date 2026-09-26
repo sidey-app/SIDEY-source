@@ -1,0 +1,31 @@
+{
+  "configuration": {
+    "backend": {
+      "override_invalid": "De Supabase-override moet een HTTPS-URL (of localhost via HTTP) en een publiceerbare sleutel bevatten. Geheime sleutels en service-role-sleutels zijn niet toegestaan."
+    }
+  },
+  "development": {
+    "local_preview": {
+      "notice": "De lokale voorvertoning met 12 personages wordt uitgevoerd omdat de omgevingsvariabelen voor de server ontbreken."
+    }
+  },
+  "renderer_metrics": {
+    "error": {
+      "not_running": "De metriekrenderer wordt niet uitgevoerd.",
+      "not_started": "De metriekrenderer is niet gestart."
+    },
+    "export": {
+      "action": "Huidige metriekgegevens als JSON exporteren",
+      "failed": "Exporteren van metriekgegevens is mislukt: {0}",
+      "path": "Exportpad: {0}",
+      "success": "Huidige metriekgegevens zijn als JSON geëxporteerd. Handmatige resultaten blijven not_run.",
+      "tooltip": "Huidige prestatiemetriek van de renderer als JSON opslaan."
+    },
+    "preview_notice": "Interne metriekmodus met alleen de hamster. Handmatige verificatie is niet vastgelegd.",
+    "samples": {
+      "empty": "Geen metriekvoorbeelden"
+    },
+    "summary": "Verstreken {0:F0} s · {1} voorbeelden · maximale frametijd {2:F2} ms · werkset {3:F1} MB (piek {4:F1} MB) · GDI {5} · USER {6}",
+    "title": "Interne renderermetriek"
+  }
+}
