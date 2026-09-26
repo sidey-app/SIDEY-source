@@ -105,7 +105,7 @@ public sealed class MainWindowViewModelTests
         await model.ExportDiagnosticDataCommand.ExecuteAsync(null);
 
         Assert.Equal(NoticeKind.Error, notice?.Kind);
-        Assert.Equal("진단 데이터를 내보내지 못했습니다.", notice?.Message);
+        Assert.Equal("진단 데이터를 내보내지 못했습니다. 다시 시도해 주세요.", notice?.Message);
         Assert.True(model.ExportDiagnosticDataCommand.CanExecute(null));
     }
     [Fact]
@@ -717,7 +717,7 @@ public sealed class MainWindowViewModelTests
             Assert.Same(product, viewModel.StoreProducts[0]);
             Assert.Equal(serverPrice, product.AmountKrw);
             Assert.Equal(koreanPrice, product.FormattedPrice);
-            Assert.Equal($"{koreanPrice} 구매", product.ActionText);
+            Assert.Equal($"{koreanPrice}에 구매", product.ActionText);
             Assert.Equal(product.ActionText, product.DetailStatusText);
             Assert.Contains(nameof(StoreProductPreviewViewModel.FormattedPrice), changes);
             Assert.Contains(nameof(StoreProductPreviewViewModel.DetailStatusText), changes);
@@ -736,7 +736,7 @@ public sealed class MainWindowViewModelTests
 
             Assert.Equal(serverPrice, product.AmountKrw);
             Assert.Equal(koreanPrice, product.FormattedPrice);
-            Assert.Equal($"{koreanPrice} 구매", product.DetailStatusText);
+            Assert.Equal($"{koreanPrice}에 구매", product.DetailStatusText);
         }
         finally
         {
@@ -927,7 +927,7 @@ public sealed class MainWindowViewModelTests
 
         Assert.Same(firstCard, Assert.Single(viewModel.Rooms));
         Assert.True(viewModel.IsConnected);
-        Assert.Equal("서버와 연결됨", viewModel.ConnectionText);
+        Assert.Equal("연결됨", viewModel.ConnectionText);
     }
 
     [Fact]
@@ -998,7 +998,7 @@ public sealed class MainWindowViewModelTests
             new FakeUpdateService());
 
         Assert.False(viewModel.IsConnected);
-        Assert.Equal("서버와 연결 안 됨", viewModel.ConnectionText);
+        Assert.Equal("연결되지 않음", viewModel.ConnectionText);
     }
 
     [Fact]
@@ -1893,7 +1893,7 @@ public sealed class MainWindowViewModelTests
         RoomCardViewModel target = viewModel.Rooms.Single(room => room.Room.Id == targetRoomId);
         RoomCardViewModel active = viewModel.Rooms.Single(room => room.Room.Id == state.ActiveRoomId);
         Assert.True(target.IsSwitching);
-        Assert.Equal("연결 중…", target.JoinActionText);
+        Assert.Equal("그룹 전환 중…", target.JoinActionText);
         Assert.False(target.IsJoinEnabled);
         Assert.False(active.IsSwitching);
         Assert.False(viewModel.AreGroupMutationsEnabled);
@@ -1904,9 +1904,9 @@ public sealed class MainWindowViewModelTests
     }
 
     [Theory]
-    [InlineData(GroupOperation.Creating, "만드는 중…", "코드로 참여")]
+    [InlineData(GroupOperation.Creating, "만드는 중…", "초대 코드로 참여")]
     [InlineData(GroupOperation.Joining, "그룹 만들기", "참여 중…")]
-    [InlineData(GroupOperation.Mutating, "그룹 만들기", "코드로 참여")]
+    [InlineData(GroupOperation.Mutating, "그룹 만들기", "초대 코드로 참여")]
     public void CreateAndJoinOperationsExposeProgressCopy(
         GroupOperation operation,
         string createText,
